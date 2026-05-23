@@ -144,10 +144,10 @@ namespace Atdl4net.Model.Types.Support
         /// <param name="obj">An object to compare with this instance.</param>
         /// <returns>A value that indicates the relative order of the objects being compared. The return value has these meanings:
         /// <list type="bullet">
-        /// <item><description>Less than zero - this instance precedes obj in the sort order.</description></item></list>
-        /// <item><description></description>Zero - this instance occurs in the same position in the sort order as obj.</item></list>
-        /// <item><description>Greater than zero - this instance follows obj in the sort order.</description></item></list>
-        /// </returns>
+        /// <item><description>Less than zero - this instance precedes obj in the sort order.</description></item>
+        /// <item><description>Zero - this instance occurs in the same position in the sort order as obj.</description></item>
+        /// <item><description>Greater than zero - this instance follows obj in the sort order.</description></item>
+        /// </list></returns>
         public int CompareTo(object obj)
         {
             // Null references are by definition less than the current instance.

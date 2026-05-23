@@ -42,14 +42,14 @@ namespace Atdl4net.Model.Controls.Support
         /// Loads the initial value for this control based on the InitPolicy, InitFixField and InitValue attributes.
         /// </summary>
         /// <param name="controlInitValueProvider">Value provider for initializing control values from InitFixField.</param>
-        /// <remarks>The spec states: 'If the value of the initPolicy attribute is undefined or equal to "UseValue" and the initValue attribute is 
-        /// defined then initialize with initValue.  If the value is equal to "UseFixField" then attempt to initialize with the value of 
-        /// the tag specified in the initFixField attribute. If the value is equal to "UseFixField" and it is not possible to access the 
+        /// <remarks>The spec states: 'If the value of the initPolicy attribute is undefined or equal to "UseValue" and the initValue attribute is
+        /// defined then initialize with initValue. If the value is equal to "UseFixField" then attempt to initialize with the value of
+        /// the tag specified in the initFixField attribute. If the value is equal to "UseFixField" and it is not possible to access the
         /// value of the specified fix tag then revert to using initValue. If the value is equal to "UseFixField", the field is not accessible,
-        /// and initValue is not defined, then do not initialize.<br/br>
-        /// Note that it is possible to initialize an enumerated control (e.g., DropDownList_t) from a FIX_ value.  In this case, it must
-        /// be possible to retrieve a valid EnumID for the supplied FIX wire value.  The target parameter is used to translate the wire value
-        /// into </remarks>
+        /// and initValue is not defined, then do not initialize.<br/>
+        /// Note that it is possible to initialize an enumerated control (e.g., DropDownList_t) from a FIX_ value. In this case, it must
+        /// be possible to retrieve a valid EnumID for the supplied FIX wire value. The target parameter is used to translate the wire value
+        /// into an EnumID.</remarks>
         public override void LoadInitValue(FixFieldValueProvider controlInitValueProvider)
         {
             // If UseFixField, then attempt to initialize with FIX field...

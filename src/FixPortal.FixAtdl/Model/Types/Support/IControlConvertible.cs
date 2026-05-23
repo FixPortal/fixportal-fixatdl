@@ -16,7 +16,7 @@ namespace Atdl4net.Model.Types.Support
     /// <see cref="Control_t"/> instances.
     /// </summary>
     /// <remarks>If the parameter's value cannot be converted to the target type, then an <see cref="InvalidCastException"/>
-    /// is thrown.<br/br/>
+    /// is thrown.<br/>
     /// (Atdl4net doesn't use <see cref="System.IConvertible"/> as that does not support the conversion to
     /// and from Nullable types.)</remarks>
     public interface IControlConvertible
