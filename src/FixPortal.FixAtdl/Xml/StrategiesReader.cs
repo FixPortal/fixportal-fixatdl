@@ -7,7 +7,6 @@
 using Atdl4net.Diagnostics;
 using Atdl4net.Diagnostics.Exceptions;
 using Atdl4net.Model.Elements;
-using Atdl4net.Notification;
 using Atdl4net.Resources;
 using Atdl4net.Xml.Serialization;
 using System.IO;
@@ -21,7 +20,11 @@ using System.Xml;
 
 namespace Atdl4net.Xml
 {
-    public class StrategiesReader: INotifyStrategyLoaded
+    /// <summary>
+    /// Reads and deserializes ATDL strategy definitions from an XML document or stream.
+    /// Raises <see cref="StrategyLoaded"/> for each strategy as it is deserialized.
+    /// </summary>
+    public class StrategiesReader
     {
         // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
         private readonly ILogger _log = NullLogger.Instance;
@@ -84,16 +87,9 @@ namespace Atdl4net.Xml
             NotifyStrategyLoaded(0,0,(args.ExtraInfo as Strategy_t).Name);
         }
 
-        #region INotifyStrategyLoad Members and Support Methods
-
         private void NotifyStrategyLoaded(int index, int total, string strategyName)
         {
-            System.EventHandler<StrategyLoadedEventArgs> strategyLoaded = StrategyLoaded;
-
-            if (strategyLoaded != null)
-                strategyLoaded(this, new StrategyLoadedEventArgs(index, total, strategyName));
+            StrategyLoaded?.Invoke(this, new StrategyLoadedEventArgs(index, total, strategyName));
         }
-
-        #endregion
     }
 }

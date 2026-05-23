@@ -10,7 +10,6 @@ using Atdl4net.Model.Collections;
 using Atdl4net.Model.Elements;
 using Atdl4net.Model.Elements.Support;
 using Atdl4net.Model.Types;
-using Atdl4net.Wpf.ViewModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 

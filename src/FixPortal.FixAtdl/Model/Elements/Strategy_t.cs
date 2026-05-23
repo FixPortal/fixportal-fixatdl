@@ -10,7 +10,6 @@ using Atdl4net.Fix;
 using Atdl4net.Model.Collections;
 using Atdl4net.Utility;
 using Atdl4net.Validation;
-using Atdl4net.Wpf.ViewModel;
 
 namespace Atdl4net.Model.Elements
 {

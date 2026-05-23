@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Atdl4net.Fix;
-using Atdl4net.Wpf.ViewModel;
+using Atdl4net.Model.Elements;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -26,7 +26,7 @@ namespace Atdl4net.Validation
         private ValidationResult _controlValidationResult;
         private ValidationResult _parameterValidationResult;
         private readonly string _controlId;
-        private readonly List<StrategyEditViewModel> _strategyEdits = new List<StrategyEditViewModel>();
+        private readonly List<StrategyEdit_t> _strategyEdits = new List<StrategyEdit_t>();
 
         /// <summary>
         /// Initializes a new <see cref="ControlValidationState"/>.
@@ -50,7 +50,7 @@ namespace Atdl4net.Validation
 
                 state &= (_parameterValidationResult == null || _parameterValidationResult.IsValid);
 
-                foreach (StrategyEditViewModel strategyEdit in _strategyEdits)
+                foreach (StrategyEdit_t strategyEdit in _strategyEdits)
                     state &= strategyEdit.CurrentState;
 
                 return state;
@@ -72,19 +72,19 @@ namespace Atdl4net.Validation
         public ValidationResult ParameterValidationResult { set { _parameterValidationResult = value; } }
 
         /// <summary>
-        /// Adds the supplied StrategyEditViewModel to this <see cref="ControlValidationState"/>.
+        /// Adds the supplied StrategyEdit_t to this <see cref="ControlValidationState"/>.
         /// </summary>
-        /// <param name="strategyEdit"><see cref="StrategyEditViewModel"/> to add to this <see cref="ControlValidationState"/>.</param>
-        public void Add(StrategyEditViewModel strategyEdit)
+        /// <param name="strategyEdit"><see cref="StrategyEdit_t"/> to add to this <see cref="ControlValidationState"/>.</param>
+        public void Add(StrategyEdit_t strategyEdit)
         {
             _strategyEdits.Add(strategyEdit);
         }
 
         /// <summary>
-        /// Removes the supplied StrategyEditViewModel from this <see cref="ControlValidationState"/>.
+        /// Removes the supplied StrategyEdit_t from this <see cref="ControlValidationState"/>.
         /// </summary>
-        /// <param name="strategyEdit"><see cref="StrategyEditViewModel"/> to remove from this <see cref="ControlValidationState"/>.</param>
-        public void Remove(StrategyEditViewModel strategyEdit)
+        /// <param name="strategyEdit"><see cref="StrategyEdit_t"/> to remove from this <see cref="ControlValidationState"/>.</param>
+        public void Remove(StrategyEdit_t strategyEdit)
         {
             _strategyEdits.Remove(strategyEdit);
         }
@@ -105,8 +105,11 @@ namespace Atdl4net.Validation
             // indeterminate state from this value change.
             state &= (_parameterValidationResult == null || _parameterValidationResult.IsValid);
 
-            foreach (StrategyEditViewModel strategyEdit in _strategyEdits)
-                state &= strategyEdit.Evaluate(additionalValues);
+            foreach (StrategyEdit_t strategyEdit in _strategyEdits)
+            {
+                strategyEdit.Evaluate(additionalValues);
+                state &= strategyEdit.CurrentState;
+            }
 
             _log.LogDebug("Evaluated ValidationState for control {ControlId}, CurrentState = {CurrentState}", _controlId, state.ToString().ToLower());
         }
@@ -120,7 +123,7 @@ namespace Atdl4net.Validation
             {
                 StringBuilder sb = new StringBuilder();
 
-                IEnumerable<StrategyEditViewModel> strategyEditsInError = from s in _strategyEdits where !s.CurrentState select s;
+                IEnumerable<StrategyEdit_t> strategyEditsInError = from s in _strategyEdits where !s.CurrentState select s;
 
                 int count = strategyEditsInError.Count();
                 bool parameterIsInvalid = _parameterValidationResult != null && !_parameterValidationResult.IsValid;
@@ -141,7 +144,7 @@ namespace Atdl4net.Validation
                         sb.AppendLine();
                 }
 
-                foreach (StrategyEditViewModel strategyEdit in (from s in _strategyEdits where !s.CurrentState select s))
+                foreach (StrategyEdit_t strategyEdit in (from s in _strategyEdits where !s.CurrentState select s))
                 {
                     sb.Append(strategyEdit.ErrorMessage);
 
