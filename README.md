@@ -43,5 +43,3 @@ Thanks to the following people who helped make Atdl4net happen:
 Atdl4net was originally dual-licensed by its creator but commercial licensing was subsequently abandoned.  The software is now licensed under the MIT License.
 
 FIX Protocol and FIXatdl are trademarks or service marks of FIX Protocol Limited
-
-Looking for a Java implementation of FIXatdl? Check out [atdl4j](https://github.com/atdl4j/atdl4j)
