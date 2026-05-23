@@ -3,16 +3,17 @@
             xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
             xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
             xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Strategy name="POV" wireValue="POV" uiRep="POV" providerID="DEMO">
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            strategyIdentifierTag="5001">
+  <Strategy name="POV" version="1" wireValue="POV" uiRep="POV" providerID="DEMO">
     <Parameter name="TargetPercentage" xsi:type="Percentage_t" fixTag="7700" use="optional"/>
     <Parameter name="Aggression" xsi:type="String_t" fixTag="7702" use="optional">
       <EnumPair enumID="PASSIVE" wireValue="PASSIVE"/>
       <EnumPair enumID="NEUTRAL" wireValue="NEUTRAL"/>
       <EnumPair enumID="AGGRESSIVE" wireValue="AGGRESSIVE"/>
     </Parameter>
-    <StrategyLayout>
-      <lay:StrategyPanel title="POV Parameters" orientation="VERTICAL" collapsible="false" border="LINE">
+    <lay:StrategyLayout>
+      <lay:StrategyPanel title="POV Parameters" orientation="VERTICAL" collapsible="false" border="Line">
         <lay:Control ID="c_TargetPercentage" xsi:type="lay:TextField_t" parameterRef="TargetPercentage" label="Target %">
           <flow:StateRule enabled="false">
             <val:Edit field="c_Aggression" operator="EQ" value="PASSIVE"/>
@@ -24,6 +25,6 @@
           <lay:ListItem uiRep="Aggressive"  enumID="AGGRESSIVE"/>
         </lay:Control>
       </lay:StrategyPanel>
-    </StrategyLayout>
+    </lay:StrategyLayout>
   </Strategy>
 </Strategies>

@@ -3,17 +3,18 @@
             xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
             xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
             xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Strategy name="TWAP" wireValue="TWAP" uiRep="TWAP" providerID="DEMO">
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            strategyIdentifierTag="5001">
+  <Strategy name="TWAP" version="1" wireValue="TWAP" uiRep="TWAP" providerID="DEMO">
     <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="168" use="required"/>
     <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="126" use="required"/>
     <Parameter name="Participation" xsi:type="Percentage_t" fixTag="7700" use="optional"/>
-    <StrategyLayout>
-      <lay:StrategyPanel title="TWAP Parameters" orientation="VERTICAL" collapsible="false" border="LINE">
+    <lay:StrategyLayout>
+      <lay:StrategyPanel title="TWAP Parameters" orientation="VERTICAL" collapsible="false" border="Line">
         <lay:Control ID="c_StartTime" xsi:type="lay:Clock_t" parameterRef="StartTime" label="Start"/>
         <lay:Control ID="c_EndTime"   xsi:type="lay:Clock_t" parameterRef="EndTime"   label="End"/>
         <lay:Control ID="c_Part"      xsi:type="lay:TextField_t" parameterRef="Participation" label="Participation %"/>
       </lay:StrategyPanel>
-    </StrategyLayout>
+    </lay:StrategyLayout>
   </Strategy>
 </Strategies>
