@@ -31,7 +31,7 @@ namespace Atdl4net.Model.Types.Support
         /// </summary>
         /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
         /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
-        public string ToString(IFormatProvider provider)
+        public string? ToString(IFormatProvider? provider) // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
         {
             T? value = ConstValue ?? _value;
 
@@ -69,11 +69,11 @@ namespace Atdl4net.Model.Types.Support
         {
             EnumState state = new EnumState(enumPairs.EnumIds);
 
-            string enumId;
-            string wireValue = ToString(null);
+            string? enumId;
+            string wireValue = ToString(null)!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             if (enumPairs.TryParseWireValue(wireValue, out enumId))
-                state[enumId] = true;
+                state[enumId!] = true; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             return state;
         }

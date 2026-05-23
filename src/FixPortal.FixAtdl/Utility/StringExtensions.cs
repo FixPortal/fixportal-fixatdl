@@ -15,7 +15,7 @@ namespace Atdl4net.Utility
     /// </summary>
     public static class StringExtensions
     {
-        private static readonly string ExceptionContext = typeof(StringExtensions).FullName;
+        private static readonly string ExceptionContext = typeof(StringExtensions).FullName!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
         /// <summary>
         /// Gets the string representation of this enumerated type value.

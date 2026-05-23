@@ -5,20 +5,13 @@
 #endregion
 
 using System;
-using System.Runtime.Serialization;
 
 namespace Atdl4net.Diagnostics.Exceptions
 {
     /// <summary>Provides a base exception class for all Atdl4net custom exceptions.</summary>
-    [Serializable]
+    // FP Enhancement: 2026-05-23 — removed obsolete SerializationInfo constructor (SYSLIB0051 — binary serialization removed in .NET 10).
     public class Atdl4netException : System.Exception
     {
-        /// <summary>Initializes a new instance of the Atdl4netException class; for serialization purposes only.</summary>
-        protected Atdl4netException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
-
         /// <summary>Initializes a new instance of the Atdl4netException class with a specified error message.</summary>
         public Atdl4netException(string message)
             : base(message)

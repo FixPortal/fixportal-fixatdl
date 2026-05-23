@@ -58,14 +58,18 @@ namespace Atdl4net.Fix
         {
             FixField field = fixField.ParseAsEnum<FixField>();
 
-            return _message.TryGetValue(field, out value);
+            bool result = _message.TryGetValue(field, out string? v);
+            value = v!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+            return result;
         }
 
         public bool TryGetValue(FixTag tag, out string value)
         {
             FixField field = tag;
 
-            return _message.TryGetValue(field, out value);
+            bool result = _message.TryGetValue(field, out string? v);
+            value = v!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+            return result;
         }
 
         public void Add(FixTag tag, string value)

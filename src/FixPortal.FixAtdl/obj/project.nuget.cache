@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "GKUMU9sGOzk=",
+  "success": true,
+  "projectFilePath": "D:\\Centerprise\\work\\FixPortal\\FixAtdl\\src\\FixPortal.FixAtdl\\FixPortal.FixAtdl.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\chris\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.0\\microsoft.extensions.dependencyinjection.abstractions.10.0.0.nupkg.sha512",
+    "C:\\Users\\chris\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.0\\microsoft.extensions.logging.abstractions.10.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

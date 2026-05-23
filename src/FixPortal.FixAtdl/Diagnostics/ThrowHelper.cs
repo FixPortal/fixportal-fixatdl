@@ -26,7 +26,7 @@ namespace Atdl4net.Diagnostics
         /// <param name="source">The source.</param>
         /// <param name="message">The message.</param>
         /// <returns>A new exception of the specified type.</returns>
-        public static T New<T>(object source, string message) where T : System.Exception
+        public static T New<T>(object? source, string message) where T : System.Exception
         {
             T ex = CreateException<T>(source, message, null);
 
@@ -43,7 +43,7 @@ namespace Atdl4net.Diagnostics
         /// <param name="innerException">The inner exception.</param>
         /// <param name="message">The message.</param>
         /// <returns>A new exception of the specified type.</returns>
-        public static T New<T>(object source, Exception innerException, string message) where T : System.Exception
+        public static T New<T>(object? source, Exception innerException, string message) where T : System.Exception
         {
             T ex = CreateException<T>(source, message, innerException, null);
 
@@ -60,9 +60,10 @@ namespace Atdl4net.Diagnostics
         /// <param name="format">The format.</param>
         /// <param name="args">The args.</param>
         /// <returns>A new exception of the specified type.</returns>
-        public static T New<T>(object source, string format, params object[] args) where T : System.Exception
+        // FP Enhancement: 2026-05-23 — params object[] args -> params object?[] args to support nullable callers.
+        public static T New<T>(object? source, string format, params object?[] args) where T : System.Exception
         {
-            T ex = CreateException<T>(source, string.Format(format, args), null);
+            T ex = CreateException<T>(source, string.Format(format, args!), null);
 
             _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -78,9 +79,9 @@ namespace Atdl4net.Diagnostics
         /// <param name="format">The format.</param>
         /// <param name="args">The args.</param>
         /// <returns>A new exception of the specified type.</returns>
-        public static T New<T>(object source, Exception innerException, string format, params object[] args) where T : System.Exception
+        public static T New<T>(object? source, Exception innerException, string format, params object?[] args) where T : System.Exception
         {
-            T ex = CreateException<T>(source, string.Format(format, args), innerException, null);
+            T ex = CreateException<T>(source, string.Format(format, args!), innerException, null);
 
             _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -95,7 +96,7 @@ namespace Atdl4net.Diagnostics
         /// <param name="info">The info.</param>
         /// <param name="message">The message.</param>
         /// <returns>A new exception of the specified type.</returns>
-        public static T New<T>(object source, ExceptionInfo info, string message) where T : System.Exception
+        public static T New<T>(object? source, ExceptionInfo? info, string message) where T : System.Exception
         {
             T ex = CreateException<T>(source, message, info);
 
@@ -113,7 +114,7 @@ namespace Atdl4net.Diagnostics
         /// <param name="info">The info.</param>
         /// <param name="message">The message.</param>
         /// <returns>A new exception of the specified type.</returns>
-        public static T New<T>(object source, Exception innerException, ExceptionInfo info, string message) where T : System.Exception
+        public static T New<T>(object? source, Exception innerException, ExceptionInfo? info, string message) where T : System.Exception
         {
             T ex = CreateException<T>(source, message, innerException, info);
 
@@ -131,9 +132,9 @@ namespace Atdl4net.Diagnostics
         /// <param name="format">The format.</param>
         /// <param name="args">The args.</param>
         /// <returns>A new exception of the specified type.</returns>
-        public static T New<T>(object source, ExceptionInfo info, string format, params object[] args) where T : System.Exception
+        public static T New<T>(object? source, ExceptionInfo? info, string format, params object?[] args) where T : System.Exception
         {
-            T ex = CreateException<T>(source, string.Format(format, args), info);
+            T ex = CreateException<T>(source, string.Format(format, args!), info);
 
             _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -150,9 +151,9 @@ namespace Atdl4net.Diagnostics
         /// <param name="format">The format.</param>
         /// <param name="args">The args.</param>
         /// <returns>A new exception of the specified type.</returns>
-        public static T New<T>(object source, Exception innerException, ExceptionInfo info, string format, params object[] args) where T : System.Exception
+        public static T New<T>(object? source, Exception innerException, ExceptionInfo? info, string format, params object?[] args) where T : System.Exception
         {
-            T ex = CreateException<T>(source, string.Format(format, args), innerException, info);
+            T ex = CreateException<T>(source, string.Format(format, args!), innerException, info);
 
             _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -168,7 +169,7 @@ namespace Atdl4net.Diagnostics
         /// <param name="format">The format.</param>
         /// <param name="args">An array of zero or more arguments.</param>
         /// <returns>A new exception of the same type as the supplied exception.</returns>
-        public static Exception Rethrow(object source, Exception ex, string format, params object[] args)
+        public static Exception Rethrow(object? source, Exception ex, string format, params object[] args)
         {
             Exception newException = Rethrow(source, ex, string.Format(format, args), new object());
 
@@ -186,7 +187,7 @@ namespace Atdl4net.Diagnostics
         /// <param name="format">The format.</param>
         /// <param name="arg">The arg.</param>
         /// <returns>A new exception of the same type as the supplied exception.</returns>
-        public static Exception Rethrow(object source, Exception ex, string format, object arg)
+        public static Exception Rethrow(object? source, Exception ex, string format, object arg)
         {
             Exception newException = Rethrow(source, ex, null, format, arg);
 
@@ -205,15 +206,15 @@ namespace Atdl4net.Diagnostics
         /// <param name="format">The format.</param>
         /// <param name="arg">The arg.</param>
         /// <returns>A new exception of the same type as the supplied exception.</returns>
-        public static Exception Rethrow(object source, Exception ex, ExceptionInfo info, string format, object arg)
+        public static Exception Rethrow(object? source, Exception ex, ExceptionInfo? info, string format, object arg)
         {
             Type classType = ex.GetType();
 
-            ConstructorInfo classConstructor = classType.GetConstructor(new Type[] { typeof(string), typeof(Exception) });
+            ConstructorInfo classConstructor = classType.GetConstructor(new Type[] { typeof(string), typeof(Exception) })!;
 
             Exception exception = (Exception)classConstructor.Invoke(new object[] { string.Format(format, arg, ex.Message), ex });
 
-            exception.Source = source.ToString();
+            exception.Source = source?.ToString();
 
             if (info != null)
                 info.PopulateExceptionData(exception.Data);
@@ -222,55 +223,47 @@ namespace Atdl4net.Diagnostics
         }
 
         // Workaround limitation in C# 3.0/4.0 - can't create an instance of a generic type with parameters using new T().
-        private static T CreateException<T>(object source, string message, ExceptionInfo info) where T : System.Exception
+        private static T CreateException<T>(object? source, string message, ExceptionInfo? info) where T : System.Exception
         {
             Type classType = typeof(T);
 
             switch (classType.Name)
             {
-                // Special treatment is needed for ArgumentOutOfRangeException and ArgumentNullException because the constructor that takes 
+                // Special treatment is needed for ArgumentOutOfRangeException and ArgumentNullException because the constructor that takes
                 // a single string for these types makes its own message.
                 case "ArgumentOutOfRangeException":
                 case "ArgumentNullException":
                     {
-                        ConstructorInfo classConstructor = classType.GetConstructor(new Type[] { typeof(string), typeof(string) });
-
+                        ConstructorInfo classConstructor = classType.GetConstructor(new Type[] { typeof(string), typeof(string) })!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
                         T exception = (T)classConstructor.Invoke(new object[] { "Value", message });
-
-                        exception.Source = source.ToString();
-
+                        exception.Source = source?.ToString();
                         if (info != null)
                             info.PopulateExceptionData(exception.Data);
-
                         return exception;
                     }
 
                 default:
                     {
-                        ConstructorInfo classConstructor = classType.GetConstructor(new Type[] { typeof(string) });
-
+                        ConstructorInfo classConstructor = classType.GetConstructor(new Type[] { typeof(string) })!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
                         T exception = (T)classConstructor.Invoke(new object[] { message });
-
-                        exception.Source = source.ToString();
-
+                        exception.Source = source?.ToString();
                         if (info != null)
                             info.PopulateExceptionData(exception.Data);
-
                         return exception;
                     }
             }
         }
 
         // Workaround limitation in C# 3.0/4.0 - can't create an instance of a generic type with parameters using new T().
-        private static T CreateException<T>(object source, string message, Exception innerException, ExceptionInfo info) where T : System.Exception
+        private static T CreateException<T>(object? source, string message, Exception innerException, ExceptionInfo? info) where T : System.Exception
         {
             Type classType = typeof(T);
 
-            ConstructorInfo classConstructor = classType.GetConstructor(new Type[] { typeof(string), typeof(Exception) });
+            ConstructorInfo classConstructor = classType.GetConstructor(new Type[] { typeof(string), typeof(Exception) })!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
 
             T exception = (T)classConstructor.Invoke(new object[] { message, innerException });
 
-            exception.Source = source.ToString();
+            exception.Source = source?.ToString();
 
             if (info != null)
                 info.PopulateExceptionData(exception.Data);

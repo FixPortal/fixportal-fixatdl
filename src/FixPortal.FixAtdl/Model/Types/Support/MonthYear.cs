@@ -60,7 +60,7 @@ namespace Atdl4net.Model.Types.Support
         /// </summary>
         /// <param name="obj">Object to compare this instance with.</param>
         /// <returns>True if the supplied object is a MonthYear, and the day, month and year values of the two are the same; false otherwise.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null || GetType() != obj.GetType())
                 return false;
@@ -221,14 +221,14 @@ namespace Atdl4net.Model.Types.Support
         /// <item><description>Zero - this instance occurs in the same position in the sort order as obj.</description></item>
         /// <item><description>Greater than zero - this instance follows obj in the sort order.</description></item>
         /// </list></returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             // Null references are by definition less than the current instance.
             if (obj == null)
                 return 1;
 
             if (!(obj is MonthYear))
-                throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName, this.GetType().FullName);
+                throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName!, this.GetType().FullName!);
 
             MonthYear rhs = (MonthYear)obj;
 

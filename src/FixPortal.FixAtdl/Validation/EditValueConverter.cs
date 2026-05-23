@@ -22,7 +22,7 @@ namespace Atdl4net.Validation
     /// </summary>
     public static class EditValueConverter
     {
-        private static readonly string ExceptionContext = typeof(EditValueConverter).FullName;
+        private static readonly string ExceptionContext = typeof(EditValueConverter).FullName!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
         /// <summary>
         /// Attempts to convert the second parameter value to a comparable type of the first parameter.

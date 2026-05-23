@@ -16,7 +16,7 @@ namespace Atdl4net.Model.Elements
     public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrategyPanel
     {
         private readonly Strategy_t _owningStrategy;
-        private StrategyPanel_t _owningStrategyPanel;
+        private StrategyPanel_t? _owningStrategyPanel; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
         private readonly StrategyPanelCollection _strategyPanels;
         private ControlCollection _controls;
 
@@ -37,7 +37,7 @@ namespace Atdl4net.Model.Elements
         /// <param name="parent">; null if this StrategyPanel_t does not have a parent (for example, because it is the
         /// immediate descendent of a StrategyLayout_t.</param>
         /// <remarks></remarks>
-        public StrategyPanel_t(Strategy_t owningStrategy, IStrategyPanel parent)
+        public StrategyPanel_t(Strategy_t owningStrategy, IStrategyPanel? parent)
         {
             _owningStrategy = owningStrategy;
             _owningStrategyPanel = parent as StrategyPanel_t;

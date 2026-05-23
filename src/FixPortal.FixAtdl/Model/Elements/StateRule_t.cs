@@ -41,13 +41,13 @@ namespace Atdl4net.Model.Elements
             sb.AppendFormat("(Control.ID=\"{0}\"", _owner.Id);
 
             if (Enabled != null)
-                sb.AppendFormat(", enabled=\"{0}\"", Enabled.ToString().ToLower());
- 
+                sb.AppendFormat(", enabled=\"{0}\"", Enabled.ToString()!.ToLower()); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+
             if (Value != null)
                 sb.AppendFormat(", value=\"{0}\"", Value);
 
             if (Visible != null)
-                sb.AppendFormat(", visible=\"{0}\"", Visible.ToString().ToLower());
+                sb.AppendFormat(", visible=\"{0}\"", Visible.ToString()!.ToLower()); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             sb.Append(")");
 

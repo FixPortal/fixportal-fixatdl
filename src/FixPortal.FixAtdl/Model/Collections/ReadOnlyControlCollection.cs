@@ -37,12 +37,13 @@ namespace Atdl4net.Model.Collections
             _owner = owner;
         }
 
-        internal void SourceCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        internal void SourceCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (Control_t item in e.NewItems)
+                    // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+                    foreach (Control_t item in e.NewItems!)
                     {
                         if (_controls.ContainsKey(item.Id))
                             throw ThrowHelper.New<DuplicateKeyException>(this, ErrorMessages.AttemptToAddDuplicateKey, item.Id, "Controls");
@@ -57,7 +58,7 @@ namespace Atdl4net.Model.Collections
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (Control_t item in e.OldItems)
+                    foreach (Control_t item in e.OldItems!) // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                     {
                         if (_controls.ContainsKey(item.Id))
                             _controls.Remove(item.Id);
@@ -65,9 +66,10 @@ namespace Atdl4net.Model.Collections
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
-                    for (int n = 0; n < e.OldItems.Count; n++)
+                    // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+                    for (int n = 0; n < e.OldItems!.Count; n++)
                     {
-                        _controls[((Control_t)e.OldItems[n]).Id] = (Control_t)e.NewItems[n];
+                        _controls[((Control_t)e.OldItems[n]!).Id] = (Control_t)e.NewItems![n]!;
                     }
                     break;
             }
@@ -126,7 +128,7 @@ namespace Atdl4net.Model.Collections
         /// <param name="shortCircuit">If true, this method returns as soon as any error is found; if false, an attempt is made to update all parameter
         /// values before the method returns.</param>
         /// <param name="validationResults">If one or more validations fail, this parameter contains a list of ValidationResults; null otherwise.</param>
-        public bool TryUpdateParameterValues(ParameterCollection parameters, bool shortCircuit, out IList<ValidationResult> validationResults)
+        public bool TryUpdateParameterValues(ParameterCollection parameters, bool shortCircuit, out IList<ValidationResult>? validationResults)
         {
             bool isValid = true;
             validationResults = null;
@@ -169,9 +171,10 @@ namespace Atdl4net.Model.Collections
             foreach (Control_t control in this)
             {
                 bool hasParameterRef = control.ParameterRef != null;
-                bool isValidParameter = hasParameterRef && parameters.Contains(control.ParameterRef);
-                IParameter parameter = isValidParameter ? parameters[control.ParameterRef] : null;
-                object parameterValue = isValidParameter ? parameter.GetCurrentValue() : null;
+                // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+                bool isValidParameter = hasParameterRef && parameters.Contains(control.ParameterRef!);
+                IParameter parameter = isValidParameter ? parameters[control.ParameterRef!]! : null!;
+                object parameterValue = isValidParameter ? parameter.GetCurrentValue() : null!;
 
                 if (hasParameterRef && !isValidParameter)
                     throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.UnresolvedParameterRefError, control.ParameterRef);
@@ -243,7 +246,7 @@ namespace Atdl4net.Model.Collections
                             if (sourceControl is CheckBox_t || !result)
                                 sourceControl.SetValue(!result);
                             else
-                                SetCompanionRadioButton(sourceControl as RadioButton_t);
+                                SetCompanionRadioButton((sourceControl as RadioButton_t)!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                         }
                     }
                 }
@@ -264,11 +267,11 @@ namespace Atdl4net.Model.Collections
             // Approach 1 - use the radio button group name
             if (radioButton.RadioGroup != null)
                 radioButtons = (from c in _controls.Values where c.Id != radioButton.Id &&
-                                     c is RadioButton_t && (c as RadioButton_t).RadioGroup == radioButton.RadioGroup
+                                     c is RadioButton_t && (c as RadioButton_t)!.RadioGroup == radioButton.RadioGroup // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                                      select c as RadioButton_t);
             else
             // Approach 2 - look for radio buttons on the same panel
-                radioButtons = (from c in radioButton.OwningStrategyPanel.Controls where c.Id != radioButton.Id &&
+                radioButtons = (from c in radioButton.OwningStrategyPanel!.Controls where c.Id != radioButton.Id && // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                                      c is RadioButton_t select c as RadioButton_t);
 
             if (radioButtons.Count() == 1)

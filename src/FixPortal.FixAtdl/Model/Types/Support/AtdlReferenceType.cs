@@ -35,15 +35,15 @@ namespace Atdl4net.Model.Types.Support
         private static readonly ILogger _log = NullLogger.Instance;
 
         /// <summary>
-        /// Storage for the value of this parameter, as type T?.
+        /// Storage for the value of this parameter; null when not set.
         /// </summary>
-        protected T _value;
+        protected T? _value; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
 
         /// <summary>
         /// Gets/sets an optional constant value for this parameter.
         /// </summary>
         /// <value>The const value.</value>
-        public T ConstValue { get; set; }
+        public T? ConstValue { get; set; } // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
 
         #region IParameterType Members
 
@@ -156,7 +156,7 @@ namespace Atdl4net.Model.Types.Support
         {
             T value = ConstValue ?? _value;
 
-            ValidationResult validity = ValidateValue(value, hostParameter.Use == Use_t.Required);
+            ValidationResult validity = ValidateValue(value!, hostParameter.Use == Use_t.Required); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             if (!validity.IsValid)
             {
@@ -167,7 +167,7 @@ namespace Atdl4net.Model.Types.Support
                     hostParameter.Name, value, validity.ErrorText);
             }
 
-            string wireValue = ConvertToWireValueFormat(value);
+            string wireValue = ConvertToWireValueFormat(value!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             _log.LogDebug("Wire value for parameter {Arg0} = '{Arg1}'", hostParameter.Name, wireValue);
 

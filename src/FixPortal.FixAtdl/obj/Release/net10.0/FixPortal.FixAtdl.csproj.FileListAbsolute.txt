@@ -1,0 +1,11 @@
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\FixPortal.FixAtdl.csproj.AssemblyReference.cache
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\Atdl4net.Resources.ErrorMessages.resources
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\Atdl4net.Resources.HumanReadableTypeNames.resources
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\Atdl4net.Resources.InternalErrors.resources
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\FixPortal.FixAtdl.csproj.GenerateResource.cache
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\FixPortal.FixAtdl.GeneratedMSBuildEditorConfig.editorconfig
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\FixPortal.FixAtdl.AssemblyInfoInputs.cache
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\FixPortal.FixAtdl.AssemblyInfo.cs
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\FixPortal.FixAtdl.csproj.CoreCompileInputs.cache
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\FixPortal.FixAtdl.sourcelink.json
+D:\Centerprise\work\FixPortal\FixAtdl\src\FixPortal.FixAtdl\obj\Release\net10.0\FixPortal.FixAtdl.xml

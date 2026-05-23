@@ -55,7 +55,7 @@ namespace Atdl4net.Model.Types.Support
             return lhs.Offset != rhs.Offset || lhs.TenorType != rhs.TenorType;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null || !(obj is Tenor))
                 return false;
@@ -148,14 +148,14 @@ namespace Atdl4net.Model.Types.Support
         /// <item><description>Zero - this instance occurs in the same position in the sort order as obj.</description></item>
         /// <item><description>Greater than zero - this instance follows obj in the sort order.</description></item>
         /// </list></returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             // Null references are by definition less than the current instance.
             if (obj == null)
                 return 1;
 
             if (!(obj is Tenor))
-                throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName, this.GetType().FullName);
+                throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName!, this.GetType().FullName!);
 
             Tenor rhs = (Tenor)obj;
 

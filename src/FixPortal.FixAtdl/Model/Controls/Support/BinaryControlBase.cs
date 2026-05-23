@@ -162,9 +162,9 @@ namespace Atdl4net.Model.Controls.Support
                 _value = null;
             else
                 throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
-                    newValue.GetType().FullName, "System.String, System.Boolean");
+                    newValue.GetType().FullName!, "System.String, System.Boolean"); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
-            _log.LogDebug("Binary control value is now {Value}", _value != null ? _value.ToString().ToLower() : "null");
+            _log.LogDebug("Binary control value is now {Value}", _value != null ? _value.ToString()!.ToLower() : "null"); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         /// <summary>
@@ -204,7 +204,8 @@ namespace Atdl4net.Model.Controls.Support
         /// <returns>A nullable 32-bit signed integer equivalent to the value of this instance.</returns>
         public override int? ToInt32(IParameter targetParameter, IFormatProvider provider)
         {
-            string wireValue = _value != null ? ToString(targetParameter) : null;
+            // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+            string wireValue = _value != null ? ToString(targetParameter) : null!;
 
             int result = 0;
 
@@ -219,7 +220,7 @@ namespace Atdl4net.Model.Controls.Support
         /// <returns>A nullable 32-bit unsigned integer equivalent to the value of this instance.</returns>
         public override uint? ToUInt32(IParameter targetParameter, IFormatProvider provider)
         {
-            string wireValue = _value != null ? ToString(targetParameter) : null;
+            string wireValue = _value != null ? ToString(targetParameter) : null!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             uint result = 0;
 
@@ -233,7 +234,7 @@ namespace Atdl4net.Model.Controls.Support
         /// <returns>A nullable char value equivalent to the value of this instance.  May be null.</returns>
         public override char? ToChar(IParameter targetParameter)
         {
-            string wireValue = _value != null ? ToString(targetParameter) : null;
+            string wireValue = _value != null ? ToString(targetParameter) : null!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             char result = char.MinValue;
 
@@ -257,7 +258,7 @@ namespace Atdl4net.Model.Controls.Support
                 return value != Atdl.NullValue ? value : null;
             }
             else
-                return _value != null ? _value.ToString().ToLower() : null;
+                return _value != null ? _value.ToString()!.ToLower() : null; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         /// <summary>

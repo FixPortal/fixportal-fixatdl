@@ -64,7 +64,7 @@ namespace Atdl4net.Model.Collections
         /// <param name="wireValue">The wire value.</param>
         /// <param name="enumId">The enum id.</param>
         /// <returns>true if the values could be parsed; false otherwise.</returns>
-        public bool TryParseWireValue(string wireValue, out string enumId)
+        public bool TryParseWireValue(string wireValue, out string? enumId)
         {
             enumId = null;
             string testValue = (wireValue != null) ? wireValue : Atdl.NullValue;

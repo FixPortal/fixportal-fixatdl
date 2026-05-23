@@ -138,7 +138,7 @@ namespace Atdl4net.Validation
 
                 if (parameterIsInvalid)
                 {
-                    sb.Append(_parameterValidationResult.ErrorText);
+                    sb.Append(_parameterValidationResult!.ErrorText); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
                     if (count > 0)
                         sb.AppendLine();

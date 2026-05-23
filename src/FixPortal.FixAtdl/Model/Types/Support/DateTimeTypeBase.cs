@@ -120,11 +120,11 @@ namespace Atdl4net.Model.Types.Support
         /// </summary>
         /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
         /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
-        public string ToString(IFormatProvider provider)
+        public string? ToString(IFormatProvider? provider) // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         {
             DateTime? value = ConstValue ?? _value;
 
-            return value != null ? ((DateTime)_value).ToString(GetDateTimeFormatStrings()[0]) : null;
+            return value != null ? ((DateTime)_value!).ToString(GetDateTimeFormatStrings()[0]) : null; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         /// <summary>

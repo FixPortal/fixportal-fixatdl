@@ -97,7 +97,7 @@ namespace Atdl4net.Model.Types
             if (Precision == null)
                 return ((decimal)value).ToString(CultureInfo.InvariantCulture);
             else
-                return ((decimal)Round(value, (int)Precision)).ToString(CultureInfo.InvariantCulture);
+                return (Round(value, Precision!.Value)!.Value).ToString(CultureInfo.InvariantCulture); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Atdl4net.Model.Types
         /// </summary>
         /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
         /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
-        public virtual string ToString(IFormatProvider provider)
+        public virtual string? ToString(IFormatProvider? provider) // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         {
             decimal? value = ConstValue ?? _value;
 

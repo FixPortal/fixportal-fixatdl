@@ -82,9 +82,9 @@ namespace Atdl4net.Xml
             return strategies;
         }
 
-        private void OnStrategyDeserialized(object sender, ClassDeserializedEventArgs args)
+        private void OnStrategyDeserialized(object? sender, ClassDeserializedEventArgs args)
         {
-            NotifyStrategyLoaded(0,0,(args.ExtraInfo as Strategy_t).Name);
+            NotifyStrategyLoaded(0, 0, (args.ExtraInfo as Strategy_t)!.Name!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         private void NotifyStrategyLoaded(int index, int total, string strategyName)

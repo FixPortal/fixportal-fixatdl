@@ -125,7 +125,7 @@ namespace Atdl4net.Model.Collections
         {
             foreach (IEdit<T> item in this.Items)
             {
-                (item as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);
+                (item as IResolvable<Strategy_t, T>)!.Resolve(strategy, sourceCollection); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             }
         }
 

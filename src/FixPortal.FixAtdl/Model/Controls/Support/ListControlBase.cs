@@ -119,7 +119,7 @@ namespace Atdl4net.Model.Controls.Support
             if (newValue == null || newValue as string == Atdl.NullValue)
                 _value.ClearAll();
             else
-                _value.UpdateFrom(newValue as EnumState);
+                _value.UpdateFrom((newValue as EnumState)!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         /// <summary>

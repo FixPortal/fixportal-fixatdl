@@ -44,13 +44,15 @@ namespace Atdl4net.Model.Types
             {
                 int adjustmentFactor = (MultiplyBy100 == true) ? 1 : 100;
 
+                // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+                // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                 if (MaxValue != null && (decimal)value > MaxValue)
                     return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded,
-                        RemoveTrailingZeroes(value * adjustmentFactor), RemoveTrailingZeroes(MaxValue * adjustmentFactor));
+                        RemoveTrailingZeroes(value * adjustmentFactor)!, RemoveTrailingZeroes(MaxValue!.Value * adjustmentFactor)!);
 
                 if (MinValue != null && (decimal)value < MinValue)
                     return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded,
-                        RemoveTrailingZeroes(value * adjustmentFactor), RemoveTrailingZeroes(MinValue * adjustmentFactor));
+                        RemoveTrailingZeroes(value * adjustmentFactor)!, RemoveTrailingZeroes(MinValue!.Value * adjustmentFactor)!);
             }
             else if (isRequired)
                 return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
@@ -69,7 +71,7 @@ namespace Atdl4net.Model.Types
         {
             decimal? decimalValue = base.ConvertFromWireValueFormat(value);
 
-            return (MultiplyBy100 == true) ? (decimal)decimalValue / 100 : (decimal)decimalValue;
+            return (MultiplyBy100 == true) ? (decimal)decimalValue! / 100 : (decimal)decimalValue!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         /// <summary>
@@ -85,12 +87,13 @@ namespace Atdl4net.Model.Types
             if (value == null)
                 return null;
 
-            decimal adjustedValue = (MultiplyBy100 == true) ? (decimal)RemoveTrailingZeroes(value * 100) : (decimal)value;
+            // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+            decimal adjustedValue = (MultiplyBy100 == true) ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value!;
 
             if (Precision == null)
                 return adjustedValue.ToString(CultureInfo.InvariantCulture);
             else
-                return ((decimal)(Round(adjustedValue, (int)Precision))).ToString(CultureInfo.InvariantCulture);
+                return (Round(adjustedValue, Precision!.Value)!.Value).ToString(CultureInfo.InvariantCulture); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         /// <summary>
@@ -125,10 +128,11 @@ namespace Atdl4net.Model.Types
 
             if (value != null && applyWireValueFormat)
             {
-                decimal adjustedValue = (MultiplyBy100 == true) ? (decimal)RemoveTrailingZeroes(value * 100) : (decimal)value;
+                // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+                decimal adjustedValue = (MultiplyBy100 == true) ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value!;
 
                 if (Precision != null)
-                    return Math.Round(adjustedValue, (int)Precision, MidpointRounding.AwayFromZero);
+                    return Math.Round(adjustedValue, Precision!.Value, MidpointRounding.AwayFromZero); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                 else
                     return adjustedValue;
             }
@@ -160,7 +164,7 @@ namespace Atdl4net.Model.Types
         /// </summary>
         /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
         /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
-        public override string ToString(IFormatProvider provider)
+        public override string? ToString(IFormatProvider? provider) // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         {
             decimal? value = ToDecimal();
 

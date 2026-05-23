@@ -33,7 +33,7 @@ namespace Atdl4net.Model.Controls.Support
 
         private readonly BitArray _enumStates;
         private readonly string[] _enumIds;
-        private string _nonEnumValue;
+        private string? _nonEnumValue; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
 
         /// <summary>
         /// Initializes a new instance of <see cref="EnumState"/> with the supplied set of EnumID values.
@@ -114,7 +114,7 @@ namespace Atdl4net.Model.Controls.Support
         /// <param name="obj">Object to compare this object to.</param>
         /// <returns>true if the state of the supplied object is identical to this object instance; false otherwise.</returns>
         /// <remarks>This method assumes that both operands have the same set of EnumID values.</remarks>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null || !(obj is EnumState))
                 return false;
@@ -360,7 +360,7 @@ namespace Atdl4net.Model.Controls.Support
                 if (!enumPairs.TryParseWireValue(inputValue, out enumId))
                     throw ThrowHelper.New<ArgumentException>(ExceptionContext, ErrorMessages.UnrecognisedEnumIdValue, inputValue);
 
-                result[enumId] = true;
+                result[enumId!] = true; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             }
 
             _log.LogDebug("Converting EnumState from WireValue; state is {State}", result.ToString());
@@ -399,7 +399,7 @@ namespace Atdl4net.Model.Controls.Support
         /// <returns></returns>
         /// <remarks>IComparable is implemented by EnumState to allow its use within Edit_t processing.  Although this interface is
         /// designed to provide less than/greater than comparison, it is primarily used here for determining equality.</remarks>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             if (obj is string)
             {
@@ -417,7 +417,7 @@ namespace Atdl4net.Model.Controls.Support
                 return this.Equals(enumState) ? 0 : -1;
             }
             else
-                throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.CompareValueFailure, this.ToString(), obj.GetType().FullName);
+                throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.CompareValueFailure, this.ToString(), obj!.GetType().FullName!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         #endregion

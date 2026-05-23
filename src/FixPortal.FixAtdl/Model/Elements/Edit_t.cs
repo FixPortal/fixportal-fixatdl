@@ -264,7 +264,7 @@ namespace Atdl4net.Model.Elements
                         break;
 
                     default:
-                        _currentState = EvaluateInequalityComparison(lhs as IComparable, GetRhsValue(additionalValues, lhs) as IComparable);
+                        _currentState = EvaluateInequalityComparison((lhs as IComparable)!, (GetRhsValue(additionalValues, lhs) as IComparable)!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                         break;
                 }
             }

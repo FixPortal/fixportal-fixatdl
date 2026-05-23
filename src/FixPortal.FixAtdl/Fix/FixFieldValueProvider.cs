@@ -24,8 +24,8 @@ namespace Atdl4net.Fix
         private readonly ILogger _log = NullLogger.Instance;
         private static readonly FixFieldValueProvider _emptyProvider = new FixFieldValueProvider(null, null);
 
-        private readonly IInitialFixValueProvider _initialValueProvider;
-        private readonly ParameterCollection _parameters;
+        private readonly IInitialFixValueProvider? _initialValueProvider; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
+        private readonly ParameterCollection? _parameters; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
 
         /// <summary>
         /// Initializes a new <see cref="FixFieldValueProvider"/> instance using the supplied set of input 
@@ -33,7 +33,7 @@ namespace Atdl4net.Fix
         /// </summary>
         /// <param name="fixValues">Input FIX fields to use.</param>
         /// <param name="parameters">Parameters to use.</param>
-        public FixFieldValueProvider(IInitialFixValueProvider initialValueProvider, ParameterCollection parameters)
+        public FixFieldValueProvider(IInitialFixValueProvider? initialValueProvider, ParameterCollection? parameters)
         {
             _initialValueProvider = initialValueProvider;
             _parameters = parameters;
@@ -52,7 +52,7 @@ namespace Atdl4net.Fix
         /// <summary>
         /// Gets the FIX values collection for this value provider.
         /// </summary>
-        public FixTagValuesCollection FixValues { get { return _initialValueProvider.InputFixValues; } }
+        public FixTagValuesCollection FixValues { get { return _initialValueProvider!.InputFixValues!; } } // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
         /// <summary>
         /// Attempts to get the value of the specified FIX field (in FIX_ format), returning the value as a string.
@@ -69,27 +69,27 @@ namespace Atdl4net.Fix
 
             bool retrieved = TryGetValue(fixField, out result);
 
-            if (retrieved && !string.IsNullOrEmpty(targetParameterName) && _parameters.Contains(targetParameterName))
+            if (retrieved && !string.IsNullOrEmpty(targetParameterName) && _parameters!.Contains(targetParameterName)) // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             {
                 IParameter parameter = _parameters[targetParameterName];
 
                 if (parameter.HasEnumPairs)
                 {
-                    string wireValue = result;
+                    string wireValue = result!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
                     _log.LogDebug("Attempting to find EnumID for FIX field {FixField} using parameter {ParameterName} with wire value '{WireValue}'",
                         fixField, targetParameterName, wireValue);
 
-                    retrieved = parameter.EnumPairs.TryParseWireValue(wireValue, out result);
+                    retrieved = parameter.EnumPairs!.TryParseWireValue(wireValue, out result); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                 }
                 else if (parameter is Parameter_t<Percentage_t>)
-                    ProcessPercentageValue(parameter as Parameter_t<Percentage_t>, ref result);
+                    ProcessPercentageValue((parameter as Parameter_t<Percentage_t>)!, ref result); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
                 _log.LogDebug("FIX enumerated value lookup for field {FixField} returning {Retrieved}; value = '{Value}'", fixField,
                     retrieved.ToString().ToLower(), retrieved ? result : "N/A");
             }
 
-            value = result;
+            value = result!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             return retrieved;
         }
@@ -115,7 +115,7 @@ namespace Atdl4net.Fix
                     retrieved.ToString().ToLower(), retrieved ? result : "N/A");
             }
 
-            value = retrieved ? result : null;
+            value = retrieved ? result! : null!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             return retrieved;
         }

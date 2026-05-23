@@ -11,14 +11,14 @@ namespace Atdl4net.Xml.Serialization
 {
     public class ElementDefinition
     {
-        public XName ElementName { get; set; }
-        public Type TargetType { get; private set; }
-        public ElementAttribute[] Attributes { get; private set; }
-        public ConstructorParameter[] ConstructorParameters { get; private set; }
-        public ChildElementDefinition[] ChildElements { get; private set; }
-        public CacheElementValueInstruction CacheElementValueInstruction { get; private set; }
+        public XName? ElementName { get; set; } // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
+        public Type? TargetType { get; private set; } // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
+        public ElementAttribute[]? Attributes { get; private set; } // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
+        public ConstructorParameter[]? ConstructorParameters { get; private set; } // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
+        public ChildElementDefinition[]? ChildElements { get; private set; } // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
+        public CacheElementValueInstruction? CacheElementValueInstruction { get; private set; } // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
 
-        public ElementDefinition(XName elementName, Type targetType, ElementAttribute[] attributes)
+        public ElementDefinition(XName? elementName, Type? targetType, ElementAttribute[]? attributes)
             : this(elementName, targetType, null, attributes, new ChildElementDefinition[] { }, null)
         {
         }
@@ -56,8 +56,8 @@ namespace Atdl4net.Xml.Serialization
         {
         }
 
-        public ElementDefinition(XName elementName, Type targetType, ConstructorParameter[] constructorParameters,
-            ElementAttribute[] attributes, ChildElementDefinition[] children, CacheElementValueInstruction cacheInstruction)
+        public ElementDefinition(XName? elementName, Type? targetType, ConstructorParameter[]? constructorParameters,
+            ElementAttribute[]? attributes, ChildElementDefinition[]? children, CacheElementValueInstruction? cacheInstruction)
         {
             ElementName = elementName;
             TargetType = targetType;

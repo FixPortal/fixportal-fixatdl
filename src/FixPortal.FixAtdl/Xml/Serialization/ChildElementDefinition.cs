@@ -12,7 +12,7 @@ namespace Atdl4net.Xml.Serialization
     public class ChildElementDefinition
     {
         public ElementDefinition ElementDefinition { get; private set; }
-        public XName ContainerElementName { get; private set; }
+        public XName? ContainerElementName { get; private set; } // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         public string ContainerProperty { get; private set; }
         public Type ContainerPropertyType { get; private set; }
         public object ContainerMethod { get; private set; }

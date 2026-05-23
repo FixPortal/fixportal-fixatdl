@@ -31,9 +31,9 @@ namespace Atdl4net.Model.Controls.Support
         private static readonly ILogger _log = NullLogger.Instance;
 
         /// <summary>
-        /// The state value for this control.
+        /// The state value for this control; null when the control has no value set.
         /// </summary>
-        protected string _value;
+        protected string? _value; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
 
         /// <summary>
         /// Initializes a new instance of <see cref="TextControlBase"/> using the supplied ID.
@@ -91,7 +91,7 @@ namespace Atdl4net.Model.Controls.Support
                 _value = null;
             else
                 throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
-                    newValue.GetType().FullName, "System.String");
+                    newValue.GetType().FullName!, "System.String"); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             _log.LogDebug("Control value is now '{Value}'", _value ?? "null");
         }
@@ -154,7 +154,8 @@ namespace Atdl4net.Model.Controls.Support
         {
             decimal result = 0;
 
-            return TryConvertToDecimal(_value, out result) ? (decimal?)result : null;
+            // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+            return TryConvertToDecimal(_value!, out result) ? (decimal?)result : null;
         }
 
         /// <summary>
@@ -167,7 +168,7 @@ namespace Atdl4net.Model.Controls.Support
         {
             int result = 0;
 
-            return TryConvertToInt(_value, out result) ? (int?)result : null;
+            return TryConvertToInt(_value!, out result) ? (int?)result : null; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         /// <summary>
@@ -180,7 +181,7 @@ namespace Atdl4net.Model.Controls.Support
         {
             uint result = 0;
 
-            return TryConvertToUint(_value, out result) ? (uint?)result : null;
+            return TryConvertToUint(_value!, out result) ? (uint?)result : null; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         /// <summary>
@@ -192,7 +193,7 @@ namespace Atdl4net.Model.Controls.Support
         {
             char result = char.MinValue;
 
-            return TryConvertToChar(_value, out result) ? (char?)result : null;
+            return TryConvertToChar(_value!, out result) ? (char?)result : null; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         /// <summary>

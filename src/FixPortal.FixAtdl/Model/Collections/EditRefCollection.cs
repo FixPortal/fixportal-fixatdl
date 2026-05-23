@@ -16,7 +16,7 @@ namespace Atdl4net.Model.Collections
     /// <typeparam name="T">Type.</typeparam>
     public class EditRefCollection<T> : KeyedCollection<string, EditRef_t<T>> where T : class, IValueProvider
     {
-        private readonly EditEvaluatingCollection<T> _evaluatingCollection;
+        private readonly EditEvaluatingCollection<T>? _evaluatingCollection;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EditRefCollection{T}"/> class.
@@ -30,7 +30,7 @@ namespace Atdl4net.Model.Collections
         /// Initializes a new instance of the <see cref="EditRefCollection{T}"/> class.
         /// </summary>
         /// <param name="evaluatingCollection">The evaluating collection.</param>
-        public EditRefCollection(EditEvaluatingCollection<T> evaluatingCollection)
+        public EditRefCollection(EditEvaluatingCollection<T>? evaluatingCollection)
         {
             _evaluatingCollection = evaluatingCollection;
         }

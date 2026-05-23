@@ -5,7 +5,6 @@
 #endregion
 
 using System;
-using System.Runtime.Serialization;
 
 namespace Atdl4net.Diagnostics.Exceptions
 {
@@ -13,15 +12,9 @@ namespace Atdl4net.Diagnostics.Exceptions
     /// The exception that is thrown when a value fails validation, either through a constraint on a parameter or throw a
     /// StrategyEdit validation rule.
     /// </summary>
-    [Serializable]
+    // FP Enhancement: 2026-05-23 — removed obsolete SerializationInfo constructor (SYSLIB0051 — binary serialization removed in .NET 10).
     public class ValidationException : Atdl4netException
     {
-        /// <summary>Initializes a new instance of the ValidationException class; for serialization purposes only.</summary>
-        protected ValidationException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationException"/> class.
         /// </summary>

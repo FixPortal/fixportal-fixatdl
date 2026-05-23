@@ -16,12 +16,12 @@ namespace Atdl4net.Model.Elements
         public string UiRep { get; set; }
         public bool IsSelected { get; set; }
 
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             if (obj is string)
                 return (this.EnumId).CompareTo(obj as string);
             else
-                throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.CompareValueFailure, "ListItem_t", obj.GetType().FullName);
+                throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.CompareValueFailure, "ListItem_t", obj!.GetType().FullName!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
         }
 
         public override string ToString()

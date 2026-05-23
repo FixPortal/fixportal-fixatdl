@@ -44,7 +44,7 @@ namespace Atdl4net.Xml.Serialization
             return CreateObject(_elementDefinition, element, null);
         }
 
-        private object CreateObject(ElementDefinition definition, XElement sourceElement, object parentObject)
+        private object CreateObject(ElementDefinition definition, XElement sourceElement, object? parentObject)
         {
             _log.LogDebug("CreateObject(ElementDefinition, XElement) called; ElementName='{ElementName}.'", definition.ElementName);
 
@@ -53,7 +53,7 @@ namespace Atdl4net.Xml.Serialization
 
             GetConstructorParameters(definition, sourceElement, parentObject, out constructorParameterTypes, out constructorParameterValues);
 
-            object newObject = CreateRawObject(definition.TargetType, constructorParameterTypes, constructorParameterValues);
+            object newObject = CreateRawObject(definition.TargetType!, constructorParameterTypes, constructorParameterValues); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             if (definition.CacheElementValueInstruction != null)
                 _elementValueCache[definition.CacheElementValueInstruction.CacheKey] = newObject;
@@ -62,7 +62,7 @@ namespace Atdl4net.Xml.Serialization
 
             try
             {
-                ProcessAttributes(definition.TargetType, definition.Attributes, attributes, newObject);
+                ProcessAttributes(definition.TargetType!, definition.Attributes!, attributes, newObject); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             }
             catch (Atdl4netException ex)
             {
@@ -89,7 +89,7 @@ namespace Atdl4net.Xml.Serialization
         /// <exception cref="MissingMandatoryValueException">Thrown when...<ul>
         /// <li></li>
         /// </ul></exception>
-        private object CreateObject(GenericTypeElementDefinition genericTypeDefinition, XElement sourceElement, object parentObject)
+        private object CreateObject(GenericTypeElementDefinition genericTypeDefinition, XElement sourceElement, object? parentObject)
         {
             _log.LogDebug("CreateObject(GenericTypeElementDefinition, XElement) called; ElementName='{ElementName}'.", genericTypeDefinition.ElementName);
 
@@ -98,32 +98,33 @@ namespace Atdl4net.Xml.Serialization
 
             GetConstructorParameters(genericTypeDefinition, sourceElement, parentObject, out constructorParameterTypes, out constructorParameterValues);
 
+            // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             string innerTypeName = ReadAttribute(sourceElement.Attributes(), genericTypeDefinition.AttributeForInnerType, typeof(string)) as string;
 
             if (string.IsNullOrEmpty(innerTypeName))
                 throw ThrowHelper.New<MissingMandatoryValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.MissingMandatoryAttribute,
-                    genericTypeDefinition.AttributeForInnerType.LocalName, genericTypeDefinition.ElementName.LocalName);
+                    genericTypeDefinition.AttributeForInnerType.LocalName, genericTypeDefinition.ElementName!.LocalName);
 
             Type innerType;
 
             if (string.IsNullOrEmpty(genericTypeDefinition.InnerTypeNamespace))
-                innerType = Type.GetType(innerTypeName);
+                innerType = Type.GetType(innerTypeName)!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             else
             {
-                innerType = Type.GetType(string.Format("{0}.{1}", genericTypeDefinition.InnerTypeNamespace, innerTypeName));
+                innerType = Type.GetType(string.Format("{0}.{1}", genericTypeDefinition.InnerTypeNamespace, innerTypeName))!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             }
 
             if (innerType == null)
                 throw ThrowHelper.New<InvalidFieldValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.UnrecognisedTypeError, innerTypeName,
-                    genericTypeDefinition.AttributeForInnerType.LocalName, genericTypeDefinition.ElementName.LocalName);
+                    genericTypeDefinition.AttributeForInnerType.LocalName, genericTypeDefinition.ElementName!.LocalName);
 
-            object newObject = CreateRawObject(genericTypeDefinition.TargetType, new Type[] { innerType }, constructorParameterTypes, constructorParameterValues);
+            object newObject = CreateRawObject(genericTypeDefinition.TargetType!, new Type[] { innerType }, constructorParameterTypes, constructorParameterValues); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             IEnumerable<XAttribute> attributes = sourceElement.Attributes();
 
             try
             {
-                ProcessAttributes(newObject.GetType(), genericTypeDefinition.Attributes, attributes, newObject);
+                ProcessAttributes(newObject.GetType(), genericTypeDefinition.Attributes!, attributes, newObject); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                 ProcessAttributes(newObject.GetType(), genericTypeDefinition.InnerTypeToAttributesMap[innerType], attributes, newObject);
             }
             catch (MissingMandatoryValueException ex)
@@ -139,7 +140,7 @@ namespace Atdl4net.Xml.Serialization
             return newObject;
         }
 
-        private object CreateObject(MultiTypeElementDefinition multiTypeDefinition, XElement sourceElement, object parentObject)
+        private object CreateObject(MultiTypeElementDefinition multiTypeDefinition, XElement sourceElement, object? parentObject)
         {
             _log.LogDebug("CreateObject(MultiTypeElementDefinition, XElement) called; ElementName='{ElementName}'.", multiTypeDefinition.ElementName);
 
@@ -148,12 +149,13 @@ namespace Atdl4net.Xml.Serialization
 
             GetConstructorParameters(multiTypeDefinition, sourceElement, parentObject, out constructorParameterTypes, out constructorParameterValues);
 
+            // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             string typeName = ReadAttribute(sourceElement.Attributes(), multiTypeDefinition.AttributeForType, typeof(string)) as string;
 
             if (string.IsNullOrEmpty(typeName))
                 throw ThrowHelper.New<MissingMandatoryValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.MissingMandatoryAttribute,
-                    multiTypeDefinition.AttributeForType.LocalName, multiTypeDefinition.ElementName.LocalName);
-            
+                    multiTypeDefinition.AttributeForType.LocalName, multiTypeDefinition.ElementName!.LocalName);
+
             // If the value for the typename is in an XML namespace, remove it.
             if (typeName.Contains(':') && typeName.IndexOf(':') < typeName.Length - 1)
                 typeName = typeName.Substring(typeName.IndexOf(':') + 1);
@@ -161,15 +163,15 @@ namespace Atdl4net.Xml.Serialization
             Type targetType;
 
             if (string.IsNullOrEmpty(multiTypeDefinition.TypeNamespace))
-                targetType = Type.GetType(typeName);
+                targetType = Type.GetType(typeName)!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             else
             {
-                targetType = Type.GetType(string.Format("{0}.{1}", multiTypeDefinition.TypeNamespace, typeName));
+                targetType = Type.GetType(string.Format("{0}.{1}", multiTypeDefinition.TypeNamespace, typeName))!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             }
 
             if (targetType == null)
                 throw ThrowHelper.New<InvalidFieldValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.UnrecognisedTypeError, typeName,
-                    multiTypeDefinition.AttributeForType.LocalName, multiTypeDefinition.ElementName.LocalName);
+                    multiTypeDefinition.AttributeForType.LocalName, multiTypeDefinition.ElementName!.LocalName);
 
             object newObject = CreateRawObject(targetType, constructorParameterTypes, constructorParameterValues);
 
@@ -177,7 +179,7 @@ namespace Atdl4net.Xml.Serialization
 
             try
             {
-                ProcessAttributes(newObject.GetType(), multiTypeDefinition.Attributes, attributes, newObject);
+                ProcessAttributes(newObject.GetType(), multiTypeDefinition.Attributes!, attributes, newObject); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                 ProcessAttributes(newObject.GetType(), multiTypeDefinition.TypeToAttributesMap[targetType], attributes, newObject);
             }
             catch (Atdl4netException ex)
@@ -202,7 +204,7 @@ namespace Atdl4net.Xml.Serialization
             ConstructorInfo classConstructor = specificType.GetConstructor(argTypes);
 
             if (classConstructor == null)
-                throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.NoConstructorFoundForSpecifiedArgumentTypes, outerType.FullName);
+                throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.NoConstructorFoundForSpecifiedArgumentTypes, outerType.FullName!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             return classConstructor.Invoke(args);
         }
@@ -214,12 +216,12 @@ namespace Atdl4net.Xml.Serialization
             ConstructorInfo classConstructor = targetType.GetConstructor(argTypes);
 
             if (classConstructor == null)
-                throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.NoConstructorFoundForSpecifiedArgumentTypes, targetType.FullName);
+                throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.NoConstructorFoundForSpecifiedArgumentTypes, targetType.FullName!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             return classConstructor.Invoke(args);
         }
 
-        private void GetConstructorParameters(ElementDefinition elementDefinition, XElement sourceElement, object parentObject,
+        private void GetConstructorParameters(ElementDefinition elementDefinition, XElement sourceElement, object? parentObject,
             out Type[] constructorParameterTypes, out object[] constructorParameterValues)
         {
             _log.LogDebug("GetConstructorParameters called; ElementName='{ElementName}'.", elementDefinition.ElementName);
@@ -238,7 +240,7 @@ namespace Atdl4net.Xml.Serialization
                             break;
 
                         case SourceType.ParentObject:
-                            constructorParameterValues[n] = parentObject;
+                            constructorParameterValues[n] = parentObject!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                             break;
 
                         case SourceType.NamedPredecessor:
@@ -289,17 +291,18 @@ namespace Atdl4net.Xml.Serialization
                     if (names.Length != 2)
                         throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.InvalidPropertyIndirection, attrDefn.Property);
 
-                    PropertyInfo outerProperty = targetType.GetProperty(names[0]);
+                    // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+                    PropertyInfo outerProperty = targetType.GetProperty(names[0])!;
 
                     if (outerProperty == null)
-                        throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal, names[0], targetType.FullName);
+                        throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal, names[0], targetType.FullName!);
 
-                    object innerObject = outerProperty.GetValue(target, null);
+                    object innerObject = outerProperty.GetValue(target, null)!;
 
                     if (innerObject == null)
-                        throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnableToRetrievePropertyValueOnObject, attrDefn.Property, targetType.FullName);
+                        throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnableToRetrievePropertyValueOnObject, attrDefn.Property, targetType.FullName!);
 
-                    PropertyInfo property = outerProperty.PropertyType.GetProperty(names[1]);
+                    PropertyInfo property = outerProperty.PropertyType.GetProperty(names[1])!;
 
                     if (property == null)
                         throw ThrowHelper.New<InvalidPropertyOnObjectException>(this, ErrorMessages.PropertyNotFoundOnObject, attrDefn.Property, targetType.Name);
@@ -308,7 +311,7 @@ namespace Atdl4net.Xml.Serialization
                 }
                 else
                 {
-                    PropertyInfo property = targetType.GetProperty(attrDefn.Property);
+                    PropertyInfo property = targetType.GetProperty(attrDefn.Property)!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
                     if (property == null)
                         throw ThrowHelper.New<InvalidPropertyOnObjectException>(this, ErrorMessages.PropertyNotFoundOnObject, attrDefn.Property, targetType.Name);
@@ -325,7 +328,8 @@ namespace Atdl4net.Xml.Serialization
             // We have to reflect the target type as we can't rely on the Definition to contain it (e.g. MultiTypeElementDefinition).
             Type targetType = target.GetType();
 
-            foreach (ChildElementDefinition childDefinition in definition.ChildElements)
+            // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+            foreach (ChildElementDefinition childDefinition in definition.ChildElements!)
             {
                 bool isRecursiveDefinition = childDefinition.ElementDefinition is RecursiveTypeElementDefinition;
                 bool hasContainerElement = !isRecursiveDefinition && childDefinition.ContainerElementName != null;
@@ -351,31 +355,31 @@ namespace Atdl4net.Xml.Serialization
                     object childObject;
 
                     if (targetDefinition is GenericTypeElementDefinition)
-                        childObject = CreateObject(targetDefinition as GenericTypeElementDefinition, childElement, target);
+                        childObject = CreateObject((GenericTypeElementDefinition)targetDefinition, childElement, target); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                     else if (targetDefinition is MultiTypeElementDefinition)
-                        childObject = CreateObject(targetDefinition as MultiTypeElementDefinition, childElement, target);
+                        childObject = CreateObject((MultiTypeElementDefinition)targetDefinition, childElement, target); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                     else
                         childObject = CreateObject(targetDefinition, childElement, target);
 
-                    PropertyInfo property = targetType.GetProperty(childDefinition.ContainerProperty);
+                    PropertyInfo property = targetType.GetProperty(childDefinition.ContainerProperty)!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
                     if (property == null)
-                        throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal, 
-                            childDefinition.ContainerProperty, targetType.FullName);
+                        throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal,
+                            childDefinition.ContainerProperty, targetType.FullName!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                     try
                     {
-                        // For the case of MultiTypeElementDefinition we must use the reflected type 
+                        // For the case of MultiTypeElementDefinition we must use the reflected type
                         ProcessChildProperty(childDefinition, property, targetDefinition.TargetType ?? childObject.GetType(), target, childObject);
                     }
                     catch (Atdl4netException ex)
                     {
                         throw ThrowHelper.Rethrow(this, ex, new ExceptionInfo(childElement), ErrorMessages.GeneralElementProcessingError,
-                            definition.ElementName.LocalName);
+                            definition.ElementName!.LocalName); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                     }
                     catch (ArgumentException ex)
                     {
                         throw ThrowHelper.New<Atdl4netException>(this, ex, new ExceptionInfo(childElement), ErrorMessages.GeneralElementProcessingError,
-                            definition.ElementName.LocalName, ex.Message);
+                            definition.ElementName!.LocalName, ex.Message); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
                     }
                 }
             }
@@ -398,16 +402,16 @@ namespace Atdl4net.Xml.Serialization
                     return;
                 }
                 else
-                    containerMethod = Enum.GetName(typeof(StandardContainerMethod), childDefinition.ContainerMethod);
+                    containerMethod = Enum.GetName(typeof(StandardContainerMethod), childDefinition.ContainerMethod)!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             }
             else
                 containerMethod = childDefinition.ContainerMethod as string;
 
-            MethodInfo targetMethod = property.PropertyType.GetMethod(containerMethod, new Type[] { targetType });
+            MethodInfo targetMethod = property.PropertyType.GetMethod(containerMethod!, new Type[] { targetType })!; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
 
             if (targetMethod == null)
                 throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.ContainerMethodNotFoundOnObject,
-                    containerMethod, targetType.FullName);
+                    containerMethod, targetType.FullName!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             try
             {
                 targetMethod.Invoke(property.GetValue(target, null), new object[] { childObject });
@@ -490,7 +494,7 @@ namespace Atdl4net.Xml.Serialization
             catch (ArgumentException ex)
             {
                 throw ThrowHelper.New<InternalErrorException>(ExceptionContext, ex, InternalErrors.UnableToSetPropertyValueOnObject,
-                    property.Name, value, target.GetType().FullName);
+                    property.Name, value, target.GetType().FullName!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
             }
         }
 
