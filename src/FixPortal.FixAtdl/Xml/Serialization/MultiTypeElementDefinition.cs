@@ -16,7 +16,7 @@ public class MultiTypeElementDefinition : ElementDefinition
     public string TypeNamespace { get; private set; }
     public Dictionary<Type, ElementAttribute[]> TypeToAttributesMap { get; private set; }
 
-    public MultiTypeElementDefinition(XName elementName, XName attributeForType, string typeNamespace, 
+    public MultiTypeElementDefinition(XName elementName, XName attributeForType, string typeNamespace,
         ConstructorParameter[] constructorParameters, ElementAttribute[] commonAttributes,
         Dictionary<Type, ElementAttribute[]> attributeDictionary, ChildElementDefinition[] children)
         : base(elementName, (Type?)null, constructorParameters, commonAttributes, children, null)

@@ -44,7 +44,7 @@ public class ElementDefinition
     {
     }
 
-    public ElementDefinition(XName elementName, Type targetType, ConstructorParameter[] constructorParameters, ElementAttribute[] attributes, 
+    public ElementDefinition(XName elementName, Type targetType, ConstructorParameter[] constructorParameters, ElementAttribute[] attributes,
         ChildElementDefinition child)
         : this(elementName, targetType, constructorParameters, attributes, [child], null)
     {

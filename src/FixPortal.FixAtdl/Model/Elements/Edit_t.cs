@@ -312,7 +312,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             IComparable? comparableRhs = rhs as IComparable;
 
             if (comparableLhs != null && comparableRhs != null)
-                equal = comparableLhs.CompareTo(comparableRhs) ==0;
+                equal = comparableLhs.CompareTo(comparableRhs) == 0;
             else
                 equal = lhs.Equals(rhs);
         }

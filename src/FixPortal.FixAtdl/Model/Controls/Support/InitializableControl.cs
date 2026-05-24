@@ -31,7 +31,7 @@ public abstract class InitializableControl<T> : Control_t
     /// </summary>
     /// <param name="id">Id of this control.</param>
     protected InitializableControl(string id)
-        :base(id)
+        : base(id)
     {
     }
 

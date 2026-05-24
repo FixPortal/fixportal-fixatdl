@@ -523,5 +523,5 @@ public enum IsoCurrencyCode
     ZMK,
 
     /// <summary>Zimbabwe Dollars (Zimbabwe)</summary>
-    ZWD 
+    ZWD
 }

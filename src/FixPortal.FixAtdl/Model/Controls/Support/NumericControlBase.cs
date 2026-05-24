@@ -155,8 +155,8 @@ public class NumericControlBase : InitializableControl<decimal?>
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
-     /// <param name="targetParameter">Target parameter for this conversion.</param>
-   /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public override decimal? ToDecimal(IParameter targetParameter, IFormatProvider provider)
     {

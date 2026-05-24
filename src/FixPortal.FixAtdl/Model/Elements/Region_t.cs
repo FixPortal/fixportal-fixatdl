@@ -16,7 +16,7 @@ public class Region_t
     public Region Name { get; set; }
     public Inclusion_t Inclusion { get; set; }
 
-    public CountryCollection Countries 
+    public CountryCollection Countries
     {
         get
         {

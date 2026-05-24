@@ -41,7 +41,7 @@ public interface IParameterConvertible
     /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable 32-bit signed integer equivalent to the value of this instance.</returns>
     int? ToInt32(IParameter targetParameter, IFormatProvider provider);
-    
+
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified culture-specific formatting information.
     /// </summary>

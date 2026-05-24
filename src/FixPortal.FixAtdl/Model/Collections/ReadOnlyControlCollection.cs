@@ -263,13 +263,16 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
 
         // Approach 1 - use the radio button group name
         if (radioButton.RadioGroup != null)
-            radioButtons = (from c in _controls.Values where c.Id != radioButton.Id &&
+            radioButtons = (from c in _controls.Values
+                            where c.Id != radioButton.Id &&
                                  c is RadioButton_t && (c as RadioButton_t)!.RadioGroup == radioButton.RadioGroup
-                                 select c as RadioButton_t);
+                            select c as RadioButton_t);
         else
-        // Approach 2 - look for radio buttons on the same panel
-            radioButtons = (from c in radioButton.OwningStrategyPanel!.Controls where c.Id != radioButton.Id &&
-                                 c is RadioButton_t select c as RadioButton_t);
+            // Approach 2 - look for radio buttons on the same panel
+            radioButtons = (from c in radioButton.OwningStrategyPanel!.Controls
+                            where c.Id != radioButton.Id &&
+                                 c is RadioButton_t
+                            select c as RadioButton_t);
 
         if (radioButtons.Count() == 1)
             radioButtons.First().SetValue(true);

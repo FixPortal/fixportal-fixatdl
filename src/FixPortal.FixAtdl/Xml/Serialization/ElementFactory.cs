@@ -98,7 +98,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         GetConstructorParameters(genericTypeDefinition, sourceElement, parentObject, out constructorParameterTypes, out constructorParameterValues);
 
-       
+
         string? innerTypeName = ReadAttribute(sourceElement.Attributes(), genericTypeDefinition.AttributeForInnerType, typeof(string)) as string;
 
         if (string.IsNullOrEmpty(innerTypeName))
@@ -149,7 +149,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         GetConstructorParameters(multiTypeDefinition, sourceElement, parentObject, out constructorParameterTypes, out constructorParameterValues);
 
-       
+
         string? typeName = ReadAttribute(sourceElement.Attributes(), multiTypeDefinition.AttributeForType, typeof(string)) as string;
 
         if (string.IsNullOrEmpty(typeName))
@@ -291,7 +291,7 @@ public class ElementFactory : INotifyClassDeserialized
                 if (names.Length != 2)
                     throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.InvalidPropertyIndirection, attrDefn.Property);
 
-               
+
                 PropertyInfo outerProperty = targetType.GetProperty(names[0])!;
 
                 if (outerProperty == null)
@@ -328,7 +328,7 @@ public class ElementFactory : INotifyClassDeserialized
         // We have to reflect the target type as we can't rely on the Definition to contain it (e.g. MultiTypeElementDefinition).
         Type targetType = target.GetType();
 
-       
+
         foreach (ChildElementDefinition childDefinition in definition.ChildElements!)
         {
             bool isRecursiveDefinition = childDefinition.ElementDefinition is RecursiveTypeElementDefinition;
@@ -419,7 +419,7 @@ public class ElementFactory : INotifyClassDeserialized
         catch (TargetInvocationException ex)
         {
             if (ex.InnerException != null)
-                throw ThrowHelper.Rethrow(this, ex.InnerException, ErrorMessages.UnableToInvokeMethodError, 
+                throw ThrowHelper.Rethrow(this, ex.InnerException, ErrorMessages.UnableToInvokeMethodError,
                     string.Format("the {0} method on the {1} property", containerMethod, property.Name));
             else
                 throw;
@@ -504,7 +504,7 @@ public class ElementFactory : INotifyClassDeserialized
     {
         EventHandler<ClassDeserializedEventArgs>? classDeserialized = ClassDeserialized;
 
-        if (classDeserialized!=null)
+        if (classDeserialized != null)
             classDeserialized(this, new ClassDeserializedEventArgs(classType, extraInfo));
     }
 

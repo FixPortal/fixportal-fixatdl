@@ -19,7 +19,7 @@ public static class ModelUtils
     static ModelUtils()
     {
         _types = from t in Assembly.GetExecutingAssembly().GetTypes()
-                 where (t.IsClass && t.Namespace == "Atdl4net.Model.Types") && !t.IsAbstract 
+                 where (t.IsClass && t.Namespace == "Atdl4net.Model.Types") && !t.IsAbstract
                  select t;
     }
 

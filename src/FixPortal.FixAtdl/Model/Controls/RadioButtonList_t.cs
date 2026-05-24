@@ -35,6 +35,6 @@ public class RadioButtonList_t : ListControlBase, IOrientableControl
     /// <summary>Must be “HORIZONTAL” or “VERTICAL”. Declares the orientation of the radio buttons within a RadioButtonList
     ///  or the checkboxes within a CheckBoxList.  Applicable when xsi:type is RadioButtonList_t or CheckBoxList_t.</summary>
     public Orientation_t? Orientation { get; set; }
-    
+
     #endregion
 }

@@ -19,7 +19,7 @@ public enum Region
 
     /// <summary>The Americas region.</summary>
     TheAmericas = 1,
-    
+
     /// <summary>The Europe, Middle East and Africa region.</summary>
     EuropeMiddleEastAfrica = 2,
 

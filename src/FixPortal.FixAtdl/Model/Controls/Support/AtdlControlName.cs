@@ -17,43 +17,43 @@ public class AtdlControlName
 
     /// <summary>CheckBoxList_t type.</summary>
     public const string CheckBoxList_t = "CheckBoxList_t";
-    
+
     /// <summary>Clock_t type.</summary>
     public const string Clock_t = "Clock_t";
-    
+
     /// <summary>DoubleSpinner_t type.</summary>
     public const string DoubleSpinner_t = "DoubleSpinner_t";
-    
+
     /// <summary>DropDownList_t type.</summary>
     public const string DropDownList_t = "DropDownList_t";
-    
+
     /// <summary>EditableDropDownList_t type.</summary>
     public const string EditableDropDownList_t = "EditableDropDownList_t";
-    
+
     /// <summary>HiddenField_t type.</summary>
     public const string HiddenField_t = "HiddenField_t";
-    
+
     /// <summary>Label_t type.</summary>
     public const string Label_t = "Label_t";
-    
+
     /// <summary>MultiSelectList_t type.</summary>
     public const string MultiSelectList_t = "MultiSelectList_t";
-    
+
     /// <summary>RadioButton_t type.</summary>
     public const string RadioButton_t = "RadioButton_t";
-    
+
     /// <summary>RadioButtonList_t type.</summary>
     public const string RadioButtonList_t = "RadioButtonList_t";
-    
+
     /// <summary>SingleSelectList_t type.</summary>
     public const string SingleSelectList_t = "SingleSelectList_t";
-    
+
     /// <summary>SingleSpinner_t type.</summary>
     public const string SingleSpinner_t = "SingleSpinner_t";
-    
+
     /// <summary>Slider_t type.</summary>
     public const string Slider_t = "Slider_t";
-    
+
     /// <summary>TextField_t type.</summary>
     public const string TextField_t = "TextField_t";
 }

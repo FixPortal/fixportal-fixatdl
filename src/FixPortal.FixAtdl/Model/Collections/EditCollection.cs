@@ -42,7 +42,7 @@ public class EditCollection : KeyedCollection<string, Edit_t>
     {
         Edit_t sourceEdit = this[Id];
 
-        return Copy<T>(sourceEdit); 
+        return Copy<T>(sourceEdit);
     }
 
     /// <summary>

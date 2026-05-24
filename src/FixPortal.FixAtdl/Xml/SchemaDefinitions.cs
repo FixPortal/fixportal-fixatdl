@@ -70,7 +70,7 @@ public static class SchemaDefinitions
 
     private static readonly ElementDefinition Region_t = new(
         AtdlNamespaces.core + "Region", typeof(Atdl4net.Model.Elements.Region_t), RegionAttributes,
-        new ChildElementDefinition(SchemaDefinitions.Country_t, "Countries", 
+        new ChildElementDefinition(SchemaDefinitions.Country_t, "Countries",
                 typeof(Atdl4net.Model.Collections.CountryCollection), StandardContainerMethod.Add));
 
     private static readonly ContainerElementDefinition Regions = new(
@@ -234,35 +234,35 @@ public static class SchemaDefinitions
         ParameterConstructorParameters, ParameterCommonAttributes,
         new Dictionary<Type, ElementAttribute[]>()
         {
-	            {  typeof(Amt_t), FloatDefinition },
-	            {  typeof(Boolean_t), BooleanDefinition },
-	            {  typeof(Char_t), CharDefinition },
-	            {  typeof(Country_t), CountryDefinition },
-	            {  typeof(Currency_t), CurrencyDefinition },
-	            {  typeof(Data_t), DataDefinition },
-	            {  typeof(Exchange_t), ExchangeDefinition },
-	            {  typeof(Float_t), FloatDefinition },
-	            {  typeof(Int_t), IntDefinition },
-	            {  typeof(Language_t), LanguageDefinition },
-	            {  typeof(Length_t), LengthDefinition },
-	            {  typeof(LocalMktDate_t), LocalMktDateDefinition },
-	            {  typeof(MonthYear_t), MonthYearDefinition },
-	            {  typeof(MultipleCharValue_t), MultipleStringValueDefinition },
-	            {  typeof(MultipleStringValue_t), MultipleStringValueDefinition },
-	            {  typeof(NumInGroup_t), LengthDefinition },
-	            {  typeof(Percentage_t), PercentageDefinition },
-	            {  typeof(Price_t), FloatDefinition },
-	            {  typeof(PriceOffset_t), FloatDefinition },
-	            {  typeof(Qty_t), FloatDefinition },
-	            {  typeof(SeqNum_t), LengthDefinition },
-	            {  typeof(String_t), StringDefinition },
-	            {  typeof(TagNum_t), LengthDefinition },
-	            {  typeof(Tenor_t), TenorDefinition },
-	            {  typeof(TZTimeOnly_t), TZTimeOnlyDefinition },
-	            {  typeof(TZTimestamp_t), TZTimeOnlyDefinition },
-	            {  typeof(UTCDateOnly_t), TZTimeOnlyDefinition },
-	            {  typeof(UTCTimeOnly_t), TZTimeOnlyDefinition },
-	            {  typeof(UTCTimestamp_t), UTCTimestampDefinition }
+                {  typeof(Amt_t), FloatDefinition },
+                {  typeof(Boolean_t), BooleanDefinition },
+                {  typeof(Char_t), CharDefinition },
+                {  typeof(Country_t), CountryDefinition },
+                {  typeof(Currency_t), CurrencyDefinition },
+                {  typeof(Data_t), DataDefinition },
+                {  typeof(Exchange_t), ExchangeDefinition },
+                {  typeof(Float_t), FloatDefinition },
+                {  typeof(Int_t), IntDefinition },
+                {  typeof(Language_t), LanguageDefinition },
+                {  typeof(Length_t), LengthDefinition },
+                {  typeof(LocalMktDate_t), LocalMktDateDefinition },
+                {  typeof(MonthYear_t), MonthYearDefinition },
+                {  typeof(MultipleCharValue_t), MultipleStringValueDefinition },
+                {  typeof(MultipleStringValue_t), MultipleStringValueDefinition },
+                {  typeof(NumInGroup_t), LengthDefinition },
+                {  typeof(Percentage_t), PercentageDefinition },
+                {  typeof(Price_t), FloatDefinition },
+                {  typeof(PriceOffset_t), FloatDefinition },
+                {  typeof(Qty_t), FloatDefinition },
+                {  typeof(SeqNum_t), LengthDefinition },
+                {  typeof(String_t), StringDefinition },
+                {  typeof(TagNum_t), LengthDefinition },
+                {  typeof(Tenor_t), TenorDefinition },
+                {  typeof(TZTimeOnly_t), TZTimeOnlyDefinition },
+                {  typeof(TZTimestamp_t), TZTimeOnlyDefinition },
+                {  typeof(UTCDateOnly_t), TZTimeOnlyDefinition },
+                {  typeof(UTCTimeOnly_t), TZTimeOnlyDefinition },
+                {  typeof(UTCTimestamp_t), UTCTimestampDefinition }
         },
         [EnumPairs]);
 
@@ -307,25 +307,25 @@ public static class SchemaDefinitions
     public static readonly ElementDefinition Edit_t = new(
         AtdlNamespaces.val + "Edit", typeof(Atdl4net.Model.Elements.Edit_t), EditAttributes,
         [
-            new ChildElementDefinition(new RecursiveTypeElementDefinition(), "Edits", 
+            new ChildElementDefinition(new RecursiveTypeElementDefinition(), "Edits",
                 typeof(Atdl4net.Model.Collections.EditCollection), StandardContainerMethod.Add)
         ]);
 
     private static readonly ElementDefinition Edit_t_Control_t = new(
         AtdlNamespaces.val + "Edit", typeof(Atdl4net.Model.Elements.Edit_t<Atdl4net.Model.Elements.Control_t>), EditAttributes,
         [
-            new ChildElementDefinition(new RecursiveTypeElementDefinition(), "Edits", 
+            new ChildElementDefinition(new RecursiveTypeElementDefinition(), "Edits",
                 typeof(Atdl4net.Model.Collections.EditEvaluatingCollection<Atdl4net.Model.Elements.Control_t>), StandardContainerMethod.Add),
-            new ChildElementDefinition(SchemaDefinitions.EditRef_t_Control_t, "EditRefs", 
+            new ChildElementDefinition(SchemaDefinitions.EditRef_t_Control_t, "EditRefs",
                 typeof(Atdl4net.Model.Collections.EditRefCollection<Atdl4net.Model.Elements.Control_t>), StandardContainerMethod.Add)
         ]);
 
     private static readonly ElementDefinition Edit_t_IParameter_t = new(
         AtdlNamespaces.val + "Edit", typeof(Atdl4net.Model.Elements.Edit_t<Atdl4net.Model.Elements.Support.IParameter>), EditAttributes,
         [
-            new ChildElementDefinition(new RecursiveTypeElementDefinition(), "Edits", 
+            new ChildElementDefinition(new RecursiveTypeElementDefinition(), "Edits",
                 typeof(Atdl4net.Model.Collections.EditEvaluatingCollection<Atdl4net.Model.Elements.Support.IParameter>), StandardContainerMethod.Add),
-            new ChildElementDefinition(SchemaDefinitions.EditRef_t_IParameter_t, "EditRefs", 
+            new ChildElementDefinition(SchemaDefinitions.EditRef_t_IParameter_t, "EditRefs",
                 typeof(Atdl4net.Model.Collections.EditRefCollection<Atdl4net.Model.Elements.Support.IParameter>), StandardContainerMethod.Add)
         ]);
 
@@ -526,7 +526,7 @@ public static class SchemaDefinitions
         ],
         StrategyPanelAttributes,
         [
-            new ChildElementDefinition(new RecursiveTypeElementDefinition(), "StrategyPanels", 
+            new ChildElementDefinition(new RecursiveTypeElementDefinition(), "StrategyPanels",
                 typeof(Atdl4net.Model.Collections.StrategyPanelCollection), StandardContainerMethod.Add),
             new ChildElementDefinition(SchemaDefinitions.Control_t, "Controls",
                 typeof(Atdl4net.Model.Collections.ControlCollection), StandardContainerMethod.Add)
@@ -560,9 +560,9 @@ public static class SchemaDefinitions
         AtdlNamespaces.val + "StrategyEdit", typeof(Atdl4net.Model.Elements.StrategyEdit_t),
         StrategyEditAttributes,
         [
-            new ChildElementDefinition(SchemaDefinitions.Edit_t_IParameter_t, "Edit", 
+            new ChildElementDefinition(SchemaDefinitions.Edit_t_IParameter_t, "Edit",
                 typeof(Atdl4net.Model.Elements.Edit_t<Atdl4net.Model.Elements.Support.IParameter>), StandardContainerMethod.Assign),
-            new ChildElementDefinition(SchemaDefinitions.EditRef_t_IParameter_t, "EditRef", 
+            new ChildElementDefinition(SchemaDefinitions.EditRef_t_IParameter_t, "EditRef",
                 typeof(Atdl4net.Model.Elements.EditRef_t<Atdl4net.Model.Elements.Support.IParameter>), StandardContainerMethod.Assign)
         ]);
 

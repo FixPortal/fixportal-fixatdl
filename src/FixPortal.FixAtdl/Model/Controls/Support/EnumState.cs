@@ -91,7 +91,7 @@ public class EnumState : IComparable
 
         for (int n = 0; n < _enumIds.Length; n++)
         {
-            for (int index =0;index < source._enumIds.Length; index++)
+            for (int index = 0; index < source._enumIds.Length; index++)
                 if (source._enumIds[index] == _enumIds[n])
                 {
                     _enumStates.Set(n, source._enumStates[index]);
@@ -280,7 +280,7 @@ public class EnumState : IComparable
             allAreValid &= IsValidEnumId(enumId);
 
         if (!allAreValid && allowNonEnumValue)
-                _nonEnumValue = initValues;
+            _nonEnumValue = initValues;
         else
         {
             // [] operator will throw if any EnumId is invalid

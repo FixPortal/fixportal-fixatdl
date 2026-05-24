@@ -58,7 +58,7 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
         get
         {
             // Lazy initialisation as we can't use 'this' pointer in constructor.
-            if ( _controls == null)
+            if (_controls == null)
             {
                 _controls = new ControlCollection(this);
 
