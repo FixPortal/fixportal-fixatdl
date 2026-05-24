@@ -235,7 +235,7 @@ public class Strategy_t : IParentable<Strategies_t>
     /// <param name="shortCircuit">If true, this method returns as soon as any error is found; if false, an attempt is made to update all parameter
     /// values before the method returns.</param>
     /// <param name="validationResults">If one or more validations fail, this parameter contains a list of ValidationResults; null otherwise.</param>
-    public bool TryUpdateParameterValuesFromControls(bool shortCircuit, out IList<ValidationResult>? validationResults) // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+    public bool TryUpdateParameterValuesFromControls(bool shortCircuit, out IList<ValidationResult>? validationResults)
     {
         return Controls.TryUpdateParameterValues(Parameters, shortCircuit, out validationResults);
     }

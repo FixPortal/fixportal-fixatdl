@@ -264,7 +264,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
                     break;
 
                 default:
-                    _currentState = EvaluateInequalityComparison((lhs as IComparable)!, (GetRhsValue(additionalValues, lhs) as IComparable)!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+                    _currentState = EvaluateInequalityComparison((lhs as IComparable)!, (GetRhsValue(additionalValues, lhs) as IComparable)!);
                     break;
             }
         }

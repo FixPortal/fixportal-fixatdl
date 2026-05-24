@@ -16,7 +16,7 @@ namespace Atdl4net.Model.Elements;
 public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrategyPanel
 {
     private readonly Strategy_t _owningStrategy;
-    private StrategyPanel_t? _owningStrategyPanel; // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C
+    private StrategyPanel_t? _owningStrategyPanel;
     private readonly StrategyPanelCollection _strategyPanels;
     private ControlCollection _controls;
 

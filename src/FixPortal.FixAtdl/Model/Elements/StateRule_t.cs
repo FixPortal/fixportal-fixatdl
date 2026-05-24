@@ -41,13 +41,13 @@ public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
         sb.AppendFormat("(Control.ID=\"{0}\"", _owner.Id);
 
         if (Enabled != null)
-            sb.AppendFormat(", enabled=\"{0}\"", Enabled.ToString()!.ToLower()); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+            sb.AppendFormat(", enabled=\"{0}\"", Enabled.Value.ToString().ToLower());
 
         if (Value != null)
             sb.AppendFormat(", value=\"{0}\"", Value);
 
         if (Visible != null)
-            sb.AppendFormat(", visible=\"{0}\"", Visible.ToString()!.ToLower()); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+            sb.AppendFormat(", visible=\"{0}\"", Visible.Value.ToString().ToLower());
 
         sb.Append(")");
 

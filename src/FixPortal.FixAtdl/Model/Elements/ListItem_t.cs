@@ -21,7 +21,7 @@ public class ListItem_t : IComparable
         if (obj is string)
             return (EnumId).CompareTo(obj as string);
         else
-            throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.CompareValueFailure, "ListItem_t", obj!.GetType().FullName!); // FP Enhancement: 2026-05-23 — nullable cleanup deferred to Phase C.
+            throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.CompareValueFailure, "ListItem_t", obj?.GetType().FullName ?? "(null)");
     }
 
     public override string ToString()
