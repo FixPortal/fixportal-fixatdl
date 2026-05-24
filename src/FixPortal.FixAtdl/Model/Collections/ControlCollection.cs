@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System.Collections.ObjectModel;
-using Atdl4net.Model.Elements;
-using Atdl4net.Utility;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Utility;
 
-namespace Atdl4net.Model.Collections;
+namespace FixPortal.FixAtdl.Model.Collections;
 
 /// <summary>
 /// Collection for storing instances of Control_t.  This class is used at the StrategyPanel level.
@@ -67,3 +67,4 @@ public class ControlCollection : ObservableCollection<Control_t>
         }
     }
 }
+

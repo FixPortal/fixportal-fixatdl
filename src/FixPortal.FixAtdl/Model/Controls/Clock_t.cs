@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,17 +6,17 @@
 
 using System;
 using System.Globalization;
-using Atdl4net.Diagnostics;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Fix;
-using Atdl4net.Model.Controls.Support;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Controls;
+namespace FixPortal.FixAtdl.Model.Controls;
 
 /// <summary>
 /// Represents the Clock_t control element within FIXatdl.
@@ -233,3 +233,4 @@ public class Clock_t : InitializableControl<DateTime?>
 
     #endregion
 }
+

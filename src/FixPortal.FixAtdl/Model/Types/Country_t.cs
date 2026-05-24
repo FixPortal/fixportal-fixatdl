@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,15 +6,15 @@
 
 using System;
 using System.Linq;
-using Atdl4net.Model.Controls.Support;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Reference;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Resources;
-using Atdl4net.Utility;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Reference;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Utility;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Types;
+namespace FixPortal.FixAtdl.Model.Types;
 
 /// <summary>
 /// Country.
@@ -85,3 +85,4 @@ public class Country_t : EnumTypeBase<IsoCountryCode>
 
     #endregion
 }
+

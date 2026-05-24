@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -7,17 +7,17 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Atdl4net.Diagnostics;
-using Atdl4net.Fix;
-using Atdl4net.Model.Elements;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Enumerations;
-using Atdl4net.Resources;
-using Atdl4net.Utility;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Utility;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Collections;
+namespace FixPortal.FixAtdl.Model.Collections;
 
 /// <summary>
 /// Collection used to store typed instances of Edit_t, either for validating parameters via StrategyEdit, or 
@@ -131,3 +131,4 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
 
     #endregion IResolvable<Strategy_t> Members
 }
+

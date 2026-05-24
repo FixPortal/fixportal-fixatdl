@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,12 +6,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Atdl4net.Fix;
-using Atdl4net.Model.Collections;
-using Atdl4net.Utility;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Utility;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 /// <summary>
 /// Represents the FIXatdl Strategy element.
@@ -258,3 +258,4 @@ public class Strategy_t : IParentable<Strategies_t>
 
     #endregion
 }
+

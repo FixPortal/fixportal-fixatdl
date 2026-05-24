@@ -5,9 +5,9 @@
 #endregion
 
 using System.Collections.Generic;
-using Atdl4net.Utility;
+using FixPortal.FixAtdl.Utility;
 
-namespace Atdl4net.Fix;
+namespace FixPortal.FixAtdl.Fix;
 
 public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>>
 {
@@ -97,3 +97,4 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
         return _message.GetEnumerator();
     }
 }
+

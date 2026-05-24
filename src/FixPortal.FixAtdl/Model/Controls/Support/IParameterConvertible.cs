@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,9 +6,9 @@
 
 using System;
 using System.Linq;
-using Atdl4net.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
 
-namespace Atdl4net.Model.Controls.Support;
+namespace FixPortal.FixAtdl.Model.Controls.Support;
 
 /// <summary>
 /// Interface that all controls must implement such that their values can be converted to a form accepted by
@@ -78,3 +78,4 @@ public interface IParameterConvertible
     /// </summary>
     bool HasEnumeratedState { get; }
 }
+

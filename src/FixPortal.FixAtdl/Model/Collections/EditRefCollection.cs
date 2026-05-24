@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System.Collections.ObjectModel;
-using Atdl4net.Model.Elements;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Collections;
+namespace FixPortal.FixAtdl.Model.Collections;
 
 /// <summary>
 /// Collection used to store typed instances of EditRef_t.
@@ -69,3 +69,4 @@ public class EditRefCollection<T> : KeyedCollection<string, EditRef_t<T>> where 
         return item.Id;
     }
 }
+

@@ -8,11 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Resources;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Resources;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Fix;
+namespace FixPortal.FixAtdl.Fix;
 
 /// <summary>
 /// Represents a FIX message.
@@ -100,3 +100,4 @@ public class FixMessage : Dictionary<FixField, string>
         return sb.ToString();
     }
 }
+

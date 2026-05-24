@@ -1,4 +1,4 @@
-#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,13 +6,13 @@
 
 using System;
 
-namespace Atdl4net.Xml;
+namespace FixPortal.FixAtdl.Xml;
 
 /// <summary>
 /// Event arguments raised by <see cref="StrategiesReader"/> each time a strategy is loaded from
 /// an ATDL document.
 /// </summary>
-/// <remarks>FP Enhancement: 2026-05-23 — moved from Atdl4net.Notification to Atdl4net.Xml when
+/// <remarks>FP Enhancement: 2026-05-23 — moved from Atdl4net.Notification to FixPortal.FixAtdl.Xml when
 /// the Notification assembly was removed (Task A8).  The event itself is still public API.</remarks>
 public sealed class StrategyLoadedEventArgs : EventArgs
 {
@@ -35,3 +35,4 @@ public sealed class StrategyLoadedEventArgs : EventArgs
         StrategyName = strategyName;
     }
 }
+

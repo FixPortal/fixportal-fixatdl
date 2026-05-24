@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,10 +6,10 @@
 
 using System;
 using System.Collections.Generic;
-using Atdl4net.Model.Enumerations;
-using Atdl4net.Xml.Serialization;
+using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Xml.Serialization;
 
-namespace Atdl4net.Xml;
+namespace FixPortal.FixAtdl.Xml;
 
 /// <summary>
 /// Provides the string representation of all the enumerated types within FIXatdl.
@@ -90,3 +90,4 @@ public static class EnumDefinitions
             { "required", Model.Enumerations.Use_t.Required }
         });
 }
+

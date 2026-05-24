@@ -9,7 +9,7 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Diagnostics;
+namespace FixPortal.FixAtdl.Diagnostics;
 
 /// <summary>
 /// Static helper class for generating new instances of exceptions using the provided parameters
@@ -271,3 +271,4 @@ public static class ThrowHelper
         return exception;
     }
 }
+

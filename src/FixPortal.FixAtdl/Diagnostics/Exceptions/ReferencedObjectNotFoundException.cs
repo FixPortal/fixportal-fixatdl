@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,7 +6,7 @@
 
 using System;
 
-namespace Atdl4net.Diagnostics.Exceptions;
+namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 
 /// <summary>
 /// The exception that is thrown when a reference from one object to another cannot be resolved; for example, if a 
@@ -35,3 +35,4 @@ public class ReferencedObjectNotFoundException : Atdl4netException
     }
 
 }
+

@@ -8,12 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Model.Elements;
-using Atdl4net.Resources;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Resources;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Model.Collections;
+namespace FixPortal.FixAtdl.Model.Collections;
 
 public class ListItemCollection : KeyedCollection<string, ListItem_t>
 {
@@ -51,3 +51,4 @@ public class ListItemCollection : KeyedCollection<string, ListItem_t>
         return item.EnumId;
     }
 }
+

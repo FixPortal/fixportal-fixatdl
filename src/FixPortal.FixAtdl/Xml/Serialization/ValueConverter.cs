@@ -6,12 +6,12 @@
 
 using System;
 using System.Globalization;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Fix;
-using Atdl4net.Resources;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Resources;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Xml.Serialization;
+namespace FixPortal.FixAtdl.Xml.Serialization;
 
 public class ValueConverter
 {
@@ -54,14 +54,15 @@ public class ValueConverter
                     return result;
                 }
 
-            case "Atdl4net.Fix.FixTag":
+            case "FixPortal.FixAtdl.Fix.FixTag":
                 return new FixTag(Convert.ToInt32(value, CultureInfo.InvariantCulture));
 
             default:
-                if (targetType.FullName!.StartsWith("Atdl4net.Model.Controls.InitValue"))
+                if (targetType.FullName!.StartsWith("FixPortal.FixAtdl.Model.Controls.InitValue"))
                     return value;
                 else
                     throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.UnrecognisedAttributeType, targetType.FullName!);
         }
     }
 }
+

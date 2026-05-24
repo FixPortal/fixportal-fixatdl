@@ -1,4 +1,4 @@
-#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -9,14 +9,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
-using Atdl4net.Diagnostics;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Xml.Serialization;
+namespace FixPortal.FixAtdl.Xml.Serialization;
 
 public class ElementFactory : INotifyClassDeserialized
 {
@@ -512,3 +512,4 @@ public class ElementFactory : INotifyClassDeserialized
 
     #endregion
 }
+

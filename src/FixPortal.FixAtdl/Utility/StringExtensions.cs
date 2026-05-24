@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System;
-using Atdl4net.Diagnostics;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Resources;
 
-namespace Atdl4net.Utility;
+namespace FixPortal.FixAtdl.Utility;
 
 /// <summary>
 /// Provides extension methods for System.String.
@@ -52,3 +52,4 @@ public static class StringExtensions
         return result;
     }
 }
+

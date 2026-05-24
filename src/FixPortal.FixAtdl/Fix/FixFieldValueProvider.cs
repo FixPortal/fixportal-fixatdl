@@ -6,14 +6,14 @@
 
 using System;
 using System.Linq;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Elements;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Types;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Types;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Fix;
+namespace FixPortal.FixAtdl.Fix;
 
 /// <summary>
 /// Provides access to initial values for FIXatdl controls based on a set of input FIX fields.
@@ -135,4 +135,5 @@ public class FixFieldValueProvider
         }
     }
 }
+
 

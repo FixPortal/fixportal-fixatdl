@@ -5,10 +5,10 @@
 #endregion
 
 using System;
-using Atdl4net.Diagnostics;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Resources;
 
-namespace Atdl4net.Fix;
+namespace FixPortal.FixAtdl.Fix;
 
 /// <summary>
 /// Represents a FIX NumInGroup value, the number of elements in a repeating block.
@@ -30,7 +30,7 @@ public readonly struct NumInGroup
     }
 
     /// <summary>
-    /// Performs an implicit conversion from <see cref="int"/> to <see cref="Atdl4net.Fix.NumInGroup"/>.
+    /// Performs an implicit conversion from <see cref="int"/> to <see cref="FixPortal.FixAtdl.Fix.NumInGroup"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
@@ -40,7 +40,7 @@ public readonly struct NumInGroup
     }
 
     /// <summary>
-    /// Performs an implicit conversion from <see cref="Atdl4net.Fix.NumInGroup"/> to <see cref="int"/>.
+    /// Performs an implicit conversion from <see cref="FixPortal.FixAtdl.Fix.NumInGroup"/> to <see cref="int"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
@@ -60,3 +60,4 @@ public readonly struct NumInGroup
         return _value.ToString();
     }
 }
+

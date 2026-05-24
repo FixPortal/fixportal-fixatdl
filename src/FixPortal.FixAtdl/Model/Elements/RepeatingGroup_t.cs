@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 /// <summary>
 /// Represents the FIXatdl RepeatingGroup element.
@@ -12,3 +12,4 @@ namespace Atdl4net.Model.Elements;
 public class RepeatingGroup_t
 {
 }
+

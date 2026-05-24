@@ -1,13 +1,13 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System.Collections.ObjectModel;
-using Atdl4net.Model.Elements;
+using FixPortal.FixAtdl.Model.Elements;
 
-namespace Atdl4net.Model.Collections;
+namespace FixPortal.FixAtdl.Model.Collections;
 
 /// <summary>
 /// Represents a collection of Markets.
@@ -24,3 +24,4 @@ public class MarketCollection : KeyedCollection<string, Market_t>
         return item.MICCode;
     }
 }
+

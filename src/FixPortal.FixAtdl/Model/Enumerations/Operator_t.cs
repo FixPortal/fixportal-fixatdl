@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Enumerations;
+namespace FixPortal.FixAtdl.Model.Enumerations;
 
 /// <summary>
 /// FIXatdl Operator type.
@@ -35,3 +35,4 @@ public enum Operator_t
     /// <summary>Greater than or equal</summary>
     GreaterThanOrEqual
 }
+

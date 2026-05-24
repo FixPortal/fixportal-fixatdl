@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Controls.Support;
+namespace FixPortal.FixAtdl.Model.Controls.Support;
 
 /// <summary>
 /// Helper class containing the names of all the valid FIXatdl control types.
@@ -57,3 +57,4 @@ public class AtdlControlName
     /// <summary>TextField_t type.</summary>
     public const string TextField_t = "TextField_t";
 }
+

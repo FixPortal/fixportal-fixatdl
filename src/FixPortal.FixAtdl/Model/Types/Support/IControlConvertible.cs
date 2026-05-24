@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,10 +6,10 @@
 
 using System;
 using System.Linq;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Controls.Support;
 
-namespace Atdl4net.Model.Types.Support;
+namespace FixPortal.FixAtdl.Model.Types.Support;
 
 /// <summary>
 /// Interface that all parameter types (Amt_t, Boolean_t, etc.) must implement such that their values can be converted to a form accepted by
@@ -52,3 +52,4 @@ public interface IControlConvertible
     /// <returns>A valid EnumState, assuming the source value can be correctly converted.</returns>
     EnumState ToEnumState(EnumPairCollection enumPairs);
 }
+

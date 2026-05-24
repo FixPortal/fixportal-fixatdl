@@ -5,16 +5,16 @@
 #endregion
 
 using System;
-using Atdl4net.Diagnostics;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Controls.Support;
+namespace FixPortal.FixAtdl.Model.Controls.Support;
 
 /// <summary>
 /// Base class for the subset of FIXatdl controls that allow ListItems.
@@ -114,7 +114,7 @@ public abstract class ListControlBase : InitializableControl<string>
     {
         if (_value == null)
             throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedNullReference, "_value",
-                "Atdl4net.Model.Types.Support.EnumState");
+                "FixPortal.FixAtdl.Model.Types.Support.EnumState");
 
         if (newValue == null || newValue as string == Atdl.NullValue)
             _value.ClearAll();
@@ -253,3 +253,4 @@ public abstract class ListControlBase : InitializableControl<string>
 
     #endregion
 }
+

@@ -1,12 +1,12 @@
-using System.Text;
-using Atdl4net.Fix;
-using Atdl4net.Xml;
+﻿using System.Text;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Fix;
 
 public class ParameterCollectionOutputTests
 {
-    private static Atdl4net.Model.Elements.Strategies_t Load(string xml)
+    private static FixPortal.FixAtdl.Model.Elements.Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream);
@@ -37,3 +37,4 @@ public class ParameterCollectionOutputTests
         dict.Should().ContainKey(7700).WhoseValue.Should().Be("0.1");
     }
 }
+

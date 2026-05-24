@@ -7,14 +7,14 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using Atdl4net.Diagnostics;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Resources;
 
-namespace Atdl4net.Utility;
+namespace FixPortal.FixAtdl.Utility;
 
 public static class ProcessExtensions
 {
-    private static readonly string ExceptionContext = "Atdl4net.Utility.ProcessExtensions";
+    private static readonly string ExceptionContext = "FixPortal.FixAtdl.Utility.ProcessExtensions";
 
     public static bool IsVSDesigner(this Process process)
     {
@@ -27,3 +27,4 @@ public static class ProcessExtensions
         return false;
     }
 }
+

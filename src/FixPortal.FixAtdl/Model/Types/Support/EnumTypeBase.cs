@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,12 +6,12 @@
 
 using System;
 using System.Linq;
-using Atdl4net.Diagnostics;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Controls.Support;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Resources;
 
-namespace Atdl4net.Model.Types.Support;
+namespace FixPortal.FixAtdl.Model.Types.Support;
 
 public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible where T : struct
 {
@@ -80,3 +80,4 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible wh
 
     #endregion
 }
+

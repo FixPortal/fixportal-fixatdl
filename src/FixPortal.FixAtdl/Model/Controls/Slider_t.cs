@@ -1,15 +1,15 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System;
-using Atdl4net.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Controls.Support;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Controls;
+namespace FixPortal.FixAtdl.Model.Controls;
 
 /// <summary>
 /// Represents the Slider_t control element within FIXatdl.
@@ -31,3 +31,4 @@ public class Slider_t : ListControlBase
         _log.LogDebug("New Slider_t created as control {Arg0}", id);
     }
 }
+

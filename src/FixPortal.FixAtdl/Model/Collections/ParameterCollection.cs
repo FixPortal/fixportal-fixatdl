@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System.Collections.ObjectModel;
-using Atdl4net.Fix;
-using Atdl4net.Model.Elements.Support;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Elements.Support;
 
-namespace Atdl4net.Model.Collections;
+namespace FixPortal.FixAtdl.Model.Collections;
 
 /// <summary>
 /// Collection class for FIXatdl parameters, keyed on parameter name.
@@ -71,3 +71,4 @@ public class ParameterCollection : KeyedCollection<string, IParameter>, ISimpleD
             parameter.Reset();
     }
 }
+

@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -7,7 +7,7 @@
 using System;
 using System.Linq;
 
-namespace Atdl4net.Validation;
+namespace FixPortal.FixAtdl.Validation;
 
 /// <summary>
 /// Represents the results of a validation operation.
@@ -73,3 +73,4 @@ public class ValidationResult
         _validityType = ResultType.Valid;
     }
 }
+

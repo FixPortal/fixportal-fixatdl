@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System;
-using Atdl4net.Diagnostics;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Resources;
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 public class ListItem_t : IComparable
 {
@@ -29,3 +29,4 @@ public class ListItem_t : IComparable
         return UiRep;
     }
 }
+

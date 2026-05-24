@@ -1,13 +1,13 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Enumerations;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Enumerations;
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 public class Region_t
 {
@@ -28,3 +28,4 @@ public class Region_t
         }
     }
 }
+

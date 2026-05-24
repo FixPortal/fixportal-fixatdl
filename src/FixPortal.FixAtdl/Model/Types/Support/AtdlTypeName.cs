@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Types.Support;
+namespace FixPortal.FixAtdl.Model.Types.Support;
 
 /// <summary>
 /// Helper class containing the names of all the valid FIXatdl data types.
@@ -98,3 +98,4 @@ public class AtdlTypeName
     /// <summary>UTCTimestamp_t type.</summary>
     public const string UTCTimestamp_t = "UTCTimestamp_t";
 }
+

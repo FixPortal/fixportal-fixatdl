@@ -5,26 +5,26 @@
 #endregion
 
 using System.Collections.Generic;
-using Atdl4net.Diagnostics;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Fix;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Enumerations;
-using Atdl4net.Resources;
-using Atdl4net.Utility;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Utility;
+using FixPortal.FixAtdl.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 /// <summary>
 /// Represents a FIXatdl EditRef_t.
 /// </summary>
 public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, IValueProvider
 {
-    // Use Atdl4net.Validation namespace rather than Atdl4net.Model.Elements for debugging purposes
+    // Use FixPortal.FixAtdl.Validation namespace rather than FixPortal.FixAtdl.Model.Elements for debugging purposes
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private static readonly ILogger _log = NullLogger.Instance;
 
@@ -143,3 +143,4 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
 
     #endregion IBinIResolvabledable<Strategy_t> Members
 }
+

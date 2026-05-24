@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Xml.Serialization;
+namespace FixPortal.FixAtdl.Xml.Serialization;
 
 /// <summary>
 /// Enumeration that defines what type of containing is being deserialized.
@@ -21,6 +21,7 @@ public enum StandardContainerMethod
     /// </summary>
     Assign
 }
+
 
 
 

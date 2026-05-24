@@ -6,15 +6,15 @@
 
 using System;
 using System.Globalization;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Controls.Support;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Resources;
-using Atdl4net.Validation;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Validation;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Model.Types;
+namespace FixPortal.FixAtdl.Model.Types;
 
 /// <summary>
 /// 'string field representing month of a year. An optional day of the month can be appended or an optional week code.
@@ -166,3 +166,4 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
 
     #endregion
 }
+

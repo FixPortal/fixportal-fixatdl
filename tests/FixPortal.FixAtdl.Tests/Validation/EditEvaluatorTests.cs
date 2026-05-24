@@ -1,10 +1,10 @@
-using System.IO;
+﻿using System.IO;
 using System.Text;
-using Atdl4net.Model.Elements;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Enumerations;
-using Atdl4net.Utility;
-using Atdl4net.Xml;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Utility;
+using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Validation;
 
@@ -16,13 +16,13 @@ namespace FixPortal.FixAtdl.Tests.Validation;
 /// </summary>
 public class EditEvaluatorTests
 {
-    private static Atdl4net.Model.Elements.Strategies_t Load(string xml)
+    private static FixPortal.FixAtdl.Model.Elements.Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream);
     }
 
-    private static Atdl4net.Model.Elements.Strategy_t LoadTwap(string xml)
+    private static FixPortal.FixAtdl.Model.Elements.Strategy_t LoadTwap(string xml)
     {
         return Load(xml).Strategies[0];
     }
@@ -59,3 +59,4 @@ public class EditEvaluatorTests
         edit.CurrentState.Should().Be(expected);
     }
 }
+

@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Enumerations;
+namespace FixPortal.FixAtdl.Model.Enumerations;
 
 /// <summary>
 /// Describes how to initialize a control.  If the value of this attribute is undefined or equal to "UseValue" and 
@@ -21,3 +21,4 @@ public enum InitPolicy_t
     /// <summary>Attempt to initialize with the value of the tag specified in initFixField.</summary>
     UseFixField
 }
+

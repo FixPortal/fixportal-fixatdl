@@ -1,19 +1,19 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System;
-using Atdl4net.Diagnostics;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Controls.Support;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Resources;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Types;
+namespace FixPortal.FixAtdl.Model.Types;
 
 /// <summary>
 /// Represents a single character value, which can include any alphanumeric character or punctuation except the delimiter. All char 
@@ -143,3 +143,4 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
 
     #endregion
 }
+

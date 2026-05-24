@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Reference;
+namespace FixPortal.FixAtdl.Model.Reference;
 
 /// <summary>
 /// Enumeration of all the ISO 3166-1 alpha-2 country codes.
@@ -757,3 +757,4 @@ public enum IsoCountryCode
     /// <summary>Zimbabwe.</summary>
     ZW
 }
+

@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,13 +6,13 @@
 
 using System;
 using System.Collections.Generic;
-using Atdl4net.Diagnostics;
-using Atdl4net.Model.Elements;
-using Atdl4net.Model.Enumerations;
-using Atdl4net.Model.Reference;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Model.Reference;
+using FixPortal.FixAtdl.Resources;
 
-namespace Atdl4net.Model.Collections;
+namespace FixPortal.FixAtdl.Model.Collections;
 
 /// <summary>
 /// Collection for storing instances of Country_t.
@@ -60,3 +60,4 @@ public class CountryCollection : HashSet<Country_t>
         base.Add(item);
     }
 }
+

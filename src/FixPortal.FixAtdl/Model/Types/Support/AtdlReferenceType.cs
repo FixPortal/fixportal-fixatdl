@@ -6,17 +6,17 @@
 
 using System;
 using System.Linq;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Model.Controls.Support;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Enumerations;
-using Atdl4net.Resources;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Model.Types.Support;
+namespace FixPortal.FixAtdl.Model.Types.Support;
 
 /// <summary>
 /// Base class for all reference type parameters (String_t, MultipleCharValue_t, MultipleStringValue_t, etc.).
@@ -118,7 +118,7 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
     /// Sets the wire value for this parameter.  This method is typically used to initialise the parameter through the
     /// InitValue mechanism, but may also be used to initialise the parameter when doing order amendments.
     /// </summary>
-    /// <param name="hostParameter"><see cref="Atdl4net.Model.Elements.Parameter_t{T}"/> that is hosting this type. 
+    /// <param name="hostParameter"><see cref="FixPortal.FixAtdl.Model.Elements.Parameter_t{T}"/> that is hosting this type. 
     /// Parameters in Atdl4net are represented by means of the generic Parameter_t type with the appropriate type parameter, 
     /// for example, Parameter_t&lt;Amt_t&gt;.</param>
     /// <param name="value">New wire value (all wire values in Atdl4net are strings).</param>
@@ -242,3 +242,4 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
 
     #endregion
 }
+

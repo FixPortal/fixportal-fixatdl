@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Enumerations;
+namespace FixPortal.FixAtdl.Model.Enumerations;
 
 /// <summary>
 /// Declares the orientation of nested StrategyPanels within a strategyPanel or the orientation of radio buttons 
@@ -18,3 +18,4 @@ public enum Orientation_t
     /// <summary>Vertical orientation.</summary>
     Vertical
 }
+

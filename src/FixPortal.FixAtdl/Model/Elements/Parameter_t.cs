@@ -5,25 +5,25 @@
 #endregion
 
 using System;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Fix;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Controls.Support;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Enumerations;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Resources;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 /// <summary>
 /// Represents a Parameter_t type.
 /// </summary>
-/// <typeparam name="T">Valid FIXatdl type <see cref="Atdl4net.Model.Types"/></typeparam>
+/// <typeparam name="T">Valid FIXatdl type <see cref="FixPortal.FixAtdl.Model.Types"/></typeparam>
 /// <example>To create a parameter with underlying type Amt_t, use <c>new Parameter_t&lt;Amt_t&gt;</c>.</example>
 public class Parameter_t<T> : IParameter where T : IParameterType, new()
 {
@@ -204,3 +204,4 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
 
     #endregion
 }
+

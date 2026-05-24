@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System;
-using Atdl4net.Resources;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Types;
+namespace FixPortal.FixAtdl.Model.Types;
 
 /// <summary>
 /// String field representing a market or exchange using ISO 10383 Market Identifier Code (MIC) values (see"Appendix 6-C).
@@ -45,3 +45,4 @@ public class Exchange_t : String_t
 
     #endregion
 }
+

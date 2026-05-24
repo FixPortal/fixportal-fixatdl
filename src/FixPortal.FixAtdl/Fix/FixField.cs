@@ -7,7 +7,7 @@
 
 // NOTE: This code is auto-generated; editing by hand is not recommended.
 
-namespace Atdl4net.Fix;
+namespace FixPortal.FixAtdl.Fix;
 
 /// <summary>
 /// FIX tag enumeration - used to implement FIXatdl's FIX_ functionality.
@@ -4371,3 +4371,4 @@ public enum FixField
     FIX_RelSymTransactTime = 1504
 
 }
+

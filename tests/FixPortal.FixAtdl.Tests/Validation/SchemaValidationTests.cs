@@ -1,6 +1,6 @@
-using System.Text;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Xml;
+﻿using System.Text;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Validation;
 
@@ -13,7 +13,7 @@ namespace FixPortal.FixAtdl.Tests.Validation;
 /// </summary>
 public class SchemaValidationTests
 {
-    private static Atdl4net.Model.Elements.Strategies_t Load(string xml)
+    private static FixPortal.FixAtdl.Model.Elements.Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream);
@@ -38,3 +38,4 @@ public class SchemaValidationTests
         act.Should().Throw<Atdl4netException>();
     }
 }
+

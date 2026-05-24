@@ -1,14 +1,15 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-using Atdl4net.Model.Collections;
+using FixPortal.FixAtdl.Model.Collections;
 
-namespace Atdl4net.Utility;
+namespace FixPortal.FixAtdl.Utility;
 
 public interface IResolvable<Thost, Tvaluesource>
 {
     void Resolve(Thost host, ISimpleDictionary<Tvaluesource> sourceCollection);
 }
+

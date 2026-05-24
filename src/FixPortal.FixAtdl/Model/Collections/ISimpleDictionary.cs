@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Collections;
+namespace FixPortal.FixAtdl.Model.Collections;
 
 /// <summary>
 /// Accessor interface that simple dictionary collections must implement.  Lookup is via string-based key.
@@ -26,3 +26,4 @@ public interface ISimpleDictionary<T>
     /// <returns>True if an item with the supplied key is present; false otherwise.</returns>
     bool Contains(string key);
 }
+

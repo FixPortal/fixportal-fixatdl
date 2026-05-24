@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,7 +6,7 @@
 
 using System;
 
-namespace Atdl4net.Diagnostics.Exceptions;
+namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 
 /// <summary>
 /// The exception that is thrown when deserializing a FIXatdl file or stream, indicating that a property has been supplied for a given object,
@@ -34,3 +34,4 @@ public class InvalidPropertyOnObjectException : Atdl4netException
     {
     }
 }
+

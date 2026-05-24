@@ -5,10 +5,10 @@
 #endregion
 
 using System;
-using Atdl4net.Resources;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using FixPortal.FixAtdl.Resources;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Model.Types.Support;
+namespace FixPortal.FixAtdl.Model.Types.Support;
 
 /// <summary>
 /// Represents a FIX/FIXatdl MonthYear value.
@@ -240,3 +240,4 @@ public struct MonthYear : IComparable
 
     #endregion
 }
+

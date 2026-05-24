@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Atdl4net.Utility;
+namespace FixPortal.FixAtdl.Utility;
 
 public static class ModelUtils
 {
@@ -19,7 +19,7 @@ public static class ModelUtils
     static ModelUtils()
     {
         _types = from t in Assembly.GetExecutingAssembly().GetTypes()
-                 where (t.IsClass && t.Namespace == "Atdl4net.Model.Types") && !t.IsAbstract
+                 where (t.IsClass && t.Namespace == "FixPortal.FixAtdl.Model.Types") && !t.IsAbstract
                  select t;
     }
 
@@ -56,3 +56,4 @@ public static class ModelUtils
         return _types.FirstOrDefault(t => t.Name == typeName);
     }
 }
+

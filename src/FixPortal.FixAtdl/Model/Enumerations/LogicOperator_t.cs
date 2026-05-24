@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Enumerations;
+namespace FixPortal.FixAtdl.Model.Enumerations;
 
 /// <summary>
 /// FIXatdl LogicOperator type.
@@ -23,3 +23,4 @@ public enum LogicOperator_t
     /// <summary>Not</summary>
     Not
 }
+

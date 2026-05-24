@@ -7,17 +7,17 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using Atdl4net.Diagnostics;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Resources;
 
-namespace Atdl4net.Fix;
+namespace FixPortal.FixAtdl.Fix;
 
 /// <summary>
 /// Static class that provides utility methods for dealing with FIX format dates and times.
 /// </summary>
 public static class FixDateTime
 {
-    private static readonly string ExceptionContext = "Atdl4net.Fix.FixDateTime";
+    private static readonly string ExceptionContext = "FixPortal.FixAtdl.Fix.FixDateTime";
 
     /// <summary>
     /// Attempts to convert the supplied string to a <see cref="DateTime"/> using either the specified
@@ -53,3 +53,4 @@ public static class FixDateTime
         throw ThrowHelper.New<InvalidCastException>(ExceptionContext, ErrorMessages.DataConversionError1, value, "DateTime");
     }
 }
+

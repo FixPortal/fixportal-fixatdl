@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,7 +6,7 @@
 
 using System;
 
-namespace Atdl4net.Model.Enumerations;
+namespace FixPortal.FixAtdl.Model.Enumerations;
 
 /// <summary>
 /// Enumeration for the regions within FIXatdl.
@@ -29,3 +29,4 @@ public enum Region
     /// <summary>All regions.</summary>
     All = Region.AsiaPacificJapan | Region.EuropeMiddleEastAfrica | Region.TheAmericas
 }
+

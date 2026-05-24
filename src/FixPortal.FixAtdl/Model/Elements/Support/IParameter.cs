@@ -5,13 +5,13 @@
 #endregion
 
 using System;
-using Atdl4net.Fix;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Enumerations;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Elements.Support;
+namespace FixPortal.FixAtdl.Model.Elements.Support;
 
 /// <summary>
 /// Common interface for all Parameter_t types.  This interface has members for all the attributes of the FIXatdl Parameter_t
@@ -108,3 +108,4 @@ public interface IParameter : IValueProvider
     /// </summary>
     bool IsSet { get; }
 }
+

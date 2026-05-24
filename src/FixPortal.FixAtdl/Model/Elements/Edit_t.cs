@@ -8,19 +8,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Fix;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Enumerations;
-using Atdl4net.Resources;
-using Atdl4net.Utility;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Utility;
+using FixPortal.FixAtdl.Validation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 /// <summary>
 /// Represents the FIXatdl type Edit_t when it occurs outside of a StateRule_t or a StrategyEdit_t element.
@@ -65,7 +65,7 @@ public class Edit_t
 /// </summary>
 public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, IValueProvider
 {
-    // Use Atdl4net.Validation namespace rather than Atdl4net.Model.Elements for debugging purposes
+    // Use FixPortal.FixAtdl.Validation namespace rather than FixPortal.FixAtdl.Model.Elements for debugging purposes
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private static readonly ILogger _log = NullLogger.Instance;
     private static readonly bool isPartOfStrategyEdit = typeof(T) == typeof(IParameter);
@@ -473,3 +473,4 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
     #endregion IResolvable<Strategy_t> Members
 }
+

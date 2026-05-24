@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -7,7 +7,7 @@
 using System;
 using System.Linq;
 
-namespace Atdl4net.Validation;
+namespace FixPortal.FixAtdl.Validation;
 
 /// <summary>
 /// Minimal interface that objects can support in order to make available a current value.
@@ -20,3 +20,4 @@ public interface IValueProvider
     /// <returns>Object's current value.</returns>
     object GetCurrentValue();
 }
+

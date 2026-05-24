@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 /// <summary>
 /// Represents a FIXatdl EnumPair_t.<br/>
@@ -19,3 +19,4 @@ public class EnumPair_t
     /// <summary>The corresponding value that is used to populate the FIX message.</summary>
     public string WireValue { get; set; } = null!;
 }
+

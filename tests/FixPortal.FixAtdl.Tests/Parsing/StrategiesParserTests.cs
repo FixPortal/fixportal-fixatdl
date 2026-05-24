@@ -1,12 +1,12 @@
-using System.Text;
-using Atdl4net.Xml;
+﻿using System.Text;
+using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Parsing;
 
 public class StrategiesParserTests
 {
     // StrategiesReader.Load() accepts a Stream, not a StringReader.
-    private static Atdl4net.Model.Elements.Strategies_t Load(string xml)
+    private static FixPortal.FixAtdl.Model.Elements.Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream);
@@ -62,3 +62,4 @@ public class StrategiesParserTests
         targetCtrl.StateRules.Should().HaveCount(1);
     }
 }
+

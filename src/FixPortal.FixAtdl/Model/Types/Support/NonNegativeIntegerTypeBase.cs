@@ -6,14 +6,14 @@
 
 using System;
 using System.Globalization;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Controls.Support;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Resources;
-using Atdl4net.Validation;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Validation;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Model.Types.Support;
+namespace FixPortal.FixAtdl.Model.Types.Support;
 
 /// <summary>
 /// Abstract base class for FIXatdl types that require positive integers.
@@ -139,3 +139,4 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
 
     #endregion
 }
+

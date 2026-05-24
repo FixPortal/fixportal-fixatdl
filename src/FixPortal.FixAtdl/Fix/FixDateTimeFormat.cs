@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -7,7 +7,7 @@
 using System;
 using System.Linq;
 
-namespace Atdl4net.Fix;
+namespace FixPortal.FixAtdl.Fix;
 
 /// <summary>
 /// Provides definitions of the different date and time formats supported by FIX in .NET DateTime.ToString()-
@@ -52,3 +52,4 @@ public static class FixDateTimeFormat
         FixTimeOnlyWithTz
     ];
 }
+

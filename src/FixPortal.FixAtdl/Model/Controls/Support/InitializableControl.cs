@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,13 +6,13 @@
 
 using System;
 using System.Linq;
-using Atdl4net.Fix;
-using Atdl4net.Model.Elements;
-using Atdl4net.Model.Enumerations;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Enumerations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Controls.Support;
+namespace FixPortal.FixAtdl.Model.Controls.Support;
 
 /// <summary>
 /// Generic base class for all controls.  Provides the ability to initialize controls based on the state of the InitPolicy, 
@@ -97,3 +97,4 @@ public abstract class InitializableControl<T> : Control_t
     /// </summary>
     protected abstract void LoadDefaultFromInitValue();
 }
+

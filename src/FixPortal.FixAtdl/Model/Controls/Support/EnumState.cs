@@ -7,14 +7,14 @@
 using System;
 using System.Collections;
 using System.Text;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Model.Collections;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Model.Controls.Support;
+namespace FixPortal.FixAtdl.Model.Controls.Support;
 
 /// <summary>
 /// Represents the state of an enumerated value within FIX, i.e., one that may have a single value, that maps to, say, Char_t, or
@@ -422,3 +422,4 @@ public class EnumState : IComparable
 
     #endregion
 }
+

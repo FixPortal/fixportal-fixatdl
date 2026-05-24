@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Reference;
+namespace FixPortal.FixAtdl.Model.Reference;
 
 /// <summary>
 /// Enumeration of all the ISO 639-1 language codes.
@@ -381,3 +381,4 @@ public enum IsoLanguageCode
     /// <summary>Zulu</summary>
     ZU
 }
+

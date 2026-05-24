@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Enumerations;
+namespace FixPortal.FixAtdl.Model.Enumerations;
 
 /// <summary>
 /// Used with single spinner control, defines how to determine the increment. 
@@ -20,3 +20,4 @@ public enum IncrementPolicy_t
     /// <summary>Use symbol minimum tick size.</summary>
     Tick
 }
+

@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System.Collections.ObjectModel;
-using Atdl4net.Model.Elements;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Collections;
+namespace FixPortal.FixAtdl.Model.Collections;
 
 /// <summary>
 /// Collection used for storing instances of Edit_t, keyed on Edit ID.  This collection is used at the root Strategies_t and Strategy_t level.
@@ -60,3 +60,4 @@ public class EditCollection : KeyedCollection<string, Edit_t>
         return target;
     }
 }
+

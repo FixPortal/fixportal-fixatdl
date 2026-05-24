@@ -5,11 +5,11 @@
 #endregion
 
 using System.Collections.Generic;
-using Atdl4net.Fix;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Enumerations;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Enumerations;
 
-namespace Atdl4net.Model.Elements.Support;
+namespace FixPortal.FixAtdl.Model.Elements.Support;
 
 // 
 /// <summary>
@@ -81,3 +81,4 @@ public interface IEdit<T>
     /// </summary>
     HashSet<string> Sources { get; }
 }
+

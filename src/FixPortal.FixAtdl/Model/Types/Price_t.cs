@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Types;
+namespace FixPortal.FixAtdl.Model.Types;
 
 /// <summary>
 /// 'float field representing a price. Note the number of decimal places may vary. For certain asset classes prices 
@@ -14,3 +14,4 @@ namespace Atdl4net.Model.Types;
 public class Price_t : Float_t
 {
 }
+

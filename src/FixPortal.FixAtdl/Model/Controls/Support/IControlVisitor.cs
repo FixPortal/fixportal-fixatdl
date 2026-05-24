@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,9 +6,9 @@
 
 using System;
 using System.Linq;
-using Atdl4net.Model.Elements;
+using FixPortal.FixAtdl.Model.Elements;
 
-namespace Atdl4net.Model.Controls.Support;
+namespace FixPortal.FixAtdl.Model.Controls.Support;
 
 /// <summary>
 /// Interface to support visitor pattern.
@@ -21,3 +21,4 @@ public interface IControlVisitor
     /// <param name="control">Control to process as part of this visitor pattern.</param>
     void Visit(Control_t control);
 }
+

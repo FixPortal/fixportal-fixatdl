@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Types;
+namespace FixPortal.FixAtdl.Model.Types;
 
 /// <summary>
 /// 'string field containing one or more space delimited multiple character values (e.g. |277=AV AN A| ).'
@@ -18,3 +18,4 @@ public class MultipleStringValue_t : String_t
     /// <value>true to instruct the OMS to invert; false otherwise.</value>
     public bool? InvertOnWire { get; set; }
 }
+

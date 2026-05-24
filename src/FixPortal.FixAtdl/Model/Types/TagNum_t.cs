@@ -1,12 +1,12 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-using Atdl4net.Model.Types.Support;
+using FixPortal.FixAtdl.Model.Types.Support;
 
-namespace Atdl4net.Model.Types;
+namespace FixPortal.FixAtdl.Model.Types;
 
 /// <summary>
 /// 'int field representing a field's tag number when using FIX "Tag=Value" syntax. Value must be positive and may not 
@@ -15,3 +15,4 @@ namespace Atdl4net.Model.Types;
 public class TagNum_t : NonZeroPositiveIntegerTypeBase
 {
 }
+

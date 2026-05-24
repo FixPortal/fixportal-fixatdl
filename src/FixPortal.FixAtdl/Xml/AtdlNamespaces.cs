@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,7 +6,7 @@
 
 using System.Xml.Linq;
 
-namespace Atdl4net.Xml;
+namespace FixPortal.FixAtdl.Xml;
 
 public class AtdlNamespaces
 {
@@ -16,3 +16,4 @@ public class AtdlNamespaces
     public static readonly XNamespace flow = "http://www.fixprotocol.org/FIXatdl-1-1/Flow";
     public static readonly XNamespace xsi = "http://www.w3.org/2001/XMLSchema-instance";
 }
+

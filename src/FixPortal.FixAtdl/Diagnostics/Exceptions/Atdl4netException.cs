@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,7 +6,7 @@
 
 using System;
 
-namespace Atdl4net.Diagnostics.Exceptions;
+namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 
 /// <summary>Provides a base exception class for all Atdl4net custom exceptions.</summary>
 // FP Enhancement: 2026-05-23 — removed obsolete SerializationInfo constructor (SYSLIB0051 — binary serialization removed in .NET 10).
@@ -25,3 +25,4 @@ public class Atdl4netException : System.Exception
     {
     }
 }
+

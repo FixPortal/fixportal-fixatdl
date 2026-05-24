@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,7 +6,7 @@
 
 using System;
 
-namespace Atdl4net.Diagnostics.Exceptions;
+namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 
 /// <summary>
 /// The exception that is thrown when a value is not supplied but is required, either by the FIXatdl schema, or by setting the
@@ -34,3 +34,4 @@ public class MissingMandatoryValueException : Atdl4netException
     {
     }
 }
+

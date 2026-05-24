@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,12 +6,12 @@
 
 using System;
 using System.Collections.Specialized;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Enumerations;
-using Atdl4net.Utility;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Utility;
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrategyPanel
 {
@@ -100,3 +100,4 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
 
     #endregion
 }
+

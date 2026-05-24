@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 /// <summary>
 /// Represents the FIXatdl StrategyEdit element, which is a definition of a validation rule. A StrategyEdit element must 
@@ -32,3 +32,4 @@ public class StrategyEdit_t : EditEvaluator<IParameter>
     /// </summary>
     public string ErrorMessage { get; set; } = null!;
 }
+

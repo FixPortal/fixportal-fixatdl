@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -7,11 +7,11 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using Atdl4net.Diagnostics;
-using Atdl4net.Resources;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Types.Support;
+namespace FixPortal.FixAtdl.Model.Types.Support;
 
 /// <summary>
 /// Base class for all date and time related UTC-prefixed FIXatdl types.
@@ -71,3 +71,4 @@ public abstract class UTCDateTimeTypeBase : DateTimeTypeBase
         return value != null ? (DateTime?)((DateTime)value).ToUniversalTime() : null;
     }
 }
+

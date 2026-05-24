@@ -7,7 +7,7 @@
 using System;
 using System.Xml.Linq;
 
-namespace Atdl4net.Xml.Serialization;
+namespace FixPortal.FixAtdl.Xml.Serialization;
 
 public class ChildElementDefinition
 {
@@ -42,3 +42,4 @@ public class ChildElementDefinition
         ContainerMethod = containerMethod;
     }
 }
+

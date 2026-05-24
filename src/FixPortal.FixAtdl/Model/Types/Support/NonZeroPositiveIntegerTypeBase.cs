@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System;
-using Atdl4net.Resources;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Types.Support;
+namespace FixPortal.FixAtdl.Model.Types.Support;
 
 /// <summary>
 /// Abstract base class for FIXatdl types that require positive integers greater than zero.
@@ -32,3 +32,4 @@ public abstract class NonZeroPositiveIntegerTypeBase : NonNegativeIntegerTypeBas
         return ValidationResult.ValidResult;
     }
 }
+

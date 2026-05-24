@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Utility;
+namespace FixPortal.FixAtdl.Utility;
 
 /// <summary>
 /// Data entry mode.
@@ -26,3 +26,4 @@ public enum DataEntryMode
     /// </summary>
     Amend
 }
+

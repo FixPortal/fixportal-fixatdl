@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -6,9 +6,10 @@
 
 using System;
 
-namespace Atdl4net.Xml.Serialization;
+namespace FixPortal.FixAtdl.Xml.Serialization;
 
 public interface INotifyClassDeserialized
 {
     event EventHandler<ClassDeserializedEventArgs> ClassDeserialized;
 }
+

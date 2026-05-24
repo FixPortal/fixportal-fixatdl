@@ -6,23 +6,23 @@
 
 using System;
 using System.Globalization;
-using Atdl4net.Diagnostics;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Fix;
-using Atdl4net.Model.Elements.Support;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Controls.Support;
+namespace FixPortal.FixAtdl.Model.Controls.Support;
 
 /// <summary>
 /// Represents control elements within FIXatdl that can support textual information.  Applies to the following controls:
 /// <list type="bullet">
-/// <item><description><see cref="Atdl4net.Model.Controls.HiddenField_t"/></description></item>
-/// <item><description><see cref="Atdl4net.Model.Controls.Label_t"/></description></item>
-/// <item><description><see cref="Atdl4net.Model.Controls.TextField_t"/></description></item>
+/// <item><description><see cref="FixPortal.FixAtdl.Model.Controls.HiddenField_t"/></description></item>
+/// <item><description><see cref="FixPortal.FixAtdl.Model.Controls.Label_t"/></description></item>
+/// <item><description><see cref="FixPortal.FixAtdl.Model.Controls.TextField_t"/></description></item>
 /// </list>
 /// </summary>
 public abstract class TextControlBase : InitializableControl<string>
@@ -232,3 +232,4 @@ public abstract class TextControlBase : InitializableControl<string>
 
     #endregion
 }
+

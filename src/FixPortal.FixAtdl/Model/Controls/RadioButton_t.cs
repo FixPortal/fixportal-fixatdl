@@ -1,15 +1,15 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System;
-using Atdl4net.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Controls.Support;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Controls;
+namespace FixPortal.FixAtdl.Model.Controls;
 
 /// <summary>
 /// Represents the RadioButton_t control element within FIXatdl.
@@ -33,3 +33,4 @@ public class RadioButton_t : BinaryControlBase
     /// may be selected at a time.  Applicable when xsi:type is RadioButton_t.</summary>
     public string RadioGroup { get; set; } = null!;
 }
+

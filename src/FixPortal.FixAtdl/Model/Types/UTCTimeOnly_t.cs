@@ -1,15 +1,15 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System;
-using Atdl4net.Fix;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Resources;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
 
-namespace Atdl4net.Model.Types;
+namespace FixPortal.FixAtdl.Model.Types;
 
 /// <summary>
 /// 'string field representing Time-only represented in UTC (Universal Time Coordinated, also known as "GMT") in either HH:MM:SS 
@@ -44,3 +44,4 @@ public class UTCTimeOnly_t : UTCDateTimeTypeBase
         return HumanReadableTypeNames.TimeType;
     }
 }
+

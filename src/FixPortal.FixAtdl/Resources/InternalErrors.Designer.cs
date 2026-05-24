@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Atdl4net.Resources {
+namespace FixPortal.FixAtdl.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Atdl4net.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Atdl4net.Resources.InternalErrors", typeof(InternalErrors).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FixPortal.FixAtdl.Resources.InternalErrors", typeof(InternalErrors).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -169,3 +169,4 @@ namespace Atdl4net.Resources {
         }
     }
 }
+

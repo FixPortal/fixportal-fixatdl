@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -8,12 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Atdl4net.Fix;
-using Atdl4net.Model.Elements;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Elements;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Validation;
+namespace FixPortal.FixAtdl.Validation;
 
 /// <summary>
 /// Used to store the validation state for a control.
@@ -158,3 +158,4 @@ public class ControlValidationState
         }
     }
 }
+

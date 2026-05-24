@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System.Text;
-using Atdl4net.Utility;
-using Atdl4net.Validation;
+using FixPortal.FixAtdl.Utility;
+using FixPortal.FixAtdl.Validation;
 
-namespace Atdl4net.Model.Elements;
+namespace FixPortal.FixAtdl.Model.Elements;
 
 // TODO: Implement IDisposable
 public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
@@ -64,3 +64,4 @@ public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
 
     #endregion IParentable<Control_t> Members
 }
+

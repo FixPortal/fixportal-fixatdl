@@ -5,10 +5,10 @@
 #endregion
 
 using System;
-using Atdl4net.Resources;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using FixPortal.FixAtdl.Resources;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Model.Types.Support;
+namespace FixPortal.FixAtdl.Model.Types.Support;
 
 /// <summary>
 /// Represents the Tenor type within FIX/FIXatdl.
@@ -167,3 +167,4 @@ public struct Tenor : IComparable
 
     #endregion
 }
+

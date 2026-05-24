@@ -6,16 +6,16 @@
 
 using System;
 using System.Collections.Generic;
-using Atdl4net.Fix;
-using Atdl4net.Model.Collections;
-using Atdl4net.Model.Elements;
-using Atdl4net.Resources;
-using Atdl4net.Utility;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Utility;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using ThrowHelper = Atdl4net.Diagnostics.ThrowHelper;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
-namespace Atdl4net.Validation;
+namespace FixPortal.FixAtdl.Validation;
 
 // TODO: Implement IDisposable
 public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : class, IValueProvider
@@ -130,4 +130,5 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
 
     #endregion IResolvable<Strategy_t> Members
 }
+
 

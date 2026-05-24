@@ -1,14 +1,14 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-using Atdl4net.Diagnostics;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Model.Elements;
-using Atdl4net.Resources;
-using Atdl4net.Xml.Serialization;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Xml.Serialization;
 using System.IO;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Xml;
 #endif
 
-namespace Atdl4net.Xml;
+namespace FixPortal.FixAtdl.Xml;
 
 /// <summary>
 /// Reads and deserializes ATDL strategy definitions from an XML document or stream.
@@ -92,3 +92,4 @@ public class StrategiesReader
         StrategyLoaded?.Invoke(this, new StrategyLoadedEventArgs(index, total, strategyName));
     }
 }
+

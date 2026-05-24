@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -7,7 +7,7 @@
 using System;
 using System.Xml.Linq;
 
-namespace Atdl4net.Xml.Serialization;
+namespace FixPortal.FixAtdl.Xml.Serialization;
 
 public class ContainerElementDefinition : ElementDefinition
 {
@@ -19,3 +19,4 @@ public class ContainerElementDefinition : ElementDefinition
         ChildDefinition = childDefinition;
     }
 }
+

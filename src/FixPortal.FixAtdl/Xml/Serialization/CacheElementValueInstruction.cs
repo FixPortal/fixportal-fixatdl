@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Xml.Serialization;
+namespace FixPortal.FixAtdl.Xml.Serialization;
 
 /// <summary>
 /// Represents a deserialization instruction that provides a mechanism to cache an element within the input stream,
@@ -17,3 +17,4 @@ public class CacheElementValueInstruction(string cacheKey)
     /// </summary>
     public string CacheKey { get; private set; } = cacheKey;
 }
+

@@ -6,13 +6,13 @@
 
 using System;
 using System.Collections.Generic;
-using Atdl4net.Fix;
-using Atdl4net.Model.Reference;
-using Atdl4net.Model.Types;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Xml.Serialization;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Reference;
+using FixPortal.FixAtdl.Model.Types;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Xml.Serialization;
 
-namespace Atdl4net.Xml;
+namespace FixPortal.FixAtdl.Xml;
 
 /// <summary>
 /// Provides the definition of the FIXatdl schema.
@@ -28,7 +28,7 @@ public static class SchemaDefinitions
     ];
 
     private static readonly ElementDefinition SecurityType_t = new(
-        AtdlNamespaces.core + "SecurityType", typeof(Atdl4net.Model.Elements.SecurityType_t), SecurityTypeAttributes);
+        AtdlNamespaces.core + "SecurityType", typeof(FixPortal.FixAtdl.Model.Elements.SecurityType_t), SecurityTypeAttributes);
 
     private static readonly ContainerElementDefinition SecurityTypes = new(
         AtdlNamespaces.core + "SecurityTypes", SchemaDefinitions.SecurityType_t);
@@ -44,7 +44,7 @@ public static class SchemaDefinitions
     ];
 
     private static readonly ElementDefinition Market_t = new(
-        AtdlNamespaces.core + "Market", typeof(Atdl4net.Model.Elements.Market_t), MarketAttributes);
+        AtdlNamespaces.core + "Market", typeof(FixPortal.FixAtdl.Model.Elements.Market_t), MarketAttributes);
 
     private static readonly ContainerElementDefinition Markets = new(
         AtdlNamespaces.core + "Markets", SchemaDefinitions.Market_t);
@@ -60,7 +60,7 @@ public static class SchemaDefinitions
     ];
 
     private static readonly ElementDefinition Country_t = new(
-        AtdlNamespaces.core + "Country", typeof(Atdl4net.Model.Elements.Country_t), CountryAttributes);
+        AtdlNamespaces.core + "Country", typeof(FixPortal.FixAtdl.Model.Elements.Country_t), CountryAttributes);
 
     private static readonly ElementAttribute[] RegionAttributes =
     [
@@ -69,9 +69,9 @@ public static class SchemaDefinitions
     ];
 
     private static readonly ElementDefinition Region_t = new(
-        AtdlNamespaces.core + "Region", typeof(Atdl4net.Model.Elements.Region_t), RegionAttributes,
+        AtdlNamespaces.core + "Region", typeof(FixPortal.FixAtdl.Model.Elements.Region_t), RegionAttributes,
         new ChildElementDefinition(SchemaDefinitions.Country_t, "Countries",
-                typeof(Atdl4net.Model.Collections.CountryCollection), StandardContainerMethod.Add));
+                typeof(FixPortal.FixAtdl.Model.Collections.CountryCollection), StandardContainerMethod.Add));
 
     private static readonly ContainerElementDefinition Regions = new(
         AtdlNamespaces.core + "Regions", SchemaDefinitions.Region_t);
@@ -219,18 +219,18 @@ public static class SchemaDefinitions
     ];
 
     private static readonly ChildElementDefinition EnumPairs = new(
-        new ElementDefinition(AtdlNamespaces.core + "EnumPair", typeof(Atdl4net.Model.Elements.EnumPair_t),
+        new ElementDefinition(AtdlNamespaces.core + "EnumPair", typeof(FixPortal.FixAtdl.Model.Elements.EnumPair_t),
             [
                 new ElementAttribute("enumID", "EnumId", typeof(string), Required.Mandatory),
                 new ElementAttribute("wireValue", "WireValue", typeof(string), Required.Mandatory)
             ]),
-            "EnumPairs", typeof(Atdl4net.Model.Collections.EnumPairCollection), StandardContainerMethod.Add);
+            "EnumPairs", typeof(FixPortal.FixAtdl.Model.Collections.EnumPairCollection), StandardContainerMethod.Add);
 
     /// <summary>
     /// Defines the content of Parameter_t.
     /// </summary>
     public static readonly GenericTypeElementDefinition Parameter_t = new(
-        AtdlNamespaces.core + "Parameter", typeof(Atdl4net.Model.Elements.Parameter_t<>), AtdlNamespaces.xsi + "type", "Atdl4net.Model.Types",
+        AtdlNamespaces.core + "Parameter", typeof(FixPortal.FixAtdl.Model.Elements.Parameter_t<>), AtdlNamespaces.xsi + "type", "FixPortal.FixAtdl.Model.Types",
         ParameterConstructorParameters, ParameterCommonAttributes,
         new Dictionary<Type, ElementAttribute[]>()
         {
@@ -279,13 +279,13 @@ public static class SchemaDefinitions
     /// Defines the content of EditRef_t when it relates to a control.
     /// </summary>
     public static readonly ElementDefinition EditRef_t_Control_t = new(
-        AtdlNamespaces.val + "EditRef", typeof(Atdl4net.Model.Elements.EditRef_t<Atdl4net.Model.Elements.Control_t>), EditRefAttributes);
+        AtdlNamespaces.val + "EditRef", typeof(FixPortal.FixAtdl.Model.Elements.EditRef_t<FixPortal.FixAtdl.Model.Elements.Control_t>), EditRefAttributes);
 
     /// <summary>
     /// Defines the content of EditRef_t when it relates to a parameter.
     /// </summary>
     public static readonly ElementDefinition EditRef_t_IParameter_t = new(
-        AtdlNamespaces.val + "EditRef", typeof(Atdl4net.Model.Elements.EditRef_t<Atdl4net.Model.Elements.Support.IParameter>), EditRefAttributes);
+        AtdlNamespaces.val + "EditRef", typeof(FixPortal.FixAtdl.Model.Elements.EditRef_t<FixPortal.FixAtdl.Model.Elements.Support.IParameter>), EditRefAttributes);
 
     #endregion // EditRef_t<T> Definitions
 
@@ -305,28 +305,28 @@ public static class SchemaDefinitions
     /// Defines the content of Edit_t.
     /// </summary>
     public static readonly ElementDefinition Edit_t = new(
-        AtdlNamespaces.val + "Edit", typeof(Atdl4net.Model.Elements.Edit_t), EditAttributes,
+        AtdlNamespaces.val + "Edit", typeof(FixPortal.FixAtdl.Model.Elements.Edit_t), EditAttributes,
         [
             new ChildElementDefinition(new RecursiveTypeElementDefinition(), "Edits",
-                typeof(Atdl4net.Model.Collections.EditCollection), StandardContainerMethod.Add)
+                typeof(FixPortal.FixAtdl.Model.Collections.EditCollection), StandardContainerMethod.Add)
         ]);
 
     private static readonly ElementDefinition Edit_t_Control_t = new(
-        AtdlNamespaces.val + "Edit", typeof(Atdl4net.Model.Elements.Edit_t<Atdl4net.Model.Elements.Control_t>), EditAttributes,
+        AtdlNamespaces.val + "Edit", typeof(FixPortal.FixAtdl.Model.Elements.Edit_t<FixPortal.FixAtdl.Model.Elements.Control_t>), EditAttributes,
         [
             new ChildElementDefinition(new RecursiveTypeElementDefinition(), "Edits",
-                typeof(Atdl4net.Model.Collections.EditEvaluatingCollection<Atdl4net.Model.Elements.Control_t>), StandardContainerMethod.Add),
+                typeof(FixPortal.FixAtdl.Model.Collections.EditEvaluatingCollection<FixPortal.FixAtdl.Model.Elements.Control_t>), StandardContainerMethod.Add),
             new ChildElementDefinition(SchemaDefinitions.EditRef_t_Control_t, "EditRefs",
-                typeof(Atdl4net.Model.Collections.EditRefCollection<Atdl4net.Model.Elements.Control_t>), StandardContainerMethod.Add)
+                typeof(FixPortal.FixAtdl.Model.Collections.EditRefCollection<FixPortal.FixAtdl.Model.Elements.Control_t>), StandardContainerMethod.Add)
         ]);
 
     private static readonly ElementDefinition Edit_t_IParameter_t = new(
-        AtdlNamespaces.val + "Edit", typeof(Atdl4net.Model.Elements.Edit_t<Atdl4net.Model.Elements.Support.IParameter>), EditAttributes,
+        AtdlNamespaces.val + "Edit", typeof(FixPortal.FixAtdl.Model.Elements.Edit_t<FixPortal.FixAtdl.Model.Elements.Support.IParameter>), EditAttributes,
         [
             new ChildElementDefinition(new RecursiveTypeElementDefinition(), "Edits",
-                typeof(Atdl4net.Model.Collections.EditEvaluatingCollection<Atdl4net.Model.Elements.Support.IParameter>), StandardContainerMethod.Add),
+                typeof(FixPortal.FixAtdl.Model.Collections.EditEvaluatingCollection<FixPortal.FixAtdl.Model.Elements.Support.IParameter>), StandardContainerMethod.Add),
             new ChildElementDefinition(SchemaDefinitions.EditRef_t_IParameter_t, "EditRefs",
-                typeof(Atdl4net.Model.Collections.EditRefCollection<Atdl4net.Model.Elements.Support.IParameter>), StandardContainerMethod.Add)
+                typeof(FixPortal.FixAtdl.Model.Collections.EditRefCollection<FixPortal.FixAtdl.Model.Elements.Support.IParameter>), StandardContainerMethod.Add)
         ]);
 
     #endregion // Edit_t Definitions
@@ -344,10 +344,10 @@ public static class SchemaDefinitions
     /// Defines the content of StateRule_t.
     /// </summary>
     public static readonly ElementDefinition StateRule_t = new(
-        AtdlNamespaces.flow + "StateRule", typeof(Atdl4net.Model.Elements.StateRule_t), StateRuleAttibutes,
+        AtdlNamespaces.flow + "StateRule", typeof(FixPortal.FixAtdl.Model.Elements.StateRule_t), StateRuleAttibutes,
             [
-                new ChildElementDefinition(SchemaDefinitions.Edit_t_Control_t, "Edit", typeof(Atdl4net.Model.Elements.Edit_t<Atdl4net.Model.Elements.Control_t>), StandardContainerMethod.Assign),
-                new ChildElementDefinition(SchemaDefinitions.EditRef_t_Control_t, "EditRef", typeof(Atdl4net.Model.Elements.EditRef_t<Atdl4net.Model.Elements.Control_t>), StandardContainerMethod.Assign)
+                new ChildElementDefinition(SchemaDefinitions.Edit_t_Control_t, "Edit", typeof(FixPortal.FixAtdl.Model.Elements.Edit_t<FixPortal.FixAtdl.Model.Elements.Control_t>), StandardContainerMethod.Assign),
+                new ChildElementDefinition(SchemaDefinitions.EditRef_t_Control_t, "EditRef", typeof(FixPortal.FixAtdl.Model.Elements.EditRef_t<FixPortal.FixAtdl.Model.Elements.Control_t>), StandardContainerMethod.Assign)
             ]);
 
     #endregion // StateRule_t Definition
@@ -364,7 +364,7 @@ public static class SchemaDefinitions
     /// Defines the content of ListItem_t.
     /// </summary>
     public static readonly ElementDefinition ListItem_t = new(
-        AtdlNamespaces.lay + "ListItem", typeof(Atdl4net.Model.Elements.ListItem_t), ListItemAttibutes);
+        AtdlNamespaces.lay + "ListItem", typeof(FixPortal.FixAtdl.Model.Elements.ListItem_t), ListItemAttibutes);
 
     #endregion // ListItem_t Definition
 
@@ -474,30 +474,30 @@ public static class SchemaDefinitions
     /// Defines the content of Control_t.
     /// </summary>
     public static readonly MultiTypeElementDefinition Control_t = new(
-        AtdlNamespaces.lay + "Control", AtdlNamespaces.xsi + "type", "Atdl4net.Model.Controls",
+        AtdlNamespaces.lay + "Control", AtdlNamespaces.xsi + "type", "FixPortal.FixAtdl.Model.Controls",
         [new ConstructorParameter(typeof(string), SourceType.ElementAttribute, "ID")],
         ControlCommonAttributes,
         new Dictionary<Type, ElementAttribute[]>()
         {
-            { typeof(Atdl4net.Model.Controls.CheckBox_t), CheckBoxAttributes },
-            { typeof(Atdl4net.Model.Controls.CheckBoxList_t), CheckBoxListAttributes },
-            { typeof(Atdl4net.Model.Controls.Clock_t), ClockAttributes },
-            { typeof(Atdl4net.Model.Controls.DoubleSpinner_t), DoubleSpinnerAttributes },
-            { typeof(Atdl4net.Model.Controls.DropDownList_t), DropDownListAttributes },
-            { typeof(Atdl4net.Model.Controls.EditableDropDownList_t), EditableDropDownListAttributes },
-            { typeof(Atdl4net.Model.Controls.HiddenField_t), HiddenFieldAttributes },
-            { typeof(Atdl4net.Model.Controls.Label_t), LabelAttributes },
-            { typeof(Atdl4net.Model.Controls.MultiSelectList_t), MultiSelectListAttributes },
-            { typeof(Atdl4net.Model.Controls.RadioButton_t), RadioButtonAttributes },
-            { typeof(Atdl4net.Model.Controls.RadioButtonList_t), RadioButtonListAttributes },
-            { typeof(Atdl4net.Model.Controls.SingleSelectList_t), SingleSelectListAttributes },
-            { typeof(Atdl4net.Model.Controls.SingleSpinner_t), SingleSpinnerAttributes },
-            { typeof(Atdl4net.Model.Controls.Slider_t), SliderAttributes },
-            { typeof(Atdl4net.Model.Controls.TextField_t), TextFieldAttributes }
+            { typeof(FixPortal.FixAtdl.Model.Controls.CheckBox_t), CheckBoxAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.CheckBoxList_t), CheckBoxListAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.Clock_t), ClockAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.DoubleSpinner_t), DoubleSpinnerAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.DropDownList_t), DropDownListAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.EditableDropDownList_t), EditableDropDownListAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.HiddenField_t), HiddenFieldAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.Label_t), LabelAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.MultiSelectList_t), MultiSelectListAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.RadioButton_t), RadioButtonAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.RadioButtonList_t), RadioButtonListAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.SingleSelectList_t), SingleSelectListAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.SingleSpinner_t), SingleSpinnerAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.Slider_t), SliderAttributes },
+            { typeof(FixPortal.FixAtdl.Model.Controls.TextField_t), TextFieldAttributes }
         },
         [
-            new ChildElementDefinition(SchemaDefinitions.ListItem_t, "ListItems", typeof(Atdl4net.Model.Collections.ListItemCollection), StandardContainerMethod.Add),
-            new ChildElementDefinition(SchemaDefinitions.StateRule_t, "StateRules", typeof(Atdl4net.Model.Collections.StateRuleCollection), StandardContainerMethod.Add)
+            new ChildElementDefinition(SchemaDefinitions.ListItem_t, "ListItems", typeof(FixPortal.FixAtdl.Model.Collections.ListItemCollection), StandardContainerMethod.Add),
+            new ChildElementDefinition(SchemaDefinitions.StateRule_t, "StateRules", typeof(FixPortal.FixAtdl.Model.Collections.StateRuleCollection), StandardContainerMethod.Add)
         ]);
 
     #endregion // Control_t Definition
@@ -519,17 +519,17 @@ public static class SchemaDefinitions
     /// </summary>
     public static readonly ElementDefinition StrategyPanel_t = new(
         AtdlNamespaces.lay + "StrategyPanel",
-        typeof(Atdl4net.Model.Elements.StrategyPanel_t),
+        typeof(FixPortal.FixAtdl.Model.Elements.StrategyPanel_t),
         [
-            new ConstructorParameter(typeof(Atdl4net.Model.Elements.Strategy_t), SourceType.NamedPredecessor, "CurrentStrategy"),
-            new ConstructorParameter(typeof(Atdl4net.Model.Elements.Support.IStrategyPanel), SourceType.ParentObject, string.Empty)
+            new ConstructorParameter(typeof(FixPortal.FixAtdl.Model.Elements.Strategy_t), SourceType.NamedPredecessor, "CurrentStrategy"),
+            new ConstructorParameter(typeof(FixPortal.FixAtdl.Model.Elements.Support.IStrategyPanel), SourceType.ParentObject, string.Empty)
         ],
         StrategyPanelAttributes,
         [
             new ChildElementDefinition(new RecursiveTypeElementDefinition(), "StrategyPanels",
-                typeof(Atdl4net.Model.Collections.StrategyPanelCollection), StandardContainerMethod.Add),
+                typeof(FixPortal.FixAtdl.Model.Collections.StrategyPanelCollection), StandardContainerMethod.Add),
             new ChildElementDefinition(SchemaDefinitions.Control_t, "Controls",
-                typeof(Atdl4net.Model.Collections.ControlCollection), StandardContainerMethod.Add)
+                typeof(FixPortal.FixAtdl.Model.Collections.ControlCollection), StandardContainerMethod.Add)
         ]);
 
     #endregion // StrategyPanel_t Definition
@@ -540,9 +540,9 @@ public static class SchemaDefinitions
     /// Defines the content of StrategyLayout_t.
     /// </summary>
     public static readonly ElementDefinition StrategyLayout_t = new(
-        AtdlNamespaces.lay + "StrategyLayout", typeof(Atdl4net.Model.Elements.StrategyLayout_t),
+        AtdlNamespaces.lay + "StrategyLayout", typeof(FixPortal.FixAtdl.Model.Elements.StrategyLayout_t),
         [], new ChildElementDefinition(
-            SchemaDefinitions.StrategyPanel_t, "StrategyPanel", typeof(Atdl4net.Model.Elements.StrategyPanel_t), StandardContainerMethod.Assign));
+            SchemaDefinitions.StrategyPanel_t, "StrategyPanel", typeof(FixPortal.FixAtdl.Model.Elements.StrategyPanel_t), StandardContainerMethod.Assign));
 
     #endregion
 
@@ -557,13 +557,13 @@ public static class SchemaDefinitions
     /// Defines the content of StrategyEdit_t.
     /// </summary>
     public static readonly ElementDefinition StrategyEdit_t = new(
-        AtdlNamespaces.val + "StrategyEdit", typeof(Atdl4net.Model.Elements.StrategyEdit_t),
+        AtdlNamespaces.val + "StrategyEdit", typeof(FixPortal.FixAtdl.Model.Elements.StrategyEdit_t),
         StrategyEditAttributes,
         [
             new ChildElementDefinition(SchemaDefinitions.Edit_t_IParameter_t, "Edit",
-                typeof(Atdl4net.Model.Elements.Edit_t<Atdl4net.Model.Elements.Support.IParameter>), StandardContainerMethod.Assign),
+                typeof(FixPortal.FixAtdl.Model.Elements.Edit_t<FixPortal.FixAtdl.Model.Elements.Support.IParameter>), StandardContainerMethod.Assign),
             new ChildElementDefinition(SchemaDefinitions.EditRef_t_IParameter_t, "EditRef",
-                typeof(Atdl4net.Model.Elements.EditRef_t<Atdl4net.Model.Elements.Support.IParameter>), StandardContainerMethod.Assign)
+                typeof(FixPortal.FixAtdl.Model.Elements.EditRef_t<FixPortal.FixAtdl.Model.Elements.Support.IParameter>), StandardContainerMethod.Assign)
         ]);
 
     #endregion // StrategyEdit_t Definition
@@ -591,15 +591,15 @@ public static class SchemaDefinitions
     /// Defines the content of Strategy_t.
     /// </summary>
     public static readonly ElementDefinition Strategy_t = new(
-        AtdlNamespaces.core + "Strategy", typeof(Atdl4net.Model.Elements.Strategy_t), StrategyAttributes,
+        AtdlNamespaces.core + "Strategy", typeof(FixPortal.FixAtdl.Model.Elements.Strategy_t), StrategyAttributes,
         [
-            new ChildElementDefinition(SchemaDefinitions.Parameter_t, "Parameters", typeof(Atdl4net.Model.Collections.ParameterCollection), StandardContainerMethod.Add),
-            new ChildElementDefinition(SchemaDefinitions.Edit_t, "Edits", typeof(Atdl4net.Model.Collections.EditCollection), StandardContainerMethod.Add),
-            new ChildElementDefinition(SchemaDefinitions.StrategyLayout_t, "StrategyLayout", typeof(Atdl4net.Model.Elements.StrategyLayout_t), StandardContainerMethod.Assign),
-            new ChildElementDefinition(SchemaDefinitions.StrategyEdit_t, "StrategyEdits", typeof(Atdl4net.Model.Collections.StrategyEditCollection), StandardContainerMethod.Add),
-            new ChildElementDefinition(SchemaDefinitions.Regions, "Regions", typeof(Atdl4net.Model.Collections.RegionCollection), StandardContainerMethod.Add),
-            new ChildElementDefinition(SchemaDefinitions.Markets, "Markets", typeof(Atdl4net.Model.Collections.MarketCollection), StandardContainerMethod.Add),
-            new ChildElementDefinition(SchemaDefinitions.SecurityTypes, "SecurityTypes", typeof(Atdl4net.Model.Collections.SecurityTypeCollection), StandardContainerMethod.Add)
+            new ChildElementDefinition(SchemaDefinitions.Parameter_t, "Parameters", typeof(FixPortal.FixAtdl.Model.Collections.ParameterCollection), StandardContainerMethod.Add),
+            new ChildElementDefinition(SchemaDefinitions.Edit_t, "Edits", typeof(FixPortal.FixAtdl.Model.Collections.EditCollection), StandardContainerMethod.Add),
+            new ChildElementDefinition(SchemaDefinitions.StrategyLayout_t, "StrategyLayout", typeof(FixPortal.FixAtdl.Model.Elements.StrategyLayout_t), StandardContainerMethod.Assign),
+            new ChildElementDefinition(SchemaDefinitions.StrategyEdit_t, "StrategyEdits", typeof(FixPortal.FixAtdl.Model.Collections.StrategyEditCollection), StandardContainerMethod.Add),
+            new ChildElementDefinition(SchemaDefinitions.Regions, "Regions", typeof(FixPortal.FixAtdl.Model.Collections.RegionCollection), StandardContainerMethod.Add),
+            new ChildElementDefinition(SchemaDefinitions.Markets, "Markets", typeof(FixPortal.FixAtdl.Model.Collections.MarketCollection), StandardContainerMethod.Add),
+            new ChildElementDefinition(SchemaDefinitions.SecurityTypes, "SecurityTypes", typeof(FixPortal.FixAtdl.Model.Collections.SecurityTypeCollection), StandardContainerMethod.Add)
         ],
         new CacheElementValueInstruction("CurrentStrategy"));
 
@@ -623,11 +623,12 @@ public static class SchemaDefinitions
     /// Defines the content of Strategies_t.
     /// </summary>
     public static readonly ElementDefinition Strategies_t = new(
-        AtdlNamespaces.core + "Strategies", typeof(Atdl4net.Model.Elements.Strategies_t), StrategiesAttributes,
+        AtdlNamespaces.core + "Strategies", typeof(FixPortal.FixAtdl.Model.Elements.Strategies_t), StrategiesAttributes,
         [
-            new ChildElementDefinition(SchemaDefinitions.Strategy_t, "Strategies", typeof(Atdl4net.Model.Collections.StrategyCollection), StandardContainerMethod.Add),
-            new ChildElementDefinition(SchemaDefinitions.Edit_t, "Edits", typeof(Atdl4net.Model.Collections.EditCollection), StandardContainerMethod.Add)
+            new ChildElementDefinition(SchemaDefinitions.Strategy_t, "Strategies", typeof(FixPortal.FixAtdl.Model.Collections.StrategyCollection), StandardContainerMethod.Add),
+            new ChildElementDefinition(SchemaDefinitions.Edit_t, "Edits", typeof(FixPortal.FixAtdl.Model.Collections.EditCollection), StandardContainerMethod.Add)
         ]);
 
     #endregion // Strategies_t Definition
 }
+

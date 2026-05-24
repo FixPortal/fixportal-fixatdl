@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -7,7 +7,7 @@
 using System;
 using System.Linq;
 
-namespace Atdl4net.Model;
+namespace FixPortal.FixAtdl.Model;
 
 /// <summary>
 /// Provides access to a set of constants useful throughout the model.
@@ -19,3 +19,4 @@ public static class Atdl
     /// </summary>
     public const string NullValue = "{NULL}";
 }
+

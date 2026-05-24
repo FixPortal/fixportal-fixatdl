@@ -7,15 +7,15 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using Atdl4net.Diagnostics;
-using Atdl4net.Diagnostics.Exceptions;
-using Atdl4net.Fix;
-using Atdl4net.Model.Reference;
-using Atdl4net.Model.Types.Support;
-using Atdl4net.Resources;
-using Atdl4net.Utility;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Reference;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Utility;
 
-namespace Atdl4net.Validation;
+namespace FixPortal.FixAtdl.Validation;
 
 /// <summary>
 /// Provides value conversion for <see cref="Edit_t"/> evaluation.
@@ -63,22 +63,22 @@ public static class EditValueConverter
             case "System.String":
                 return value;
 
-            case "Atdl4net.Model.Reference.IsoCountryCode":
+            case "FixPortal.FixAtdl.Model.Reference.IsoCountryCode":
                 return value.ParseAsEnum<IsoCountryCode>();
 
-            case "Atdl4net.Model.Reference.IsoCurrencyCode":
+            case "FixPortal.FixAtdl.Model.Reference.IsoCurrencyCode":
                 return value.ParseAsEnum<IsoCurrencyCode>();
 
-            case "Atdl4net.Model.Reference.IsoLanguageCode":
+            case "FixPortal.FixAtdl.Model.Reference.IsoLanguageCode":
                 return value.ParseAsEnum<IsoLanguageCode>();
 
-            case "Atdl4net.Model.Types.Support.MonthYear":
+            case "FixPortal.FixAtdl.Model.Types.Support.MonthYear":
                 return MonthYear.Parse(value);
 
-            case "Atdl4net.Model.Types.Support.Tenor":
+            case "FixPortal.FixAtdl.Model.Types.Support.Tenor":
                 return Tenor.Parse(value);
 
-            case "Atdl4net.Model.Controls.Support.EnumState":
+            case "FixPortal.FixAtdl.Model.Controls.Support.EnumState":
                 return value;
 
             default:
@@ -104,3 +104,4 @@ public static class EditValueConverter
         }
     }
 }
+

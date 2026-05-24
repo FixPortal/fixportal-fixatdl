@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Atdl4net.Diagnostics;
+namespace FixPortal.FixAtdl.Diagnostics;
 
 /// <summary>
 /// This class is used to hold additional information about an exception, such as line number and line position for 
@@ -42,3 +42,4 @@ public class ExceptionInfo
             data[item.Key] = item.Value;
     }
 }
+

@@ -1,4 +1,4 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 // This software is released under the MIT License..
 // If you received this software under the commercial license, the terms of that license can be found in the
 // Commercial.txt file in the Licenses folder.  If you received this software under the open-source license,
@@ -17,11 +17,11 @@
 #endregion
 
 using System;
-using Atdl4net.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Controls.Support;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Controls;
+namespace FixPortal.FixAtdl.Model.Controls;
 
 /// <summary>
 /// Represents the DropDownList_t control element within FIXatdl.
@@ -41,3 +41,4 @@ public class DropDownList_t : ListControlBase
         _log.LogDebug("New DropDownList_t created as control {Arg0}", id);
     }
 }
+

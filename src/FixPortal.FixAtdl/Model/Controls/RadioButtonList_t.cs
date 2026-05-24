@@ -1,16 +1,16 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System;
-using Atdl4net.Model.Controls.Support;
-using Atdl4net.Model.Enumerations;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Enumerations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Controls;
+namespace FixPortal.FixAtdl.Model.Controls;
 
 /// <summary>
 /// Represents the RadioButtonList_t control element within FIXatdl.
@@ -38,3 +38,4 @@ public class RadioButtonList_t : ListControlBase, IOrientableControl
 
     #endregion
 }
+

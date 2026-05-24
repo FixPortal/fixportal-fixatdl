@@ -1,17 +1,17 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
 using System.Collections.ObjectModel;
-using Atdl4net.Fix;
-using Atdl4net.Model.Elements;
-using Atdl4net.Utility;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Utility;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Atdl4net.Model.Collections;
+namespace FixPortal.FixAtdl.Model.Collections;
 
 public class StateRuleCollection : Collection<StateRule_t>
 {
@@ -53,3 +53,4 @@ public class StateRuleCollection : Collection<StateRule_t>
             (rule as IResolvable<Strategy_t, Control_t>).Resolve(strategy, strategy.Controls);
     }
 }
+

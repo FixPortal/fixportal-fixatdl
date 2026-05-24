@@ -1,10 +1,10 @@
-﻿#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..
 //
 #endregion
 
-namespace Atdl4net.Model.Types;
+namespace FixPortal.FixAtdl.Model.Types;
 
 /// <summary>
 /// 'float field capable of storing either a whole number (no decimal places) of "shares" (securities denominated in 
@@ -14,3 +14,4 @@ namespace Atdl4net.Model.Types;
 public class Qty_t : Float_t
 {
 }
+
