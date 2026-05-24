@@ -1,45 +1,60 @@
-# Atdl4net
+# FixPortal.FixAtdl
 
-### The Original Open Source .NET Reference Implementation of FIXatdl v1.1
+> Modernised .NET 10 fork of [Atdl4net](https://github.com/atdl4net/atdl4net) — the open-source reference implementation of FIXatdl v1.1. Maintained by [FixPortal](https://www.fixportal.org).
 
-Atdl4net is an open source and not-for-profit C# implementation of [FIXatdl](https://www.fixtrading.org/standards/fixatdl/), the FIX Protocol Algorithmic Trading Definition Language standard developed by FIX Protocol Limited (FPL).  Despite little activity in the repository, Atdl4net is nevertheless in active use in a number of commercial buy-side trading systems.
+## What this is
 
-## Features
+A headless library for parsing, validating, and emitting FIX-tag values from
+FIXatdl v1.1 strategy XML documents. It targets .NET 10 and is consumed as a
+NuGet package (`FixPortal.FixAtdl`).
 
-* Compatible with .NET 3.5 and .NET 4.x
-* Displays algo input screens based on the latest industry-standard FIXatdl 1.1 XML schema
-* Reads and generates algorithm-specific FIX message content
-* Can be integrated into a trading system, using the supplied sample, run as a standalone testing/validation tool.
-* Supports the full set of UI widgets defined in FIXatdl 1.1
-* Support for message validation and widget state rules (such as show/hide and enable/disable.)
-* Supports strategy filtering, customizable settings, and context-specific views (for example Cancel/Replace mode)
-* Written in the C# language using standard libraries.
-* Source code can be modified to support in-house FIXatdl schema extensions
+## What it is *not*
+
+- **Not a FIX engine.** It produces FIX tag values; sending them over the wire
+  is the host application's responsibility. Pair with QuickFIX/n or similar.
+- **Not a UI library.** The upstream Atdl4net's WPF rendering layer has been
+  removed. Consumers wire their own UI (React, Blazor, WPF, anything) on top
+  of the parsed model.
+
+## Install
+
+```
+dotnet add package FixPortal.FixAtdl
+```
+
+## Quick start
+
+```csharp
+using FixPortal.FixAtdl.Xml;
+
+var reader = new StrategiesReader();
+using var stream = File.OpenRead("twap.xml");
+var strategies = reader.Load(stream);
+
+var twap = strategies.Strategies[0];
+twap.Parameters["StartTime"].WireValue = "20260101-09:30:00";
+
+foreach (var tag in twap.Parameters.GetOutputValues())
+    Console.WriteLine($"{tag.Key}={tag.Value}");
+```
+
+## Differences from upstream Atdl4net
+
+- Target framework: `net10.0` only (upstream: `net3.5`, `net4.0`).
+- Namespace: `FixPortal.FixAtdl.*` (upstream: `Atdl4net.*`).
+- WPF UI controls removed; library is now UI-agnostic.
+- `Common.Logging` → `Microsoft.Extensions.Logging.Abstractions`.
+- `System.Configuration` glue replaced with `FixAtdlOptions` POCO.
+- Nullable reference types enabled throughout.
+- New xUnit v3 test suite (AwesomeAssertions + NSubstitute).
+
+Files modified from upstream carry a `// FP Enhancement: <date> — <reason>` banner.
+
+## Licence
+
+MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.
 
 ## Status
 
-This software was developed by the author (Steve Wilkinson) as FIXatdl was being conceived, and was developed in parallel with the Java reference implementation (see below) in the 2010-2011 timeframe.  The intention was to provide a demonstration that the standard could be fully implemented in the then-current flavours of .NET (v3.5, v4.0); this work was completed in 2011 with the ratification of the FIXatdl v1.1 standard.
-
-Subsequence to the publication of the v1.1 FIXatdl standard, a v1.2 was developed but the author was unable to undertake any further work on the code base due to personal circumstances, and no other contributors came forward.  ***No support for FIXatdl v1.2 is provided or planned.***
-
-Since that time, the author ceased to be directly involved with the FIX Protocol and is no longer able to provide support or fixes for the software.  That said, as noted above, the software is still in active use and the recent move to the MIT License should provide the freedom for interested individuals to take the software forward if desired.
-
-## FIX Engine Integration
-
-Please note that Atdl4net is **NOT** a FIX engine for sending and receiving orders over the wire. Rather, Atdl4net draws order entry screens from FIXatdl templates and gets/sets their FIX parameter values.
-
-If you are intending to implement a full-stack trading system with FIX order capability, you will additionally require a FIX engine such as the open-source [QuickFIX/n](http://quickfixn.org/).
-
-## Acknowledgements
-
-Thanks to the following people who helped make Atdl4net happen:
-
-* Scott Atwell, American Century Investments
-* [John Shields](https://github.com/johnnyshields)
-* Rick Labs, chair of the FIXatdl working group
-
-## License
-
-Atdl4net was originally dual-licensed by its creator but commercial licensing was subsequently abandoned.  The software is now licensed under the MIT License.
-
-FIX Protocol and FIXatdl are trademarks or service marks of FIX Protocol Limited
+Pre-1.0; the public surface may evolve as the QFSIM ATDL Examiner exercises it.
+Issues and PRs welcome at https://github.com/FixPortal/FixAtdl.
