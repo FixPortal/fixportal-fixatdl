@@ -1,0 +1,44 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  pack-and-release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore FixPortal.FixAtdl.sln
+
+      - name: Build (Release)
+        run: dotnet build FixPortal.FixAtdl.sln -c Release --no-restore
+
+      - name: Test (Release)
+        run: dotnet test FixPortal.FixAtdl.sln -c Release --no-build
+
+      - name: Pack
+        run: dotnet pack src/FixPortal.FixAtdl/FixPortal.FixAtdl.csproj -c Release --no-build -o artifacts
+
+      - name: Upload nupkg artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*.nupkg
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.nupkg
+          generate_release_notes: true
