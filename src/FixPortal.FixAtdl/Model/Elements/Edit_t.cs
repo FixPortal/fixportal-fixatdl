@@ -47,16 +47,34 @@ public class Edit_t
     /// </summary>
     public string Field2 { get; set; } = null!;
 
+    /// <summary>
+    /// Gets or sets the optional identifier for this edit.
+    /// </summary>
     public string Id { get; set; } = null!;
 
+    /// <summary>
+    /// Gets or sets the comparison operator used by this edit.
+    /// </summary>
     public Operator_t? Operator { get; set; }
 
+    /// <summary>
+    /// Gets or sets the logical operator used to combine child edits.
+    /// </summary>
     public LogicOperator_t? LogicOperator { get; set; }
 
+    /// <summary>
+    /// Gets or sets the optional fixed right-hand-side value for the edit.
+    /// </summary>
     public string Value { get; set; } = null!;
 
+    /// <summary>
+    /// Gets the child edits contained by this edit.
+    /// </summary>
     public EditCollection Edits { get; private set; }
 
+    /// <summary>
+    /// Initializes a new <see cref="Edit_t"/>.
+    /// </summary>
     public Edit_t()
     {
         Edits = [];
@@ -76,7 +94,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     private T _field2Source = null!;
 
     /// <summary>
-    /// Initializes a new <see cref="Edit{T}"/> instance.
+    /// Initializes a new <see cref="Edit_t{T}"/> instance.
     /// </summary>
     public Edit_t()
     {

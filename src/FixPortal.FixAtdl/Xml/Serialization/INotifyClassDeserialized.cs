@@ -9,8 +9,13 @@ using System;
 
 namespace FixPortal.FixAtdl.Xml.Serialization;
 
+/// <summary>
+/// Exposes notifications when a configured type has been deserialized.
+/// </summary>
 public interface INotifyClassDeserialized
 {
+    /// <summary>
+    /// Occurs when a class has been deserialized.
+    /// </summary>
     event EventHandler<ClassDeserializedEventArgs> ClassDeserialized;
 }
-

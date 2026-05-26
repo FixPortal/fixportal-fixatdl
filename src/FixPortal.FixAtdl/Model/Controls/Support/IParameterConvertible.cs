@@ -13,7 +13,7 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 
 /// <summary>
 /// Interface that all controls must implement such that their values can be converted to a form accepted by
-/// <see cref="Parameter_t{T}"/> instances.
+/// <see cref="FixPortal.FixAtdl.Model.Elements.Support.IParameter"/> instances.
 /// </summary>
 /// <remarks>If the control's value cannot be converted to the target type, then an <see cref="InvalidCastException"/>
 /// is thrown.<br/><br/>
@@ -80,4 +80,3 @@ public interface IParameterConvertible
     /// </summary>
     bool HasEnumeratedState { get; }
 }
-

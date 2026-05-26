@@ -51,6 +51,11 @@ public class StrategyEditCollection : Collection<StrategyEdit_t>
         return valid;
     }
 
+    /// <summary>
+    /// Inserts a strategy edit into the collection.
+    /// </summary>
+    /// <param name="index">The insertion index.</param>
+    /// <param name="item">The strategy edit to insert.</param>
     protected override void InsertItem(int index, StrategyEdit_t item)
     {
         _log.LogDebug("StrategyEdit added");
@@ -62,6 +67,7 @@ public class StrategyEditCollection : Collection<StrategyEdit_t>
     /// Resolves all interdependencies e.g. edits to edit refs, control values to edits, etc.  Called once
     /// all strategies have been loaded as there may be dependencies on EditRefs at the global level.
     /// </summary>
+    /// <param name="owningStrategy">The strategy that owns the strategy edits.</param>
     public void ResolveAll(Strategy_t owningStrategy)
     {
         foreach (StrategyEdit_t strategyEdit in this)
@@ -70,4 +76,3 @@ public class StrategyEditCollection : Collection<StrategyEdit_t>
         }
     }
 }
-

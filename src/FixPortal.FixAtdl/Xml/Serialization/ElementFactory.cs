@@ -20,6 +20,9 @@ using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Xml.Serialization;
 
+/// <summary>
+/// Creates CLR objects from FIXatdl XML according to an <see cref="ElementDefinition"/>.
+/// </summary>
 public class ElementFactory : INotifyClassDeserialized
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
@@ -31,6 +34,11 @@ public class ElementFactory : INotifyClassDeserialized
     private readonly ElementDefinition _elementDefinition;
     private readonly Dictionary<string, object> _elementValueCache = [];
 
+    /// <summary>
+    /// Initializes a new <see cref="ElementFactory"/>.
+    /// </summary>
+    /// <param name="elementDefinition">The root element definition used for deserialization.</param>
+    /// <param name="notifyCreationOfType">The type whose creation should raise <see cref="ClassDeserialized"/>.</param>
     public ElementFactory(ElementDefinition elementDefinition, Type notifyCreationOfType)
     {
         if (_log.IsEnabled(LogLevel.Debug))
@@ -42,6 +50,11 @@ public class ElementFactory : INotifyClassDeserialized
         _notifyCreationOfType = notifyCreationOfType;
     }
 
+    /// <summary>
+    /// Deserializes the supplied XML element into a CLR object graph.
+    /// </summary>
+    /// <param name="element">The XML element to deserialize.</param>
+    /// <returns>The deserialized object graph.</returns>
     public object DeserializeElement(XElement element)
     {
         if (_log.IsEnabled(LogLevel.Debug))
@@ -587,6 +600,9 @@ public class ElementFactory : INotifyClassDeserialized
         ClassDeserialized?.Invoke(this, new ClassDeserializedEventArgs(classType, extraInfo));
     }
 
+    /// <summary>
+    /// Occurs when an object of the configured notification type has been deserialized.
+    /// </summary>
     public event EventHandler<ClassDeserializedEventArgs>? ClassDeserialized;
 
     #endregion

@@ -31,18 +31,59 @@ public struct Tenor : IComparable
     private int Offset;
     private TenorTypeValue TenorType;
 
+    /// <summary>
+    /// Compares one tenor to see whether it is less than or equal to another tenor.
+    /// </summary>
+    /// <param name="lhs">Left hand side value.</param>
+    /// <param name="rhs">Right hand side value.</param>
+    /// <returns>True if <paramref name="lhs"/> is earlier than or equal to <paramref name="rhs"/>; otherwise, false.</returns>
     public static bool operator <=(Tenor lhs, Tenor rhs) => Compare(lhs, rhs) <= 0;
 
+    /// <summary>
+    /// Compares one tenor to see whether it is greater than or equal to another tenor.
+    /// </summary>
+    /// <param name="lhs">Left hand side value.</param>
+    /// <param name="rhs">Right hand side value.</param>
+    /// <returns>True if <paramref name="lhs"/> is later than or equal to <paramref name="rhs"/>; otherwise, false.</returns>
     public static bool operator >=(Tenor lhs, Tenor rhs) => Compare(lhs, rhs) >= 0;
 
+    /// <summary>
+    /// Compares one tenor to see whether it is earlier than another tenor.
+    /// </summary>
+    /// <param name="lhs">Left hand side value.</param>
+    /// <param name="rhs">Right hand side value.</param>
+    /// <returns>True if <paramref name="lhs"/> is earlier than <paramref name="rhs"/>; otherwise, false.</returns>
     public static bool operator <(Tenor lhs, Tenor rhs) => Compare(lhs, rhs) < 0;
 
+    /// <summary>
+    /// Compares one tenor to see whether it is later than another tenor.
+    /// </summary>
+    /// <param name="lhs">Left hand side value.</param>
+    /// <param name="rhs">Right hand side value.</param>
+    /// <returns>True if <paramref name="lhs"/> is later than <paramref name="rhs"/>; otherwise, false.</returns>
     public static bool operator >(Tenor lhs, Tenor rhs) => Compare(lhs, rhs) > 0;
 
+    /// <summary>
+    /// Compares two tenor values for equality.
+    /// </summary>
+    /// <param name="lhs">Left hand side value.</param>
+    /// <param name="rhs">Right hand side value.</param>
+    /// <returns>True if both the tenor type and offset are equal; otherwise, false.</returns>
     public static bool operator ==(Tenor lhs, Tenor rhs) => lhs.Offset == rhs.Offset && lhs.TenorType == rhs.TenorType;
 
+    /// <summary>
+    /// Compares two tenor values for inequality.
+    /// </summary>
+    /// <param name="lhs">Left hand side value.</param>
+    /// <param name="rhs">Right hand side value.</param>
+    /// <returns>True if the tenor values differ; otherwise, false.</returns>
     public static bool operator !=(Tenor lhs, Tenor rhs) => lhs.Offset != rhs.Offset || lhs.TenorType != rhs.TenorType;
 
+    /// <summary>
+    /// Determines whether the supplied object is equal to this tenor value.
+    /// </summary>
+    /// <param name="obj">The object to compare with this instance.</param>
+    /// <returns><see langword="true"/> if the supplied object is a matching <see cref="Tenor"/>; otherwise, <see langword="false"/>.</returns>
     public override readonly bool Equals(object? obj)
     {
         if (obj == null || obj is not Tenor)
@@ -63,6 +104,11 @@ public struct Tenor : IComparable
         return Offset * 251 + (int)TenorType;
     }
 
+    /// <summary>
+    /// Parses the supplied FIX tenor string.
+    /// </summary>
+    /// <param name="value">The tenor string to parse.</param>
+    /// <returns>The parsed <see cref="Tenor"/> value.</returns>
     public static Tenor Parse(string value)
     {
         Tenor result = new();
@@ -108,6 +154,10 @@ public struct Tenor : IComparable
         throw ThrowHelper.New<ArgumentException>(ExceptionContext, ErrorMessages.InvalidTenorValue, value);
     }
 
+    /// <summary>
+    /// Returns the FIX string representation of the tenor.
+    /// </summary>
+    /// <returns>The tenor encoded as a FIX string.</returns>
     public override readonly string ToString()
     {
         return TenorType switch

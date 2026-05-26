@@ -10,7 +10,9 @@ using FixPortal.FixAtdl.Model.Elements;
 
 namespace FixPortal.FixAtdl.Model.Collections;
 
+/// <summary>
+/// Represents the collection of child strategy panels within a parent panel.
+/// </summary>
 public class StrategyPanelCollection : Collection<StrategyPanel_t>
 {
 }
-

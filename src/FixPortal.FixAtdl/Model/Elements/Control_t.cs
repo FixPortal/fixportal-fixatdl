@@ -66,7 +66,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
 
     /// <summary>The name of the parameter for which this control gives the visual representation. A parameter with this name
     /// must be defined within the same strategy as this control.</summary>
-    /// <remarks>The <see cref="ReferencedParameter"/> property provides access to the parameter instance itself, whilst
+    /// <remarks>The resolved parameter instance itself is available via the owning strategy, whilst
     /// this property provides access to the name of the parameter.</remarks>
     public string ParameterRef { get; set; } = null!;
 
@@ -309,4 +309,3 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
 
     #endregion
 }
-

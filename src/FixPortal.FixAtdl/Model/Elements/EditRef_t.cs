@@ -31,6 +31,10 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
 
     private Edit_t<T> _referencedEdit = null!;
 
+    /// <summary>
+    /// Initializes a new <see cref="EditRef_t{T}"/>.
+    /// </summary>
+    /// <param name="id">The identifier of the referenced edit.</param>
     public EditRef_t(string id)
     {
         Id = id;
@@ -63,6 +67,7 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
     /// EditRef references.
     /// </summary>
     /// <param name="additionalValues">Any additional FIX field values that may be required in the Edit evaluation.</param>
+    /// <inheritdoc />
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
         _referencedEdit.Evaluate(additionalValues);
@@ -70,42 +75,49 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
 
     #region IEdit_t Members
 
+    /// <inheritdoc />
     public string Field
     {
         get => _referencedEdit.Field; set => _referencedEdit.Field = value;
     }
 
+    /// <inheritdoc />
     public string Field2
     {
         get => _referencedEdit.Field2; set => _referencedEdit.Field2 = value;
     }
 
+    /// <inheritdoc />
     public Operator_t? Operator
     {
         get => _referencedEdit.Operator; set => _referencedEdit.Operator = value;
     }
 
+    /// <inheritdoc />
     public LogicOperator_t? LogicOperator
     {
         get => _referencedEdit.LogicOperator; set => _referencedEdit.LogicOperator = value;
     }
 
+    /// <inheritdoc />
     public string Value
     {
         get => _referencedEdit.Value; set => _referencedEdit.Value = value;
     }
 
+    /// <inheritdoc />
     public object FieldValue => _referencedEdit.FieldValue;
 
+    /// <inheritdoc />
     public object Field2Value => _referencedEdit.Field2Value;
 
+    /// <inheritdoc />
     public bool CurrentState => _referencedEdit.CurrentState;
 
+    /// <inheritdoc />
     public EditEvaluatingCollection<T> Edits => _referencedEdit.Edits;
 
-    /// <summary>
-    /// Gets the set of sources for the data to be evaluated as part of this StrategyEdit.
-    /// </summary>
+    /// <inheritdoc />
     public HashSet<string> Sources => _referencedEdit.Sources;
 
     #endregion

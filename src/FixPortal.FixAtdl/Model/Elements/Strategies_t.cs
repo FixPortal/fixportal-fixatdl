@@ -28,6 +28,9 @@ public class Strategies_t : IEnumerable<Strategy_t>
     /// <summary>Indicates whether a new strategy can be chosen during a Cancel/Replace.</summary>
     public bool? ChangeStrategyOnCxlRpl { get; set; }
 
+    /// <summary>
+    /// Gets or sets the description for the strategies document.
+    /// </summary>
     public Description_t Description { get; set; } = null!;
 
     /// <summary>The tag within the FIX order message to be populated with a boolean ('Y'/'N') indicating
@@ -108,4 +111,3 @@ public class Strategies_t : IEnumerable<Strategy_t>
         return Strategies.GetEnumerator();
     }
 }
-

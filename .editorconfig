@@ -319,17 +319,5 @@ dotnet_diagnostic.CA1707.severity = none
 # silences CA1707 for tests; FixAtdl needs it silenced globally.
 dotnet_diagnostic.CA1707.severity = none
 
-# ---------------------------------------------------------------------------
-# XML doc warnings — deferred to Phase E (Task E1: XML doc comments on all
-# public API surface). At E1 these get re-enabled as errors so the
-# doc-completeness gate bites.
-# ---------------------------------------------------------------------------
-
-# CS1572: XML comment has a param tag for a parameter that doesn't exist — Phase E re-enables
-dotnet_diagnostic.CS1572.severity = none
-
-# CS1573: Parameter has no matching param tag in XML comment — Phase E re-enables
-dotnet_diagnostic.CS1573.severity = none
-
-# CS1574: XML comment has cref attribute that couldn't be resolved — Phase E re-enables
-dotnet_diagnostic.CS1574.severity = none
+# XML documentation completeness gate
+dotnet_diagnostic.CS1591.severity = error

@@ -155,8 +155,8 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
     /// Gets the wire value for this parameter.  This method is used to retrieve the value of the parameter that should
     /// be transmitted over FIX.
     /// </summary>
-    /// <param name="hostParameter"><see cref="Parameter_t{T}"/> that is hosting this type.  Parameters in Atdl4net are
-    /// represented by means of the generic Parameter_t type with the appropriate type parameter, for example, 
+    /// <param name="hostParameter"><see cref="IParameter"/> that is hosting this type. Parameters in Atdl4net are
+    /// represented by means of the generic Parameter_t type with the appropriate type parameter, for example,
     /// Parameter_t&lt;Amt_t&gt;.</param>
     /// <returns>The parameter's current wire value (all wire values in Atdl4net are strings).</returns>
     public string GetWireValue(IParameter hostParameter)

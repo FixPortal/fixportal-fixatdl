@@ -19,7 +19,7 @@ using FixPortal.FixAtdl.Utility;
 namespace FixPortal.FixAtdl.Validation;
 
 /// <summary>
-/// Provides value conversion for <see cref="Edit_t"/> evaluation.
+/// Provides value conversion for <see cref="FixPortal.FixAtdl.Model.Elements.Edit_t"/> evaluation.
 /// </summary>
 public static class EditValueConverter
 {

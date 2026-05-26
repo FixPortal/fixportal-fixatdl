@@ -19,6 +19,11 @@ namespace FixPortal.FixAtdl.Model.Collections;
 /// </summary>
 public class EnumPairCollection : KeyedCollection<string, EnumPair_t>
 {
+    /// <summary>
+    /// Gets the key for the specified enum pair item.
+    /// </summary>
+    /// <param name="item">The enum pair item.</param>
+    /// <returns>The enum identifier.</returns>
     protected override string GetKeyForItem(EnumPair_t item)
     {
         return item.EnumId;
@@ -79,4 +84,3 @@ public class EnumPairCollection : KeyedCollection<string, EnumPair_t>
         return false;
     }
 }
-

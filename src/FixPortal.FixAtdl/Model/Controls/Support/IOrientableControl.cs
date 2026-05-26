@@ -9,8 +9,13 @@ using FixPortal.FixAtdl.Model.Enumerations;
 
 namespace FixPortal.FixAtdl.Model.Controls.Support;
 
+/// <summary>
+/// Exposes an orientation setting for controls that support layout direction.
+/// </summary>
 public interface IOrientableControl
 {
+    /// <summary>
+    /// Gets the control orientation.
+    /// </summary>
     Orientation_t? Orientation { get; }
 }
-

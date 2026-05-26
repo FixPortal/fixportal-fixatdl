@@ -10,10 +10,18 @@ using FixPortal.FixAtdl.Model.Reference;
 
 namespace FixPortal.FixAtdl.Model.Elements;
 
+/// <summary>
+/// Represents a country inclusion or exclusion entry.
+/// </summary>
 public class Country_t
 {
+    /// <summary>
+    /// Gets or sets the ISO country code.
+    /// </summary>
     public IsoCountryCode CountryCode { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether the country is included or excluded.
+    /// </summary>
     public Inclusion_t Inclusion { get; set; }
 }
-

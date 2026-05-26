@@ -10,32 +10,57 @@ using FixPortal.FixAtdl.Utility;
 
 namespace FixPortal.FixAtdl.Fix;
 
+/// <summary>
+/// Represents a collection of FIX tag values backed by a <see cref="FixMessage"/>.
+/// </summary>
 public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>>
 {
     private readonly FixMessage _message;
 
+    /// <summary>
+    /// Initializes a new empty <see cref="FixTagValuesCollection"/>.
+    /// </summary>
     public FixTagValuesCollection()
     {
         _message = [];
     }
 
+    /// <summary>
+    /// Initializes a new <see cref="FixTagValuesCollection"/> from a FIX wire-format message.
+    /// </summary>
+    /// <param name="fixMessage">The FIX message to parse.</param>
     public FixTagValuesCollection(string fixMessage)
         : this(new FixMessage(fixMessage))
     {
     }
 
+    /// <summary>
+    /// Initializes a new <see cref="FixTagValuesCollection"/> from an existing <see cref="FixMessage"/>.
+    /// </summary>
+    /// <param name="message">The backing FIX message.</param>
     public FixTagValuesCollection(FixMessage message)
     {
         _message = message;
     }
 
+    /// <summary>
+    /// Gets an empty collection instance.
+    /// </summary>
     public static FixTagValuesCollection Empty { get; } = [];
 
+    /// <summary>
+    /// Gets or sets the value for the specified FIX field.
+    /// </summary>
+    /// <param name="fixField">The FIX field to read or write.</param>
     public string this[FixField fixField]
     {
         get => _message[fixField]; set => _message[fixField] = value;
     }
 
+    /// <summary>
+    /// Gets or sets the value for the specified FIX field name.
+    /// </summary>
+    /// <param name="fixField">The FIX field name.</param>
     public string this[string fixField]
     {
         get
@@ -53,6 +78,12 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
         }
     }
 
+    /// <summary>
+    /// Attempts to get the value for the specified FIX field name.
+    /// </summary>
+    /// <param name="fixField">The FIX field name.</param>
+    /// <param name="value">When this method returns, contains the field value if found.</param>
+    /// <returns><see langword="true"/> if the field was present; otherwise, <see langword="false"/>.</returns>
     public bool TryGetValue(string fixField, out string value)
     {
         FixField field = fixField.ParseAsEnum<FixField>();
@@ -62,6 +93,12 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
         return result;
     }
 
+    /// <summary>
+    /// Attempts to get the value for the specified FIX tag.
+    /// </summary>
+    /// <param name="tag">The FIX tag to look up.</param>
+    /// <param name="value">When this method returns, contains the field value if found.</param>
+    /// <returns><see langword="true"/> if the field was present; otherwise, <see langword="false"/>.</returns>
     public bool TryGetValue(FixTag tag, out string value)
     {
         FixField field = tag;
@@ -71,21 +108,38 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
         return result;
     }
 
+    /// <summary>
+    /// Adds a FIX tag value to the collection.
+    /// </summary>
+    /// <param name="tag">The FIX tag to add.</param>
+    /// <param name="value">The tag value.</param>
     public void Add(FixTag tag, string value)
     {
         _message.Add(tag, value);
     }
 
+    /// <summary>
+    /// Converts the collection to FIX wire format.
+    /// </summary>
+    /// <returns>The FIX message using SOH delimiters.</returns>
     public string ToFix()
     {
         return _message.ToFix();
     }
 
+    /// <summary>
+    /// Returns a readable string form of the FIX message.
+    /// </summary>
+    /// <returns>The FIX message with SOH delimiters replaced for display.</returns>
     public override string ToString()
     {
         return ToFix().Replace("\x01", " | ");
     }
 
+    /// <summary>
+    /// Returns an enumerator over the tag-value pairs.
+    /// </summary>
+    /// <returns>An enumerator for the collection.</returns>
     public IEnumerator<KeyValuePair<FixField, string>> GetEnumerator()
     {
         return _message.GetEnumerator();
@@ -96,4 +150,3 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
         return _message.GetEnumerator();
     }
 }
-

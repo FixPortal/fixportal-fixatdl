@@ -39,7 +39,7 @@ public interface IParameterType
     /// Sets the wire value for this parameter.  This method is typically used to initialise the parameter through the
     /// InitValue mechanism, but may also be used to initialise the parameter when doing order amendments.
     /// </summary>
-    /// <param name="hostParameter"><see cref="Parameter_t{T}"/> that is hosting this type.  Parameters in Atdl4net are
+    /// <param name="hostParameter"><see cref="IParameter"/> that is hosting this type. Parameters in Atdl4net are
     /// represented by means of the generic Parameter_t type with the appropriate type parameter, for example, Parameter_t&lt;Amt_t&gt;.</param>
     /// <param name="value">New wire value (all wire values in Atdl4net are strings).</param>
     void SetWireValue(IParameter hostParameter, string value);
@@ -48,7 +48,7 @@ public interface IParameterType
     /// Gets the wire value for this parameter.  This method is used to retrieve the value of the parameter that should
     /// be transmitted over FIX.
     /// </summary>
-    /// <param name="hostParameter"><see cref="Parameter_t{T}"/> that is hosting this type.  Parameters in Atdl4net are
+    /// <param name="hostParameter"><see cref="IParameter"/> that is hosting this type. Parameters in Atdl4net are
     /// represented by means of the generic Parameter_t type with the appropriate type parameter, for example, Parameter_t&lt;Amt_t&gt;.</param>
     /// <returns>The parameter's current wire value (all wire values in Atdl4net are strings).</returns>
     string GetWireValue(IParameter hostParameter);
@@ -77,4 +77,3 @@ public interface IParameterType
     /// </summary>
     bool IsSet { get; }
 }
-

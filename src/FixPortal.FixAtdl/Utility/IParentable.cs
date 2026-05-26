@@ -7,8 +7,14 @@
 
 namespace FixPortal.FixAtdl.Utility;
 
+/// <summary>
+/// Exposes a parent relationship for a model object.
+/// </summary>
+/// <typeparam name="T">The parent type.</typeparam>
 public interface IParentable<T>
 {
+    /// <summary>
+    /// Gets or sets the parent object.
+    /// </summary>
     T Parent { get; set; }
 }
-

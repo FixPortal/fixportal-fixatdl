@@ -100,8 +100,20 @@ public struct MonthYear : IComparable
     /// <returns>True if the left hand operand occurs at the same time or after the right hand operand; false otherwise.</returns>
     public static bool operator >=(MonthYear lhs, MonthYear rhs) => Compare(lhs, rhs) >= 0;
 
+    /// <summary>
+    /// Compares one MonthYear value to see whether it is earlier than a second MonthYear value.
+    /// </summary>
+    /// <param name="lhs">Left hand side value.</param>
+    /// <param name="rhs">Right hand side value.</param>
+    /// <returns>True if the left hand operand occurs before the right hand operand; otherwise, false.</returns>
     public static bool operator <(MonthYear lhs, MonthYear rhs) => Compare(lhs, rhs) < 0;
 
+    /// <summary>
+    /// Compares one MonthYear value to see whether it is later than a second MonthYear value.
+    /// </summary>
+    /// <param name="lhs">Left hand side value.</param>
+    /// <param name="rhs">Right hand side value.</param>
+    /// <returns>True if the left hand operand occurs after the right hand operand; otherwise, false.</returns>
     public static bool operator >(MonthYear lhs, MonthYear rhs) => Compare(lhs, rhs) > 0;
 
     /// <summary>

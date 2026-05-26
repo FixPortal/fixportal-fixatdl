@@ -9,12 +9,33 @@ using System.Xml.Linq;
 
 namespace FixPortal.FixAtdl.Xml;
 
+/// <summary>
+/// Provides the XML namespaces used by FIXatdl documents.
+/// </summary>
 public class AtdlNamespaces
 {
+    /// <summary>
+    /// The FIXatdl core namespace.
+    /// </summary>
     public static readonly XNamespace core = "http://www.fixprotocol.org/FIXatdl-1-1/Core";
+
+    /// <summary>
+    /// The FIXatdl layout namespace.
+    /// </summary>
     public static readonly XNamespace lay = "http://www.fixprotocol.org/FIXatdl-1-1/Layout";
+
+    /// <summary>
+    /// The FIXatdl validation namespace.
+    /// </summary>
     public static readonly XNamespace val = "http://www.fixprotocol.org/FIXatdl-1-1/Validation";
+
+    /// <summary>
+    /// The FIXatdl flow namespace.
+    /// </summary>
     public static readonly XNamespace flow = "http://www.fixprotocol.org/FIXatdl-1-1/Flow";
+
+    /// <summary>
+    /// The XML Schema Instance namespace.
+    /// </summary>
     public static readonly XNamespace xsi = "http://www.w3.org/2001/XMLSchema-instance";
 }
-

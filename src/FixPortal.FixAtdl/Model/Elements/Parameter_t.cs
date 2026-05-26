@@ -39,7 +39,7 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     /// <summary>
     /// Creates a new instance of <see cref="Parameter_t{T}"/>.
     /// </summary>
-    /// <param name="name">Name of this parameter.  See <see cref="Parameter{T}.Name"/> for constraints on parameter names.</param>
+    /// <param name="name">Name of this parameter. See <see cref="IParameter.Name"/> for constraints on parameter names.</param>
     public Parameter_t(string name)
     {
         if (_log.IsEnabled(LogLevel.Debug))

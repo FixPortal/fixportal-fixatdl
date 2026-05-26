@@ -13,6 +13,9 @@ using FixPortal.FixAtdl.Validation;
 namespace FixPortal.FixAtdl.Model.Elements;
 
 // TODO: Implement IDisposable
+/// <summary>
+/// Represents a FIXatdl state rule that updates control state from edit evaluation.
+/// </summary>
 public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
 {
     private Control_t _owner = null!;
