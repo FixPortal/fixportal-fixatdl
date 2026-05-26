@@ -324,54 +324,6 @@ dotnet_diagnostic.CA1707.severity = none
 # language features pass).
 # ---------------------------------------------------------------------------
 
-# IDE0011: Add braces — deferred to Phase C (C8 dotnet format pass)
-dotnet_diagnostic.IDE0011.severity = none
-
-# IDE0025: Use expression body for property — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0025.severity = none
-
-# IDE0027: Use expression body for accessor — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0027.severity = none
-
-# IDE0023: Use expression body for conversion operator — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0023.severity = none
-
-# IDE0024: Use expression body for operator — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0024.severity = none
-
-# IDE0026: Use expression body for indexer — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0026.severity = none
-
-# IDE0032: Use auto property — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0032.severity = none
-
-# IDE0047: Remove unnecessary parentheses — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0047.severity = none
-
-# IDE0018: Inline variable declaration — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0018.severity = none
-
-# IDE0019: Use pattern matching (as+null) — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0019.severity = none
-
-# IDE0020: Use pattern matching (is+cast) — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0020.severity = none
-
-# IDE0031: Use null propagation — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0031.severity = none
-
-# IDE0054: Use compound assignment — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0054.severity = none
-
-# IDE0066: Convert switch statement to expression — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0066.severity = none
-
-# IDE0074: Use coalesce compound assignment — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0074.severity = none
-
-# IDE1005: Use conditional delegate call — deferred to Phase C (C8)
-dotnet_diagnostic.IDE1005.severity = none
-
 # CA1873: Don't evaluate log arguments — deferred to Phase C (C8)
 dotnet_diagnostic.CA1873.severity = none
 
