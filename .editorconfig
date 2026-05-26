@@ -319,14 +319,6 @@ dotnet_diagnostic.CA1707.severity = none
 # silences CA1707 for tests; FixAtdl needs it silenced globally.
 dotnet_diagnostic.CA1707.severity = none
 
-# ---- IDisposable safety (canonical baseline does not silence these) ----
-# Re-enabled per project as the disposal contract is reviewed; legacy code
-# implements IDisposable in the VS2010-era pattern and a sweep is queued.
-dotnet_diagnostic.CA1063.severity = none
-dotnet_diagnostic.CA1816.severity = none
-dotnet_diagnostic.CA2213.severity = none
-dotnet_diagnostic.S3881.severity = none
-
 # ---------------------------------------------------------------------------
 # Phase A build gate: rules deferred to Phase C (C8: dotnet format / modern
 # language features pass).
