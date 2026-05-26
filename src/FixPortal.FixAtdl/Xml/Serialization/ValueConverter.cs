@@ -64,7 +64,7 @@ public class ValueConverter
                 return new FixTag(Convert.ToInt32(value, CultureInfo.InvariantCulture));
 
             default:
-                if (targetType.FullName!.StartsWith("FixPortal.FixAtdl.Model.Controls.InitValue"))
+                if (targetType.FullName!.StartsWith("FixPortal.FixAtdl.Model.Controls.InitValue", StringComparison.Ordinal))
                 {
                     return value;
                 }
@@ -75,4 +75,3 @@ public class ValueConverter
         }
     }
 }
-

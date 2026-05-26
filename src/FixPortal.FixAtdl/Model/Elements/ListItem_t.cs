@@ -21,7 +21,7 @@ public class ListItem_t : IComparable
     {
         if (obj is string)
         {
-            return EnumId.CompareTo(obj as string);
+            return string.Compare(EnumId, obj as string, StringComparison.Ordinal);
         }
         else
         {
@@ -34,4 +34,3 @@ public class ListItem_t : IComparable
         return UiRep;
     }
 }
-

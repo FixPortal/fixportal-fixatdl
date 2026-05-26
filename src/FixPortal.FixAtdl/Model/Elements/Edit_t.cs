@@ -373,7 +373,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
     private object GetLhsValue(FixFieldValueProvider additionalValues)
     {
-        if (Field.StartsWith("FIX_"))
+        if (Field.StartsWith("FIX_", StringComparison.Ordinal))
         {
             return GetFixFieldValue(additionalValues, Field);
         }
@@ -397,7 +397,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
         if (Field2 != null)
         {
-            if (Field2.StartsWith("FIX_"))
+            if (Field2.StartsWith("FIX_", StringComparison.Ordinal))
             {
                 return GetFixFieldValue(additionalValues, Field2);
             }
@@ -449,14 +449,14 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     {
         (Edits as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);
 
-        if (!string.IsNullOrEmpty(Field) && !Field.StartsWith("FIX_"))
+        if (!string.IsNullOrEmpty(Field) && !Field.StartsWith("FIX_", StringComparison.Ordinal))
         {
             _fieldSource = sourceCollection.Contains(Field)
                 ? sourceCollection[Field]
                 : throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefFieldControlNotFound, Field, "Field");
         }
 
-        if (!string.IsNullOrEmpty(Field2) && !Field2.StartsWith("FIX_"))
+        if (!string.IsNullOrEmpty(Field2) && !Field2.StartsWith("FIX_", StringComparison.Ordinal))
         {
             _field2Source = sourceCollection.Contains(Field2)
                 ? sourceCollection[Field2]
@@ -466,4 +466,3 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
     #endregion IResolvable<Strategy_t> Members
 }
-
