@@ -46,10 +46,11 @@ public static class FixDateTime
     /// <returns>If successful, the DateTime equivalent representation of the supplied string.</returns>
     public static DateTime Parse(string value, IFormatProvider provider)
     {
-        DateTime result;
 
-        if (TryParse(value, provider, out result))
+        if (TryParse(value, provider, out DateTime result))
+        {
             return result;
+        }
 
         throw ThrowHelper.New<InvalidCastException>(ExceptionContext, ErrorMessages.DataConversionError1, value, "DateTime");
     }

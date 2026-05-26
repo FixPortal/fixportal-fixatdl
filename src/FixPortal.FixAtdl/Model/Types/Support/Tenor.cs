@@ -33,7 +33,9 @@ public struct Tenor : IComparable
     public static bool operator <=(Tenor lhs, Tenor rhs)
     {
         if (lhs.TenorType != rhs.TenorType)
+        {
             throw ThrowHelper.New<NotSupportedException>(ExceptionContext, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
+        }
 
         return lhs.Offset <= rhs.Offset;
     }
@@ -41,25 +43,23 @@ public struct Tenor : IComparable
     public static bool operator >=(Tenor lhs, Tenor rhs)
     {
         if (lhs.TenorType != rhs.TenorType)
+        {
             throw ThrowHelper.New<NotSupportedException>(ExceptionContext, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
+        }
 
         return lhs.Offset >= rhs.Offset;
     }
 
-    public static bool operator ==(Tenor lhs, Tenor rhs)
-    {
-        return lhs.Offset == rhs.Offset && lhs.TenorType == rhs.TenorType;
-    }
+    public static bool operator ==(Tenor lhs, Tenor rhs) => lhs.Offset == rhs.Offset && lhs.TenorType == rhs.TenorType;
 
-    public static bool operator !=(Tenor lhs, Tenor rhs)
-    {
-        return lhs.Offset != rhs.Offset || lhs.TenorType != rhs.TenorType;
-    }
+    public static bool operator !=(Tenor lhs, Tenor rhs) => lhs.Offset != rhs.Offset || lhs.TenorType != rhs.TenorType;
 
     public override readonly bool Equals(object? obj)
     {
         if (obj == null || obj is not Tenor)
+        {
             return false;
+        }
 
         return this == (Tenor)obj;
     }
@@ -71,7 +71,7 @@ public struct Tenor : IComparable
     /// <remarks>The value 251 is used here because it is a prime number, helpful for generating unique hash values.</remarks>
     public override readonly int GetHashCode()
     {
-        return (Offset * 251) + (int)TenorType;
+        return Offset * 251 + (int)TenorType;
     }
 
     public static Tenor Parse(string value)
@@ -106,7 +106,9 @@ public struct Tenor : IComparable
                 result.Offset = Convert.ToInt32(number);
 
                 if (result.TenorType != TenorTypeValue.Invalid)
+                {
                     return result;
+                }
             }
             catch (FormatException ex)
             {
@@ -119,20 +121,13 @@ public struct Tenor : IComparable
 
     public override readonly string ToString()
     {
-        switch (TenorType)
+        return TenorType switch
         {
-            case TenorTypeValue.Day:
-                return string.Format("D{0}", Offset);
-
-            case TenorTypeValue.Week:
-                return string.Format("W{0}", Offset);
-
-            case TenorTypeValue.Month:
-                return string.Format("M{0}", Offset);
-
-            default:
-                return string.Format("Y{0}", Offset);
-        }
+            TenorTypeValue.Day => string.Format("D{0}", Offset),
+            TenorTypeValue.Week => string.Format("W{0}", Offset),
+            TenorTypeValue.Month => string.Format("M{0}", Offset),
+            _ => string.Format("Y{0}", Offset),
+        };
     }
 
     #region IComparable Members
@@ -153,15 +148,21 @@ public struct Tenor : IComparable
     {
         // Null references are by definition less than the current instance.
         if (obj == null)
+        {
             return 1;
+        }
 
         if (obj is not Tenor)
+        {
             throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName!, GetType().FullName!);
+        }
 
         Tenor rhs = (Tenor)obj;
 
         if (rhs == this)
+        {
             return 0;
+        }
 
         return rhs <= this ? 1 : -1;
     }

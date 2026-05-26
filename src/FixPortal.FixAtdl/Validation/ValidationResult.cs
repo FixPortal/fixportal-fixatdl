@@ -31,42 +31,39 @@ public class ValidationResult
     }
 
     private readonly ResultType _validityType;
-    private readonly string _errorText = null!;
-
-    private static readonly ValidationResult _validResult = new();
 
     /// <summary>
     /// Indicates whether the validation that this ValidationResult corresponds to is valid.
     /// </summary>
-    public bool IsValid { get { return _validityType == ResultType.Valid; } }
+    public bool IsValid => _validityType == ResultType.Valid;
 
     /// <summary>
     /// Indicates whether the result that this ValidationResult corresponds to is invalid
     /// because the field was required but not present.
     /// </summary>
-    public bool IsMissing { get { return _validityType == ResultType.Missing; } }
+    public bool IsMissing => _validityType == ResultType.Missing;
 
     /// <summary>
     /// Gets the error text for this ValidationResult; used when a validation has failed.
     /// </summary>
-    public string ErrorText { get { return _errorText; } }
+    public string ErrorText { get; } = null!;
 
     /// <summary>
     /// Gets a static ValidationResult instance that corresponds to a successful validation.
     /// </summary>
-    public static ValidationResult ValidResult { get { return _validResult; } }
+    public static ValidationResult ValidResult { get; } = new();
 
     /// <summary>
     /// Initializes a new <see cref="ValidationResult"/> instance with the supplied state,
     /// format string and optional array of arguments.
     /// </summary>
-    /// <param name="isValid">Set this value to true if the validation succeeded, false otherwise.</param>
+    /// <param name="resultType"></param>
     /// <param name="format">Format string.</param>
     /// <param name="args">Optional array of arguments to apply to format string.</param>
     public ValidationResult(ResultType resultType, string format, params object[] args)
     {
         _validityType = resultType;
-        _errorText = string.Format(format, args);
+        ErrorText = string.Format(format, args);
     }
 
     private ValidationResult()

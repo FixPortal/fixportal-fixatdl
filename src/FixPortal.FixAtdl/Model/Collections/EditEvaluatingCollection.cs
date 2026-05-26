@@ -31,9 +31,6 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private readonly ILogger _log = NullLogger.Instance;
 
-    private bool _currentState;
-    private readonly HashSet<string> _sources = [];
-
     /// <summary>
     /// Logic operator for this collection of Edits.
     /// </summary>
@@ -42,12 +39,12 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
     /// <summary>
     /// Current state of this collection of Edits.
     /// </summary>
-    public bool CurrentState { get { return _currentState; } }
+    public bool CurrentState { get; private set; }
 
     /// <summary>
     /// Gets the set of sources for the data to be evaluated as part of this collection of Edits.
     /// </summary>
-    public HashSet<string> Sources { get { return _sources; } }
+    public HashSet<string> Sources { get; } = [];
 
     /// <summary>
     /// Adds the specified item.
@@ -58,7 +55,9 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
         base.Add(item);
 
         foreach (string source in item.Sources)
-            _sources.Add(source);
+        {
+            Sources.Add(source);
+        }
 
         _log.LogDebug("Edit_t {Edit} added to EditEvaluatingCollection", item.ToString());
     }
@@ -70,19 +69,23 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
     /// <param name="additionalValues">Any additional FIX field values that may be required in the Edit evaluation.</param>
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
-        _log.LogDebug("Evaluating EditEvaluatingCollection with {Count} elements; current state = {CurrentState}", Count, _currentState.ToString().ToLower());
+        _log.LogDebug("Evaluating EditEvaluatingCollection with {Count} elements; current state = {CurrentState}", Count, CurrentState.ToString().ToLower());
 
         if (LogicOperator == null)
+        {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.MissingLogicalOperatorOnSetOfEdits);
+        }
 
         bool shortCircuit = false;
-        bool newState = (LogicOperator == LogicOperator_t.And);
+        bool newState = LogicOperator == LogicOperator_t.And;
         int xorCount = 0;
 
         foreach (IEdit<T> item in Items)
         {
             if (shortCircuit)
+            {
                 break;
+            }
 
             item.Evaluate(additionalValues);
 
@@ -91,13 +94,19 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
                 case LogicOperator_t.And:
                     newState &= item.CurrentState;
                     if (!newState)
+                    {
                         shortCircuit = true;
+                    }
+
                     break;
 
                 case LogicOperator_t.Or:
                     newState |= item.CurrentState;
                     if (newState)
+                    {
                         shortCircuit = true;
+                    }
+
                     break;
 
                 case LogicOperator_t.Not:
@@ -108,7 +117,10 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
                 // and only one of its operands is true. If none or more than one of its operands is true then XOR is false."
                 case LogicOperator_t.Xor:
                     if (item.CurrentState)
+                    {
                         xorCount++;
+                    }
+
                     newState = xorCount == 1;
                     break;
             }
@@ -116,7 +128,7 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
             _log.LogDebug("EditEvaluatingCollection state is now {NewState}", newState.ToString().ToLower());
         }
 
-        _currentState = newState;
+        CurrentState = newState;
     }
 
     #region IResolvable<Strategy_t, T> Members

@@ -32,9 +32,13 @@ public class ValueConverter
 
             case "System.Char":
                 if (value.Length == 1)
+                {
                     return Convert.ToChar(value);
+                }
                 else
+                {
                     throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.InvalidCharValue, value);
+                }
 
             case "System.Boolean":
                 return bool.Parse(value);
@@ -47,10 +51,11 @@ public class ValueConverter
 
             case "System.DateTime":
                 {
-                    DateTime result;
 
-                    if (!FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out result))
+                    if (!FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result))
+                    {
                         throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.InvalidDateOrTimeValue, value);
+                    }
 
                     return result;
                 }
@@ -60,9 +65,13 @@ public class ValueConverter
 
             default:
                 if (targetType.FullName!.StartsWith("FixPortal.FixAtdl.Model.Controls.InitValue"))
+                {
                     return value;
+                }
                 else
+                {
                     throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.UnrecognisedAttributeType, targetType.FullName!);
+                }
         }
     }
 }

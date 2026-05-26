@@ -51,14 +51,19 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
         if (value != null)
         {
             if (MaxValue != null && (int)value > MaxValue)
+            {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, MaxValue);
+            }
 
             if (MinValue != null && (int)value < MinValue)
+            {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+            }
         }
         else if (isRequired)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
-
+        }
 
         return ValidationResult.ValidResult;
     }
@@ -135,7 +140,6 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
@@ -145,7 +149,6 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
@@ -159,9 +162,13 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
         if (_value == null)
+        {
             return new EnumState(enumPairs.EnumIds);
+        }
         else
+        {
             return EnumState.FromWireValue(enumPairs, ToString(CultureInfo.InvariantCulture)!);
+        }
     }
 
     #endregion

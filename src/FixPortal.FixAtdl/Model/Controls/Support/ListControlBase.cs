@@ -50,7 +50,7 @@ public abstract class ListControlBase : InitializableControl<string>
     /// Indicates whether the EnumState value for this control can be set to a value other than one of the enumerated
     /// values.  (This property is present to support editable drop-down list controls.)
     /// </summary>
-    protected virtual bool IsNonEnumValueAllowed { get { return false; } }
+    protected virtual bool IsNonEnumValueAllowed => false;
 
     /// <summary>
     /// Initializes the base Control_t class with the supplied control identifier.
@@ -73,7 +73,9 @@ public abstract class ListControlBase : InitializableControl<string>
     protected override bool LoadDefaultFromFixValue(string value)
     {
         if (string.IsNullOrEmpty(value))
+        {
             return false;
+        }
 
         _value = new EnumState(ListItems.EnumIds);
 
@@ -91,7 +93,9 @@ public abstract class ListControlBase : InitializableControl<string>
         _value = new EnumState(ListItems.EnumIds);
 
         if (InitValue != null)
+        {
             _value.LoadInitValue(InitValue, IsNonEnumValueAllowed);
+        }
     }
 
     #endregion
@@ -114,13 +118,19 @@ public abstract class ListControlBase : InitializableControl<string>
     public override void SetValue(object newValue)
     {
         if (_value == null)
+        {
             throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedNullReference, "_value",
                 "FixPortal.FixAtdl.Model.Types.Support.EnumState");
+        }
 
         if (newValue == null || newValue as string == Atdl.NullValue)
+        {
             _value.ClearAll();
+        }
         else
+        {
             _value.UpdateFrom((newValue as EnumState)!);
+        }
     }
 
     /// <summary>
@@ -128,19 +138,18 @@ public abstract class ListControlBase : InitializableControl<string>
     /// </summary>
     public override void Reset()
     {
-        if (_value != null)
-            _value.ClearAll();
+        _value?.ClearAll();
     }
 
     /// <summary>
     /// Gets the collection of ListItems for this control.
     /// </summary>
-    public ListItemCollection ListItems { get { return _listItems; } }
+    public ListItemCollection ListItems => _listItems;
 
     /// <summary>
     /// Indicates whether this control has one or more ListItems.
     /// </summary>
-    public bool HasListItems { get { return _listItems.HasItems; } }
+    public bool HasListItems => _listItems.HasItems;
 
     /// <summary>
     /// Sets the value of this control using the value of the supplied parameter.
@@ -167,40 +176,40 @@ public abstract class ListControlBase : InitializableControl<string>
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
+    /// <param name="targetParameter"></param>
     /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public override decimal? ToDecimal(IParameter targetParameter, IFormatProvider provider)
     {
-        decimal result = 0;
         string wireValue = ToString(targetParameter);
 
-        return TryConvertToDecimal(wireValue, out result) ? (decimal?)result : null;
+        return TryConvertToDecimal(wireValue, out decimal result) ? (decimal?)result : null;
     }
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit signed integer using the specified culture-specific formatting information.
     /// </summary>
+    /// <param name="targetParameter"></param>
     /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable 32-bit signed integer equivalent to the value of this instance.</returns>
     public override int? ToInt32(IParameter targetParameter, IFormatProvider provider)
     {
-        int result = 0;
         string wireValue = ToString(targetParameter);
 
-        return TryConvertToInt(wireValue, out result) ? (int?)result : null;
+        return TryConvertToInt(wireValue, out int result) ? (int?)result : null;
     }
 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified culture-specific formatting information.
     /// </summary>
+    /// <param name="targetParameter"></param>
     /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable 32-bit unsigned integer equivalent to the value of this instance.</returns>
     public override uint? ToUInt32(IParameter targetParameter, IFormatProvider provider)
     {
-        uint result = 0;
         string wireValue = ToString(targetParameter);
 
-        return TryConvertToUint(wireValue, out result) ? (uint?)result : null;
+        return TryConvertToUint(wireValue, out uint result) ? (uint?)result : null;
     }
 
     /// <summary>
@@ -219,12 +228,13 @@ public abstract class ListControlBase : InitializableControl<string>
     /// <summary>
     /// Converts the value of this instance to an equivalent string value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
     public override string ToString(IParameter targetParameter)
     {
         if (_value == null)
+        {
             throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedNullReference, "_value", GetType().Name);
+        }
 
         try
         {
@@ -239,6 +249,7 @@ public abstract class ListControlBase : InitializableControl<string>
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
+    /// <param name="targetParameter"></param>
     /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public override DateTime? ToDateTime(IParameter targetParameter, IFormatProvider provider)
@@ -250,7 +261,7 @@ public abstract class ListControlBase : InitializableControl<string>
     /// Indicates whether the control has enumerated state (i.e., its state is held internally in an <see cref="EnumState"/> which
     /// requires special conversion, or if instead a regular value conversion is appropriate).
     /// </summary>
-    public override bool HasEnumeratedState { get { return _value != null; } }
+    public override bool HasEnumeratedState => _value != null;
 
     #endregion
 }

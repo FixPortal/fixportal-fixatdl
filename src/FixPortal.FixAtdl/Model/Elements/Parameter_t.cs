@@ -31,8 +31,6 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private static readonly ILogger _log = NullLogger.Instance;
 
-    private readonly EnumPairCollection _enumPairs = [];
-
     /// <summary>
     /// The underlying value of this parameter.
     /// </summary>
@@ -59,7 +57,7 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     /// <summary>
     /// Value accessor.  <b>This property is intended to be used for deserialization purposes only.</b>
     /// </summary>
-    public T Value { get { return _value; } }
+    public T Value => _value;
 
     #region IParameter Members
 
@@ -83,12 +81,12 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     /// parameter types within FIXatdl may contain an EnumPairs element, so we must support it at the base level.
     /// </summary>
     /// <value>The enum pairs.  Will be an empty collection if no enum pairs were present in the parameter definition.</value>
-    public EnumPairCollection EnumPairs { get { return _enumPairs; } }
+    public EnumPairCollection EnumPairs { get; } = [];
 
     /// <summary>
     /// Indicates whether the parameter has an EnumPairs element with at least one sub-element.
     /// </summary>
-    public bool HasEnumPairs { get { return _enumPairs.Count != 0; } }
+    public bool HasEnumPairs => EnumPairs.Count != 0;
 
     /// <summary>Gets or sets the FIX tag for this parameter, i.e., the tag that will hold the value of the 
     /// parameter. Required when parameter value is intended to be transported over the wire.  If fixTag is not 
@@ -134,7 +132,7 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     /// <summary>
     /// Indicates whether this parameter has been set to a value other than null.
     /// </summary>
-    public bool IsSet { get { return _value.IsSet; } }
+    public bool IsSet => _value.IsSet;
 
 
     /// <summary>
@@ -163,7 +161,9 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
 
             // Update the text in the ValidationResult to include this parameter's name
             if (result.IsMissing)
+            {
                 return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied, Name);
+            }
 
             return result;
         }
@@ -178,13 +178,15 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     /// </summary>
     public string WireValue
     {
-        get { return _value.GetWireValue(this); }
+        get => _value.GetWireValue(this);
 
         set
         {
             // Wire value of null is not allowed (as it is equivalent to writing FIX tag=<SOH>)
             if (value == null)
+            {
                 throw ThrowHelper.New<ArgumentNullException>(this, ErrorMessages.IllegalUseOfNullError);
+            }
 
             _value.SetWireValue(this, value);
         }

@@ -51,13 +51,19 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     protected override ValidationResult ValidateValue(MonthYear? value, bool isRequired)
     {
         if (MaxValue != null && !(value >= MaxValue))
+        {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value.ToString()!, MaxValue);
+        }
 
         if (MinValue != null && !(value <= MinValue))
+        {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value.ToString()!, MinValue);
+        }
 
         if (isRequired && value == null)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }
@@ -136,7 +142,6 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
@@ -146,7 +151,6 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
@@ -160,9 +164,13 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
         if (_value == null)
+        {
             return new EnumState(enumPairs.EnumIds);
+        }
         else
+        {
             return EnumState.FromWireValue(enumPairs, ToString(CultureInfo.InvariantCulture)!);
+        }
     }
 
     #endregion

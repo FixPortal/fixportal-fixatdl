@@ -32,6 +32,7 @@ public interface IParameterConvertible
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
     /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <param name="provider"></param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     decimal? ToDecimal(IParameter targetParameter, IFormatProvider provider);
 

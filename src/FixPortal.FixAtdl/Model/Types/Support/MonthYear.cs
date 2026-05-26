@@ -40,10 +40,7 @@ public struct MonthYear : IComparable
     /// <param name="lhs">Left hand side value.</param>
     /// <param name="rhs">Right hand side value.</param>
     /// <returns>True if the day, month and year values of the two operands are the same; false otherwise.</returns>
-    public static bool operator ==(MonthYear lhs, MonthYear rhs)
-    {
-        return lhs.Year == rhs.Year && lhs.Month == rhs.Month && lhs.Day == rhs.Day && lhs.Month == rhs.Month;
-    }
+    public static bool operator ==(MonthYear lhs, MonthYear rhs) => lhs.Year == rhs.Year && lhs.Month == rhs.Month && lhs.Day == rhs.Day && lhs.Month == rhs.Month;
 
     /// <summary>
     /// Compares two MonthYear values for inequality.
@@ -51,10 +48,7 @@ public struct MonthYear : IComparable
     /// <param name="lhs">Left hand side value.</param>
     /// <param name="rhs">Right hand side value.</param>
     /// <returns>True if any of the day, month and year values of the two operands are not the same; false otherwise.</returns>
-    public static bool operator !=(MonthYear lhs, MonthYear rhs)
-    {
-        return !(lhs == rhs);
-    }
+    public static bool operator !=(MonthYear lhs, MonthYear rhs) => !(lhs == rhs);
 
     /// <summary>
     /// Compares the supplied object for equality with this MonthYear instance.
@@ -64,7 +58,9 @@ public struct MonthYear : IComparable
     public override readonly bool Equals(object? obj)
     {
         if (obj == null || GetType() != obj.GetType())
+        {
             return false;
+        }
 
         return (MonthYear)obj == this;
     }
@@ -78,7 +74,7 @@ public struct MonthYear : IComparable
     {
         unchecked // No issue with int overflow
         {
-            int hashCode = ((Year * 251) + Month) * 251;
+            int hashCode = (Year * 251 + Month) * 251;
 
             hashCode = (Day != null) ? (hashCode + (ushort)Day) * 251 : hashCode * 251;
             hashCode = (Week != null) ? (hashCode + (ushort)Week) * 251 : hashCode * 251;
@@ -96,27 +92,41 @@ public struct MonthYear : IComparable
     public static bool operator <=(MonthYear lhs, MonthYear rhs)
     {
         if (lhs.Year > rhs.Year)
+        {
             return false;
+        }
 
         if (lhs.Year < rhs.Year)
+        {
             return true;
+        }
 
         // Years equal...
         if (lhs.Month > rhs.Month)
+        {
             return false;
+        }
 
         if (lhs.Month < rhs.Month)
+        {
             return true;
+        }
 
         // Years and months equal...
         if (lhs.Day == null && rhs.Day == null && lhs.Week == null && lhs.Week == null)
+        {
             return true;
+        }
 
         if (lhs.Day != null && rhs.Day != null)
+        {
             return lhs.Day <= rhs.Day;
+        }
 
         if (lhs.Week != null && lhs.Week != null)
+        {
             return lhs.Week <= rhs.Week;
+        }
 
         throw ThrowHelper.New<NotSupportedException>(ExceptionContext, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
     }
@@ -130,27 +140,41 @@ public struct MonthYear : IComparable
     public static bool operator >=(MonthYear lhs, MonthYear rhs)
     {
         if (lhs.Year < rhs.Year)
+        {
             return false;
+        }
 
         if (lhs.Year > rhs.Year)
+        {
             return true;
+        }
 
         // Years equal...
         if (lhs.Month < rhs.Month)
+        {
             return false;
+        }
 
         if (lhs.Month > rhs.Month)
+        {
             return true;
+        }
 
         // Years and months equal...
         if (lhs.Day == null && rhs.Day == null && lhs.Week == null && lhs.Week == null)
+        {
             return true;
+        }
 
         if (lhs.Day != null && rhs.Day != null)
+        {
             return lhs.Day >= rhs.Day;
+        }
 
         if (lhs.Week != null && lhs.Week != null)
+        {
             return lhs.Week >= rhs.Week;
+        }
 
         throw ThrowHelper.New<NotSupportedException>(ExceptionContext, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
     }
@@ -173,14 +197,18 @@ public struct MonthYear : IComparable
             string suffix = value.Substring(6, 2);
 
             if (suffix[0] == 'w')
+            {
                 result.Week = ValidateRange(suffix[1].ToString(), 1, 5);
+            }
             else
+            {
                 result.Day = ValidateRange(suffix, 1, 31);
+            }
 
             suffixValid = true;
         }
 
-        if (value.Length == 6 || (value.Length == 8 && suffixValid))
+        if (value.Length == 6 || value.Length == 8 && suffixValid)
         {
             result.Year = ValidateRange(value[..4], 0, 9999);
             result.Month = ValidateRange(value.Substring(4, 2), 1, 12);
@@ -198,7 +226,9 @@ public struct MonthYear : IComparable
             ushort numValue = Convert.ToUInt16(value);
 
             if (numValue >= lowerBound && numValue <= upperBound)
+            {
                 return numValue;
+            }
 
             throw ThrowHelper.New<ArgumentException>(ExceptionContext, ErrorMessages.InvalidMonthYearValue, value);
         }
@@ -226,15 +256,21 @@ public struct MonthYear : IComparable
     {
         // Null references are by definition less than the current instance.
         if (obj == null)
+        {
             return 1;
+        }
 
         if (obj is not MonthYear)
+        {
             throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName!, GetType().FullName!);
+        }
 
         MonthYear rhs = (MonthYear)obj;
 
         if (rhs == this)
+        {
             return 0;
+        }
 
         return rhs <= this ? 1 : -1;
     }

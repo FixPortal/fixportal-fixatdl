@@ -28,10 +28,7 @@ public class EnumPairCollection : KeyedCollection<string, EnumPair_t>
     /// Gets the full set of EnumIds.
     /// </summary>
     /// <value>The enum ids.</value>
-    public string[] EnumIds
-    {
-        get { return [.. (from item in Items select item.EnumId)]; }
-    }
+    public string[] EnumIds => [.. from item in Items select item.EnumId];
 
     /// <summary>
     /// Gets a value indicating whether this instance has values.
@@ -39,10 +36,7 @@ public class EnumPairCollection : KeyedCollection<string, EnumPair_t>
     /// <value>
     /// 	<c>true</c> if this instance has values; otherwise, <c>false</c>.
     /// </value>
-    public bool HasValues
-    {
-        get { return Count > 0; }
-    }
+    public bool HasValues => Count > 0;
 
     /// <summary>
     /// Gets the wire value from enum id.
@@ -54,7 +48,9 @@ public class EnumPairCollection : KeyedCollection<string, EnumPair_t>
         EnumPair_t enumPair = this[enumId];
 
         if (enumPair == null)
+        {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.EnumerationNotFound, enumId);
+        }
 
         return enumPair.WireValue;
     }

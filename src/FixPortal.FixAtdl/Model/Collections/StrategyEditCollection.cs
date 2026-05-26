@@ -40,7 +40,9 @@ public class StrategyEditCollection : Collection<StrategyEdit_t>
             if (!strategyEdit.CurrentState)
             {
                 if (shortCircuit)
+                {
                     return false;
+                }
 
                 valid = false;
             }
@@ -63,7 +65,9 @@ public class StrategyEditCollection : Collection<StrategyEdit_t>
     public void ResolveAll(Strategy_t owningStrategy)
     {
         foreach (StrategyEdit_t strategyEdit in this)
+        {
             (strategyEdit as IResolvable<Strategy_t, IParameter>).Resolve(owningStrategy, owningStrategy.Parameters);
+        }
     }
 }
 

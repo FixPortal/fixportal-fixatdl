@@ -34,14 +34,17 @@ public class ParameterCollection : KeyedCollection<string, IParameter>, ISimpleD
     /// not specified in inputValues; set to false to leave the parameter value unchanged.</param>
     public void LoadInitialValues(FixTagValuesCollection initialValues, bool resetNonSuppliedParameters)
     {
-        string value;
 
         foreach (IParameter parameter in Items)
         {
-            if (parameter.FixTag != null && initialValues.TryGetValue((FixTag)parameter.FixTag, out value))
+            if (parameter.FixTag != null && initialValues.TryGetValue((FixTag)parameter.FixTag, out string value))
+            {
                 parameter.WireValue = value;
+            }
             else if (resetNonSuppliedParameters)
+            {
                 parameter.Reset();
+            }
         }
     }
 
@@ -57,7 +60,9 @@ public class ParameterCollection : KeyedCollection<string, IParameter>, ISimpleD
         foreach (IParameter parameter in Items)
         {
             if (parameter.FixTag != null && parameter.WireValue != null)
+            {
                 output.Add((FixTag)parameter.FixTag, parameter.WireValue);
+            }
         }
 
         return output;
@@ -69,7 +74,9 @@ public class ParameterCollection : KeyedCollection<string, IParameter>, ISimpleD
     public void ResetAll()
     {
         foreach (IParameter parameter in Items)
+        {
             parameter.Reset();
+        }
     }
 }
 

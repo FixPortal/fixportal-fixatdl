@@ -27,12 +27,16 @@ public static class StringExtensions
     public static T ParseAsEnum<T>(this string value) where T : struct
     {
         if (string.IsNullOrEmpty(value))
+        {
             throw ThrowHelper.New<ArgumentNullException>(ExceptionContext, ErrorMessages.NullOrEmptyStringEnumParseFailure, typeof(T).Name);
+        }
 
         T result;
 
         if (!typeof(T).IsEnum)
+        {
             throw ThrowHelper.New<InvalidOperationException>(ExceptionContext, InternalErrors.InvalidUseOfParseAsEnum);
+        }
 
 #if NET_40
         if (!Enum.TryParse<T>(value, true, out result))

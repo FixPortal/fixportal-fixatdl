@@ -26,7 +26,9 @@ public readonly struct FixTag
     public FixTag(int value)
     {
         if (value <= 0)
+        {
             throw ThrowHelper.New<ArgumentOutOfRangeException>(typeof(FixTag).FullName, ErrorMessages.NonZeroPositiveIntRequired, value);
+        }
 
         _value = value;
     }
@@ -36,40 +38,28 @@ public readonly struct FixTag
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator FixTag(int value)
-    {
-        return new FixTag(value);
-    }
+    public static implicit operator FixTag(int value) => new FixTag(value);
 
     /// <summary>
     /// Performs an implicit conversion from <see cref="FixPortal.FixAtdl.Fix.FixField"/> to <see cref="FixPortal.FixAtdl.Fix.FixTag"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator FixTag(FixField value)
-    {
-        return new FixTag((int)value);
-    }
+    public static implicit operator FixTag(FixField value) => new FixTag((int)value);
 
     /// <summary>
     /// Performs an implicit conversion from <see cref="FixPortal.FixAtdl.Fix.FixTag"/> to <see cref="int"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator int(FixTag value)
-    {
-        return value._value;
-    }
+    public static implicit operator int(FixTag value) => value._value;
 
     /// <summary>
     /// Performs an implicit conversion from <see cref="FixPortal.FixAtdl.Fix.FixTag"/> to <see cref="FixPortal.FixAtdl.Fix.FixField"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator FixField(FixTag value)
-    {
-        return (FixField)value._value;
-    }
+    public static implicit operator FixField(FixTag value) => (FixField)value._value;
 
     /// <summary>
     /// Returns a <see cref="string"/> that represents this instance.

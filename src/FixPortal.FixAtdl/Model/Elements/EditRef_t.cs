@@ -72,46 +72,41 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
 
     public string Field
     {
-        get { return _referencedEdit.Field; }
-        set { _referencedEdit.Field = value; }
+        get => _referencedEdit.Field; set => _referencedEdit.Field = value;
     }
 
     public string Field2
     {
-        get { return _referencedEdit.Field2; }
-        set { _referencedEdit.Field2 = value; }
+        get => _referencedEdit.Field2; set => _referencedEdit.Field2 = value;
     }
 
     public Operator_t? Operator
     {
-        get { return _referencedEdit.Operator; }
-        set { _referencedEdit.Operator = value; }
+        get => _referencedEdit.Operator; set => _referencedEdit.Operator = value;
     }
 
     public LogicOperator_t? LogicOperator
     {
-        get { return _referencedEdit.LogicOperator; }
-        set { _referencedEdit.LogicOperator = value; }
+        get => _referencedEdit.LogicOperator; set => _referencedEdit.LogicOperator = value;
     }
 
     public string Value
     {
-        get { return _referencedEdit.Value; }
-        set { _referencedEdit.Value = value; }
+        get => _referencedEdit.Value; set => _referencedEdit.Value = value;
     }
 
-    public object FieldValue { get { return _referencedEdit.FieldValue; } }
+    public object FieldValue => _referencedEdit.FieldValue;
 
-    public object Field2Value { get { return _referencedEdit.Field2Value; } }
+    public object Field2Value => _referencedEdit.Field2Value;
 
-    public bool CurrentState { get { return _referencedEdit.CurrentState; } }
+    public bool CurrentState => _referencedEdit.CurrentState;
 
-    public EditEvaluatingCollection<T> Edits { get { return _referencedEdit.Edits; } }
+    public EditEvaluatingCollection<T> Edits => _referencedEdit.Edits;
 
     /// <summary>
     /// Gets the set of sources for the data to be evaluated as part of this StrategyEdit.
     /// </summary>
-    public HashSet<string> Sources { get { return _referencedEdit.Sources; } }
+    public HashSet<string> Sources => _referencedEdit.Sources;
 
     #endregion
 
@@ -136,7 +131,9 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
                 _log.LogDebug("EditRef Id {Arg0} linked to new Edit_t resolved resolved from Strategies level", Id);
             }
             else
+            {
                 throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefResolutionFailure, Id);
+            }
         }
 
         (_referencedEdit as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);

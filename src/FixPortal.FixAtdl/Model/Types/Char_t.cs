@@ -36,7 +36,9 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
     protected override ValidationResult ValidateValue(char? value, bool isRequired)
     {
         if (isRequired && value == null)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }
@@ -50,7 +52,9 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
     protected override char? ConvertFromWireValueFormat(string value)
     {
         if (string.IsNullOrEmpty(value))
+        {
             throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.InvalidNullOrEmptyStringValue);
+        }
 
         return value[0];
     }
@@ -108,7 +112,7 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
     /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
     public string? ToString(IFormatProvider? provider)
     {
-        return _value != null ? _value.ToString() : null;
+        return _value?.ToString();
     }
 
     /// <summary>
@@ -123,7 +127,6 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
@@ -137,9 +140,13 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
         if (_value == null)
+        {
             return new EnumState(enumPairs.EnumIds);
+        }
         else
+        {
             return EnumState.FromWireValue(enumPairs, ((char)_value).ToString());
+        }
     }
 
     #endregion

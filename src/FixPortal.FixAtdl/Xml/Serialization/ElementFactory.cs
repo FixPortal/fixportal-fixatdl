@@ -49,15 +49,15 @@ public class ElementFactory : INotifyClassDeserialized
     {
         _log.LogDebug("CreateObject(ElementDefinition, XElement) called; ElementName='{ElementName}.'", definition.ElementName);
 
-        Type[] constructorParameterTypes;
-        object[] constructorParameterValues;
 
-        GetConstructorParameters(definition, sourceElement, parentObject, out constructorParameterTypes, out constructorParameterValues);
+        GetConstructorParameters(definition, sourceElement, parentObject, out Type[] constructorParameterTypes, out object[] constructorParameterValues);
 
         object newObject = CreateRawObject(definition.TargetType!, constructorParameterTypes, constructorParameterValues);
 
         if (definition.CacheElementValueInstruction != null)
+        {
             _elementValueCache[definition.CacheElementValueInstruction.CacheKey] = newObject;
+        }
 
         IEnumerable<XAttribute> attributes = sourceElement.Attributes();
 
@@ -73,7 +73,9 @@ public class ElementFactory : INotifyClassDeserialized
         ProcessChildren(definition, sourceElement, newObject);
 
         if (newObject.GetType() == _notifyCreationOfType)
+        {
             NotifyClassDeserialized(_notifyCreationOfType, newObject);
+        }
 
         return newObject;
     }
@@ -94,30 +96,27 @@ public class ElementFactory : INotifyClassDeserialized
     {
         _log.LogDebug("CreateObject(GenericTypeElementDefinition, XElement) called; ElementName='{ElementName}'.", genericTypeDefinition.ElementName);
 
-        object[] constructorParameterValues;
-        Type[] constructorParameterTypes;
 
-        GetConstructorParameters(genericTypeDefinition, sourceElement, parentObject, out constructorParameterTypes, out constructorParameterValues);
+        GetConstructorParameters(genericTypeDefinition, sourceElement, parentObject, out Type[] constructorParameterTypes, out object[] constructorParameterValues);
 
 
         string? innerTypeName = ReadAttribute(sourceElement.Attributes(), genericTypeDefinition.AttributeForInnerType, typeof(string)) as string;
 
         if (string.IsNullOrEmpty(innerTypeName))
+        {
             throw ThrowHelper.New<MissingMandatoryValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.MissingMandatoryAttribute,
                 genericTypeDefinition.AttributeForInnerType.LocalName, genericTypeDefinition.ElementName!.LocalName);
-
-        Type innerType;
-
-        if (string.IsNullOrEmpty(genericTypeDefinition.InnerTypeNamespace))
-            innerType = Type.GetType(innerTypeName)!;
-        else
-        {
-            innerType = Type.GetType(string.Format("{0}.{1}", genericTypeDefinition.InnerTypeNamespace, innerTypeName))!;
         }
 
+        Type innerType = string.IsNullOrEmpty(genericTypeDefinition.InnerTypeNamespace)
+            ? Type.GetType(innerTypeName)!
+            : Type.GetType(string.Format("{0}.{1}", genericTypeDefinition.InnerTypeNamespace, innerTypeName))!;
+
         if (innerType == null)
+        {
             throw ThrowHelper.New<InvalidFieldValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.UnrecognisedTypeError, innerTypeName,
                 genericTypeDefinition.AttributeForInnerType.LocalName, genericTypeDefinition.ElementName!.LocalName);
+        }
 
         object newObject = CreateRawObject(genericTypeDefinition.TargetType!, [innerType], constructorParameterTypes, constructorParameterValues);
 
@@ -136,7 +135,9 @@ public class ElementFactory : INotifyClassDeserialized
         ProcessChildren(genericTypeDefinition, sourceElement, newObject);
 
         if (newObject.GetType() == _notifyCreationOfType)
+        {
             NotifyClassDeserialized(_notifyCreationOfType, newObject);
+        }
 
         return newObject;
     }
@@ -145,34 +146,33 @@ public class ElementFactory : INotifyClassDeserialized
     {
         _log.LogDebug("CreateObject(MultiTypeElementDefinition, XElement) called; ElementName='{ElementName}'.", multiTypeDefinition.ElementName);
 
-        object[] constructorParameterValues;
-        Type[] constructorParameterTypes;
 
-        GetConstructorParameters(multiTypeDefinition, sourceElement, parentObject, out constructorParameterTypes, out constructorParameterValues);
+        GetConstructorParameters(multiTypeDefinition, sourceElement, parentObject, out Type[] constructorParameterTypes, out object[] constructorParameterValues);
 
 
         string? typeName = ReadAttribute(sourceElement.Attributes(), multiTypeDefinition.AttributeForType, typeof(string)) as string;
 
         if (string.IsNullOrEmpty(typeName))
+        {
             throw ThrowHelper.New<MissingMandatoryValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.MissingMandatoryAttribute,
                 multiTypeDefinition.AttributeForType.LocalName, multiTypeDefinition.ElementName!.LocalName);
+        }
 
         // If the value for the typename is in an XML namespace, remove it.
         if (typeName.Contains(':') && typeName.IndexOf(':') < typeName.Length - 1)
-            typeName = typeName[(typeName.IndexOf(':') + 1)..];
-
-        Type targetType;
-
-        if (string.IsNullOrEmpty(multiTypeDefinition.TypeNamespace))
-            targetType = Type.GetType(typeName)!;
-        else
         {
-            targetType = Type.GetType(string.Format("{0}.{1}", multiTypeDefinition.TypeNamespace, typeName))!;
+            typeName = typeName[(typeName.IndexOf(':') + 1)..];
         }
 
+        Type targetType = string.IsNullOrEmpty(multiTypeDefinition.TypeNamespace)
+            ? Type.GetType(typeName)!
+            : Type.GetType(string.Format("{0}.{1}", multiTypeDefinition.TypeNamespace, typeName))!;
+
         if (targetType == null)
+        {
             throw ThrowHelper.New<InvalidFieldValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.UnrecognisedTypeError, typeName,
                 multiTypeDefinition.AttributeForType.LocalName, multiTypeDefinition.ElementName!.LocalName);
+        }
 
         object newObject = CreateRawObject(targetType, constructorParameterTypes, constructorParameterValues);
 
@@ -191,7 +191,9 @@ public class ElementFactory : INotifyClassDeserialized
         ProcessChildren(multiTypeDefinition, sourceElement, newObject);
 
         if (newObject.GetType() == _notifyCreationOfType)
+        {
             NotifyClassDeserialized(_notifyCreationOfType, newObject);
+        }
 
         return newObject;
     }
@@ -205,7 +207,9 @@ public class ElementFactory : INotifyClassDeserialized
         ConstructorInfo? classConstructor = specificType.GetConstructor(argTypes);
 
         if (classConstructor == null)
+        {
             throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.NoConstructorFoundForSpecifiedArgumentTypes, outerType.FullName!);
+        }
 
         return classConstructor.Invoke(args);
     }
@@ -217,7 +221,9 @@ public class ElementFactory : INotifyClassDeserialized
         ConstructorInfo? classConstructor = targetType.GetConstructor(argTypes);
 
         if (classConstructor == null)
+        {
             throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.NoConstructorFoundForSpecifiedArgumentTypes, targetType.FullName!);
+        }
 
         return classConstructor.Invoke(args);
     }
@@ -246,10 +252,11 @@ public class ElementFactory : INotifyClassDeserialized
 
                     case SourceType.NamedPredecessor:
                         {
-                            object? value;
 
-                            if (_elementValueCache.TryGetValue(elementDefinition.ConstructorParameters[n].Source, out value))
+                            if (_elementValueCache.TryGetValue(elementDefinition.ConstructorParameters[n].Source, out object? value))
+                            {
                                 constructorParameterValues[n] = value;
+                            }
                         }
                         break;
                 }
@@ -270,19 +277,20 @@ public class ElementFactory : INotifyClassDeserialized
 
         foreach (ElementAttribute attrDefn in attributeDefinitions)
         {
-            object? value = null;
-
-            if (attrDefn.Type.IsEnum && attrDefn.EnumValues != null)
-                value = ReadAttribute(attributes, attrDefn.XmlName, attrDefn.Type, attrDefn.EnumValues);
-            else
-                value = ReadAttribute(attributes, attrDefn.XmlName, attrDefn.Type);
+            object? value = attrDefn.Type.IsEnum && attrDefn.EnumValues != null
+                ? ReadAttribute(attributes, attrDefn.XmlName, attrDefn.Type, attrDefn.EnumValues)
+                : ReadAttribute(attributes, attrDefn.XmlName, attrDefn.Type);
 
             if (attrDefn.Required == Required.Mandatory && value == null)
+            {
                 throw ThrowHelper.New<MissingMandatoryValueException>(this, ErrorMessages.MissingMandatoryAttribute,
                     attrDefn.XmlName.LocalName, targetType.Name);
+            }
 
             if (value == null)
+            {
                 continue;
+            }
 
             // Process indirect properties (only one level of indirect is supported).
             if (attrDefn.Property.Contains("."))
@@ -290,23 +298,30 @@ public class ElementFactory : INotifyClassDeserialized
                 string[] names = attrDefn.Property.Split(['.']);
 
                 if (names.Length != 2)
+                {
                     throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.InvalidPropertyIndirection, attrDefn.Property);
-
+                }
 
                 PropertyInfo outerProperty = targetType.GetProperty(names[0])!;
 
                 if (outerProperty == null)
+                {
                     throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal, names[0], targetType.FullName!);
+                }
 
                 object innerObject = outerProperty.GetValue(target, null)!;
 
                 if (innerObject == null)
+                {
                     throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnableToRetrievePropertyValueOnObject, attrDefn.Property, targetType.FullName!);
+                }
 
                 PropertyInfo property = outerProperty.PropertyType.GetProperty(names[1])!;
 
                 if (property == null)
+                {
                     throw ThrowHelper.New<InvalidPropertyOnObjectException>(this, ErrorMessages.PropertyNotFoundOnObject, attrDefn.Property, targetType.Name);
+                }
 
                 SetPropertyValue(property, innerObject, value);
             }
@@ -315,7 +330,9 @@ public class ElementFactory : INotifyClassDeserialized
                 PropertyInfo property = targetType.GetProperty(attrDefn.Property)!;
 
                 if (property == null)
+                {
                     throw ThrowHelper.New<InvalidPropertyOnObjectException>(this, ErrorMessages.PropertyNotFoundOnObject, attrDefn.Property, targetType.Name);
+                }
 
                 SetPropertyValue(property, target, value);
             }
@@ -344,29 +361,33 @@ public class ElementFactory : INotifyClassDeserialized
                 XElement? containerElement = (from e in sourceElement.Elements(childDefinition.ContainerElementName) select e).FirstOrDefault();
 
                 if (containerElement == null)
+                {
                     return;
+                }
 
                 matchingChildElements = from e in containerElement.Elements(childDefinition.ElementDefinition.ElementName) select e;
             }
             else
+            {
                 matchingChildElements = from e in sourceElement.Elements(targetDefinition.ElementName) select e;
+            }
 
             foreach (XElement childElement in matchingChildElements)
             {
-                object childObject;
-
-                if (targetDefinition is GenericTypeElementDefinition)
-                    childObject = CreateObject((GenericTypeElementDefinition)targetDefinition, childElement, target);
-                else if (targetDefinition is MultiTypeElementDefinition)
-                    childObject = CreateObject((MultiTypeElementDefinition)targetDefinition, childElement, target);
-                else
-                    childObject = CreateObject(targetDefinition, childElement, target);
+                object childObject = targetDefinition is GenericTypeElementDefinition genericDefinition
+                    ? CreateObject(genericDefinition, childElement, target)
+                    : targetDefinition is MultiTypeElementDefinition multiDefinition
+                        ? CreateObject(multiDefinition, childElement, target)
+                        : CreateObject(targetDefinition, childElement, target);
 
                 PropertyInfo property = targetType.GetProperty(childDefinition.ContainerProperty)!;
 
                 if (property == null)
+                {
                     throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal,
                         childDefinition.ContainerProperty, targetType.FullName!);
+                }
+
                 try
                 {
                     // For the case of MultiTypeElementDefinition we must use the reflected type
@@ -392,10 +413,8 @@ public class ElementFactory : INotifyClassDeserialized
 
         string containerMethod;
 
-        if (childDefinition.ContainerMethod is StandardContainerMethod)
+        if (childDefinition.ContainerMethod is StandardContainerMethod method)
         {
-            StandardContainerMethod method = (StandardContainerMethod)childDefinition.ContainerMethod;
-
             if (method == StandardContainerMethod.Assign)
             {
                 SetPropertyValue(property, target, childObject);
@@ -403,16 +422,23 @@ public class ElementFactory : INotifyClassDeserialized
                 return;
             }
             else
+            {
                 containerMethod = Enum.GetName(typeof(StandardContainerMethod), childDefinition.ContainerMethod)!;
+            }
         }
         else
+        {
             containerMethod = (childDefinition.ContainerMethod as string)!;
+        }
 
         MethodInfo targetMethod = property.PropertyType.GetMethod(containerMethod!, [targetType])!;
 
         if (targetMethod == null)
+        {
             throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.ContainerMethodNotFoundOnObject,
                 containerMethod, targetType.FullName!);
+        }
+
         try
         {
             targetMethod.Invoke(property.GetValue(target, null), [childObject]);
@@ -420,10 +446,14 @@ public class ElementFactory : INotifyClassDeserialized
         catch (TargetInvocationException ex)
         {
             if (ex.InnerException != null)
+            {
                 throw ThrowHelper.Rethrow(this, ex.InnerException, ErrorMessages.UnableToInvokeMethodError,
                     string.Format("the {0} method on the {1} property", containerMethod, property.Name));
+            }
             else
+            {
                 throw;
+            }
         }
     }
 
@@ -434,7 +464,9 @@ public class ElementFactory : INotifyClassDeserialized
         XAttribute? attribute = attributes.FirstOrDefault(a => a.Name == attributeName);
 
         if (attribute == null)
+        {
             return null!;
+        }
 
         // NB Most simple enums are dealt with in the other overload of ReadAttribute.
         if (type.IsEnum)
@@ -469,10 +501,14 @@ public class ElementFactory : INotifyClassDeserialized
         XAttribute? attribute = attributes.FirstOrDefault(a => a.Name == attributeName);
 
         if (attribute == null)
+        {
             return null!;
+        }
 
         if (!enumValues.ContainsKey(attribute.Value))
+        {
             throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.InvalidValueEnumParseFailure, attribute.Value, enumType.Name);
+        }
 
         return Enum.ToObject(enumType, enumValues[attribute.Value]);
     }
@@ -484,7 +520,9 @@ public class ElementFactory : INotifyClassDeserialized
         try
         {
             if (property.PropertyType == value.GetType())
+            {
                 property.SetValue(target, value, null);
+            }
             else
             {
                 object newValue = CreateRawObject(property.PropertyType, [value.GetType()], value);
@@ -503,10 +541,7 @@ public class ElementFactory : INotifyClassDeserialized
 
     private void NotifyClassDeserialized(Type classType, object extraInfo)
     {
-        EventHandler<ClassDeserializedEventArgs>? classDeserialized = ClassDeserialized;
-
-        if (classDeserialized != null)
-            classDeserialized(this, new ClassDeserializedEventArgs(classType, extraInfo));
+        ClassDeserialized?.Invoke(this, new ClassDeserializedEventArgs(classType, extraInfo));
     }
 
     public event EventHandler<ClassDeserializedEventArgs>? ClassDeserialized;

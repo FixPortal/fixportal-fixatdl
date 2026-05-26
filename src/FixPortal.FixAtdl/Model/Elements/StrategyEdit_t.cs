@@ -20,13 +20,11 @@ namespace FixPortal.FixAtdl.Model.Elements;
 /// </summary>
 public class StrategyEdit_t : EditEvaluator<IParameter>
 {
-    private readonly string _internalId = Guid.NewGuid().ToString();
-
     /// <summary>
     ///  Gets the internal ID for this StrategyEdit; used to support lookups when applying the results of validations to
     ///  controls.
     /// </summary>
-    public string InternalId { get { return _internalId; } }
+    public string InternalId { get; } = Guid.NewGuid().ToString();
 
     /// <summary>
     /// Gets/sets the error message to display when the boolean expression defined by StrategyEdit/Edit evaluates to False.

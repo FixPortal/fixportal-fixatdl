@@ -23,13 +23,19 @@ public static class Regions
     public static Region GetRegionForCountry(IsoCountryCode country)
     {
         if (TheAmericasCountries.Contains(country))
+        {
             return Region.TheAmericas;
+        }
 
         if (EuropeMiddleEastAfricaCountries.Contains(country))
+        {
             return Region.EuropeMiddleEastAfrica;
+        }
 
         if (AsiaPacificJapanCountries.Contains(country))
+        {
             return Region.AsiaPacificJapan;
+        }
 
         return Region.None;
     }

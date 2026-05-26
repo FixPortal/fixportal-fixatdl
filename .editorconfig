@@ -434,11 +434,9 @@ dotnet_diagnostic.CA1715.severity = none
 # CA1725: Parameter names should match base declaration — deferred to Phase C
 dotnet_diagnostic.CA1725.severity = none
 
-# IDE0045: Convert if-else to conditional — deferred to Phase C (C8)
-dotnet_diagnostic.IDE0045.severity = none
-
-# IDE0060: Remove unused parameter — deferred to Phase C
-dotnet_diagnostic.IDE0060.severity = none
+# Note on IDE0045 / IDE0060: previously deferred, now re-enabled.
+# Cleared on 2026-05-26 — see commits removing the related sites in
+# Strategy_t.UpdateControlValuesFromParameters and BinaryControlBase.SetValue.
 
 # ---------------------------------------------------------------------------
 # XML doc warnings — deferred to Phase E (Task E1: XML doc comments on all

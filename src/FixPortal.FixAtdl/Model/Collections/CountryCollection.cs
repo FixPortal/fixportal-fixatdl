@@ -55,8 +55,10 @@ public class CountryCollection : HashSet<Country_t>
         }
 
         if (!countryOkay)
+        {
             throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.InvalidAttemptToAddCountryToRegion,
                 Enum.GetName(typeof(IsoCountryCode), item.CountryCode), Enum.GetName(typeof(Region), _region));
+        }
 
         base.Add(item);
     }

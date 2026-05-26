@@ -46,7 +46,9 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                 foreach (Control_t item in e.NewItems!)
                 {
                     if (_controls.ContainsKey(item.Id))
+                    {
                         throw ThrowHelper.New<DuplicateKeyException>(this, ErrorMessages.AttemptToAddDuplicateKey, item.Id, "Controls");
+                    }
 
                     _controls.Add(item.Id, item);
                 }
@@ -61,7 +63,9 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                 foreach (Control_t item in e.OldItems!)
                 {
                     if (_controls.ContainsKey(item.Id))
+                    {
                         _controls.Remove(item.Id);
+                    }
                 }
                 break;
 
@@ -83,12 +87,15 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     {
         get
         {
-            Control_t? value;
 
-            if (_controls.TryGetValue(controlId, out value))
+            if (_controls.TryGetValue(controlId, out Control_t? value))
+            {
                 return value;
+            }
             else
+            {
                 return null!;
+            }
         }
     }
 
@@ -139,19 +146,22 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             if (parameter != null)
             {
                 if (!parameters.Contains(parameter))
+                {
                     throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.UnresolvedParameterRefError, parameter);
+                }
 
                 ValidationResult result = parameters[parameter].SetValueFromControl(control);
 
                 if (!result.IsValid)
                 {
-                    if (validationResults == null)
-                        validationResults = [];
+                    validationResults ??= [];
 
                     validationResults.Add(result);
 
                     if (shortCircuit)
+                    {
                         return false;
+                    }
 
                     isValid = false;
                 }
@@ -175,7 +185,9 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             object parameterValue = isValidParameter ? parameter.GetCurrentValue() : null!;
 
             if (hasParameterRef && !isValidParameter)
+            {
                 throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.UnresolvedParameterRefError, control.ParameterRef);
+            }
 
             // We only want to update the control value if the parameter has a value
             if (parameterValue != null)
@@ -195,7 +207,9 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     public void RunStateRules()
     {
         foreach (Control_t control in this)
+        {
             control.StateRules.EvaluateAll();
+        }
     }
 
     /// <summary>
@@ -204,7 +218,9 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     public void ResetAll()
     {
         foreach (Control_t control in this)
+        {
             control.Reset();
+        }
     }
 
     /// <summary>
@@ -213,7 +229,9 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     public void ResolveAll()
     {
         foreach (Control_t control in this)
+        {
             control.StateRules.ResolveAll(_owner);
+        }
     }
 
     // This is a bit of a hack to address a design deficiency in FIXatdl 1.1, whereby when doing order amendments
@@ -235,16 +253,19 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                 {
                     Control_t sourceControl = this[sourceControlId];
 
-                    bool result;
 
-                    if (sourceControl.IsToggleable && bool.TryParse(edit.Value, out result))
+                    if (sourceControl.IsToggleable && bool.TryParse(edit.Value, out bool result))
                     {
                         // If the control is a radio button, then we can only set directly, un-set
                         // has be done by setting its companion control
                         if (sourceControl is CheckBox_t || !result)
+                        {
                             sourceControl.SetValue(!result);
+                        }
                         else
+                        {
                             SetCompanionRadioButton((sourceControl as RadioButton_t)!);
+                        }
                     }
                 }
             }
@@ -264,19 +285,25 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
 
         // Approach 1 - use the radio button group name
         if (radioButton.RadioGroup != null)
+        {
             radioButtons = (from c in _controls.Values
                             where c.Id != radioButton.Id &&
                                  c is RadioButton_t && (c as RadioButton_t)!.RadioGroup == radioButton.RadioGroup
                             select c as RadioButton_t);
+        }
         else
+        {
             // Approach 2 - look for radio buttons on the same panel
             radioButtons = (from c in radioButton.OwningStrategyPanel!.Controls
                             where c.Id != radioButton.Id &&
                                  c is RadioButton_t
                             select c as RadioButton_t);
+        }
 
         if (radioButtons.Count() == 1)
+        {
             radioButtons.First().SetValue(true);
+        }
     }
 
     #region IParentable<Strategy_t> Members
@@ -286,8 +313,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     /// </summary>
     Strategy_t IParentable<Strategy_t>.Parent
     {
-        get { return _owner; }
-        set { _owner = value; }
+        get => _owner; set => _owner = value;
     }
 
     #endregion

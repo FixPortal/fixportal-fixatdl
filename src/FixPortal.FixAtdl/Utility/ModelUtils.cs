@@ -20,7 +20,7 @@ public static class ModelUtils
     static ModelUtils()
     {
         _types = from t in Assembly.GetExecutingAssembly().GetTypes()
-                 where (t.IsClass && t.Namespace == "FixPortal.FixAtdl.Model.Types") && !t.IsAbstract
+                 where t.IsClass && t.Namespace == "FixPortal.FixAtdl.Model.Types" && !t.IsAbstract
                  select t;
     }
 
@@ -40,7 +40,9 @@ public static class ModelUtils
                 methodInfo = visitor.GetType().GetMethod("Visit", types);
 
                 if (methodInfo == null)
+                {
                     return false;
+                }
 
                 _methodInfoCache.Add(searchString, methodInfo);
             }

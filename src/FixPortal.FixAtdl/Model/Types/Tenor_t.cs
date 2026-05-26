@@ -46,13 +46,19 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
     protected override ValidationResult ValidateValue(Tenor? value, bool isRequired)
     {
         if (MaxValue != null && value != null && !(value >= MaxValue))
+        {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, MaxValue);
+        }
 
         if (MinValue != null && value != null && !(value <= MinValue))
+        {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+        }
 
         if (isRequired && value == null)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }
@@ -131,7 +137,6 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
@@ -141,7 +146,6 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
@@ -155,9 +159,13 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
         if (_value == null)
+        {
             return new EnumState(enumPairs.EnumIds);
+        }
         else
+        {
             return EnumState.FromWireValue(enumPairs, ToString(null)!);
+        }
     }
 
     #endregion

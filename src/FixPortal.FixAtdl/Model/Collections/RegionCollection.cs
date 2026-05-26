@@ -27,7 +27,9 @@ public class RegionCollection : KeyedCollection<Region, Region_t>
     public Region GetApplicableRegions()
     {
         if (Count == 0)
+        {
             return Region.All;
+        }
         else
         {
             Region applicableRegions = Region.None;
@@ -35,7 +37,9 @@ public class RegionCollection : KeyedCollection<Region, Region_t>
             foreach (Region_t region in Items)
             {
                 if (region.Inclusion == Inclusion_t.Include)
+                {
                     applicableRegions |= region.Name;
+                }
             }
 
             return applicableRegions;

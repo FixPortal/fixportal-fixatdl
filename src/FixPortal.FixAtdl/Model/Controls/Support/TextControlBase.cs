@@ -83,16 +83,15 @@ public abstract class TextControlBase : InitializableControl<string>
         {
             string? value = newValue as string;
 
-            if (value == Atdl.NullValue)
-                _value = null;
-            else
-                _value = value;
+            _value = value == Atdl.NullValue ? null : value;
         }
-        else if (newValue == null)
-            _value = null;
         else
-            throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
+        {
+            _value = newValue == null
+            ? null
+            : throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
                 newValue.GetType().FullName!, "System.String");
+        }
 
         _log.LogDebug("Control value is now '{Value}'", _value ?? "null");
     }
@@ -135,12 +134,15 @@ public abstract class TextControlBase : InitializableControl<string>
     public override bool? ToBoolean(IParameter targetParameter)
     {
         if (string.IsNullOrEmpty(_value))
+        {
             return null;
+        }
 
-        bool result;
 
-        if (bool.TryParse(_value, out result))
+        if (bool.TryParse(_value, out bool result))
+        {
             return result;
+        }
 
         throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidBooleanValue, _value, bool.TrueString.ToLower(), bool.FalseString.ToLower());
     }
@@ -153,9 +155,8 @@ public abstract class TextControlBase : InitializableControl<string>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public override decimal? ToDecimal(IParameter targetParameter, IFormatProvider provider)
     {
-        decimal result = 0;
 
-        return TryConvertToDecimal(_value, out result) ? (decimal?)result : null;
+        return TryConvertToDecimal(_value, out decimal result) ? (decimal?)result : null;
     }
 
     /// <summary>
@@ -166,9 +167,8 @@ public abstract class TextControlBase : InitializableControl<string>
     /// <returns>A nullable 32-bit signed integer equivalent to the value of this instance.</returns>
     public override int? ToInt32(IParameter targetParameter, IFormatProvider provider)
     {
-        int result = 0;
 
-        return TryConvertToInt(_value, out result) ? (int?)result : null;
+        return TryConvertToInt(_value, out int result) ? (int?)result : null;
     }
 
     /// <summary>
@@ -179,9 +179,8 @@ public abstract class TextControlBase : InitializableControl<string>
     /// <returns>A nullable 32-bit unsigned integer equivalent to the value of this instance.</returns>
     public override uint? ToUInt32(IParameter targetParameter, IFormatProvider provider)
     {
-        uint result = 0;
 
-        return TryConvertToUint(_value, out result) ? (uint?)result : null;
+        return TryConvertToUint(_value, out uint result) ? (uint?)result : null;
     }
 
     /// <summary>
@@ -215,12 +214,15 @@ public abstract class TextControlBase : InitializableControl<string>
     public override DateTime? ToDateTime(IParameter targetParameter, IFormatProvider provider)
     {
         if (string.IsNullOrEmpty(_value))
+        {
             return null;
+        }
 
-        DateTime result;
 
-        if (!FixDateTime.TryParse(_value, provider, out result))
+        if (!FixDateTime.TryParse(_value, provider, out DateTime result))
+        {
             throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidDateOrTimeValue, _value);
+        }
 
         return result;
     }
@@ -229,7 +231,7 @@ public abstract class TextControlBase : InitializableControl<string>
     /// Indicates whether the control has enumerated state (i.e., its state is held internally in an <see cref="EnumState"/> which
     /// requires special conversion, or if instead a regular value conversion is appropriate).
     /// </summary>
-    public override bool HasEnumeratedState { get { return false; } }
+    public override bool HasEnumeratedState => false;
 
     #endregion
 }

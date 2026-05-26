@@ -23,8 +23,6 @@ public class ControlValidationState
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private readonly ILogger _log = NullLogger.Instance;
-
-    private ValidationResult _controlValidationResult = null!;
     private ValidationResult _parameterValidationResult = null!;
     private readonly string _controlId;
     private readonly List<StrategyEdit_t> _strategyEdits = [];
@@ -47,12 +45,14 @@ public class ControlValidationState
     {
         get
         {
-            bool state = (_controlValidationResult == null || _controlValidationResult.IsValid);
+            bool state = ControlValidationResult == null || ControlValidationResult.IsValid;
 
-            state &= (_parameterValidationResult == null || _parameterValidationResult.IsValid);
+            state &= _parameterValidationResult == null || _parameterValidationResult.IsValid;
 
             foreach (StrategyEdit_t strategyEdit in _strategyEdits)
+            {
                 state &= strategyEdit.CurrentState;
+            }
 
             return state;
         }
@@ -61,16 +61,12 @@ public class ControlValidationState
     /// <summary>
     /// Used to hold the results obtained from the control set/validation operation.
     /// </summary>
-    public ValidationResult ControlValidationResult
-    {
-        get { return _controlValidationResult; }
-        set { _controlValidationResult = value; }
-    }
+    public ValidationResult ControlValidationResult { get; set; } = null!;
 
     /// <summary>
     /// Used to hold the results obtained from the parameter set and validation operation.
     /// </summary>
-    public ValidationResult ParameterValidationResult { set { _parameterValidationResult = value; } }
+    public ValidationResult ParameterValidationResult { set => _parameterValidationResult = value; }
 
     /// <summary>
     /// Adds the supplied StrategyEdit_t to this <see cref="ControlValidationState"/>.
@@ -99,12 +95,12 @@ public class ControlValidationState
     {
         _log.LogDebug("Evaluating ValidationState for control {ControlId}, CurrentState = {CurrentState}", _controlId, CurrentState.ToString().ToLower());
 
-        bool state = (_controlValidationResult == null || _controlValidationResult.IsValid);
+        bool state = ControlValidationResult == null || ControlValidationResult.IsValid;
 
         // Evaluating the StrategyEdits may give us meaningless information if the parameter value
         // didn't validate, but we go ahead and do it anyway because failing to do leaves us in an
         // indeterminate state from this value change.
-        state &= (_parameterValidationResult == null || _parameterValidationResult.IsValid);
+        state &= _parameterValidationResult == null || _parameterValidationResult.IsValid;
 
         foreach (StrategyEdit_t strategyEdit in _strategyEdits)
         {
@@ -129,12 +125,14 @@ public class ControlValidationState
             int count = strategyEditsInError.Count();
             bool parameterIsInvalid = _parameterValidationResult != null && !_parameterValidationResult.IsValid;
 
-            if (_controlValidationResult != null && !_controlValidationResult.IsValid)
+            if (ControlValidationResult != null && !ControlValidationResult.IsValid)
             {
-                sb.Append(_controlValidationResult.ErrorText);
+                sb.Append(ControlValidationResult.ErrorText);
 
                 if (count > 0 || parameterIsInvalid)
+                {
                     sb.AppendLine();
+                }
             }
 
             if (parameterIsInvalid)
@@ -142,15 +140,19 @@ public class ControlValidationState
                 sb.Append(_parameterValidationResult!.ErrorText);
 
                 if (count > 0)
+                {
                     sb.AppendLine();
+                }
             }
 
-            foreach (StrategyEdit_t strategyEdit in (from s in _strategyEdits where !s.CurrentState select s))
+            foreach (StrategyEdit_t strategyEdit in from s in _strategyEdits where !s.CurrentState select s)
             {
                 sb.Append(strategyEdit.ErrorMessage);
 
                 if (--count > 0)
+                {
                     sb.AppendLine();
+                }
             }
 
             _log.LogDebug("ValidationState for control {ControlId} = '{ValidationState}'", _controlId, sb.ToString());

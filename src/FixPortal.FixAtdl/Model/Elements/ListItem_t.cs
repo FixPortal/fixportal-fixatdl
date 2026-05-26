@@ -20,9 +20,13 @@ public class ListItem_t : IComparable
     public int CompareTo(object? obj)
     {
         if (obj is string)
-            return (EnumId).CompareTo(obj as string);
+        {
+            return EnumId.CompareTo(obj as string);
+        }
         else
+        {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.CompareValueFailure, "ListItem_t", obj?.GetType().FullName ?? "(null)");
+        }
     }
 
     public override string ToString()

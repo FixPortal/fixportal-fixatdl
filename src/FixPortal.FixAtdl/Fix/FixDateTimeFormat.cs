@@ -40,10 +40,7 @@ public static class FixDateTimeFormat
     /// <summary>
     /// Gets an array containing all the FIX date/time formats.
     /// </summary>
-    public static string[] AllFormats { get { return _allFormats; } }
-
-    private static readonly string[] _allFormats =
-    [
+    public static string[] AllFormats { get; } = [
         FixDateTime,
         FixDateTimeMs,
         FixTimeOnly,

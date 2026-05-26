@@ -34,6 +34,6 @@ public class EditableDropDownList_t : ListControlBase
     /// Indicates whether the EnumState value for this control can be set to a value other than one of the enumerated
     /// values.
     /// </summary>
-    protected override bool IsNonEnumValueAllowed { get { return true; } }
+    protected override bool IsNonEnumValueAllowed => true;
 }
 

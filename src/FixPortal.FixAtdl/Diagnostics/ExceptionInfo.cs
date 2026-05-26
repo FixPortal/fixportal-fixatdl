@@ -40,7 +40,9 @@ public class ExceptionInfo
     public void PopulateExceptionData(IDictionary data)
     {
         foreach (KeyValuePair<string, object> item in _data)
+        {
             data[item.Key] = item.Value;
+        }
     }
 }
 

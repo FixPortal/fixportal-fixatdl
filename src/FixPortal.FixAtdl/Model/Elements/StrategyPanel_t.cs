@@ -16,10 +16,7 @@ namespace FixPortal.FixAtdl.Model.Elements;
 
 public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrategyPanel
 {
-    private readonly Strategy_t _owningStrategy;
     private StrategyPanel_t? _owningStrategyPanel;
-    private readonly StrategyPanelCollection _strategyPanels;
-    private ControlCollection _controls = null!;
 
     public Border_t? Border { get; set; }
     public bool? Collapsed { get; set; }
@@ -34,51 +31,51 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="owner"></param>
+    /// <param name="owningStrategy"></param>
     /// <param name="parent">; null if this StrategyPanel_t does not have a parent (for example, because it is the
     /// immediate descendent of a StrategyLayout_t.</param>
     /// <remarks></remarks>
     public StrategyPanel_t(Strategy_t owningStrategy, IStrategyPanel? parent)
     {
-        _owningStrategy = owningStrategy;
+        OwningStrategy = owningStrategy;
         _owningStrategyPanel = parent as StrategyPanel_t;
 
         // Set defaults
         Collapsed = true;
         Collapsible = false;
 
-        _strategyPanels = [];
+        StrategyPanels = [];
     }
 
-    public Strategy_t OwningStrategy { get { return _owningStrategy; } }
+    public Strategy_t OwningStrategy { get; }
 
-    public StrategyPanelCollection StrategyPanels { get { return _strategyPanels; } }
+    public StrategyPanelCollection StrategyPanels { get; }
 
     public ControlCollection Controls
     {
         get
         {
             // Lazy initialisation as we can't use 'this' pointer in constructor.
-            if (_controls == null)
+            if (field == null)
             {
-                _controls = new ControlCollection(this);
+                field = new ControlCollection(this);
 
                 // Provide a mechanism for the Controls collection of the Strategy_t (as opposed to the StrategyPanel_t) to be
                 // notified as controls are added to and removed from this StrategyPanel_t.
-                _controls.CollectionChanged += new NotifyCollectionChangedEventHandler(_owningStrategy.Controls.SourceCollectionChanged);
+                field.CollectionChanged += new NotifyCollectionChangedEventHandler(OwningStrategy.Controls.SourceCollectionChanged);
             }
 
-            return _controls;
+            return field;
         }
-    }
+    } = null!;
 
     #region IDisposable Members
 
     protected virtual void Dispose(bool disposing)
     {
-        if (disposing && _owningStrategy != null)
+        if (disposing && OwningStrategy != null)
         {
-            Controls.CollectionChanged -= new NotifyCollectionChangedEventHandler(_owningStrategy.Controls.SourceCollectionChanged);
+            Controls.CollectionChanged -= new NotifyCollectionChangedEventHandler(OwningStrategy.Controls.SourceCollectionChanged);
         }
     }
 
@@ -95,8 +92,7 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
 
     StrategyPanel_t IParentable<StrategyPanel_t>.Parent
     {
-        get { return _owningStrategyPanel!; }
-        set { _owningStrategyPanel = value; }
+        get => _owningStrategyPanel!; set => _owningStrategyPanel = value;
     }
 
     #endregion

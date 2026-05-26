@@ -34,7 +34,9 @@ public class Country_t : EnumTypeBase<IsoCountryCode>
     protected override ValidationResult ValidateValue(IsoCountryCode? value, bool isRequired)
     {
         if (isRequired && value == null)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }
