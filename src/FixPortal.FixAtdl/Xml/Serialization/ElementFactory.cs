@@ -56,7 +56,8 @@ public class ElementFactory : INotifyClassDeserialized
     {
         if (_log.IsEnabled(LogLevel.Debug))
         {
-            _log.LogDebug("DeserializeElement called; first 50 characters of XML='{XmlSnippet}'.", element.ToString()[..50]);
+            string xml = element.ToString();
+            _log.LogDebug("DeserializeElement called; first 50 characters of XML='{XmlSnippet}'.", xml[..Math.Min(50, xml.Length)]);
         }
 
         return CreateObject(_elementDefinition, element, null);
@@ -403,7 +404,7 @@ public class ElementFactory : INotifyClassDeserialized
 
                 if (containerElement == null)
                 {
-                    return;
+                    continue;
                 }
 
                 matchingChildElements = from e in containerElement.Elements(childDefinition.ElementDefinition.ElementName) select e;
@@ -534,7 +535,7 @@ public class ElementFactory : INotifyClassDeserialized
             {
                 return ValueConverter.ConvertTo(attribute.Value, type);
             }
-            catch (FormatException ex)
+            catch (Exception ex) when (ex is FormatException or OverflowException)
             {
                 throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError2,
                     attribute.Value, type.Name, attributeName.LocalName);
