@@ -320,18 +320,6 @@ dotnet_diagnostic.CA1707.severity = none
 dotnet_diagnostic.CA1707.severity = none
 
 # ---------------------------------------------------------------------------
-# Phase A build gate: rules deferred to Phase C (C8: dotnet format / modern
-# language features pass).
-# ---------------------------------------------------------------------------
-
-# CA1861: Prefer static readonly arrays — deferred to Phase C (C8)
-dotnet_diagnostic.CA1861.severity = none
-
-# Note on IDE0045 / IDE0060: previously deferred, now re-enabled.
-# Cleared on 2026-05-26 — see commits removing the related sites in
-# Strategy_t.UpdateControlValuesFromParameters and BinaryControlBase.SetValue.
-
-# ---------------------------------------------------------------------------
 # XML doc warnings — deferred to Phase E (Task E1: XML doc comments on all
 # public API surface). At E1 these get re-enabled as errors so the
 # doc-completeness gate bites.
