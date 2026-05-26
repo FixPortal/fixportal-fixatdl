@@ -91,6 +91,7 @@ public class FixMessage : Dictionary<FixField, string>
     /// Provides the string representation of this FixMessage.
     /// </summary>
     /// <returns>String representation of this message.</returns>
+    /// <remarks>Emits fields in insertion order; FIX-spec ordering (header/trailer positions, repeating groups) is the responsibility of the host FIX engine.</remarks>
     public string ToFix()
     {
         StringBuilder sb = new();
