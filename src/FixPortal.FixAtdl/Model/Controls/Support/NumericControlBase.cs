@@ -25,7 +25,7 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 public class NumericControlBase : InitializableControl<decimal?>
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     private const decimal InvalidValue = decimal.MaxValue;
 
@@ -118,7 +118,10 @@ public class NumericControlBase : InitializableControl<decimal?>
                 newValue.GetType().FullName, "System.String, System.Decimal");
         }
 
-        _log.LogDebug("Control value is now {Value}", _value != null ? _value.Value.ToString(CultureInfo.InvariantCulture) : "null");
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Control value is now {Value}", _value);
+        }
     }
 
     /// <summary>
@@ -139,7 +142,10 @@ public class NumericControlBase : InitializableControl<decimal?>
 
         _value = value.ToDecimal();
 
-        _log.LogDebug("Numeric control {Arg0} value is now {Arg1}", Id, _value);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Numeric control {Arg0} value is now {Arg1}", Id, _value);
+        }
     }
 
     /// <summary>

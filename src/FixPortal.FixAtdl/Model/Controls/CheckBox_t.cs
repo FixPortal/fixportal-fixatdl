@@ -18,7 +18,7 @@ namespace FixPortal.FixAtdl.Model.Controls;
 public class CheckBox_t : BinaryControlBase
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// Initializes a new instance of <see cref="CheckBox_t"/> using the supplied ID.
@@ -27,7 +27,9 @@ public class CheckBox_t : BinaryControlBase
     public CheckBox_t(string id)
         : base(id)
     {
-        _log.LogDebug("New CheckBox_t created as control {Arg0}", id);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("New CheckBox_t created as control {Arg0}", id);
+        }
     }
 }
-

@@ -17,7 +17,7 @@ namespace FixPortal.FixAtdl.Model.Collections;
 public class StateRuleCollection : Collection<StateRule_t>
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly ILogger _log = NullLogger.Instance;
+    private readonly NullLogger _log = NullLogger.Instance;
 
     private readonly Control_t _owner;
 
@@ -32,14 +32,20 @@ public class StateRuleCollection : Collection<StateRule_t>
 
         base.Add(item);
 
-        _log.LogDebug("StateRule_t {StateRule} added to StateRules for control Id {ControlId}", item.ToString(), _owner.Id);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("StateRule_t {StateRule} added to StateRules for control Id {ControlId}", item, _owner.Id);
+        }
     }
 
     public void EvaluateAll()
     {
         if (Items.Count > 0)
         {
-            _log.LogDebug("Evaluating all {Count} StateRule_t instances for control Id {ControlId}", Items.Count, _owner.Id);
+            if (_log.IsEnabled(LogLevel.Debug))
+            {
+                _log.LogDebug("Evaluating all {Count} StateRule_t instances for control Id {ControlId}", Items.Count, _owner.Id);
+            }
         }
 
         foreach (StateRule_t rule in Items)
@@ -60,4 +66,3 @@ public class StateRuleCollection : Collection<StateRule_t>
         }
     }
 }
-

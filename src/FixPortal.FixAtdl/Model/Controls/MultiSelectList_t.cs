@@ -18,7 +18,7 @@ namespace FixPortal.FixAtdl.Model.Controls;
 public class MultiSelectList_t : ListControlBase
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// Initializes a new instance of <see cref="MultiSelectList_t"/> using the supplied ID.
@@ -27,7 +27,9 @@ public class MultiSelectList_t : ListControlBase
     public MultiSelectList_t(string id)
         : base(id)
     {
-        _log.LogDebug("New MultiSelectList_t created as control {Arg0}", id);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("New MultiSelectList_t created as control {Arg0}", id);
+        }
     }
 }
-

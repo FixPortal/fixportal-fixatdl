@@ -18,7 +18,7 @@ namespace FixPortal.FixAtdl.Model.Controls;
 public class RadioButton_t : BinaryControlBase
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// Initializes a new instance of <see cref="RadioButton_t"/> using the supplied ID.
@@ -27,11 +27,13 @@ public class RadioButton_t : BinaryControlBase
     public RadioButton_t(string id)
         : base(id)
     {
-        _log.LogDebug("New RadioButton_t created as control {Arg0}", id);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("New RadioButton_t created as control {Arg0}", id);
+        }
     }
 
     /// <summary>Identifies a common group name used by a set of RadioButton_t among which only one radio button 
     /// may be selected at a time.  Applicable when xsi:type is RadioButton_t.</summary>
     public string RadioGroup { get; set; } = null!;
 }
-

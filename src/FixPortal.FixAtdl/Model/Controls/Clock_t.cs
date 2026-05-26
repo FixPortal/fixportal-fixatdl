@@ -25,7 +25,7 @@ namespace FixPortal.FixAtdl.Model.Controls;
 public class Clock_t : InitializableControl<DateTime?>
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     private DateTime? _value;
 
@@ -36,7 +36,10 @@ public class Clock_t : InitializableControl<DateTime?>
     public Clock_t(string id)
         : base(id)
     {
-        _log.LogDebug("New Clock_t created as control {Arg0}", id);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("New Clock_t created as control {Arg0}", id);
+        }
     }
 
     // TODO: Implement LocalMktTz as a type.
@@ -88,7 +91,10 @@ public class Clock_t : InitializableControl<DateTime?>
 
         _value = value.ToDateTime();
 
-        _log.LogDebug("Clock_t control value is now {Value}", _value);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Clock_t control value is now {Value}", _value);
+        }
     }
 
     /// <summary>

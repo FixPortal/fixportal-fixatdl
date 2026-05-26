@@ -25,7 +25,7 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 public abstract class InitializableControl<T> : Control_t
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// Initializes a new <see cref="InitializableControl"/> instance with the specified identifier as id.
@@ -56,7 +56,10 @@ public abstract class InitializableControl<T> : Control_t
         // If UseFixField, then attempt to initialize with FIX field...
         if (InitPolicy == InitPolicy_t.UseFixField)
         {
-            _log.LogDebug("Attempting to initialize control {Arg0} from FIX field...", Id);
+            if (_log.IsEnabled(LogLevel.Debug))
+            {
+                _log.LogDebug("Attempting to initialize control {Arg0} from FIX field...", Id);
+            }
 
             if (!string.IsNullOrEmpty(InitFixField))
             {
@@ -65,7 +68,10 @@ public abstract class InitializableControl<T> : Control_t
                 {
                     if (LoadDefaultFromFixValue(value))
                     {
-                        _log.LogDebug("Control {Arg0} successfully initialized with value '{Arg1}' from FIX field {Arg2}", Id, value, InitFixField);
+                        if (_log.IsEnabled(LogLevel.Debug))
+                        {
+                            _log.LogDebug("Control {Arg0} successfully initialized with value '{Arg1}' from FIX field {Arg2}", Id, value, InitFixField);
+                        }
 
                         return;
                     }
@@ -81,7 +87,10 @@ public abstract class InitializableControl<T> : Control_t
             }
         }
 
-        _log.LogDebug("Initializing control {Arg0} with InitValue '{Arg1}'...", Id, InitValue != null ? InitValue.ToString() : "null");
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Initializing control {Arg0} with InitValue '{Arg1}'...", Id, InitValue);
+        }
 
         // Unable to initialize with FIX field so let's try using InitValue.  If InitValue is null, then control value will
         // be set to default/empty value.
@@ -101,4 +110,3 @@ public abstract class InitializableControl<T> : Control_t
     /// </summary>
     protected abstract void LoadDefaultFromInitValue();
 }
-

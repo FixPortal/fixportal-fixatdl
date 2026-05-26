@@ -29,7 +29,7 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 public abstract class TextControlBase : InitializableControl<string>
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// The state value for this control; null when the control has no value set.
@@ -93,7 +93,10 @@ public abstract class TextControlBase : InitializableControl<string>
                 newValue.GetType().FullName!, "System.String");
         }
 
-        _log.LogDebug("Control value is now '{Value}'", _value ?? "null");
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Control value is now '{Value}'", _value ?? "null");
+        }
     }
 
     /// <summary>
@@ -114,7 +117,10 @@ public abstract class TextControlBase : InitializableControl<string>
 
         _value = value.ToString(CultureInfo.InvariantCulture);
 
-        _log.LogDebug("Text control {Arg0} value is now {Arg1}", Id, _value);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Text control {Arg0} value is now {Arg1}", Id, _value);
+        }
     }
 
     /// <summary>
@@ -235,4 +241,3 @@ public abstract class TextControlBase : InitializableControl<string>
 
     #endregion
 }
-

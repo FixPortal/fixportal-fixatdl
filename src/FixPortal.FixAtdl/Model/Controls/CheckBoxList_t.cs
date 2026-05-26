@@ -19,7 +19,7 @@ namespace FixPortal.FixAtdl.Model.Controls;
 public class CheckBoxList_t : ListControlBase, IOrientableControl
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// Initializes a new instance of <see cref="CheckBoxList_t"/> using the supplied ID.
@@ -28,7 +28,10 @@ public class CheckBoxList_t : ListControlBase, IOrientableControl
     public CheckBoxList_t(string id)
         : base(id)
     {
-        _log.LogDebug("New CheckBoxList_t created as control {Arg0}", id);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("New CheckBoxList_t created as control {Arg0}", id);
+        }
     }
 
     #region IOrientableControl Members
@@ -39,4 +42,3 @@ public class CheckBoxList_t : ListControlBase, IOrientableControl
 
     #endregion
 }
-
