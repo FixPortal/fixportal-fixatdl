@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -27,7 +28,7 @@ public static class ModelUtils
     public static bool VisitHelper(Type visitorType, object visitor, object target)
     {
         Type targetParamType = target.GetType();
-        string searchString = string.Format("{0}:{1}", visitorType.FullName, targetParamType.FullName);
+        string searchString = string.Format(CultureInfo.InvariantCulture, "{0}:{1}", visitorType.FullName, targetParamType.FullName);
 
         MethodInfo? methodInfo = null;
 
@@ -59,4 +60,3 @@ public static class ModelUtils
         return _types.FirstOrDefault(t => t.Name == typeName);
     }
 }
-

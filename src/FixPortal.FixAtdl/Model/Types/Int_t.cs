@@ -76,7 +76,7 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override int? ConvertFromWireValueFormat(string value)
     {
-        return value != null ? (int?)Convert.ToInt32(value) : null;
+        return value != null ? (int?)Convert.ToInt32(value, CultureInfo.InvariantCulture) : null;
     }
 
     /// <summary>
@@ -100,7 +100,7 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
     /// implements <see cref="IParameterConvertible"/>).</remarks>
     protected override int? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
     {
-        return value.ToInt32(hostParameter, CultureInfo.CurrentUICulture);
+        return value.ToInt32(hostParameter, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -173,4 +173,3 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
 
     #endregion
 }
-

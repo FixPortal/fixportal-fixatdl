@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Globalization;
 using System.Text;
 using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Validation;
@@ -39,21 +40,21 @@ public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
     {
         StringBuilder sb = new();
 
-        sb.AppendFormat("(Control.ID=\"{0}\"", _owner.Id);
+        sb.AppendFormat(CultureInfo.InvariantCulture, "(Control.ID=\"{0}\"", _owner.Id);
 
         if (Enabled != null)
         {
-            sb.AppendFormat(", enabled=\"{0}\"", Enabled.Value.ToString().ToLower());
+            sb.AppendFormat(CultureInfo.InvariantCulture, ", enabled=\"{0}\"", Enabled.Value.ToString().ToLowerInvariant());
         }
 
         if (Value != null)
         {
-            sb.AppendFormat(", value=\"{0}\"", Value);
+            sb.AppendFormat(CultureInfo.InvariantCulture, ", value=\"{0}\"", Value);
         }
 
         if (Visible != null)
         {
-            sb.AppendFormat(", visible=\"{0}\"", Visible.Value.ToString().ToLower());
+            sb.AppendFormat(CultureInfo.InvariantCulture, ", visible=\"{0}\"", Visible.Value.ToString().ToLowerInvariant());
         }
 
         sb.Append(')');
@@ -70,4 +71,3 @@ public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
 
     #endregion IParentable<Control_t> Members
 }
-

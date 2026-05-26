@@ -123,7 +123,7 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// implements <see cref="IParameterConvertible"/>).</remarks>
     protected override decimal? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
     {
-        return value.ToDecimal(hostParameter, CultureInfo.CurrentUICulture);
+        return value.ToDecimal(hostParameter, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -221,4 +221,3 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
 
     #endregion
 }
-

@@ -106,7 +106,7 @@ public class NumericControlBase : InitializableControl<decimal?>
             _value = value == Atdl.NullValue
                 ? null
                 : throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InitControlValueError,
-                    Id, string.Format("'{0}' is not a valid value for this control", value));
+                    Id, string.Format(CultureInfo.InvariantCulture, "'{0}' is not a valid value for this control", value));
         }
         else
         {
@@ -118,7 +118,7 @@ public class NumericControlBase : InitializableControl<decimal?>
                 newValue.GetType().FullName, "System.String, System.Decimal");
         }
 
-        _log.LogDebug("Control value is now {Value}", _value != null ? _value.ToString() : "null");
+        _log.LogDebug("Control value is now {Value}", _value != null ? _value.Value.ToString(CultureInfo.InvariantCulture) : "null");
     }
 
     /// <summary>
@@ -224,4 +224,3 @@ public class NumericControlBase : InitializableControl<decimal?>
 
     #endregion
 }
-

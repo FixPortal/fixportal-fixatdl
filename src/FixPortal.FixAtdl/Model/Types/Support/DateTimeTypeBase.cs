@@ -96,7 +96,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     {
         string format = GetDateTimeFormatStrings()[0];
 
-        return _value != null ? ((DateTime)_value).ToString(format) : null!;
+        return _value != null ? ((DateTime)_value).ToString(format, CultureInfo.InvariantCulture) : null!;
     }
 
     /// <summary>
@@ -109,7 +109,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     /// implements <see cref="IParameterConvertible"/>).</remarks>
     protected override DateTime? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
     {
-        return value.ToDateTime(hostParameter, CultureInfo.CurrentUICulture);
+        return value.ToDateTime(hostParameter, CultureInfo.InvariantCulture);
     }
 
     #endregion
@@ -134,7 +134,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     {
         DateTime? value = ConstValue ?? _value;
 
-        return value != null ? ((DateTime)_value!).ToString(GetDateTimeFormatStrings()[0]) : null;
+        return value != null ? ((DateTime)_value!).ToString(GetDateTimeFormatStrings()[0], CultureInfo.InvariantCulture) : null;
     }
 
     /// <summary>
@@ -179,4 +179,3 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     /// value is used.</remarks>
     protected abstract string[] GetDateTimeFormatStrings();
 }
-

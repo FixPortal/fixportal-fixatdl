@@ -327,17 +327,11 @@ dotnet_diagnostic.CA1707.severity = none
 # CA1873: Don't evaluate log arguments — deferred to Phase C (C8)
 dotnet_diagnostic.CA1873.severity = none
 
-# CA1305: Specify IFormatProvider — deferred to Phase C (C8)
-dotnet_diagnostic.CA1305.severity = none
-
 # CA1861: Prefer static readonly arrays — deferred to Phase C (C8)
 dotnet_diagnostic.CA1861.severity = none
 
 # CA1036: Override comparison operators — deferred to Phase C
 dotnet_diagnostic.CA1036.severity = none
-
-# CA1863: Use CompositeFormat — deferred to Phase C (C8) — tied to CA1305 (IFormatProvider)
-dotnet_diagnostic.CA1863.severity = none
 
 # CA1715: Identifiers should have correct prefix — deferred to Phase C
 dotnet_diagnostic.CA1715.severity = none

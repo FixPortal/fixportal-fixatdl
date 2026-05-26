@@ -109,7 +109,7 @@ public class Clock_t : InitializableControl<DateTime?>
             _value = value == Atdl.NullValue
                 ? null
                 : throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InitControlValueError,
-                    Id, string.Format("'{0}' is not a valid value for this control", value));
+                    Id, string.Format(CultureInfo.InvariantCulture, "'{0}' is not a valid value for this control", value));
         }
         else
         {
@@ -188,7 +188,7 @@ public class Clock_t : InitializableControl<DateTime?>
     /// <returns>A string value equivalent to the value of this instance in the format YYYYMMDD-HH:MM:SS.  May be null.</returns>
     public override string ToString(IParameter targetParameter)
     {
-        return _value != null ? ((DateTime)_value).ToString(FixDateTimeFormat.FixDateTime) : null!;
+        return _value != null ? ((DateTime)_value).ToString(FixDateTimeFormat.FixDateTime, CultureInfo.InvariantCulture) : null!;
     }
 
     /// <summary>
@@ -223,4 +223,3 @@ public class Clock_t : InitializableControl<DateTime?>
 
     #endregion
 }
-

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections;
+using System.Globalization;
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Collections;
@@ -364,7 +365,7 @@ public class EnumState : IComparable
                     // Only prepend a space after the first entry
                     if (hasAtLeastOneValue)
                     {
-                        sb.AppendFormat(" {0}", value);
+                        sb.AppendFormat(CultureInfo.InvariantCulture, " {0}", value);
                     }
                     else
                     {
@@ -423,12 +424,12 @@ public class EnumState : IComparable
 
         for (int n = 0; n < _enumStates.Length; n++)
         {
-            sb.AppendFormat("{0}={1}{2}", _enumIds[n], _enumStates[n].ToString().ToLower(), n < _enumStates.Length - 1 ? ", " : string.Empty);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "{0}={1}{2}", _enumIds[n], _enumStates[n].ToString().ToLowerInvariant(), n < _enumStates.Length - 1 ? ", " : string.Empty);
         }
 
         if (_nonEnumValue != null)
         {
-            sb.AppendFormat(", NonEnumValue='{0}'", _nonEnumValue);
+            sb.AppendFormat(CultureInfo.InvariantCulture, ", NonEnumValue='{0}'", _nonEnumValue);
         }
 
         sb.Append(')');
@@ -469,4 +470,3 @@ public class EnumState : IComparable
 
     #endregion
 }
-

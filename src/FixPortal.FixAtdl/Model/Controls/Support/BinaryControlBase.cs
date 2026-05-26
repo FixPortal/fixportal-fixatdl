@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Collections;
@@ -155,7 +156,7 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
                     : value == UncheckedEnumRef
                         ? false
                         : throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InitControlValueError,
-                            Id, string.Format("'{0}' is not a valid value for this control", value));
+                            Id, string.Format(CultureInfo.InvariantCulture, "'{0}' is not a valid value for this control", value));
         }
         else
         {
@@ -167,7 +168,7 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
                 newValue.GetType().FullName!, "System.String, System.Boolean");
         }
 
-        _log.LogDebug("Binary control value is now {Value}", _value != null ? _value.Value.ToString().ToLower() : "null");
+        _log.LogDebug("Binary control value is now {Value}", _value != null ? _value.Value.ToString().ToLowerInvariant() : "null");
     }
 
     /// <summary>
@@ -282,4 +283,3 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
 
     #endregion
 }
-

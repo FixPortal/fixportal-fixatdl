@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using FixPortal.FixAtdl.Resources;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
@@ -29,9 +30,9 @@ public struct MonthYear : IComparable
     /// <returns>MonthYear as a string.</returns>
     public override readonly string ToString()
     {
-        string suffix = Week != null ? string.Format("w{0}", Week) : (Day != null ? string.Format("{0:00}", Day) : string.Empty);
+        string suffix = Week != null ? string.Format(CultureInfo.InvariantCulture, "w{0}", Week) : (Day != null ? string.Format(CultureInfo.InvariantCulture, "{0:00}", Day) : string.Empty);
 
-        return string.Format("{0:0000}{1:00}{2}", Year, Month, suffix);
+        return string.Format(CultureInfo.InvariantCulture, "{0:0000}{1:00}{2}", Year, Month, suffix);
     }
 
     /// <summary>
@@ -223,7 +224,7 @@ public struct MonthYear : IComparable
     {
         try
         {
-            ushort numValue = Convert.ToUInt16(value);
+            ushort numValue = Convert.ToUInt16(value, CultureInfo.InvariantCulture);
 
             if (numValue >= lowerBound && numValue <= upperBound)
             {
@@ -277,4 +278,3 @@ public struct MonthYear : IComparable
 
     #endregion
 }
-

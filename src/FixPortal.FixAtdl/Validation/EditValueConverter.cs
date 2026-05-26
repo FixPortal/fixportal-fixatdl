@@ -45,10 +45,10 @@ public static class EditValueConverter
 
         return type switch
         {
-            "System.Decimal" => Convert.ToDecimal(value),
+            "System.Decimal" => Convert.ToDecimal(value, CultureInfo.InvariantCulture),
             "System.Boolean" => ConvertToBool(value),
-            "System.Int32" => Convert.ToInt32(value),
-            "System.UInt32" => Convert.ToUInt32(value),
+            "System.Int32" => Convert.ToInt32(value, CultureInfo.InvariantCulture),
+            "System.UInt32" => Convert.ToUInt32(value, CultureInfo.InvariantCulture),
             "System.Char" => Convert.ToChar(value),
             "System.DateTime" => FixDateTime.Parse(value, CultureInfo.InvariantCulture),
             "System.String" => value,
@@ -77,4 +77,3 @@ public static class EditValueConverter
         };
     }
 }
-

@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace FixPortal.FixAtdl.Validation;
@@ -63,7 +64,7 @@ public class ValidationResult
     public ValidationResult(ResultType resultType, string format, params object[] args)
     {
         _validityType = resultType;
-        ErrorText = string.Format(format, args);
+        ErrorText = string.Format(CultureInfo.InvariantCulture, format, args);
     }
 
     private ValidationResult()
@@ -71,4 +72,3 @@ public class ValidationResult
         _validityType = ResultType.Valid;
     }
 }
-

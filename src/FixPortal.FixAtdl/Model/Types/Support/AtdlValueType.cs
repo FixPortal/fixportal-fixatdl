@@ -6,7 +6,9 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -34,6 +36,7 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly CompositeFormat _attemptToSetConstValueParameterFormat = CompositeFormat.Parse(ErrorMessages.AttemptToSetConstValueParameter);
 
     /// <summary>
     /// Storage for the value of this parameter, as type T?.
@@ -78,7 +81,7 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
     {
         if (ConstValue != null)
         {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, string.Format(ErrorMessages.AttemptToSetConstValueParameter, ConstValue));
+            return new ValidationResult(ValidationResult.ResultType.Invalid, string.Format(CultureInfo.InvariantCulture, _attemptToSetConstValueParameterFormat, ConstValue));
         }
 
         try
@@ -248,4 +251,3 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
 
     #endregion
 }
-

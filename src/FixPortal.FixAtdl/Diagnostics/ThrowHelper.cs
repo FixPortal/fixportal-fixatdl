@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -64,7 +65,7 @@ public static class ThrowHelper
     // FP Enhancement: 2026-05-23 — params object[] args -> params object?[] args to support nullable callers.
     public static T New<T>(object? source, string format, params object?[] args) where T : System.Exception
     {
-        T ex = CreateException<T>(source, string.Format(format, args!), null);
+        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args!), null);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -82,7 +83,7 @@ public static class ThrowHelper
     /// <returns>A new exception of the specified type.</returns>
     public static T New<T>(object? source, Exception innerException, string format, params object?[] args) where T : System.Exception
     {
-        T ex = CreateException<T>(source, string.Format(format, args!), innerException, null);
+        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args!), innerException, null);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -135,7 +136,7 @@ public static class ThrowHelper
     /// <returns>A new exception of the specified type.</returns>
     public static T New<T>(object? source, ExceptionInfo? info, string format, params object?[] args) where T : System.Exception
     {
-        T ex = CreateException<T>(source, string.Format(format, args!), info);
+        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args!), info);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -154,7 +155,7 @@ public static class ThrowHelper
     /// <returns>A new exception of the specified type.</returns>
     public static T New<T>(object? source, Exception innerException, ExceptionInfo? info, string format, params object?[] args) where T : System.Exception
     {
-        T ex = CreateException<T>(source, string.Format(format, args!), innerException, info);
+        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args!), innerException, info);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -172,7 +173,7 @@ public static class ThrowHelper
     /// <returns>A new exception of the same type as the supplied exception.</returns>
     public static Exception Rethrow(object? source, Exception ex, string format, params object[] args)
     {
-        Exception newException = Rethrow(source, ex, string.Format(format, args), new object());
+        Exception newException = Rethrow(source, ex, string.Format(CultureInfo.InvariantCulture, format, args), new object());
 
         _log.LogError(newException, "Exception rethrown by ThrowHelper");
 
@@ -213,7 +214,7 @@ public static class ThrowHelper
 
         ConstructorInfo classConstructor = classType.GetConstructor([typeof(string), typeof(Exception)])!;
 
-        Exception exception = (Exception)classConstructor.Invoke([string.Format(format, arg, ex.Message), ex]);
+        Exception exception = (Exception)classConstructor.Invoke([string.Format(CultureInfo.InvariantCulture, format, arg, ex.Message), ex]);
 
         exception.Source = source?.ToString();
 
@@ -270,4 +271,3 @@ public static class ThrowHelper
         return exception;
     }
 }
-

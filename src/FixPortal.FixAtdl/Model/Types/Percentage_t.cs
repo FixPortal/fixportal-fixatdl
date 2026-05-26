@@ -120,7 +120,7 @@ public class Percentage_t : Float_t
     /// is not set to true).</remarks>
     protected override decimal? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
     {
-        decimal? convertedValue = value.ToDecimal(hostParameter, CultureInfo.CurrentUICulture);
+        decimal? convertedValue = value.ToDecimal(hostParameter, CultureInfo.InvariantCulture);
 
         return (convertedValue != null) ? convertedValue /= 100 : null;
     }
@@ -197,7 +197,6 @@ public class Percentage_t : Float_t
         }
 
         // We use this slightly ugly manipulation to remove the trailing zeroes that multiplication by 100 produces
-        return decimal.Parse(((decimal)value).ToString("G29"));
+        return decimal.Parse(((decimal)value).ToString("G29", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
     }
 }
-

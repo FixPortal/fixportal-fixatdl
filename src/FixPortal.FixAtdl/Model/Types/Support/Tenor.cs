@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using FixPortal.FixAtdl.Resources;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
@@ -103,7 +104,7 @@ public struct Tenor : IComparable
 
             try
             {
-                result.Offset = Convert.ToInt32(number);
+                result.Offset = Convert.ToInt32(number, CultureInfo.InvariantCulture);
 
                 if (result.TenorType != TenorTypeValue.Invalid)
                 {
@@ -123,10 +124,10 @@ public struct Tenor : IComparable
     {
         return TenorType switch
         {
-            TenorTypeValue.Day => string.Format("D{0}", Offset),
-            TenorTypeValue.Week => string.Format("W{0}", Offset),
-            TenorTypeValue.Month => string.Format("M{0}", Offset),
-            _ => string.Format("Y{0}", Offset),
+            TenorTypeValue.Day => string.Format(CultureInfo.InvariantCulture, "D{0}", Offset),
+            TenorTypeValue.Week => string.Format(CultureInfo.InvariantCulture, "W{0}", Offset),
+            TenorTypeValue.Month => string.Format(CultureInfo.InvariantCulture, "M{0}", Offset),
+            _ => string.Format(CultureInfo.InvariantCulture, "Y{0}", Offset),
         };
     }
 
@@ -169,4 +170,3 @@ public struct Tenor : IComparable
 
     #endregion
 }
-

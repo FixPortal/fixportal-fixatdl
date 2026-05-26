@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
@@ -110,7 +111,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         Type innerType = string.IsNullOrEmpty(genericTypeDefinition.InnerTypeNamespace)
             ? Type.GetType(innerTypeName)!
-            : Type.GetType(string.Format("{0}.{1}", genericTypeDefinition.InnerTypeNamespace, innerTypeName))!;
+            : Type.GetType(string.Format(CultureInfo.InvariantCulture, "{0}.{1}", genericTypeDefinition.InnerTypeNamespace, innerTypeName))!;
 
         if (innerType == null)
         {
@@ -166,7 +167,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         Type targetType = string.IsNullOrEmpty(multiTypeDefinition.TypeNamespace)
             ? Type.GetType(typeName)!
-            : Type.GetType(string.Format("{0}.{1}", multiTypeDefinition.TypeNamespace, typeName))!;
+            : Type.GetType(string.Format(CultureInfo.InvariantCulture, "{0}.{1}", multiTypeDefinition.TypeNamespace, typeName))!;
 
         if (targetType == null)
         {
@@ -448,7 +449,7 @@ public class ElementFactory : INotifyClassDeserialized
             if (ex.InnerException != null)
             {
                 throw ThrowHelper.Rethrow(this, ex.InnerException, ErrorMessages.UnableToInvokeMethodError,
-                    string.Format("the {0} method on the {1} property", containerMethod, property.Name));
+                    string.Format(CultureInfo.InvariantCulture, "the {0} method on the {1} property", containerMethod, property.Name));
             }
             else
             {
@@ -548,4 +549,3 @@ public class ElementFactory : INotifyClassDeserialized
 
     #endregion
 }
-

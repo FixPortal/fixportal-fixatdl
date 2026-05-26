@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Linq;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements;
@@ -127,9 +128,10 @@ public class FixFieldValueProvider
         if (adjustmentNeeded)
         {
 
-            value = decimal.TryParse(value, out decimal decimalValue) ? (decimalValue * 100).ToString("0.####") : string.Empty;
+            value = decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal decimalValue)
+                ? (decimalValue * 100).ToString("0.####", CultureInfo.InvariantCulture)
+                : string.Empty;
         }
     }
 }
-
 

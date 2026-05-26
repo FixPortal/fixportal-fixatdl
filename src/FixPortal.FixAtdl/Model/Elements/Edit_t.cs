@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
@@ -98,38 +99,38 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
         if (Id != null)
         {
-            sb.AppendFormat("Id=\"{0}\", ", Id);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "Id=\"{0}\", ", Id);
         }
 
         if (LogicOperator != null)
         {
-            sb.AppendFormat("LogicOperator=\"{0}\", ", LogicOperator);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "LogicOperator=\"{0}\", ", LogicOperator);
         }
 
         if (Field != null)
         {
-            sb.AppendFormat("Field=\"{0}\", ", Field);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "Field=\"{0}\", ", Field);
         }
 
         if (Operator != null)
         {
-            sb.AppendFormat("Operator=\"{0}\", ", Operator);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "Operator=\"{0}\", ", Operator);
         }
 
         if (Value != null)
         {
-            sb.AppendFormat("Value=\"{0}\", ", Value);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "Value=\"{0}\", ", Value);
         }
 
         if (Field2 != null)
         {
-            sb.AppendFormat("Field2=\"{0}\", ", Field2);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "Field2=\"{0}\", ", Field2);
         }
 
         // Convert to string so we can remove trailing ', '
         string text = sb.ToString();
 
-        return string.Format("{0})", text[..^2]);
+        return string.Format(CultureInfo.InvariantCulture, "{0})", text[..^2]);
     }
 
     /// <summary>

@@ -47,7 +47,7 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
     /// <returns>Value converted from a string.</returns>
     protected override uint? ConvertFromWireValueFormat(string value)
     {
-        return value != null ? (uint?)Convert.ToUInt32(value) : null;
+        return value != null ? (uint?)Convert.ToUInt32(value, CultureInfo.InvariantCulture) : null;
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
     /// implements <see cref="IParameterConvertible"/>).</remarks>
     protected override uint? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
     {
-        return value.ToUInt32(hostParameter, CultureInfo.CurrentUICulture);
+        return value.ToUInt32(hostParameter, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -144,4 +144,3 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
 
     #endregion
 }
-

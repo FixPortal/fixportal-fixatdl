@@ -71,7 +71,7 @@ public class FixMessage : Dictionary<FixField, string>
                 tagText = parts[0];
                 valueText = parts[1];
 
-                int tag = Convert.ToInt32(tagText);
+                int tag = Convert.ToInt32(tagText, CultureInfo.InvariantCulture);
 
                 Add((FixField)tag, parts[1]);
             }
@@ -98,10 +98,9 @@ public class FixMessage : Dictionary<FixField, string>
 
         foreach (KeyValuePair<FixField, string> item in this)
         {
-            sb.AppendFormat("{0}{1}{2}{3}", ((uint)item.Key).ToString(CultureInfo.InvariantCulture), Separator, item.Value, SOH);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "{0}{1}{2}{3}", ((uint)item.Key).ToString(CultureInfo.InvariantCulture), Separator, item.Value, SOH);
         }
 
         return sb.ToString();
     }
 }
-

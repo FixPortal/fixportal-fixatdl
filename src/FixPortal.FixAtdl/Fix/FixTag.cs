@@ -6,6 +6,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Resources;
 
@@ -69,7 +70,6 @@ public readonly struct FixTag
     /// </returns>
     public override string ToString()
     {
-        return _value.ToString();
+        return _value.ToString(CultureInfo.InvariantCulture);
     }
 }
-
