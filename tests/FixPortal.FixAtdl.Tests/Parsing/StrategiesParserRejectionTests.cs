@@ -6,7 +6,7 @@ namespace FixPortal.FixAtdl.Tests.Parsing;
 
 public class StrategiesParserRejectionTests
 {
-    private static FixPortal.FixAtdl.Model.Elements.Strategies_t Load(string xml)
+    private static Model.Elements.Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream);

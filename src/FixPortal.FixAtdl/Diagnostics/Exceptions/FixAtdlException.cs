@@ -5,13 +5,11 @@
 //
 #endregion
 
-using System;
-
 namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 
 /// <summary>Provides a base exception class for all FixPortal.FixAtdl custom exceptions.</summary>
 // FP Enhancement: 2026-05-23 — removed obsolete SerializationInfo constructor (SYSLIB0051 — binary serialization removed in .NET 10).
-public class FixAtdlException : System.Exception
+public class FixAtdlException : Exception
 {
     /// <summary>Initializes a new instance of the FixAtdlException class with a specified error message.</summary>
     public FixAtdlException(string message)

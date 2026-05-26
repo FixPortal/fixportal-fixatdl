@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Collections;
@@ -186,7 +185,7 @@ public abstract class ListControlBase : InitializableControl<string>
     {
         string wireValue = ToString(targetParameter);
 
-        return TryConvertToDecimal(wireValue, out decimal result) ? (decimal?)result : null;
+        return TryConvertToDecimal(wireValue, out decimal result) ? result : null;
     }
 
     /// <summary>
@@ -199,7 +198,7 @@ public abstract class ListControlBase : InitializableControl<string>
     {
         string wireValue = ToString(targetParameter);
 
-        return TryConvertToInt(wireValue, out int result) ? (int?)result : null;
+        return TryConvertToInt(wireValue, out int result) ? result : null;
     }
 
     /// <summary>
@@ -212,7 +211,7 @@ public abstract class ListControlBase : InitializableControl<string>
     {
         string wireValue = ToString(targetParameter);
 
-        return TryConvertToUint(wireValue, out uint result) ? (uint?)result : null;
+        return TryConvertToUint(wireValue, out uint result) ? result : null;
     }
 
     /// <summary>
@@ -223,9 +222,7 @@ public abstract class ListControlBase : InitializableControl<string>
     {
         string wireValue = ToString(targetParameter);
 
-        char result = char.MinValue;
-
-        return TryConvertToChar(wireValue, out result) ? (char?)result : null;
+        return TryConvertToChar(wireValue, out var result) ? result : null;
     }
 
     /// <summary>

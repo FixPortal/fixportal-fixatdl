@@ -6,7 +6,7 @@ namespace FixPortal.FixAtdl.Tests.Parsing;
 public class StrategiesParserTests
 {
     // StrategiesReader.Load() accepts a Stream, not a StringReader.
-    private static FixPortal.FixAtdl.Model.Elements.Strategies_t Load(string xml)
+    private static Model.Elements.Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream);
@@ -45,7 +45,7 @@ public class StrategiesParserTests
 
         var layout = strategies.Strategies[0].StrategyLayout;
         layout.Should().NotBeNull();
-        var panel = layout!.StrategyPanel;
+        var panel = layout.StrategyPanel;
         panel.Controls.Should().HaveCount(3);
         panel.Controls.Select(c => c.Id).Should().BeEquivalentTo("c_StartTime", "c_EndTime", "c_Part");
     }
@@ -57,7 +57,7 @@ public class StrategiesParserTests
         var strategies = Load(xml);
 
         var pov = strategies.Strategies[0];
-        var targetCtrl = pov.StrategyLayout!.StrategyPanel.Controls
+        var targetCtrl = pov.StrategyLayout.StrategyPanel.Controls
             .Single(c => c.ParameterRef == "TargetPercentage");
         targetCtrl.StateRules.Should().HaveCount(1);
     }

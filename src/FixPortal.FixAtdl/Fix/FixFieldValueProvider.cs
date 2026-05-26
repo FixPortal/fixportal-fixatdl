@@ -5,9 +5,7 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
-using System.Linq;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -51,7 +49,7 @@ public class FixFieldValueProvider
     /// <summary>
     /// Gets the FIX values collection for this value provider.
     /// </summary>
-    public FixTagValuesCollection FixValues => _initialValueProvider!.InputFixValues!;
+    public FixTagValuesCollection FixValues => _initialValueProvider!.InputFixValues;
 
     /// <summary>
     /// Attempts to get the value of the specified FIX field (in FIX_ format), returning the value as a string.
@@ -64,9 +62,7 @@ public class FixFieldValueProvider
     /// <returns>true if the field could be retrieved; false otherwise.</returns>
     public bool TryGetValue(string fixField, string targetParameterName, out string value)
     {
-        string? result = null;
-
-        bool retrieved = TryGetValue(fixField, out result!);
+        bool retrieved = TryGetValue(fixField, out var result);
 
         if (retrieved && !string.IsNullOrEmpty(targetParameterName) && Parameters!.Contains(targetParameterName))
         {
@@ -74,7 +70,7 @@ public class FixFieldValueProvider
 
             if (parameter.HasEnumPairs)
             {
-                string wireValue = result!;
+                string wireValue = result;
 
                 if (_log.IsEnabled(LogLevel.Debug))
                 {
@@ -82,11 +78,11 @@ public class FixFieldValueProvider
                         fixField, targetParameterName, wireValue);
                 }
 
-                retrieved = parameter.EnumPairs!.TryParseWireValue(wireValue, out result);
+                retrieved = parameter.EnumPairs.TryParseWireValue(wireValue, out result);
             }
-            else if (parameter is Parameter_t<Percentage_t>)
+            else if (parameter is Parameter_t<Percentage_t> t)
             {
-                ProcessPercentageValue((parameter as Parameter_t<Percentage_t>)!, ref result);
+                ProcessPercentageValue(t, ref result);
             }
 
             if (_log.IsEnabled(LogLevel.Debug))

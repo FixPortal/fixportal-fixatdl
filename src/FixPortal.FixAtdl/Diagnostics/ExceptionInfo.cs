@@ -6,7 +6,6 @@
 #endregion
 
 using System.Collections;
-using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -26,10 +25,10 @@ public class ExceptionInfo
     /// <param name="obj">The obj.</param>
     public ExceptionInfo(XObject obj)
     {
-        if (obj is IXmlLineInfo && (obj as IXmlLineInfo).HasLineInfo())
+        if (obj is IXmlLineInfo info && info.HasLineInfo())
         {
-            _data["LineNumber"] = (obj as IXmlLineInfo).LineNumber;
-            _data["LinePosition"] = (obj as IXmlLineInfo).LinePosition;
+            _data["LineNumber"] = info.LineNumber;
+            _data["LinePosition"] = info.LinePosition;
         }
     }
 

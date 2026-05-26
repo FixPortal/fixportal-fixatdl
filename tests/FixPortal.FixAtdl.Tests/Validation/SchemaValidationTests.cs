@@ -13,7 +13,7 @@ namespace FixPortal.FixAtdl.Tests.Validation;
 /// </summary>
 public class SchemaValidationTests
 {
-    private static FixPortal.FixAtdl.Model.Elements.Strategies_t Load(string xml)
+    private static Model.Elements.Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream);

@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -43,7 +42,7 @@ public class Percentage_t : Float_t
     {
         if (value != null)
         {
-            int adjustmentFactor = (MultiplyBy100 == true) ? 1 : 100;
+            int adjustmentFactor = MultiplyBy100 == true ? 1 : 100;
 
             if (MaxValue != null && (decimal)value > MaxValue)
             {
@@ -76,7 +75,7 @@ public class Percentage_t : Float_t
     {
         decimal? decimalValue = base.ConvertFromWireValueFormat(value);
 
-        return (MultiplyBy100 == true) ? (decimal)decimalValue! / 100 : (decimal)decimalValue!;
+        return MultiplyBy100 == true ? (decimal)decimalValue! / 100 : (decimal)decimalValue!;
     }
 
     /// <summary>
@@ -94,7 +93,7 @@ public class Percentage_t : Float_t
             return null!;
         }
 
-        decimal adjustedValue = (MultiplyBy100 == true) ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value!;
+        decimal adjustedValue = MultiplyBy100 == true ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value;
 
         if (Precision == null)
         {
@@ -122,7 +121,7 @@ public class Percentage_t : Float_t
     {
         decimal? convertedValue = value.ToDecimal(hostParameter, CultureInfo.InvariantCulture);
 
-        return (convertedValue != null) ? convertedValue /= 100 : null;
+        return convertedValue != null ? convertedValue /= 100 : null;
     }
 
     /// <summary>
@@ -134,11 +133,11 @@ public class Percentage_t : Float_t
     /// <returns>Native parameter value.</returns>
     public override object GetNativeValue(bool applyWireValueFormat)
     {
-        decimal? value = ConstValue != null ? ((MultiplyBy100 == true) ? ConstValue / 100 : ConstValue) : _value;
+        decimal? value = ConstValue != null ? MultiplyBy100 == true ? ConstValue / 100 : ConstValue : _value;
 
         if (value != null && applyWireValueFormat)
         {
-            decimal adjustedValue = (MultiplyBy100 == true) ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value!;
+            decimal adjustedValue = MultiplyBy100 == true ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value;
 
             if (Precision != null)
             {
@@ -184,7 +183,7 @@ public class Percentage_t : Float_t
     {
         decimal? value = ToDecimal();
 
-        return (value != null) ? ((decimal)value).ToString(provider) : null;
+        return value != null ? ((decimal)value).ToString(provider) : null;
     }
 
     #endregion

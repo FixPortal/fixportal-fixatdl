@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Collections;
 using System.Globalization;
 using System.Text;
@@ -130,12 +129,12 @@ public class EnumState
     /// <remarks>This method assumes that both operands have the same set of EnumID values.</remarks>
     public override bool Equals(object? obj)
     {
-        if (obj == null || obj is not EnumState)
+        if (obj == null || obj is not EnumState state)
         {
             return false;
         }
 
-        return _enumStates.Equals(obj) && _nonEnumValue == ((EnumState)obj)._nonEnumValue;
+        return _enumStates.Equals(state) && _nonEnumValue == state._nonEnumValue;
     }
 
     /// <summary>

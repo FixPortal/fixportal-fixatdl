@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Resources;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
@@ -30,7 +29,7 @@ public struct MonthYear : IComparable
     /// <returns>MonthYear as a string.</returns>
     public override readonly string ToString()
     {
-        string suffix = Week != null ? string.Format(CultureInfo.InvariantCulture, "w{0}", Week) : (Day != null ? string.Format(CultureInfo.InvariantCulture, "{0:00}", Day) : string.Empty);
+        string suffix = Week != null ? string.Format(CultureInfo.InvariantCulture, "w{0}", Week) : Day != null ? string.Format(CultureInfo.InvariantCulture, "{0:00}", Day) : string.Empty;
 
         return string.Format(CultureInfo.InvariantCulture, "{0:0000}{1:00}{2}", Year, Month, suffix);
     }
@@ -56,7 +55,7 @@ public struct MonthYear : IComparable
     /// </summary>
     /// <param name="obj">Object to compare this instance with.</param>
     /// <returns>True if the supplied object is a MonthYear, and the day, month and year values of the two are the same; false otherwise.</returns>
-    public override readonly bool Equals(object? obj)
+    public override bool Equals(object? obj)
     {
         if (obj == null || GetType() != obj.GetType())
         {
@@ -77,8 +76,8 @@ public struct MonthYear : IComparable
         {
             int hashCode = (Year * 251 + Month) * 251;
 
-            hashCode = (Day != null) ? (hashCode + (ushort)Day) * 251 : hashCode * 251;
-            hashCode = (Week != null) ? (hashCode + (ushort)Week) * 251 : hashCode * 251;
+            hashCode = Day != null ? (hashCode + (ushort)Day) * 251 : hashCode * 251;
+            hashCode = Week != null ? (hashCode + (ushort)Week) * 251 : hashCode * 251;
 
             return hashCode;
         }
@@ -189,7 +188,7 @@ public struct MonthYear : IComparable
     /// <item><description>Zero - this instance occurs in the same position in the sort order as obj.</description></item>
     /// <item><description>Greater than zero - this instance follows obj in the sort order.</description></item>
     /// </list></returns>
-    public readonly int CompareTo(object? obj)
+    public int CompareTo(object? obj)
     {
         // Null references are by definition less than the current instance.
         if (obj == null)
@@ -197,12 +196,10 @@ public struct MonthYear : IComparable
             return 1;
         }
 
-        if (obj is not MonthYear)
+        if (obj is not MonthYear rhs)
         {
             throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName!, GetType().FullName!);
         }
-
-        MonthYear rhs = (MonthYear)obj;
 
         if (rhs == this)
         {

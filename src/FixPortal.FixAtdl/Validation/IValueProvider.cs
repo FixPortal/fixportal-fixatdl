@@ -5,9 +5,6 @@
 //
 #endregion
 
-using System;
-using System.Linq;
-
 namespace FixPortal.FixAtdl.Validation;
 
 /// <summary>

@@ -17,7 +17,6 @@
 //   http://www.gnu.org/licenses/.
 #endregion
 
-using System;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;

@@ -5,8 +5,6 @@
 //
 #endregion
 
-using System;
-
 namespace FixPortal.FixAtdl.Model.Enumerations;
 
 /// <summary>
@@ -28,6 +26,6 @@ public enum Region
     AsiaPacificJapan = 4,
 
     /// <summary>All regions.</summary>
-    All = Region.AsiaPacificJapan | Region.EuropeMiddleEastAfrica | Region.TheAmericas
+    All = AsiaPacificJapan | EuropeMiddleEastAfrica | TheAmericas
 }
 

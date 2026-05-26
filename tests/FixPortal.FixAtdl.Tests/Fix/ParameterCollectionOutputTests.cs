@@ -1,12 +1,11 @@
 using System.Text;
-using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Fix;
 
 public class ParameterCollectionOutputTests
 {
-    private static FixPortal.FixAtdl.Model.Elements.Strategies_t Load(string xml)
+    private static Model.Elements.Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream);

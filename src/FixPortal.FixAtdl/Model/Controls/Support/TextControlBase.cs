@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
@@ -79,19 +78,13 @@ public abstract class TextControlBase : InitializableControl<string>
     /// May also contain the FIXatdl '{NULL}' value as a string.</param>
     public override void SetValue(object newValue)
     {
-        if (newValue is string)
+        _value = newValue switch
         {
-            string? value = newValue as string;
-
-            _value = value == Atdl.NullValue ? null : value;
-        }
-        else
-        {
-            _value = newValue == null
-            ? null
-            : throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
-                newValue.GetType().FullName!, "System.String");
-        }
+            string value => value == Atdl.NullValue ? null : value,
+            null => null,
+            _ => throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
+                newValue.GetType().FullName!, "System.String")
+        };
 
         if (_log.IsEnabled(LogLevel.Debug))
         {
@@ -162,7 +155,7 @@ public abstract class TextControlBase : InitializableControl<string>
     public override decimal? ToDecimal(IParameter targetParameter, IFormatProvider provider)
     {
 
-        return TryConvertToDecimal(_value, out decimal result) ? (decimal?)result : null;
+        return TryConvertToDecimal(_value, out decimal result) ? result : null;
     }
 
     /// <summary>
@@ -174,7 +167,7 @@ public abstract class TextControlBase : InitializableControl<string>
     public override int? ToInt32(IParameter targetParameter, IFormatProvider provider)
     {
 
-        return TryConvertToInt(_value, out int result) ? (int?)result : null;
+        return TryConvertToInt(_value, out int result) ? result : null;
     }
 
     /// <summary>
@@ -186,7 +179,7 @@ public abstract class TextControlBase : InitializableControl<string>
     public override uint? ToUInt32(IParameter targetParameter, IFormatProvider provider)
     {
 
-        return TryConvertToUint(_value, out uint result) ? (uint?)result : null;
+        return TryConvertToUint(_value, out uint result) ? result : null;
     }
 
     /// <summary>
@@ -196,9 +189,7 @@ public abstract class TextControlBase : InitializableControl<string>
     /// <returns>A nullable char value equivalent to the value of this instance.  May be null.</returns>
     public override char? ToChar(IParameter targetParameter)
     {
-        char result = char.MinValue;
-
-        return TryConvertToChar(_value, out result) ? (char?)result : null;
+        return TryConvertToChar(_value, out var result) ? result : null;
     }
 
     /// <summary>

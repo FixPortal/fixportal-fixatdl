@@ -5,10 +5,7 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 
 namespace FixPortal.FixAtdl.Utility;
@@ -70,7 +67,7 @@ public static class ModelUtils
     /// </summary>
     /// <param name="typeName">The CLR type name to look up.</param>
     /// <returns>The matching type, or <see langword="null"/> if no type matches.</returns>
-    public static System.Type? GetTypeFromName(string typeName)
+    public static Type? GetTypeFromName(string typeName)
     {
         return _types.FirstOrDefault(t => t.Name == typeName);
     }

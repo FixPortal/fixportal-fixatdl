@@ -5,8 +5,6 @@
 //
 #endregion
 
-using System;
-
 namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 
 /// <summary>

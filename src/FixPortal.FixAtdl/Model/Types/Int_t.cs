@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
@@ -76,7 +75,7 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override int? ConvertFromWireValueFormat(string value)
     {
-        return value != null ? (int?)Convert.ToInt32(value, CultureInfo.InvariantCulture) : null;
+        return value != null ? Convert.ToInt32(value, CultureInfo.InvariantCulture) : null;
     }
 
     /// <summary>
@@ -134,7 +133,7 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
     {
         int? value = ConstValue ?? _value;
 
-        return (value != null) ? ((int)value).ToString(provider) : null;
+        return value != null ? ((int)value).ToString(provider) : null;
     }
 
     /// <summary>

@@ -5,9 +5,7 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
-using System.Linq;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Validation;
@@ -70,6 +68,6 @@ public abstract class UTCDateTimeTypeBase : DateTimeTypeBase
 
     private DateTime? GetAdjustedValue(DateTime? value)
     {
-        return value != null ? (DateTime?)((DateTime)value).ToUniversalTime() : null;
+        return value != null ? ((DateTime)value).ToUniversalTime() : null;
     }
 }

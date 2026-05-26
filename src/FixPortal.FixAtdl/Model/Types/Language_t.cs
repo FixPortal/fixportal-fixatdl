@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Reference;
@@ -48,7 +47,7 @@ public class Language_t : EnumTypeBase<IsoLanguageCode>
     /// <returns>Value converted from a string.</returns>
     protected override IsoLanguageCode? ConvertFromWireValueFormat(string value)
     {
-        return (IsoLanguageCode?)value.ParseAsEnum<IsoLanguageCode>();
+        return value.ParseAsEnum<IsoLanguageCode>();
     }
 
     /// <summary>

@@ -5,8 +5,6 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace FixPortal.FixAtdl.Xml.Serialization;
@@ -44,7 +42,7 @@ public class MultiTypeElementDefinition : ElementDefinition
     public MultiTypeElementDefinition(XName elementName, XName attributeForType, string typeNamespace,
         ConstructorParameter[] constructorParameters, ElementAttribute[] commonAttributes,
         Dictionary<Type, ElementAttribute[]> attributeDictionary, ChildElementDefinition[] children)
-        : base(elementName, (Type?)null, constructorParameters, commonAttributes, children, null)
+        : base(elementName, null, constructorParameters, commonAttributes, children, null)
     {
         AttributeForType = attributeForType;
         TypeNamespace = typeNamespace;

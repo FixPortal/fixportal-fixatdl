@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
@@ -41,7 +40,7 @@ public class ValueConverter
     /// <param name="value">The text value to convert.</param>
     /// <param name="targetType">The requested target type.</param>
     /// <returns>The converted value.</returns>
-    public static object ConvertTo(string value, System.Type targetType)
+    public static object ConvertTo(string value, Type targetType)
     {
         switch (targetType.FullName)
         {

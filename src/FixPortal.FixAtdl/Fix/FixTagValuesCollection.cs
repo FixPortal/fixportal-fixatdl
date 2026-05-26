@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System.Collections.Generic;
 using FixPortal.FixAtdl.Utility;
 
 namespace FixPortal.FixAtdl.Fix;

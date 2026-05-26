@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Reference;
@@ -48,7 +47,7 @@ public class Currency_t : EnumTypeBase<IsoCurrencyCode>
     /// <returns>Value converted from a string.</returns>
     protected override IsoCurrencyCode? ConvertFromWireValueFormat(string value)
     {
-        return (IsoCurrencyCode?)value.ParseAsEnum<IsoCurrencyCode>();
+        return value.ParseAsEnum<IsoCurrencyCode>();
     }
 
     /// <summary>

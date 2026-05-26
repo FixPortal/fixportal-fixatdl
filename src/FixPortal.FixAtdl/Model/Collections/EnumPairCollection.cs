@@ -5,9 +5,7 @@
 //
 #endregion
 
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Resources;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
@@ -69,7 +67,7 @@ public class EnumPairCollection : KeyedCollection<string, EnumPair_t>
     public bool TryParseWireValue(string wireValue, out string? enumId)
     {
         enumId = null;
-        string testValue = (wireValue != null) ? wireValue : Atdl.NullValue;
+        string testValue = wireValue != null ? wireValue : Atdl.NullValue;
 
         foreach (EnumPair_t enumPair in this)
         {
