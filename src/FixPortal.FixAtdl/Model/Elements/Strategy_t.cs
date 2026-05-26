@@ -19,26 +19,19 @@ namespace FixPortal.FixAtdl.Model.Elements;
 /// </summary>
 public class Strategy_t : IParentable<Strategies_t>
 {
-    private readonly ReadOnlyControlCollection _controls;
-    private readonly StrategyEditCollection _strategyEdits = [];
-    private readonly ParameterCollection _parameters = [];
-    private readonly EditCollection _edits = [];
-    private readonly MarketCollection _markets = [];
-    private readonly RegionCollection _regions = [];
-    private readonly SecurityTypeCollection _securityTypes = [];
 
     /// <summary>
     /// Initializes a new <see cref="Strategy_t"/> instance.
     /// </summary>
     public Strategy_t()
     {
-        _controls = new ReadOnlyControlCollection(this);
+        Controls = new ReadOnlyControlCollection(this);
     }
 
     /// <summary>
     /// Gets a read-only list of the controls for this Strategy.
     /// </summary>
-    public ReadOnlyControlCollection Controls { get { return _controls; } }
+    public ReadOnlyControlCollection Controls { get; }
 
     /// <summary>
     /// Gets/sets a description for this Strategy.
@@ -54,7 +47,7 @@ public class Strategy_t : IParentable<Strategies_t>
     /// Gets the collection of Edits for this strategy.  Edits at this level are available to be used in either the
     /// StateRules and/or the StrategyEdits for this Strategy.
     /// </summary>
-    public EditCollection Edits { get { return _edits; } }
+    public EditCollection Edits { get; } = [];
 
     /// <summary>
     /// Gets/sets the FIX message to use when transmitting the order that this Strategy relates to. Values are taken from FIX tag 35 and
@@ -81,7 +74,7 @@ public class Strategy_t : IParentable<Strategies_t>
     /// (XFKA) is defined as an included market, the strategy will be applicable for all markets in The Americas and EMEA,
     /// as well as only the Fukuoka Stock Exchange in the APAC region.
     /// </summary>
-    public MarketCollection Markets { get { return _markets; } }
+    public MarketCollection Markets { get; } = [];
 
     /// <summary>
     /// Gets/sets the unique identifier of a Strategy. Strategy names must be unique per provider.
@@ -96,7 +89,7 @@ public class Strategy_t : IParentable<Strategies_t>
     /// <summary>
     /// Gets the collection of Parameters for this Strategy.
     /// </summary>
-    public ParameterCollection Parameters { get { return _parameters; } }
+    public ParameterCollection Parameters { get; } = [];
 
     /// <summary>
     /// Gets/sets a string that identifies the firm providing the algorithm.
@@ -111,7 +104,7 @@ public class Strategy_t : IParentable<Strategies_t>
     /// <summary>
     /// Gets the Regions that this Strategy pertains to.
     /// </summary>
-    public RegionCollection Regions { get { return _regions; } }
+    public RegionCollection Regions { get; } = [];
 
     /// <summary>
     /// Gets/sets the group of Parameter elements that are intended for use with multi-leg or basket strategies.
@@ -126,7 +119,7 @@ public class Strategy_t : IParentable<Strategies_t>
     /// Gets the list of security types (by SecurityType (tag 167)) for which this Strategy is valid. The absence 
     /// of any security types implies that the strategy is valid for all security types.
     /// </summary>
-    public SecurityTypeCollection SecurityTypes { get { return _securityTypes; } }
+    public SecurityTypeCollection SecurityTypes { get; } = [];
 
     /// <summary>
     /// Gets/sets the prefix portion of a URL used to access the order or draft at the target 
@@ -139,7 +132,7 @@ public class Strategy_t : IParentable<Strategies_t>
     /// <summary>
     /// Gets the collection of <see cref="StrategyEdit_t">StrategyEdits</see> for validating the output of this Strategy.
     /// </summary>
-    public StrategyEditCollection StrategyEdits { get { return _strategyEdits; } }
+    public StrategyEditCollection StrategyEdits { get; } = [];
 
     /// <summary>
     /// Gets/sets the StrategyLayout for this Strategy, which itself contains the root StrategyPanel for displaying
@@ -189,9 +182,7 @@ public class Strategy_t : IParentable<Strategies_t>
     /// <summary>
     /// Updates the values of each control within this strategy from its respective parameter.
     /// </summary>
-    /// <param name="controlInitValueProvider">Initial value provider that provides access to the initial FIX field values,
-    /// needed to allow control values to be initialised using the FIX_ mechanism .</param>
-    public void UpdateControlValuesFromParameters(FixFieldValueProvider controlInitValueProvider)
+    public void UpdateControlValuesFromParameters()
     {
         Controls.UpdateValuesFromParameters(Parameters);
     }
@@ -227,7 +218,7 @@ public class Strategy_t : IParentable<Strategies_t>
         FixFieldValueProvider additionalValues = inputValueProvider == null ?
             FixFieldValueProvider.Empty : new FixFieldValueProvider(inputValueProvider, Parameters);
 
-        return _strategyEdits.EvaluateAll(additionalValues, shortCircuit);
+        return StrategyEdits.EvaluateAll(additionalValues, shortCircuit);
     }
 
     /// <summary>
@@ -249,7 +240,7 @@ public class Strategy_t : IParentable<Strategies_t>
         Parameters.ResetAll();
         Controls.ResetAll();
 
-        UpdateControlValuesFromParameters(FixFieldValueProvider.Empty);
+        UpdateControlValuesFromParameters();
     }
 
 

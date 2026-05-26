@@ -27,10 +27,14 @@ public class Exchange_t : String_t
     protected override ValidationResult ValidateValue(string value, bool isRequired)
     {
         if (value != null && value.Length != 4)
+        {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.InvalidExchangeCode);
+        }
 
         if (isRequired && value == null)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }

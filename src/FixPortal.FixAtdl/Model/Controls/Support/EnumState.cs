@@ -55,7 +55,9 @@ public class EnumState : IComparable
     public EnumState(EnumState sourceState)
     {
         if (sourceState == null)
+        {
             throw ThrowHelper.New<ArgumentException>(typeof(EnumState), "A valid EnumState value must be supplied to use this constuctor");
+        }
 
         _enumIds = sourceState._enumIds;
         _enumStates = new BitArray(sourceState._enumStates);
@@ -65,7 +67,6 @@ public class EnumState : IComparable
     /// <summary>
     /// Makes a copy (deep clone) of this EnumState.
     /// </summary>
-    /// <param name="targetState">EnumState to update.</param>
     /// <remarks>This method is provided to allow value type-like semantics for EnumState.</remarks>
     public EnumState Copy()
     {
@@ -81,10 +82,14 @@ public class EnumState : IComparable
     public void UpdateFrom(EnumState source)
     {
         if (source == null)
+        {
             throw ThrowHelper.New<ArgumentNullException>(this, "A valid EnumState must be supplied");
+        }
 
         if (_enumIds.Length != source._enumIds.Length)
+        {
             throw ThrowHelper.New<ArgumentException>(this, "Unable to update this EnumState from supplied EnumState as the number of EnumIDs was not consistent");
+        }
 
         _log.LogDebug("Updating EnumState from {Arg0} to {Arg1}", ToString(), source.ToString());
 
@@ -93,6 +98,7 @@ public class EnumState : IComparable
         for (int n = 0; n < _enumIds.Length; n++)
         {
             for (int index = 0; index < source._enumIds.Length; index++)
+            {
                 if (source._enumIds[index] == _enumIds[n])
                 {
                     _enumStates.Set(n, source._enumStates[index]);
@@ -101,10 +107,13 @@ public class EnumState : IComparable
 
                     break;
                 }
+            }
         }
 
         if (enumCount != 0)
+        {
             throw ThrowHelper.New<ArgumentException>(this, "Mismatch between the EnumIDs of the source and target EnumState");
+        }
 
         _nonEnumValue = source._nonEnumValue;
     }
@@ -118,7 +127,9 @@ public class EnumState : IComparable
     public override bool Equals(object? obj)
     {
         if (obj == null || obj is not EnumState)
+        {
             return false;
+        }
 
         return _enumStates.Equals(obj) && _nonEnumValue == ((EnumState)obj)._nonEnumValue;
     }
@@ -139,10 +150,14 @@ public class EnumState : IComparable
             int hashCode = enumStates[0] * 251;
 
             if (_enumIds != null)
-                hashCode = hashCode + _enumIds.GetHashCode();
+            {
+                hashCode += _enumIds.GetHashCode();
+            }
 
             if (_nonEnumValue != null)
-                hashCode = (hashCode * 251) + _nonEnumValue.GetHashCode();
+            {
+                hashCode = hashCode * 251 + _nonEnumValue.GetHashCode();
+            }
 
             return hashCode;
         }
@@ -158,8 +173,12 @@ public class EnumState : IComparable
         get
         {
             for (int n = 0; n < _enumIds.Length; n++)
+            {
                 if (_enumIds[n] == enumId)
+                {
                     return _enumStates[n];
+                }
+            }
 
             throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.UnrecognisedEnumIdValue, enumId);
         }
@@ -167,6 +186,7 @@ public class EnumState : IComparable
         set
         {
             for (int n = 0; n < _enumIds.Length; n++)
+            {
                 if (_enumIds[n] == enumId)
                 {
                     _enumStates[n] = value;
@@ -175,6 +195,7 @@ public class EnumState : IComparable
 
                     return;
                 }
+            }
 
             throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.UnrecognisedEnumIdValue, enumId);
         }
@@ -183,7 +204,7 @@ public class EnumState : IComparable
     /// <summary>
     /// Gets the number of elements (EnumIDs) that this EnumState holds state for.
     /// </summary>
-    public int Count { get { return _enumIds.Length; } }
+    public int Count => _enumIds.Length;
 
     /// <summary>
     /// Determines whether the supplied EnumID value is valid for this EnumState instance.
@@ -200,7 +221,7 @@ public class EnumState : IComparable
     /// </summary>
     public string? NonEnumValue
     {
-        get { return _nonEnumValue; }
+        get => _nonEnumValue;
 
         set
         {
@@ -228,8 +249,12 @@ public class EnumState : IComparable
     public int GetFirstSelectedEnumIdIndex()
     {
         for (int n = 0; n < _enumStates.Length; n++)
+        {
             if (_enumStates[n])
+            {
                 return n;
+            }
+        }
 
         return -1;
     }
@@ -241,8 +266,12 @@ public class EnumState : IComparable
     public int GetIndexOfEnumId(string enumId)
     {
         for (int n = 0; n < _enumIds.Length; n++)
+        {
             if (_enumIds[n] == enumId)
+            {
                 return n;
+            }
+        }
 
         return -1;
     }
@@ -278,15 +307,21 @@ public class EnumState : IComparable
 
         // Verify that all EnumIds supplied in initValues are valid
         foreach (string enumId in enumIds)
+        {
             allAreValid &= IsValidEnumId(enumId);
+        }
 
         if (!allAreValid && allowNonEnumValue)
+        {
             _nonEnumValue = initValues;
+        }
         else
         {
             // [] operator will throw if any EnumId is invalid
             foreach (string enumId in enumIds)
+            {
                 this[enumId] = true;
+            }
         }
 
         _log.LogDebug("EnumState is now {State}", ToString());
@@ -303,12 +338,16 @@ public class EnumState : IComparable
         _log.LogDebug("Converting EnumState to WireValue; current state is {State}", ToString());
 
         if (enumPairs.Count != _enumStates.Count)
+        {
             throw ThrowHelper.New<InvalidOperationException>(ExceptionContext, ErrorMessages.InconsistentEnumPairsListItemsError);
+        }
 
         // Override the values in the states collection if a non-enum value is supplied.  This is used to handle 
         // the unique case of the EditableDropDownList_t control.
         if (NonEnumValue != null)
+        {
             return NonEnumValue.Length > 0 ? NonEnumValue : null!;
+        }
 
         bool hasAtLeastOneValue = false;
         StringBuilder sb = new();
@@ -324,7 +363,9 @@ public class EnumState : IComparable
                 {
                     // Only prepend a space after the first entry
                     if (hasAtLeastOneValue)
+                    {
                         sb.AppendFormat(" {0}", value);
+                    }
                     else
                     {
                         sb.Append(value);
@@ -356,10 +397,11 @@ public class EnumState : IComparable
 
         foreach (string inputValue in inputValues)
         {
-            string? enumId;
 
-            if (!enumPairs.TryParseWireValue(inputValue, out enumId))
+            if (!enumPairs.TryParseWireValue(inputValue, out string? enumId))
+            {
                 throw ThrowHelper.New<ArgumentException>(ExceptionContext, ErrorMessages.UnrecognisedEnumIdValue, inputValue);
+            }
 
             result[enumId!] = true;
         }
@@ -380,10 +422,14 @@ public class EnumState : IComparable
         sb.Append("(");
 
         for (int n = 0; n < _enumStates.Length; n++)
+        {
             sb.AppendFormat("{0}={1}{2}", _enumIds[n], _enumStates[n].ToString().ToLower(), n < _enumStates.Length - 1 ? ", " : string.Empty);
+        }
 
         if (_nonEnumValue != null)
+        {
             sb.AppendFormat(", NonEnumValue='{0}'", _nonEnumValue);
+        }
 
         sb.Append(")");
 
@@ -402,23 +448,23 @@ public class EnumState : IComparable
     /// designed to provide less than/greater than comparison, it is primarily used here for determining equality.</remarks>
     public int CompareTo(object? obj)
     {
-        if (obj is string)
+        if (obj is string enumId)
         {
-            string enumId = (string)obj;
-
             if (!IsValidEnumId(enumId))
+            {
                 throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.UnrecognisedEnumIdValue, enumId);
+            }
 
             return this[enumId] ? 0 : -1;
         }
-        else if (obj is EnumState)
+        else if (obj is EnumState enumState)
         {
-            EnumState enumState = (EnumState)obj;
-
             return Equals(enumState) ? 0 : -1;
         }
         else
+        {
             throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.CompareValueFailure, ToString(), obj?.GetType().FullName ?? "(null)");
+        }
     }
 
     #endregion

@@ -20,10 +20,14 @@ public static class ProcessExtensions
     public static bool IsVSDesigner(this Process process)
     {
         if (process == null)
+        {
             throw ThrowHelper.New<NullReferenceException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
+        }
 
         if (process.MainModule != null)
-            return (process.MainModule.ModuleName.Contains("devenv.exe"));
+        {
+            return process.MainModule.ModuleName.Contains("devenv.exe");
+        }
 
         return false;
     }

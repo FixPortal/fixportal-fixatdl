@@ -12,7 +12,6 @@ namespace FixPortal.FixAtdl.Fix;
 
 public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>>
 {
-    private static readonly FixTagValuesCollection _empty = [];
     private readonly FixMessage _message;
 
     public FixTagValuesCollection()
@@ -30,12 +29,11 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
         _message = message;
     }
 
-    public static FixTagValuesCollection Empty { get { return _empty; } }
+    public static FixTagValuesCollection Empty { get; } = [];
 
     public string this[FixField fixField]
     {
-        get { return _message[fixField]; }
-        set { _message[fixField] = value; }
+        get => _message[fixField]; set => _message[fixField] = value;
     }
 
     public string this[string fixField]

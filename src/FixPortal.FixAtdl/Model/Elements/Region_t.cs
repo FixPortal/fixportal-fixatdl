@@ -12,8 +12,6 @@ namespace FixPortal.FixAtdl.Model.Elements;
 
 public class Region_t
 {
-    private CountryCollection _countries = null!;
-
     public Region Name { get; set; }
     public Inclusion_t Inclusion { get; set; }
 
@@ -22,11 +20,10 @@ public class Region_t
         get
         {
             // Lazy initialize as we can't use 'this' in constructor.
-            if (_countries == null)
-                _countries = new CountryCollection(this);
+            field ??= new CountryCollection(this);
 
-            return _countries;
+            return field;
         }
-    }
+    } = null!;
 }
 

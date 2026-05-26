@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Xml;
 

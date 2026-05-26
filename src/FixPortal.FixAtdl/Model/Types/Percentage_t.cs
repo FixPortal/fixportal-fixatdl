@@ -46,15 +46,21 @@ public class Percentage_t : Float_t
             int adjustmentFactor = (MultiplyBy100 == true) ? 1 : 100;
 
             if (MaxValue != null && (decimal)value > MaxValue)
+            {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded,
                     RemoveTrailingZeroes(value * adjustmentFactor)!, RemoveTrailingZeroes(MaxValue.Value * adjustmentFactor)!);
+            }
 
             if (MinValue != null && (decimal)value < MinValue)
+            {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded,
                     RemoveTrailingZeroes(value * adjustmentFactor)!, RemoveTrailingZeroes(MinValue.Value * adjustmentFactor)!);
+            }
         }
         else if (isRequired)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }
@@ -84,14 +90,20 @@ public class Percentage_t : Float_t
     protected override string ConvertToWireValueFormat(decimal? value)
     {
         if (value == null)
+        {
             return null!;
+        }
 
         decimal adjustedValue = (MultiplyBy100 == true) ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value!;
 
         if (Precision == null)
+        {
             return adjustedValue.ToString(CultureInfo.InvariantCulture);
+        }
         else
+        {
             return Round(adjustedValue, Precision.Value)!.Value.ToString(CultureInfo.InvariantCulture);
+        }
     }
 
     /// <summary>
@@ -129,12 +141,18 @@ public class Percentage_t : Float_t
             decimal adjustedValue = (MultiplyBy100 == true) ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value!;
 
             if (Precision != null)
+            {
                 return Math.Round(adjustedValue, Precision.Value, MidpointRounding.AwayFromZero);
+            }
             else
+            {
                 return adjustedValue;
+            }
         }
         else
+        {
             return value!;
+        }
     }
 
     #endregion
@@ -144,14 +162,15 @@ public class Percentage_t : Float_t
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public override decimal? ToDecimal()
     {
         decimal? value = ConstValue ?? _value;
 
         if (value == null || MultiplyBy100 == true)
+        {
             return value;
+        }
 
         return RemoveTrailingZeroes(value * 100);
     }
@@ -173,7 +192,9 @@ public class Percentage_t : Float_t
     private static decimal? RemoveTrailingZeroes(decimal? value)
     {
         if (value == null)
+        {
             return null;
+        }
 
         // We use this slightly ugly manipulation to remove the trailing zeroes that multiplication by 100 produces
         return decimal.Parse(((decimal)value).ToString("G29"));

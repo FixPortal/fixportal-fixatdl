@@ -37,72 +37,44 @@ public static class EditValueConverter
     {
         // If we don't have a valid type to convert to, then best leave the value alone.
         if (typeInstanceToMatch == null)
+        {
             return value;
+        }
 
         string? type = typeInstanceToMatch.GetType().FullName;
 
-        switch (type)
+        return type switch
         {
-            case "System.Decimal":
-                return Convert.ToDecimal(value);
-
-            case "System.Boolean":
-                return ConvertToBool(value);
-
-            case "System.Int32":
-                return Convert.ToInt32(value);
-
-            case "System.UInt32":
-                return Convert.ToUInt32(value);
-
-            case "System.Char":
-                return Convert.ToChar(value);
-
-            case "System.DateTime":
-                return FixDateTime.Parse(value, CultureInfo.InvariantCulture);
-
-            case "System.String":
-                return value;
-
-            case "FixPortal.FixAtdl.Model.Reference.IsoCountryCode":
-                return value.ParseAsEnum<IsoCountryCode>();
-
-            case "FixPortal.FixAtdl.Model.Reference.IsoCurrencyCode":
-                return value.ParseAsEnum<IsoCurrencyCode>();
-
-            case "FixPortal.FixAtdl.Model.Reference.IsoLanguageCode":
-                return value.ParseAsEnum<IsoLanguageCode>();
-
-            case "FixPortal.FixAtdl.Model.Types.Support.MonthYear":
-                return MonthYear.Parse(value);
-
-            case "FixPortal.FixAtdl.Model.Types.Support.Tenor":
-                return Tenor.Parse(value);
-
-            case "FixPortal.FixAtdl.Model.Controls.Support.EnumState":
-                return value;
-
-            default:
-                throw ThrowHelper.New<InvalidCastException>(ExceptionContext, ErrorMessages.DataConversionError1, value, type);
-        }
+            "System.Decimal" => Convert.ToDecimal(value),
+            "System.Boolean" => ConvertToBool(value),
+            "System.Int32" => Convert.ToInt32(value),
+            "System.UInt32" => Convert.ToUInt32(value),
+            "System.Char" => Convert.ToChar(value),
+            "System.DateTime" => FixDateTime.Parse(value, CultureInfo.InvariantCulture),
+            "System.String" => value,
+            "FixPortal.FixAtdl.Model.Reference.IsoCountryCode" => value.ParseAsEnum<IsoCountryCode>(),
+            "FixPortal.FixAtdl.Model.Reference.IsoCurrencyCode" => value.ParseAsEnum<IsoCurrencyCode>(),
+            "FixPortal.FixAtdl.Model.Reference.IsoLanguageCode" => value.ParseAsEnum<IsoLanguageCode>(),
+            "FixPortal.FixAtdl.Model.Types.Support.MonthYear" => MonthYear.Parse(value),
+            "FixPortal.FixAtdl.Model.Types.Support.Tenor" => Tenor.Parse(value),
+            "FixPortal.FixAtdl.Model.Controls.Support.EnumState" => value,
+            _ => throw ThrowHelper.New<InvalidCastException>(ExceptionContext, ErrorMessages.DataConversionError1, value, type),
+        };
     }
 
     private static bool ConvertToBool(string value)
     {
         if (value == null)
-            throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
-
-        switch (value.ToUpper())
         {
-            case "N":
-                return false;
-
-            case "Y":
-                return true;
-
-            default:
-                return bool.Parse(value);
+            throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
         }
+
+        return value.ToUpper() switch
+        {
+            "N" => false,
+            "Y" => true,
+            _ => bool.Parse(value),
+        };
     }
 }
 

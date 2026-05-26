@@ -43,11 +43,12 @@ public abstract class UTCDateTimeTypeBase : DateTimeTypeBase
     {
         string[] formats = GetDateTimeFormatStrings();
 
-        DateTime result;
 
         // Unless instructed otherwise, DateTime.TryParseExact returns a DateTime with Kind = Local
-        if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal, out result))
+        if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal, out DateTime result))
+        {
             return result;
+        }
 
         throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidDateOrTimeValue, value);
     }

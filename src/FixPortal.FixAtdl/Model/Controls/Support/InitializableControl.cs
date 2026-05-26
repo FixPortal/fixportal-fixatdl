@@ -60,9 +60,8 @@ public abstract class InitializableControl<T> : Control_t
 
             if (!string.IsNullOrEmpty(InitFixField))
             {
-                string value;
 
-                if (controlInitValueProvider.TryGetValue(InitFixField, ParameterRef, out value))
+                if (controlInitValueProvider.TryGetValue(InitFixField, ParameterRef, out string value))
                 {
                     if (LoadDefaultFromFixValue(value))
                     {
@@ -72,10 +71,14 @@ public abstract class InitializableControl<T> : Control_t
                     }
                 }
                 else
+                {
                     _log.LogWarning("Unable to initialize control {Arg0} with FIX field {Arg1} as no valid value was found", Id, InitFixField);
+                }
             }
             else
+            {
                 _log.LogWarning("Unable to initialize control {Arg0} with initPolicy = UseFixField as no valid initFixField was supplied", Id);
+            }
         }
 
         _log.LogDebug("Initializing control {Arg0} with InitValue '{Arg1}'...", Id, InitValue != null ? InitValue.ToString() : "null");

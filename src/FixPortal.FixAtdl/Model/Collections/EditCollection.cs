@@ -56,7 +56,9 @@ public class EditCollection : KeyedCollection<string, Edit_t>
         Edit_t<T> target = new() { Field = source.Field, Field2 = source.Field2, LogicOperator = source.LogicOperator, Operator = source.Operator, Value = source.Value };
 
         foreach (Edit_t child in source.Edits)
+        {
             target.Edits.Add(Copy<T>(child));
+        }
 
         return target;
     }

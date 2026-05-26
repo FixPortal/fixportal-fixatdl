@@ -51,7 +51,7 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
     /// <summary>
     /// Indicates whether this parameter has been set to a value other than null.
     /// </summary>
-    public bool IsSet { get { return (ConstValue ?? _value) != null; } }
+    public bool IsSet => (ConstValue ?? _value) != null;
 
     /// <summary>
     /// Gets the value of this parameter as seen by the Control_t that references it.  May be null if the 
@@ -77,7 +77,9 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
     public ValidationResult SetValueFromControl(IParameter hostParameter, IParameterConvertible value)
     {
         if (ConstValue != null)
+        {
             return new ValidationResult(ValidationResult.ResultType.Invalid, string.Format(ErrorMessages.AttemptToSetConstValueParameter, ConstValue));
+        }
 
         try
         {
@@ -129,7 +131,9 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
         if (ConstValue != null)
         {
             if (ConvertToWireValueFormat(ConstValue) == value)
+            {
                 return;
+            }
 
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.AttemptToSetConstValueParameter, ConstValue);
         }
@@ -138,10 +142,9 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
 
         ValidationResult result = ValidateValue(convertedValue, true);
 
-        if (result.IsValid)
-            _value = convertedValue;
-        else
-            throw ThrowHelper.New<InvalidFieldValueException>(this,
+        _value = result.IsValid
+            ? convertedValue
+            : throw ThrowHelper.New<InvalidFieldValueException>(this,
                 ErrorMessages.InvalidParameterSetValue, hostParameter.Name, value, result.ErrorText);
     }
 
@@ -162,7 +165,9 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
         if (!validity.IsValid)
         {
             if (validity.IsMissing)
+            {
                 throw ThrowHelper.New<MissingMandatoryValueException>(this, ErrorMessages.NonOptionalParameterNotSupplied, hostParameter.Name);
+            }
 
             throw ThrowHelper.New<InvalidFieldValueException>(ErrorMessages.InvalidGetParameterValue,
                 hostParameter.Name, value, validity.ErrorText);
@@ -190,7 +195,7 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
     /// <summary>
     /// Gets the human-readable name of this type.
     /// </summary>
-    public string HumanReadableTypeName { get { return GetHumanReadableTypeName(); } }
+    public string HumanReadableTypeName => GetHumanReadableTypeName();
 
     /// <summary>
     /// Resets this parameter value to its default state.

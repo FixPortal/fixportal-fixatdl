@@ -19,38 +19,32 @@ public class RecursiveTypeElementDefinition : ElementDefinition
 
     public new XName ElementName
     {
-        get { throw new NotSupportedException(); }
-        set { throw new NotSupportedException(); }
+        get => throw new NotSupportedException(); set => throw new NotSupportedException();
     }
 
     public new Type TargetType
     {
-        get { throw new NotSupportedException(); }
-        set { throw new NotSupportedException(); }
+        get => throw new NotSupportedException(); set => throw new NotSupportedException();
     }
 
     public new ElementAttribute[] Attributes
     {
-        get { throw new NotSupportedException(); }
-        set { throw new NotSupportedException(); }
+        get => throw new NotSupportedException(); set => throw new NotSupportedException();
     }
 
     public new ConstructorParameter[] ConstructorParameters
     {
-        get { throw new NotSupportedException(); }
-        set { throw new NotSupportedException(); }
+        get => throw new NotSupportedException(); set => throw new NotSupportedException();
     }
 
     public new ChildElementDefinition[] ChildElements
     {
-        get { throw new NotSupportedException(); }
-        set { throw new NotSupportedException(); }
+        get => throw new NotSupportedException(); set => throw new NotSupportedException();
     }
 
     public new CacheElementValueInstruction CacheElementValueInstruction
     {
-        get { throw new NotSupportedException(); }
-        set { throw new NotSupportedException(); }
+        get => throw new NotSupportedException(); set => throw new NotSupportedException();
     }
 }
 

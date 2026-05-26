@@ -46,16 +46,24 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
         if (value != null)
         {
             if (value == DateTime.MaxValue)
+            {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.InvalidDateOrTimeValueUnknown);
+            }
 
             if (MaxValue != null && (DateTime)value > MaxValue)
+            {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, MaxValue);
+            }
 
             if (MinValue != null && (DateTime)value < MinValue)
+            {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+            }
         }
         else if (isRequired)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }
@@ -70,10 +78,11 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     {
         string[] formats = GetDateTimeFormatStrings();
 
-        DateTime result;
 
-        if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out result))
+        if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime result))
+        {
             return result;
+        }
 
         throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidDateOrTimeValue, value);
     }
@@ -131,7 +140,6 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
@@ -141,7 +149,6 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {

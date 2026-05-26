@@ -70,24 +70,20 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private static readonly ILogger _log = NullLogger.Instance;
     private static readonly bool isPartOfStrategyEdit = typeof(T) == typeof(IParameter);
-
-    private bool _currentState;
     private T _fieldSource = null!;
     private T _field2Source = null!;
-    private readonly EditEvaluatingCollection<T> _edits;
-    private readonly EditRefCollection<T> _editRefs;
 
     /// <summary>
     /// Initializes a new <see cref="Edit{T}"/> instance.
     /// </summary>
     public Edit_t()
     {
-        _edits = [];
-        _editRefs = new EditRefCollection<T>(_edits);
+        Edits = [];
+        EditRefs = new EditRefCollection<T>(Edits);
 
         // For StrategyEdits, we want to start with the assumption that the current state of this
         // Edit is true (i.e., valid) before it has been evaluated
-        _currentState = isPartOfStrategyEdit;
+        CurrentState = isPartOfStrategyEdit;
     }
 
     /// <summary>
@@ -101,22 +97,34 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         sb.Append("(");
 
         if (Id != null)
+        {
             sb.AppendFormat("Id=\"{0}\", ", Id);
+        }
 
         if (LogicOperator != null)
+        {
             sb.AppendFormat("LogicOperator=\"{0}\", ", LogicOperator);
+        }
 
         if (Field != null)
+        {
             sb.AppendFormat("Field=\"{0}\", ", Field);
+        }
 
         if (Operator != null)
+        {
             sb.AppendFormat("Operator=\"{0}\", ", Operator);
+        }
 
         if (Value != null)
+        {
             sb.AppendFormat("Value=\"{0}\", ", Value);
+        }
 
         if (Field2 != null)
+        {
             sb.AppendFormat("Field2=\"{0}\", ", Field2);
+        }
 
         // Convert to string so we can remove trailing ', '
         string text = sb.ToString();
@@ -127,7 +135,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     /// <summary>
     /// Gets the collection of EditRefs for this Edit.
     /// </summary>
-    public EditRefCollection<T> EditRefs { get { return _editRefs; } }
+    public EditRefCollection<T> EditRefs { get; }
 
     /// <summary>
     /// Gets the set of sources for this Edit and its children.  As source is non-null Field or Field2 value.
@@ -143,11 +151,17 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
                 sources.Add(Field);
 
                 if (Field2 != null)
+                {
                     sources.Add(Field2);
+                }
             }
             else
-                foreach (string source in _edits.Sources)
+            {
+                foreach (string source in Edits.Sources)
+                {
                     sources.Add(source);
+                }
+            }
 
             return sources;
         }
@@ -188,20 +202,19 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     /// <summary>
     /// Gets the current state of this Edit based on the most recent evaluation.
     /// </summary>
-    public bool CurrentState { get { return _currentState; } }
+    public bool CurrentState { get; private set; }
 
     /// <summary>
     /// Gets the collection of child Edits.  May be empty, unless LogicOperator is non-null.
     /// </summary>
-    public EditEvaluatingCollection<T> Edits { get { return _edits; } }
+    public EditEvaluatingCollection<T> Edits { get; }
 
     /// <summary>
     /// Gets/sets the optional logical operator - used when combining two or more Edits.
     /// </summary>
     public LogicOperator_t? LogicOperator
     {
-        get { return Edits.LogicOperator; }
-        set { Edits.LogicOperator = value; }
+        get => Edits.LogicOperator; set => Edits.LogicOperator = value;
     }
 
     /// <summary>
@@ -212,9 +225,13 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         get
         {
             if (_fieldSource != null)
+            {
                 return _fieldSource.GetCurrentValue();
+            }
             else
+            {
                 throw ThrowHelper.New<InvalidOperationException>(this, "Edit attempted to access FieldValue but requisite control was not set.");
+            }
         }
     }
 
@@ -226,9 +243,13 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         get
         {
             if (_field2Source != null)
+            {
                 return _field2Source.GetCurrentValue();
+            }
             else
+            {
                 throw ThrowHelper.New<InvalidOperationException>(this, "Edit attempted to access Field2Value but requisite control was not set.");
+            }
         }
     }
 
@@ -246,39 +267,31 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     /// <param name="additionalValues">Any additional FIX field values that may be required in the Edit evaluation.</param>
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
-        _log.LogDebug("Evaluating Edit_t {Arg0}; current state is {Arg1}", ToString(), _currentState.ToString().ToLower());
+        _log.LogDebug("Evaluating Edit_t {Arg0}; current state is {Arg1}", ToString(), CurrentState.ToString().ToLower());
 
         if (Operator != null)
         {
             object lhs = GetLhsValue(additionalValues);
 
-            switch (Operator)
+            CurrentState = Operator switch
             {
-                case Operator_t.Exist:
-                case Operator_t.NotExist:
-                    _currentState = EvaluateExists(lhs);
-                    break;
-
-                case Operator_t.Equal:
-                case Operator_t.NotEqual:
-                    _currentState = EvaluateEquality(lhs, GetRhsValue(additionalValues, lhs));
-                    break;
-
-                default:
-                    _currentState = EvaluateInequalityComparison((lhs as IComparable)!, (GetRhsValue(additionalValues, lhs) as IComparable)!);
-                    break;
-            }
+                Operator_t.Exist or Operator_t.NotExist => EvaluateExists(lhs),
+                Operator_t.Equal or Operator_t.NotEqual => EvaluateEquality(lhs, GetRhsValue(additionalValues, lhs)),
+                _ => EvaluateInequalityComparison((lhs as IComparable)!, (GetRhsValue(additionalValues, lhs) as IComparable)!),
+            };
         }
         else if (LogicOperator != null)
         {
-            _edits.Evaluate(additionalValues);
+            Edits.Evaluate(additionalValues);
 
-            _currentState = _edits.CurrentState;
+            CurrentState = Edits.CurrentState;
         }
         else
+        {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.MissingOperatorsOnEdit);
+        }
 
-        _log.LogDebug("Evaluation of Edit_t {Arg0} yielded state of {Arg1}", ToString(), _currentState.ToString().ToLower());
+        _log.LogDebug("Evaluation of Edit_t {Arg0} yielded state of {Arg1}", ToString(), CurrentState.ToString().ToLower());
     }
 
     #endregion IEdit_t Members
@@ -287,7 +300,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     {
         bool checkingForExist = Operator == Operator_t.Exist;
 
-        bool empty = value == null || (value as string == string.Empty);
+        bool empty = value == null || value as string == string.Empty;
 
         bool result = checkingForExist ? !empty : empty;
 
@@ -303,20 +316,11 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
         CheckForUnsupportedComparisons(lhs, rhs);
 
-        bool equal;
-
-        if (lhs == null)
-            equal = rhs == null || (rhs as string) == Atdl.NullValue;
-        else
-        {
-            IComparable? comparableLhs = lhs as IComparable;
-            IComparable? comparableRhs = rhs as IComparable;
-
-            if (comparableLhs != null && comparableRhs != null)
-                equal = comparableLhs.CompareTo(comparableRhs) == 0;
-            else
-                equal = lhs.Equals(rhs);
-        }
+        bool equal = lhs == null
+            ? rhs == null || rhs as string == Atdl.NullValue
+            : lhs is IComparable comparableLhs && rhs is IComparable comparableRhs
+                ? comparableLhs.CompareTo(comparableRhs) == 0
+                : lhs.Equals(rhs);
 
         bool finalResult = Operator == Operator_t.Equal ? equal : !equal;
 
@@ -370,24 +374,16 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     private object GetLhsValue(FixFieldValueProvider additionalValues)
     {
         if (Field.StartsWith("FIX_"))
+        {
             return GetFixFieldValue(additionalValues, Field);
+        }
 
         object result;
         object fieldValue = FieldValue;
 
         // If the field value can be converted into a number, most likely it should be treated as one
         // for comparison purposes
-        if (fieldValue is string)
-        {
-            decimal number;
-
-            if (decimal.TryParse(fieldValue as string, out number))
-                result = number;
-            else
-                result = fieldValue;
-        }
-        else
-            result = fieldValue;
+        result = fieldValue is string ? decimal.TryParse(fieldValue as string, out decimal number) ? number : fieldValue : fieldValue;
 
         return result;
     }
@@ -395,12 +391,16 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     private object GetRhsValue(FixFieldValueProvider additionalValues, object lhs)
     {
         if (Value != null)
+        {
             return EditValueConverter.ConvertToComparableType(lhs, Value);
+        }
 
         if (Field2 != null)
         {
             if (Field2.StartsWith("FIX_"))
+            {
                 return GetFixFieldValue(additionalValues, Field2);
+            }
 
             return Field2Value;
         }
@@ -412,10 +412,14 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     {
         // We don't currently support comparisons for type 'Data_t' which is represented by a char[].
         if (lhs is char[])
+        {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, Value, new string(lhs as char[]));
+        }
 
         if (rhs is char[])
+        {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, Value, new string(rhs as char[]));
+        }
     }
 
     private static object GetFixFieldValue(FixFieldValueProvider additionalValues, string fixField)
@@ -427,17 +431,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
         // If the FIX value can be converted into a number, most likely it should be treated as one
         // for comparison purposes
-        if (gotValue)
-        {
-            decimal number;
-
-            if (decimal.TryParse(value, out number))
-                result = number;
-            else
-                result = value;
-        }
-        else
-            result = null;
+        result = gotValue ? decimal.TryParse(value, out decimal number) ? number : value : null;
 
         _log.LogDebug("Looked up FIX field {Arg0} for comparison; field was {Arg1}, value={Arg2}",
             fixField, gotValue ? "found" : "not found", gotValue ? result : "N/A");
@@ -453,22 +447,20 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     /// </summary>
     void IResolvable<Strategy_t, T>.Resolve(Strategy_t strategy, ISimpleDictionary<T> sourceCollection)
     {
-        (_edits as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);
+        (Edits as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);
 
         if (!string.IsNullOrEmpty(Field) && !Field.StartsWith("FIX_"))
         {
-            if (sourceCollection.Contains(Field))
-                _fieldSource = sourceCollection[Field];
-            else
-                throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefFieldControlNotFound, Field, "Field");
+            _fieldSource = sourceCollection.Contains(Field)
+                ? sourceCollection[Field]
+                : throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefFieldControlNotFound, Field, "Field");
         }
 
         if (!string.IsNullOrEmpty(Field2) && !Field2.StartsWith("FIX_"))
         {
-            if (sourceCollection.Contains(Field2))
-                _field2Source = sourceCollection[Field2];
-            else
-                throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefFieldControlNotFound, Field2, "Field2");
+            _field2Source = sourceCollection.Contains(Field2)
+                ? sourceCollection[Field2]
+                : throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefFieldControlNotFound, Field2, "Field2");
         }
     }
 

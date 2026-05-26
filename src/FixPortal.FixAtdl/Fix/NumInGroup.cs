@@ -25,7 +25,9 @@ public readonly struct NumInGroup
     public NumInGroup(int value)
     {
         if (value < 0)
+        {
             throw ThrowHelper.New<ArgumentOutOfRangeException>(typeof(NumInGroup).FullName, ErrorMessages.NonNegativeIntRequired, value);
+        }
 
         _value = value;
     }
@@ -35,20 +37,14 @@ public readonly struct NumInGroup
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator NumInGroup(int value)
-    {
-        return new NumInGroup(value);
-    }
+    public static implicit operator NumInGroup(int value) => new NumInGroup(value);
 
     /// <summary>
     /// Performs an implicit conversion from <see cref="FixPortal.FixAtdl.Fix.NumInGroup"/> to <see cref="int"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator int(NumInGroup value)
-    {
-        return value._value;
-    }
+    public static implicit operator int(NumInGroup value) => value._value;
 
     /// <summary>
     /// Returns a <see cref="string"/> that represents this instance.

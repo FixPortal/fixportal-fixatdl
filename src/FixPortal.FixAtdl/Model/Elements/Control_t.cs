@@ -23,8 +23,6 @@ namespace FixPortal.FixAtdl.Model.Elements;
 /// </summary>
 public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, IParameterConvertible
 {
-    private StrategyPanel_t _owner = null!;
-    private readonly StateRuleCollection _stateRules;
 
     /// <summary>
     /// Initializes a new <see cref="Control_t"/> instance with the specified identifier as id.
@@ -33,7 +31,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     protected Control_t(string id)
     {
         Id = id;
-        _stateRules = new StateRuleCollection(this);
+        StateRules = new StateRuleCollection(this);
     }
 
     #region Control_t Attributes
@@ -80,12 +78,12 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// <summary>
     /// Indicates whether this control can be toggled (i.e., is a checkbox or radiobutton).
     /// </summary>
-    public bool IsToggleable { get { return this is BinaryControlBase; } }
+    public bool IsToggleable => this is BinaryControlBase;
 
     /// <summary>
     /// Gets the StrategyPanel that this control belongs to.
     /// </summary>
-    public StrategyPanel_t OwningStrategyPanel { get { return _owner; } }
+    public StrategyPanel_t OwningStrategyPanel { get; private set; } = null!;
 
     /// <summary>
     /// Sets the value of this control; either with a value of the appropriate type, or using the FIXatdl '{NULL}' 
@@ -113,7 +111,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// <summary>
     /// Gets the collection of <see cref="StateRule_t"/>s for this control.
     /// </summary>
-    public StateRuleCollection StateRules { get { return _stateRules; } }
+    public StateRuleCollection StateRules { get; }
 
     /// <summary>
     /// Adds support for the visitor pattern, enabling the appropriate Visit() method to be called on the visitor
@@ -161,8 +159,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
 
     StrategyPanel_t IParentable<StrategyPanel_t>.Parent
     {
-        get { return _owner; }
-        set { _owner = value; }
+        get => OwningStrategyPanel; set => OwningStrategyPanel = value;
     }
 
     #endregion
@@ -178,6 +175,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
+    /// <param name="targetParameter"></param>
     /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public abstract decimal? ToDecimal(IParameter targetParameter, IFormatProvider provider);
@@ -185,6 +183,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit signed integer using the specified culture-specific formatting information.
     /// </summary>
+    /// <param name="targetParameter"></param>
     /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable 32-bit signed integer equivalent to the value of this instance.</returns>
     public abstract int? ToInt32(IParameter targetParameter, IFormatProvider provider);
@@ -192,6 +191,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// <summary>
     /// Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified culture-specific formatting information.
     /// </summary>
+    /// <param name="targetParameter"></param>
     /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable 32-bit unsigned integer equivalent to the value of this instance.</returns>
     public abstract uint? ToUInt32(IParameter targetParameter, IFormatProvider provider);
@@ -205,13 +205,13 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// <summary>
     /// Converts the value of this instance to an equivalent string value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
     public abstract string ToString(IParameter targetParameter);
 
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
+    /// <param name="targetParameter"></param>
     /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public abstract DateTime? ToDateTime(IParameter targetParameter, IFormatProvider provider);
@@ -239,7 +239,9 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
         bool hasValue = !string.IsNullOrEmpty(value);
 
         if (hasValue && !int.TryParse(value, out result))
+        {
             throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidNumericValue, value);
+        }
 
         return hasValue;
     }
@@ -257,7 +259,9 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
         bool hasValue = !string.IsNullOrEmpty(value);
 
         if (hasValue && !uint.TryParse(value, out result))
+        {
             throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidNumericValue, value);
+        }
 
         return hasValue;
     }
@@ -275,7 +279,9 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
         bool hasValue = !string.IsNullOrEmpty(value);
 
         if (hasValue && !decimal.TryParse(value, out result))
+        {
             throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidNumericValue, value);
+        }
 
         return hasValue;
     }
@@ -292,7 +298,9 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
         bool hasValue = !string.IsNullOrEmpty(value);
 
         if (hasValue && value!.Length != 1)
+        {
             throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidCharValue, value);
+        }
 
         result = hasValue ? value![0] : char.MinValue;
 

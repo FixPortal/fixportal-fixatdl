@@ -38,10 +38,14 @@ public class StateRuleCollection : Collection<StateRule_t>
     public void EvaluateAll()
     {
         if (Items.Count > 0)
+        {
             _log.LogDebug("Evaluating all {Count} StateRule_t instances for control Id {ControlId}", Items.Count, _owner.Id);
+        }
 
         foreach (StateRule_t rule in Items)
+        {
             rule.Evaluate();
+        }
     }
 
     /// <summary>
@@ -51,7 +55,9 @@ public class StateRuleCollection : Collection<StateRule_t>
     public void ResolveAll(Strategy_t strategy)
     {
         foreach (StateRule_t rule in Items)
+        {
             (rule as IResolvable<Strategy_t, Control_t>).Resolve(strategy, strategy.Controls);
+        }
     }
 }
 

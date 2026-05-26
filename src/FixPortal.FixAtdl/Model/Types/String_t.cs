@@ -45,13 +45,19 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     protected override ValidationResult ValidateValue(string value, bool isRequired)
     {
         if (MaxLength != null && value != null && value.Length > MaxLength)
+        {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxLengthExceeded, value, MaxLength);
+        }
 
         if (MinLength != null && value != null && value.Length < MinLength)
+        {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinLengthExceeded, value, MinLength);
+        }
 
         if (isRequired && string.IsNullOrEmpty(value))
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }
@@ -132,7 +138,6 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
@@ -146,9 +151,13 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
         if (_value == null)
+        {
             return new EnumState(enumPairs.EnumIds);
+        }
         else
+        {
             return EnumState.FromWireValue(enumPairs, _value.ToString());
+        }
     }
 
     #endregion

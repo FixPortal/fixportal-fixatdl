@@ -33,7 +33,9 @@ public class Language_t : EnumTypeBase<IsoLanguageCode>
     protected override ValidationResult ValidateValue(IsoLanguageCode? value, bool isRequired)
     {
         if (isRequired && value == null)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }

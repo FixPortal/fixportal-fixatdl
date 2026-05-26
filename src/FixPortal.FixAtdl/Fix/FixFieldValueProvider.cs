@@ -23,37 +23,34 @@ public class FixFieldValueProvider
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private readonly ILogger _log = NullLogger.Instance;
-    private static readonly FixFieldValueProvider _emptyProvider = new(null, null);
-
     private readonly IInitialFixValueProvider? _initialValueProvider;
-    private readonly ParameterCollection? _parameters;
 
     /// <summary>
     /// Initializes a new <see cref="FixFieldValueProvider"/> instance using the supplied set of input 
     /// values and parameters.
     /// </summary>
-    /// <param name="fixValues">Input FIX fields to use.</param>
+    /// <param name="initialValueProvider"></param>
     /// <param name="parameters">Parameters to use.</param>
     public FixFieldValueProvider(IInitialFixValueProvider? initialValueProvider, ParameterCollection? parameters)
     {
         _initialValueProvider = initialValueProvider;
-        _parameters = parameters;
+        Parameters = parameters;
     }
 
     /// <summary>
     /// Gets a static instance of an empty provider.
     /// </summary>
-    public static FixFieldValueProvider Empty { get { return _emptyProvider; } }
+    public static FixFieldValueProvider Empty { get; } = new(null, null);
 
     /// <summary>
     /// Gets the parameters for this value provider.
     /// </summary>
-    public ParameterCollection? Parameters { get { return _parameters; } }
+    public ParameterCollection? Parameters { get; }
 
     /// <summary>
     /// Gets the FIX values collection for this value provider.
     /// </summary>
-    public FixTagValuesCollection FixValues { get { return _initialValueProvider!.InputFixValues!; } }
+    public FixTagValuesCollection FixValues => _initialValueProvider!.InputFixValues!;
 
     /// <summary>
     /// Attempts to get the value of the specified FIX field (in FIX_ format), returning the value as a string.
@@ -70,9 +67,9 @@ public class FixFieldValueProvider
 
         bool retrieved = TryGetValue(fixField, out result!);
 
-        if (retrieved && !string.IsNullOrEmpty(targetParameterName) && _parameters!.Contains(targetParameterName))
+        if (retrieved && !string.IsNullOrEmpty(targetParameterName) && Parameters!.Contains(targetParameterName))
         {
-            IParameter parameter = _parameters[targetParameterName];
+            IParameter parameter = Parameters[targetParameterName];
 
             if (parameter.HasEnumPairs)
             {
@@ -84,7 +81,9 @@ public class FixFieldValueProvider
                 retrieved = parameter.EnumPairs!.TryParseWireValue(wireValue, out result);
             }
             else if (parameter is Parameter_t<Percentage_t>)
+            {
                 ProcessPercentageValue((parameter as Parameter_t<Percentage_t>)!, ref result);
+            }
 
             _log.LogDebug("FIX enumerated value lookup for field {FixField} returning {Retrieved}; value = '{Value}'", fixField,
                 retrieved.ToString().ToLower(), retrieved ? result : "N/A");
@@ -127,12 +126,8 @@ public class FixFieldValueProvider
 
         if (adjustmentNeeded)
         {
-            decimal decimalValue;
 
-            if (decimal.TryParse(value, out decimalValue))
-                value = (decimalValue * 100).ToString("0.####");
-            else
-                value = string.Empty;
+            value = decimal.TryParse(value, out decimal decimalValue) ? (decimalValue * 100).ToString("0.####") : string.Empty;
         }
     }
 }

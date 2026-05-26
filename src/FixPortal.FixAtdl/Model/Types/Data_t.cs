@@ -48,13 +48,19 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     protected override ValidationResult ValidateValue(char[] value, bool isRequired)
     {
         if (MaxLength != null && value != null && value.Length > MaxLength)
+        {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxLengthExceeded, value, MaxLength);
+        }
 
         if (MinLength != null && value != null && value.Length < MinLength)
+        {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinLengthExceeded, value, MinLength);
+        }
 
         if (isRequired && value == null)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }
@@ -88,7 +94,7 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <returns>If input value is not null, returns value converted to T?; null otherwise.</returns>
     protected override char[] ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
     {
-        string? result = value != null ? value.ToString(hostParameter) : null;
+        string? result = value?.ToString(hostParameter);
 
         return result != null ? result.ToCharArray() : null!;
     }
@@ -130,7 +136,6 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
@@ -140,7 +145,6 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {

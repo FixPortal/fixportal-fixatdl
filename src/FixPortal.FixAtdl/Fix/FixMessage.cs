@@ -41,12 +41,16 @@ public class FixMessage : Dictionary<FixField, string>
     public FixMessage(string rawMessage)
     {
         if (string.IsNullOrEmpty(rawMessage))
+        {
             throw ThrowHelper.New<FixParseException>(this, ErrorMessages.UnableToParseFixMessageEmpty);
+        }
 
         string[] nameValuePairs = rawMessage.Split([SOH], StringSplitOptions.RemoveEmptyEntries);
 
         if (nameValuePairs.Length == 0)
+        {
             throw ThrowHelper.New<FixParseException>(this, ErrorMessages.UnableToParseFixMessageInvalidContent, rawMessage);
+        }
 
         char[] separator = [Separator];
 
@@ -60,7 +64,9 @@ public class FixMessage : Dictionary<FixField, string>
                 string[] parts = nameValuePair.Split(separator);
 
                 if (parts.Length != 2)
+                {
                     throw ThrowHelper.New<FixParseException>(this, ErrorMessages.UnableToParseFixMessageInvalidContent, nameValuePair);
+                }
 
                 tagText = parts[0];
                 valueText = parts[1];
@@ -80,10 +86,7 @@ public class FixMessage : Dictionary<FixField, string>
     /// Gets the complete set of fix fields for this message.
     /// </summary>
     /// <value>The fix fields.</value>
-    public ICollection<FixField> FixFields
-    {
-        get { return Keys; }
-    }
+    public ICollection<FixField> FixFields => Keys;
 
     /// <summary>
     /// Provides the string representation of this FixMessage.

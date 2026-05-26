@@ -57,9 +57,8 @@ public class Clock_t : InitializableControl<DateTime?>
     /// <returns>true if it was possible to set the value of this control using the supplied value; false otherwise.</returns>
     protected override bool LoadDefaultFromFixValue(string value)
     {
-        DateTime result;
 
-        bool parsed = FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out result);
+        bool parsed = FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result);
 
         _value = parsed ? (DateTime?)result : null;
 
@@ -72,15 +71,7 @@ public class Clock_t : InitializableControl<DateTime?>
     /// </summary>
     protected override void LoadDefaultFromInitValue()
     {
-        if (InitValue != null)
-        {
-            if (InitValueMode == 1)
-                _value = DateTime.Now > InitValue ? DateTime.Now : InitValue;
-            else
-                _value = InitValue;
-        }
-        else
-            _value = null;
+        _value = InitValue != null ? InitValueMode == 1 ? DateTime.Now > InitValue ? DateTime.Now : InitValue : InitValue : null;
     }
 
     #endregion
@@ -115,19 +106,18 @@ public class Clock_t : InitializableControl<DateTime?>
         {
             string? value = newValue as string;
 
-            if (value == Atdl.NullValue)
-                _value = null;
-            else
-                throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InitControlValueError,
+            _value = value == Atdl.NullValue
+                ? null
+                : throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InitControlValueError,
                     Id, string.Format("'{0}' is not a valid value for this control", value));
         }
-        else if (isDateTime || newValue == null)
-        {
-            _value = (DateTime?)newValue;
-        }
         else
-            throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
+        {
+            _value = isDateTime || newValue == null
+                ? (DateTime?)newValue
+                : throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
                 newValue.GetType().FullName, "System.String, System.DateTime");
+        }
     }
 
     /// <summary>
@@ -195,7 +185,6 @@ public class Clock_t : InitializableControl<DateTime?>
     /// Converts the value of this instance to an equivalent string value using the specified culture-specific formatting information.
     /// </summary>
     /// <param name="targetParameter">Target parameter for this conversion.</param>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A string value equivalent to the value of this instance in the format YYYYMMDD-HH:MM:SS.  May be null.</returns>
     public override string ToString(IParameter targetParameter)
     {
@@ -217,7 +206,7 @@ public class Clock_t : InitializableControl<DateTime?>
     /// Indicates whether the control has enumerated state (i.e., its state is held internally in an <see cref="EnumState"/> which
     /// requires special conversion, or if instead a regular value conversion is appropriate.
     /// </summary>
-    public override bool HasEnumeratedState { get { return false; } }
+    public override bool HasEnumeratedState => false;
 
     #endregion
 

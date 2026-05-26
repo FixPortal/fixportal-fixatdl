@@ -103,21 +103,20 @@ public class NumericControlBase : InitializableControl<decimal?>
         {
             string? value = newValue as string;
 
-            if (value == Atdl.NullValue)
-                _value = null;
-            else
-                throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InitControlValueError,
+            _value = value == Atdl.NullValue
+                ? null
+                : throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InitControlValueError,
                     Id, string.Format("'{0}' is not a valid value for this control", value));
         }
-        else if (isDecimal)
-        {
-            _value = (decimal?)newValue;
-        }
-        else if (newValue == null)
-            _value = null;
         else
-            throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
+        {
+            _value = isDecimal
+                ? (decimal?)newValue
+                : newValue == null
+            ? null
+            : throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
                 newValue.GetType().FullName, "System.String, System.Decimal");
+        }
 
         _log.LogDebug("Control value is now {Value}", _value != null ? _value.ToString() : "null");
     }
@@ -221,7 +220,7 @@ public class NumericControlBase : InitializableControl<decimal?>
     /// Indicates whether the control has enumerated state (i.e., its state is held internally in an <see cref="EnumState"/> which
     /// requires special conversion, or if instead a regular value conversion is appropriate).
     /// </summary>
-    public override bool HasEnumeratedState { get { return false; } }
+    public override bool HasEnumeratedState => false;
 
     #endregion
 }

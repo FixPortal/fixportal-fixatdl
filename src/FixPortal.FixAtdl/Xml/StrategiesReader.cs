@@ -70,7 +70,9 @@ public class StrategiesReader
         XElement? element = document.Element(AtdlNamespaces.core + "Strategies");
 
         if (element == null)
+        {
             throw ThrowHelper.New<FixAtdlException>(this, ErrorMessages.StrategiesLoadFailure);
+        }
 
         ElementFactory factory = new(SchemaDefinitions.Strategies_t, typeof(Strategy_t));
 

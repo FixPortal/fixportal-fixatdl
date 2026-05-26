@@ -75,9 +75,13 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     {
         // Binary controls should have a default state of off if no InitValue is specified.
         if (InitValue != null)
+        {
             SetValue(InitValue);
+        }
         else
+        {
             _value = false;
+        }
     }
 
     #endregion
@@ -109,18 +113,17 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
             {
                 EnumState state = value.ToEnumState(parameter.EnumPairs);
 
-                if (state[CheckedEnumRef])
-                    _value = true;
-                else if (state[UncheckedEnumRef])
-                    _value = false;
-                else
-                    _value = null;
+                _value = state[CheckedEnumRef] ? true : state[UncheckedEnumRef] ? false : null;
             }
             else
+            {
                 throw ThrowHelper.New<InconsistentStrategyException>(this, ErrorMessages.InconsistentEnumPairsListItemsError);
+            }
         }
         else
+        {
             _value = value.ToBoolean();
+        }
 
         _log.LogDebug("Binary control value is now {Value}", _value);
     }
@@ -145,25 +148,24 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
         {
             string? value = newValue as string;
 
-            if (value == Atdl.NullValue)
-                _value = null;
-            else if (value == CheckedEnumRef)
-                _value = true;
-            else if (value == UncheckedEnumRef)
-                _value = false;
-            else
-                throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InitControlValueError,
-                    Id, string.Format("'{0}' is not a valid value for this control", value));
+            _value = value == Atdl.NullValue
+                ? null
+                : value == CheckedEnumRef
+                    ? true
+                    : value == UncheckedEnumRef
+                        ? false
+                        : throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InitControlValueError,
+                            Id, string.Format("'{0}' is not a valid value for this control", value));
         }
-        else if (isBool)
-        {
-            _value = (bool?)newValue;
-        }
-        else if (newValue == null)
-            _value = null;
         else
-            throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
+        {
+            _value = isBool
+                ? (bool?)newValue
+                : newValue == null
+            ? null
+            : throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
                 newValue.GetType().FullName!, "System.String, System.Boolean");
+        }
 
         _log.LogDebug("Binary control value is now {Value}", _value != null ? _value.Value.ToString().ToLower() : "null");
     }
@@ -207,9 +209,8 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     {
         string? wireValue = _value != null ? ToString(targetParameter) : null;
 
-        int result = 0;
 
-        return TryConvertToInt(wireValue, out result) ? (int?)result : null;
+        return TryConvertToInt(wireValue, out int result) ? (int?)result : null;
     }
 
     /// <summary>
@@ -222,9 +223,8 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     {
         string? wireValue = _value != null ? ToString(targetParameter) : null;
 
-        uint result = 0;
 
-        return TryConvertToUint(wireValue, out result) ? (uint?)result : null;
+        return TryConvertToUint(wireValue, out uint result) ? (uint?)result : null;
     }
 
     /// <summary>
@@ -258,7 +258,9 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
             return value != Atdl.NullValue ? value : null!;
         }
         else
+        {
             return _value != null ? _value.Value.ToString().ToLower() : null!;
+        }
     }
 
     /// <summary>
@@ -276,7 +278,7 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     /// Indicates whether the control has enumerated state (i.e., its state is held internally in an <see cref="EnumState"/> which
     /// requires special conversion, or if instead a regular value conversion is appropriate).
     /// </summary>
-    public override bool HasEnumeratedState { get { return CheckedEnumRef != null && UncheckedEnumRef != null; } }
+    public override bool HasEnumeratedState => CheckedEnumRef != null && UncheckedEnumRef != null;
 
     #endregion
 }

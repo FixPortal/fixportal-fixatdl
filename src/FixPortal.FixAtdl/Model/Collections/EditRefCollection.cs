@@ -42,8 +42,7 @@ public class EditRefCollection<T> : KeyedCollection<string, EditRef_t<T>> where 
     /// <param name="item">The item.</param>
     public new void Add(EditRef_t<T> item)
     {
-        if (_evaluatingCollection != null)
-            _evaluatingCollection.Add(item);
+        _evaluatingCollection?.Add(item);
 
         base.Add(item);
     }

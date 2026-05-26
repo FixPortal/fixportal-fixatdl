@@ -16,15 +16,13 @@ namespace FixPortal.FixAtdl.Model.Elements;
 /// </summary>
 public class Strategies_t : IEnumerable<Strategy_t>
 {
-    private readonly StrategyCollection _strategies;
-    private readonly EditCollection _edits = [];
 
     /// <summary>
     /// Initializes a new <see cref="Strategies_t"/> instance.
     /// </summary>
     public Strategies_t()
     {
-        _strategies = new StrategyCollection(this);
+        Strategies = new StrategyCollection(this);
     }
 
     /// <summary>Indicates whether a new strategy can be chosen during a Cancel/Replace.</summary>
@@ -58,7 +56,7 @@ public class Strategies_t : IEnumerable<Strategy_t>
     /// <summary>
     /// Gets the number of <see cref="Strategy_t"/> instances in this collection.
     /// </summary>
-    public int Count { get { return _strategies.Count; } }
+    public int Count => Strategies.Count;
 
     /// <summary>
     /// Gets the strategy identified by the supplied name.
@@ -66,17 +64,17 @@ public class Strategies_t : IEnumerable<Strategy_t>
     /// <param name="name">Name of strategy.</param>
     /// <returns><see cref="Strategy_t"/> that has the specified name.</returns>
     /// <exception cref="KeyNotFoundException">Thrown if the specified name does not match a valid strategy.</exception>
-    public Strategy_t this[string name] { get { return _strategies[name]; } }
+    public Strategy_t this[string name] => Strategies[name];
 
     /// <summary>
     /// Provides access to the underlying collection of strategies - used primarily for deserialization purposes.
     /// </summary>
-    public StrategyCollection Strategies { get { return _strategies; } }
+    public StrategyCollection Strategies { get; }
 
     /// <summary>
     /// Gets the global <see cref="Edit_t">Edits</see> for this collection of strategies.
     /// </summary>
-    public EditCollection Edits { get { return _edits; } }
+    public EditCollection Edits { get; } = [];
 
     /// <summary>
     /// Resolves all interdependencies e.g. edits to edit refs, control values to edits, etc.  Called once
@@ -98,7 +96,7 @@ public class Strategies_t : IEnumerable<Strategy_t>
     /// <returns>An IEnumerator object that can be used to iterate through the collection.</returns>
     public IEnumerator<Strategy_t> GetEnumerator()
     {
-        return _strategies.GetEnumerator();
+        return Strategies.GetEnumerator();
     }
 
     /// <summary>
@@ -107,7 +105,7 @@ public class Strategies_t : IEnumerable<Strategy_t>
     /// <returns>An IEnumerator object that can be used to iterate through the collection.</returns>
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
     {
-        return _strategies.GetEnumerator();
+        return Strategies.GetEnumerator();
     }
 }
 

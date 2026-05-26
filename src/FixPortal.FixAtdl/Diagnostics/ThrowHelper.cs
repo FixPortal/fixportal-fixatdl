@@ -217,8 +217,7 @@ public static class ThrowHelper
 
         exception.Source = source?.ToString();
 
-        if (info != null)
-            info.PopulateExceptionData(exception.Data);
+        info?.PopulateExceptionData(exception.Data);
 
         return exception;
     }
@@ -238,8 +237,8 @@ public static class ThrowHelper
                     ConstructorInfo classConstructor = classType.GetConstructor([typeof(string), typeof(string)])!;
                     T exception = (T)classConstructor.Invoke(["Value", message]);
                     exception.Source = source?.ToString();
-                    if (info != null)
-                        info.PopulateExceptionData(exception.Data);
+                    info?.PopulateExceptionData(exception.Data);
+
                     return exception;
                 }
 
@@ -248,8 +247,8 @@ public static class ThrowHelper
                     ConstructorInfo classConstructor = classType.GetConstructor([typeof(string)])!;
                     T exception = (T)classConstructor.Invoke([message]);
                     exception.Source = source?.ToString();
-                    if (info != null)
-                        info.PopulateExceptionData(exception.Data);
+                    info?.PopulateExceptionData(exception.Data);
+
                     return exception;
                 }
         }
@@ -266,8 +265,7 @@ public static class ThrowHelper
 
         exception.Source = source?.ToString();
 
-        if (info != null)
-            info.PopulateExceptionData(exception.Data);
+        info?.PopulateExceptionData(exception.Data);
 
         return exception;
     }

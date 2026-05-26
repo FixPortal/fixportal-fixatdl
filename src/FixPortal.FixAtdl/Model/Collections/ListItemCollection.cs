@@ -21,7 +21,9 @@ public class ListItemCollection : KeyedCollection<string, ListItem_t>
     public void CopyFrom(List<ListItem_t> items)
     {
         foreach (ListItem_t item in items)
+        {
             Add(item);
+        }
     }
 
     public new void Add(ListItem_t item)
@@ -37,15 +39,9 @@ public class ListItemCollection : KeyedCollection<string, ListItem_t>
         }
     }
 
-    public string[] EnumIds
-    {
-        get { return [.. (from item in Items select item.EnumId)]; }
-    }
+    public string[] EnumIds => [.. from item in Items select item.EnumId];
 
-    public bool HasItems
-    {
-        get { return Count > 0; }
-    }
+    public bool HasItems => Count > 0;
 
     protected override string GetKeyForItem(ListItem_t item)
     {

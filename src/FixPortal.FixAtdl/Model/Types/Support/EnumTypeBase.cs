@@ -42,7 +42,6 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible wh
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
@@ -52,7 +51,6 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible wh
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
@@ -70,11 +68,12 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible wh
     {
         EnumState state = new(enumPairs.EnumIds);
 
-        string? enumId;
         string wireValue = ToString(null)!;
 
-        if (enumPairs.TryParseWireValue(wireValue, out enumId))
+        if (enumPairs.TryParseWireValue(wireValue, out string? enumId))
+        {
             state[enumId!] = true;
+        }
 
         return state;
     }

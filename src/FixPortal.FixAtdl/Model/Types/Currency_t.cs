@@ -33,7 +33,9 @@ public class Currency_t : EnumTypeBase<IsoCurrencyCode>
     protected override ValidationResult ValidateValue(IsoCurrencyCode? value, bool isRequired)
     {
         if (isRequired && value == null)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }

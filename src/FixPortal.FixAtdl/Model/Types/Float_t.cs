@@ -62,13 +62,19 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
         if (value != null)
         {
             if (MaxValue != null && (decimal)value > MaxValue)
+            {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, MaxValue);
+            }
 
             if (MinValue != null && (decimal)value < MinValue)
+            {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+            }
         }
         else if (isRequired)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }
@@ -93,12 +99,18 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     protected override string ConvertToWireValueFormat(decimal? value)
     {
         if (value == null)
+        {
             return null!;
+        }
 
         if (Precision == null)
+        {
             return ((decimal)value).ToString(CultureInfo.InvariantCulture);
+        }
         else
+        {
             return Round(value, Precision.Value)!.Value.ToString(CultureInfo.InvariantCulture);
+        }
     }
 
     /// <summary>
@@ -126,9 +138,13 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
         decimal? value = ConstValue != null ? ConstValue : _value;
 
         if (value != null && applyWireValueFormat && Precision != null)
+        {
             return Round(value, (int)Precision)!;
+        }
         else
+        {
             return value!;
+        }
     }
 
     /// <summary>
@@ -150,7 +166,7 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <returns>If the supplied value is non-null, the rounded value is returned; otherwise returns null.</returns>
     protected decimal? Round(decimal? value, int precision)
     {
-        return value != null ? (decimal?)(Math.Round((decimal)value, precision, MidpointRounding.AwayFromZero)) : null;
+        return value != null ? (decimal?)Math.Round((decimal)value, precision, MidpointRounding.AwayFromZero) : null;
     }
 
     #region IControlConvertible Members
@@ -179,7 +195,6 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public virtual decimal? ToDecimal()
     {
@@ -189,7 +204,6 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {

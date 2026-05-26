@@ -64,7 +64,9 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     protected override ValidationResult ValidateValue(bool? value, bool isRequired)
     {
         if (isRequired && value == null)
+        {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
+        }
 
         return ValidationResult.ValidResult;
     }
@@ -80,14 +82,11 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
         string trueValue = (TrueWireValue != null) ? TrueWireValue : DefaultTrueValue;
         string falseValue = (FalseWireValue != null) ? FalseWireValue : DefaultFalseValue;
 
-        bool? result = null;
-
-        if (value == trueValue)
-            result = true;
-        else if (value == falseValue)
-            result = false;
-        else
-            throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.InvalidBooleanValue, value, trueValue, falseValue);
+        bool? result = value == trueValue
+            ? true
+            : value == falseValue
+            ? false
+            : throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.InvalidBooleanValue, value, trueValue, falseValue);
 
         return result;
     }
@@ -100,12 +99,16 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     protected override string ConvertToWireValueFormat(bool? value)
     {
         if (value == null)
+        {
             return null!;
+        }
 
         bool actualValue = (bool)value;
 
-        if ((actualValue && TrueWireValue == Atdl.NullValue) || (!actualValue && FalseWireValue == Atdl.NullValue))
+        if (actualValue && TrueWireValue == Atdl.NullValue || !actualValue && FalseWireValue == Atdl.NullValue)
+        {
             return null!;
+        }
 
         return actualValue ? (TrueWireValue ?? DefaultTrueValue) : (FalseWireValue ?? DefaultFalseValue);
     }
@@ -158,7 +161,6 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
@@ -168,7 +170,6 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <summary>
     /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
     /// </summary>
-    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
