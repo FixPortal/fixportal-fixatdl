@@ -50,8 +50,6 @@ public class FixMessage : Dictionary<FixField, string>
             throw ThrowHelper.New<FixParseException>(this, ErrorMessages.UnableToParseFixMessageInvalidContent, rawMessage);
         }
 
-        char[] separator = [Separator];
-
         string tagText = string.Empty;
         string valueText = string.Empty;
 
@@ -59,19 +57,19 @@ public class FixMessage : Dictionary<FixField, string>
         {
             foreach (string nameValuePair in nameValuePairs)
             {
-                string[] parts = nameValuePair.Split(separator);
+                int separatorIndex = nameValuePair.IndexOf(Separator);
 
-                if (parts.Length != 2)
+                if (separatorIndex <= 0 || separatorIndex == nameValuePair.Length - 1)
                 {
                     throw ThrowHelper.New<FixParseException>(this, ErrorMessages.UnableToParseFixMessageInvalidContent, nameValuePair);
                 }
 
-                tagText = parts[0];
-                valueText = parts[1];
+                tagText = nameValuePair[..separatorIndex];
+                valueText = nameValuePair[(separatorIndex + 1)..];
 
                 int tag = Convert.ToInt32(tagText, CultureInfo.InvariantCulture);
 
-                Add((FixField)tag, parts[1]);
+                Add((FixField)tag, valueText);
             }
         }
         catch (FormatException fe)

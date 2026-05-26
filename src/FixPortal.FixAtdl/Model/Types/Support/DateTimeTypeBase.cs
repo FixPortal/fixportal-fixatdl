@@ -94,7 +94,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     {
         string format = GetDateTimeFormatStrings()[0];
 
-        return _value != null ? ((DateTime)_value).ToString(format, CultureInfo.InvariantCulture) : null!;
+        return value != null ? ((DateTime)value).ToString(format, CultureInfo.InvariantCulture) : null!;
     }
 
     /// <summary>
@@ -132,7 +132,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     {
         DateTime? value = ConstValue ?? _value;
 
-        return value != null ? ((DateTime)_value!).ToString(GetDateTimeFormatStrings()[0], CultureInfo.InvariantCulture) : null;
+        return value != null ? ((DateTime)value).ToString(GetDateTimeFormatStrings()[0], CultureInfo.InvariantCulture) : null;
     }
 
     /// <summary>

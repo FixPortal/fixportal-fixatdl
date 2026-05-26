@@ -435,7 +435,9 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
         // If the field value can be converted into a number, most likely it should be treated as one
         // for comparison purposes
-        result = fieldValue is string value ? decimal.TryParse(value, out decimal number) ? number : value : fieldValue;
+        result = fieldValue is string value
+            ? decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal number) ? number : value
+            : fieldValue;
 
         return result;
     }
@@ -482,7 +484,9 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
         // If the FIX value can be converted into a number, most likely it should be treated as one
         // for comparison purposes
-        result = gotValue ? decimal.TryParse(value, out decimal number) ? number : value : null;
+        result = gotValue
+            ? decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal number) ? number : value
+            : null;
 
         if (_log.IsEnabled(LogLevel.Debug))
         {

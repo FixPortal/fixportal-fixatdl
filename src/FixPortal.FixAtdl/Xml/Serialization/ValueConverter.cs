@@ -58,13 +58,34 @@ public class ValueConverter
                 }
 
             case "System.Boolean":
-                return bool.Parse(value);
+                try
+                {
+                    return bool.Parse(value);
+                }
+                catch (FormatException ex)
+                {
+                    throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError1, value, targetType.Name);
+                }
 
             case "System.Int32":
-                return Convert.ToInt32(value, CultureInfo.InvariantCulture);
+                try
+                {
+                    return Convert.ToInt32(value, CultureInfo.InvariantCulture);
+                }
+                catch (Exception ex) when (ex is FormatException or OverflowException)
+                {
+                    throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError1, value, targetType.Name);
+                }
 
             case "System.Decimal":
-                return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+                try
+                {
+                    return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+                }
+                catch (Exception ex) when (ex is FormatException or OverflowException)
+                {
+                    throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError1, value, targetType.Name);
+                }
 
             case "System.DateTime":
                 {
@@ -78,7 +99,14 @@ public class ValueConverter
                 }
 
             case "FixPortal.FixAtdl.Fix.FixTag":
-                return new FixTag(Convert.ToInt32(value, CultureInfo.InvariantCulture));
+                try
+                {
+                    return new FixTag(Convert.ToInt32(value, CultureInfo.InvariantCulture));
+                }
+                catch (Exception ex) when (ex is FormatException or OverflowException)
+                {
+                    throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError1, value, targetType.Name);
+                }
 
             default:
                 if (targetType.FullName!.StartsWith("FixPortal.FixAtdl.Model.Controls.InitValue", StringComparison.Ordinal))
