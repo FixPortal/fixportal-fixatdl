@@ -319,15 +319,6 @@ dotnet_diagnostic.CA1707.severity = none
 # silences CA1707 for tests; FixAtdl needs it silenced globally.
 dotnet_diagnostic.CA1707.severity = none
 
-# ---- Security (canonical baseline does not silence these) ----
-# Inherited from Atdl4net — to be reviewed once the public API surface is
-# locked down. Re-enable once each call site has been audited.
-dotnet_diagnostic.CA5394.severity = none
-dotnet_diagnostic.CA5401.severity = none
-dotnet_diagnostic.CA2326.severity = none
-dotnet_diagnostic.CA2327.severity = none
-dotnet_diagnostic.S6781.severity = none
-
 # ---- IDisposable safety (canonical baseline does not silence these) ----
 # Re-enabled per project as the disposal contract is reviewed; legacy code
 # implements IDisposable in the VS2010-era pattern and a sweep is queued.
