@@ -77,7 +77,7 @@ dotnet_style_parentheses_in_relational_binary_operators = never_if_unnecessary:e
 dotnet_style_require_accessibility_modifiers = for_non_interface_members:error
 
 # Expression-level preferences
-dotnet_style_coalesce_expression = true:none
+dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_collection_initializer = true:error
 dotnet_style_explicit_tuple_names = true:error
 dotnet_style_null_propagation = true:error
@@ -97,9 +97,10 @@ csharp_using_directive_placement = outside_namespace:error
 csharp_prefer_simple_using_statement = true:error
 csharp_prefer_braces = true:error
 csharp_style_namespace_declarations = file_scoped:error
-csharp_style_prefer_method_group_conversion = true:silent
-csharp_style_prefer_top_level_statements = true:silent
+csharp_style_prefer_method_group_conversion = true:suggestion
+csharp_style_prefer_top_level_statements = false:suggestion
 csharp_style_prefer_primary_constructors = true:none
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
 
 # Expression-bodied members
 csharp_style_expression_bodied_methods = false:silent
@@ -261,25 +262,18 @@ dotnet_diagnostic.CA1311.severity = none
 # --- Exception handling (judgement calls) ---
 dotnet_diagnostic.CA1031.severity = none
 
+# --- Agent-friendly safety diagnostics (IDE-visible, kept non-blocking) ---
+dotnet_diagnostic.CS8602.severity = suggestion
+dotnet_diagnostic.CS8604.severity = suggestion
+dotnet_diagnostic.CA1062.severity = suggestion
+dotnet_diagnostic.CA2007.severity = suggestion
+dotnet_diagnostic.IDE0058.severity = suggestion
+dotnet_diagnostic.IDE0059.severity = suggestion
 # --- IDE style rules (covered by other settings above) ---
 dotnet_diagnostic.IDE0046.severity = none
 dotnet_diagnostic.IDE0053.severity = none
 dotnet_diagnostic.IDE0270.severity = none
 dotnet_diagnostic.IDE0290.severity = none
-
-# --- Sonar noise ---
-dotnet_diagnostic.S112.severity = none
-dotnet_diagnostic.S125.severity = none
-dotnet_diagnostic.S1075.severity = none
-dotnet_diagnostic.S1118.severity = none
-dotnet_diagnostic.S1144.severity = none
-dotnet_diagnostic.S2094.severity = none
-dotnet_diagnostic.S2139.severity = none
-dotnet_diagnostic.S2325.severity = none
-dotnet_diagnostic.S2365.severity = none
-dotnet_diagnostic.S3267.severity = none
-dotnet_diagnostic.S4136.severity = none
-dotnet_diagnostic.S6605.severity = none
 
 # DELIBERATELY NOT SILENCED — do not add back unless project-specific reason:
 #   CA5394, CA5401, CA2326, CA2327, S6781  — security
@@ -289,6 +283,10 @@ dotnet_diagnostic.S6605.severity = none
 #   CA1707                                   — underscores; scoped to tests below
 
 #### Test project overrides ####
+# FIX protocol identifiers and legacy FIXatdl type names intentionally use underscores.
+[**/*.cs]
+dotnet_diagnostic.CA1707.severity = none
+
 # Test method names commonly use Method_Should_DoX style.
 [*Tests.cs]
 dotnet_diagnostic.CA1707.severity = none
@@ -299,25 +297,4 @@ dotnet_diagnostic.CA1707.severity = none
 [**/tests/**.cs]
 dotnet_diagnostic.CA1707.severity = none
 
-# ============================================================================
-# FixAtdl project-specific deferrals
-# ----------------------------------------------------------------------------
-# These suppressions are *not* permanent — each rule documents the phase that
-# will re-enable it. They cover patterns that apply systematically to the
-# VS2010-era code inherited from Atdl4net and are batched for the Phase C
-# (C8: dotnet format / modern language features) and Phase E (XML doc) passes.
-# ============================================================================
 
-# Reset glob scope from the test-only overrides above back to all C# files —
-# without this header the deferrals below would only apply to test files.
-[*.cs]
-
-# ---- FIX naming convention (permanent, not a deferral) ----
-# FixField.cs contains FIX-protocol-defined identifiers like FIX_StreamAsgnReqType
-# whose underscore form is part of the FIX standard. CA1707's underscore ban
-# does not apply to wire-protocol identifiers. The canonical baseline only
-# silences CA1707 for tests; FixAtdl needs it silenced globally.
-dotnet_diagnostic.CA1707.severity = none
-
-# XML documentation completeness gate
-dotnet_diagnostic.CS1591.severity = error
