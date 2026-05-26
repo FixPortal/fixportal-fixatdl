@@ -35,7 +35,7 @@ namespace FixPortal.FixAtdl.Model.Types.Support;
 public abstract class AtdlReferenceType<T> : IParameterType where T : class
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
     private static readonly CompositeFormat _attemptToSetConstValueParameterFormat = CompositeFormat.Parse(ErrorMessages.AttemptToSetConstValueParameter);
 
     /// <summary>
@@ -178,7 +178,10 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
 
         string wireValue = ConvertToWireValueFormat(value!);
 
-        _log.LogDebug("Wire value for parameter {Arg0} = '{Arg1}'", hostParameter.Name, wireValue);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Wire value for parameter {Arg0} = '{Arg1}'", hostParameter.Name, wireValue);
+        }
 
         return wireValue;
     }

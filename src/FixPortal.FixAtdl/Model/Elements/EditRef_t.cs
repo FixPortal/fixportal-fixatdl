@@ -27,7 +27,7 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
 {
     // Use FixPortal.FixAtdl.Validation namespace rather than FixPortal.FixAtdl.Model.Elements for debugging purposes
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     private Edit_t<T> _referencedEdit = null!;
 
@@ -118,7 +118,10 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
         {
             _referencedEdit = strategy.Edits.Clone<T>(Id);
 
-            _log.LogDebug("EditRef Id {Arg0} linked to new Edit_t resolved from Strategy '{Arg1}'", Id, strategy.Name);
+            if (_log.IsEnabled(LogLevel.Debug))
+            {
+                _log.LogDebug("EditRef Id {Arg0} linked to new Edit_t resolved from Strategy '{Arg1}'", Id, strategy.Name);
+            }
         }
         else
         {
@@ -128,7 +131,10 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
             {
                 _referencedEdit = strategies.Edits.Clone<T>(Id);
 
-                _log.LogDebug("EditRef Id {Arg0} linked to new Edit_t resolved resolved from Strategies level", Id);
+                if (_log.IsEnabled(LogLevel.Debug))
+                {
+                    _log.LogDebug("EditRef Id {Arg0} linked to new Edit_t resolved resolved from Strategies level", Id);
+                }
             }
             else
             {
@@ -141,4 +147,3 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
 
     #endregion IBinIResolvabledable<Strategy_t> Members
 }
-

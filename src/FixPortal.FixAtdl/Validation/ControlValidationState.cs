@@ -22,7 +22,7 @@ namespace FixPortal.FixAtdl.Validation;
 public class ControlValidationState
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly ILogger _log = NullLogger.Instance;
+    private readonly NullLogger _log = NullLogger.Instance;
     private ValidationResult _parameterValidationResult = null!;
     private readonly string _controlId;
     private readonly List<StrategyEdit_t> _strategyEdits = [];
@@ -93,7 +93,10 @@ public class ControlValidationState
     /// <remarks>See <see cref="CurrentState"/> for an explanation of why we don't cache the state locally within the class.</remarks>
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
-        _log.LogDebug("Evaluating ValidationState for control {ControlId}, CurrentState = {CurrentState}", _controlId, CurrentState.ToString().ToLower());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Evaluating ValidationState for control {ControlId}, CurrentState = {CurrentState}", _controlId, CurrentState);
+        }
 
         bool state = ControlValidationResult == null || ControlValidationResult.IsValid;
 
@@ -108,7 +111,10 @@ public class ControlValidationState
             state &= strategyEdit.CurrentState;
         }
 
-        _log.LogDebug("Evaluated ValidationState for control {ControlId}, CurrentState = {CurrentState}", _controlId, state.ToString().ToLower());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Evaluated ValidationState for control {ControlId}, CurrentState = {CurrentState}", _controlId, state);
+        }
     }
 
     /// <summary>
@@ -155,10 +161,12 @@ public class ControlValidationState
                 }
             }
 
-            _log.LogDebug("ValidationState for control {ControlId} = '{ValidationState}'", _controlId, sb.ToString());
+            if (_log.IsEnabled(LogLevel.Debug))
+            {
+                _log.LogDebug("ValidationState for control {ControlId} = '{ValidationState}'", _controlId, sb);
+            }
 
             return sb.ToString();
         }
     }
 }
-

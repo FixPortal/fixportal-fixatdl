@@ -29,7 +29,7 @@ namespace FixPortal.FixAtdl.Model.Elements;
 public class Parameter_t<T> : IParameter where T : IParameterType, new()
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// The underlying value of this parameter.
@@ -42,7 +42,10 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     /// <param name="name">Name of this parameter.  See <see cref="Parameter{T}.Name"/> for constraints on parameter names.</param>
     public Parameter_t(string name)
     {
-        _log.LogDebug("New Parameter_t<{Arg0}> created, Name='{Arg1}'.", typeof(T).Name, name);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("New Parameter_t<{Arg0}> created, Name='{Arg1}'.", typeof(T).Name, name);
+        }
 
         Name = name;
         Type = typeof(T).Name;
@@ -67,7 +70,10 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     /// </summary>
     public void Reset()
     {
-        _log.LogDebug("Parameter_t<{Arg0}> {Arg1} reset.", typeof(T).Name, Name);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Parameter_t<{Arg0}> {Arg1} reset.", typeof(T).Name, Name);
+        }
 
         _value.Reset();
     }
@@ -207,4 +213,3 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
 
     #endregion
 }
-

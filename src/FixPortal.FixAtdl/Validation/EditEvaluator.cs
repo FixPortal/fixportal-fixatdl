@@ -22,7 +22,7 @@ namespace FixPortal.FixAtdl.Validation;
 public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : class, IValueProvider
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly ILogger _log = NullLogger.Instance;
+    private readonly NullLogger _log = NullLogger.Instance;
 
     public HashSet<string> Sources
     {
@@ -95,7 +95,10 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
     /// <param name="additionalValues">Any additional FIX field values that may be required in the Edit evaluation.</param>
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
-        _log.LogDebug("EditEvaluator evaluating state of Edit_t/EditRef_t; current state is {CurrentState}", CurrentState.ToString().ToLower());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("EditEvaluator evaluating state of Edit_t/EditRef_t; current state is {CurrentState}", CurrentState);
+        }
 
         if (Edit != null)
         {
@@ -110,7 +113,10 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.NeitherEditNorEditRefSetOnObject, GetType().Name);
         }
 
-        _log.LogDebug("EditEvaluator evaluated to state {CurrentState}", CurrentState.ToString().ToLower());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("EditEvaluator evaluated to state {CurrentState}", CurrentState);
+        }
     }
 
     /// <summary>
@@ -118,7 +124,10 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
     /// </summary>
     public void Evaluate()
     {
-        _log.LogDebug("EditEvaluator evaluating state of Edit_t/EditRef_t; current state is {CurrentState}", CurrentState.ToString().ToLower());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("EditEvaluator evaluating state of Edit_t/EditRef_t; current state is {CurrentState}", CurrentState);
+        }
 
         if (Edit != null)
         {
@@ -133,7 +142,10 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.NeitherEditNorEditRefSetOnObject, GetType().Name);
         }
 
-        _log.LogDebug("EditEvaluator evaluated to state {CurrentState}", CurrentState.ToString().ToLower());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("EditEvaluator evaluated to state {CurrentState}", CurrentState);
+        }
     }
 
     #region IResolvable<Strategy_t> Members
@@ -156,5 +168,3 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
 
     #endregion IResolvable<Strategy_t> Members
 }
-
-
