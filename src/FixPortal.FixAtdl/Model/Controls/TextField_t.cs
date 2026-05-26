@@ -18,7 +18,7 @@ namespace FixPortal.FixAtdl.Model.Controls;
 public class TextField_t : TextControlBase
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// Initializes a new instance of <see cref="TextField_t"/> using the supplied ID.
@@ -27,7 +27,9 @@ public class TextField_t : TextControlBase
     public TextField_t(string id)
         : base(id)
     {
-        _log.LogDebug("New TextField_t created as control {Arg0}", id);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("New TextField_t created as control {Arg0}", id);
+        }
     }
 }
-

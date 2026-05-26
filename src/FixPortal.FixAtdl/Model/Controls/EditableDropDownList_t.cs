@@ -18,7 +18,7 @@ namespace FixPortal.FixAtdl.Model.Controls;
 public class EditableDropDownList_t : ListControlBase
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// Initializes a new instance of <see cref="EditableDropDownList_t"/> using the supplied ID.
@@ -27,7 +27,10 @@ public class EditableDropDownList_t : ListControlBase
     public EditableDropDownList_t(string id)
         : base(id)
     {
-        _log.LogDebug("New EditableDropDownList_t created as control {Arg0}", id);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("New EditableDropDownList_t created as control {Arg0}", id);
+        }
     }
 
     /// <summary>
@@ -36,4 +39,3 @@ public class EditableDropDownList_t : ListControlBase
     /// </summary>
     protected override bool IsNonEnumValueAllowed => true;
 }
-

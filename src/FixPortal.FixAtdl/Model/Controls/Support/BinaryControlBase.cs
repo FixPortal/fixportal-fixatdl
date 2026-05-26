@@ -24,7 +24,7 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 public abstract class BinaryControlBase : InitializableControl<bool?>
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// The state value for this control.
@@ -126,7 +126,10 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
             _value = value.ToBoolean();
         }
 
-        _log.LogDebug("Binary control value is now {Value}", _value);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Binary control value is now {Value}", _value);
+        }
     }
 
     /// <summary>
@@ -140,7 +143,10 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
         bool isString = newValue is string;
         bool isBool = newValue is bool;
 
-        _log.LogDebug("Setting binary control {Arg0} using value {Arg1} (of type {Arg2})", Id, newValue, newValue != null ? newValue.GetType().Name : "N/A");
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Setting binary control {Arg0} using value {Arg1} (of type {Arg2})", Id, newValue, newValue?.GetType().Name ?? "N/A");
+        }
 
         // Strictly this is a bit of a hack as the right thing to do when implementing CheckBoxes and RadioButtons is
         // to enforce the use of boolean inputs.  However as atdl4j supports setting of these controls' state via
@@ -168,7 +174,10 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
                 newValue.GetType().FullName!, "System.String, System.Boolean");
         }
 
-        _log.LogDebug("Binary control value is now {Value}", _value != null ? _value.Value.ToString().ToLowerInvariant() : "null");
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Binary control value is now {Value}", _value);
+        }
     }
 
     /// <summary>

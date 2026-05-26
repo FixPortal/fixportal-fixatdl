@@ -29,7 +29,7 @@ namespace FixPortal.FixAtdl.Model.Collections;
 public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Strategy_t, T>
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly ILogger _log = NullLogger.Instance;
+    private readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// Logic operator for this collection of Edits.
@@ -59,7 +59,10 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
             Sources.Add(source);
         }
 
-        _log.LogDebug("Edit_t {Edit} added to EditEvaluatingCollection", item.ToString());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Edit_t {Edit} added to EditEvaluatingCollection", item);
+        }
     }
 
     /// <summary>
@@ -69,7 +72,10 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
     /// <param name="additionalValues">Any additional FIX field values that may be required in the Edit evaluation.</param>
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
-        _log.LogDebug("Evaluating EditEvaluatingCollection with {Count} elements; current state = {CurrentState}", Count, CurrentState.ToString().ToLower());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Evaluating EditEvaluatingCollection with {Count} elements; current state = {CurrentState}", Count, CurrentState);
+        }
 
         if (LogicOperator == null)
         {
@@ -125,7 +131,10 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
                     break;
             }
 
-            _log.LogDebug("EditEvaluatingCollection state is now {NewState}", newState.ToString().ToLower());
+            if (_log.IsEnabled(LogLevel.Debug))
+            {
+                _log.LogDebug("EditEvaluatingCollection state is now {NewState}", newState);
+            }
         }
 
         CurrentState = newState;
@@ -144,4 +153,3 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
 
     #endregion IResolvable<Strategy_t> Members
 }
-

@@ -19,7 +19,7 @@ namespace FixPortal.FixAtdl.Model.Controls;
 public class DoubleSpinner_t : NumericControlBase
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// Initializes a new instance of <see cref="DoubleSpinner_t"/> using the supplied ID.
@@ -28,7 +28,10 @@ public class DoubleSpinner_t : NumericControlBase
     public DoubleSpinner_t(string id)
         : base(id)
     {
-        _log.LogDebug("New DoubleSpinner_t created as control {Arg0}", id);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("New DoubleSpinner_t created as control {Arg0}", id);
+        }
     }
 
     /// <summary>Limits the granularity of the inner spinner of a double spinner control. Useful in spinner objects to enforce
@@ -47,4 +50,3 @@ public class DoubleSpinner_t : NumericControlBase
     /// when xsi:type is DoubleSpinner_t only.</summary>
     public IncrementPolicy_t? OuterIncrementPolicy { get; set; }
 }
-

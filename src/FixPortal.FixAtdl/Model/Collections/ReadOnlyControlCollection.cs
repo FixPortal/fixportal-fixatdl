@@ -28,7 +28,7 @@ namespace FixPortal.FixAtdl.Model.Collections;
 public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Control_t>, ISimpleDictionary<Control_t>
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly ILogger _log = NullLogger.Instance;
+    private readonly NullLogger _log = NullLogger.Instance;
 
     private Strategy_t _owner;
     private readonly Dictionary<string, Control_t> _controls = [];
@@ -192,7 +192,10 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             // We only want to update the control value if the parameter has a value
             if (parameterValue != null)
             {
-                _log.LogDebug("Updating control {ControlId} value from parameter {ParameterName}", control.Id, parameter.Name);
+                if (_log.IsEnabled(LogLevel.Debug))
+                {
+                    _log.LogDebug("Updating control {ControlId} value from parameter {ParameterName}", control.Id, parameter.Name);
+                }
 
                 control.SetValueFromParameter(parameter);
 
@@ -335,4 +338,3 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
 
     #endregion IEnumerable<Control_t> Members
 }
-

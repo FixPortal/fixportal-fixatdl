@@ -19,7 +19,7 @@ namespace FixPortal.FixAtdl.Model.Controls;
 public class SingleSpinner_t : NumericControlBase
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
     /// Initializes a new instance of <see cref="SingleSpinner_t"/> using the supplied ID.
@@ -28,7 +28,10 @@ public class SingleSpinner_t : NumericControlBase
     public SingleSpinner_t(string id)
         : base(id)
     {
-        _log.LogDebug("New SingleSpinner_t created as control {Arg0}", id);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("New SingleSpinner_t created as control {Arg0}", id);
+        }
     }
 
     /// <summary>Limits the granularity of a spinner control. Useful in spinner objects to enforce odd-lot and sub-penny
@@ -38,4 +41,3 @@ public class SingleSpinner_t : NumericControlBase
     /// <summary>For single spinner control, defines how to determine the increment. Applicable when xsi:type is SingleSpinner_t.</summary>
     public IncrementPolicy_t? IncrementPolicy { get; set; }
 }
-

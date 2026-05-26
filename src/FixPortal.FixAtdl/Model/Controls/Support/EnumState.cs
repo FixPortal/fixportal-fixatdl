@@ -31,7 +31,7 @@ public class EnumState : IComparable
     private const string ExceptionContext = "EnumState";
 
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
+    private static readonly NullLogger _log = NullLogger.Instance;
 
     private readonly BitArray _enumStates;
     private readonly string[] _enumIds;
@@ -92,7 +92,10 @@ public class EnumState : IComparable
             throw ThrowHelper.New<ArgumentException>(this, "Unable to update this EnumState from supplied EnumState as the number of EnumIDs was not consistent");
         }
 
-        _log.LogDebug("Updating EnumState from {Arg0} to {Arg1}", ToString(), source.ToString());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Updating EnumState from {Arg0} to {Arg1}", this, source);
+        }
 
         int enumCount = _enumIds.Length;
 
@@ -192,7 +195,10 @@ public class EnumState : IComparable
                 {
                     _enumStates[n] = value;
 
-                    _log.LogDebug("EnumState state now {State}", ToString());
+                    if (_log.IsEnabled(LogLevel.Debug))
+                    {
+                        _log.LogDebug("EnumState state now {State}", this);
+                    }
 
                     return;
                 }
@@ -298,7 +304,10 @@ public class EnumState : IComparable
     /// values whereas this method parses the string for EnumIDs.</remarks>
     public void LoadInitValue(string initValues, bool allowNonEnumValue)
     {
-        _log.LogDebug("Loading EnumState with InitValue '{InitValue}'", initValues);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Loading EnumState with InitValue '{InitValue}'", initValues);
+        }
 
         string[] enumIds = initValues.Split([';', ' ', ',']);
 
@@ -325,7 +334,10 @@ public class EnumState : IComparable
             }
         }
 
-        _log.LogDebug("EnumState is now {State}", ToString());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("EnumState is now {State}", this);
+        }
     }
 
     /// <summary>
@@ -336,7 +348,10 @@ public class EnumState : IComparable
     /// then null is returned.</returns>
     public string ToWireValue(EnumPairCollection enumPairs)
     {
-        _log.LogDebug("Converting EnumState to WireValue; current state is {State}", ToString());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Converting EnumState to WireValue; current state is {State}", this);
+        }
 
         if (enumPairs.Count != _enumStates.Count)
         {
@@ -377,7 +392,10 @@ public class EnumState : IComparable
             }
         }
 
-        _log.LogDebug("EnumState as WireValue is {WireValue}", sb.ToString());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("EnumState as WireValue is {WireValue}", sb);
+        }
 
         return hasAtLeastOneValue ? sb.ToString() : null!;
     }
@@ -390,7 +408,10 @@ public class EnumState : IComparable
     /// <returns></returns>
     public static EnumState FromWireValue(EnumPairCollection enumPairs, string multiValueString)
     {
-        _log.LogDebug("Converting WireValue '{WireValue}' to EnumState", multiValueString);
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Converting WireValue '{WireValue}' to EnumState", multiValueString);
+        }
 
         string[] inputValues = multiValueString.Split([';', ' ', ',']);
 
@@ -407,7 +428,10 @@ public class EnumState : IComparable
             result[enumId!] = true;
         }
 
-        _log.LogDebug("Converting EnumState from WireValue; state is {State}", result.ToString());
+        if (_log.IsEnabled(LogLevel.Debug))
+        {
+            _log.LogDebug("Converting EnumState from WireValue; state is {State}", result);
+        }
 
         return result;
     }
