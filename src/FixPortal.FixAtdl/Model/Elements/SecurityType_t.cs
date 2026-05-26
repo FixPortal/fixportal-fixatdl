@@ -9,10 +9,18 @@ using FixPortal.FixAtdl.Model.Enumerations;
 
 namespace FixPortal.FixAtdl.Model.Elements;
 
+/// <summary>
+/// Represents a security-type inclusion or exclusion entry.
+/// </summary>
 public class SecurityType_t
 {
+    /// <summary>
+    /// Gets or sets the security type name.
+    /// </summary>
     public string Name { get; set; } = null!;
 
+    /// <summary>
+    /// Gets or sets whether the security type is included or excluded.
+    /// </summary>
     public Inclusion_t Inclusion { get; set; }
 }
-

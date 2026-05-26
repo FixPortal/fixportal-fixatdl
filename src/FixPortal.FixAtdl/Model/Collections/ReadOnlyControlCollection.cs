@@ -25,6 +25,9 @@ using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Collections;
 
+/// <summary>
+/// Provides read-only keyed access to the controls defined for a strategy.
+/// </summary>
 public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Control_t>, ISimpleDictionary<Control_t>
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
@@ -33,6 +36,10 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     private Strategy_t _owner;
     private readonly Dictionary<string, Control_t> _controls = [];
 
+    /// <summary>
+    /// Initializes a new <see cref="ReadOnlyControlCollection"/>.
+    /// </summary>
+    /// <param name="owner">The owning strategy.</param>
     public ReadOnlyControlCollection(Strategy_t owner)
     {
         _owner = owner;
@@ -78,11 +85,20 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         }
     }
 
+    /// <summary>
+    /// Determines whether the collection contains a control with the specified identifier.
+    /// </summary>
+    /// <param name="key">The control identifier to look up.</param>
+    /// <returns><see langword="true"/> if the control exists; otherwise, <see langword="false"/>.</returns>
     public bool Contains(string key)
     {
         return _controls.ContainsKey(key);
     }
 
+    /// <summary>
+    /// Gets the control with the specified identifier.
+    /// </summary>
+    /// <param name="key">The control identifier.</param>
     public Control_t this[string key]
     {
         get

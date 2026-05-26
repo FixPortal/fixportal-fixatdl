@@ -12,8 +12,16 @@ using FixPortal.FixAtdl.Model.Reference;
 
 namespace FixPortal.FixAtdl.Model.Collections;
 
+/// <summary>
+/// Represents the collection of regions to which a strategy applies.
+/// </summary>
 public class RegionCollection : KeyedCollection<Region, Region_t>
 {
+    /// <summary>
+    /// Gets the key for the specified region item.
+    /// </summary>
+    /// <param name="region">The region item.</param>
+    /// <returns>The region identifier.</returns>
     protected override Region GetKeyForItem(Region_t region)
     {
         return region.Name;
@@ -60,4 +68,3 @@ public class RegionCollection : KeyedCollection<Region, Region_t>
         return (applicableRegions & targetRegion) != 0;
     }
 }
-

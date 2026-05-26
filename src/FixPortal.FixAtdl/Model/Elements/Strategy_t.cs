@@ -246,8 +246,10 @@ public class Strategy_t : IParentable<Strategies_t>
 
     #region IParentable<Strategies_t> Members
 
+    /// <summary>
+    /// Gets or sets the parent strategies container.
+    /// </summary>
     public Strategies_t Parent { get; set; } = null!;
 
     #endregion
 }
-

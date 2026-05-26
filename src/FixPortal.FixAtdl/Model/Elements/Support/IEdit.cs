@@ -17,7 +17,7 @@ namespace FixPortal.FixAtdl.Model.Elements.Support;
 /// Interface to allow both Edits and EditRefs to be put in the Edit collections.  The type parameter
 /// specifies whether the Edit relates to a StateRule or to a StrategyEdit.
 /// </summary>
-/// <typeparam name="T">One of <see cref="Control_t"/> or <see cref="Parameter_t"/>.</typeparam>
+/// <typeparam name="T">One of <see cref="Control_t"/> or <see cref="IParameter"/>.</typeparam>
 public interface IEdit<T>
 {
     /// <summary>
@@ -82,4 +82,3 @@ public interface IEdit<T>
     /// </summary>
     HashSet<string> Sources { get; }
 }
-

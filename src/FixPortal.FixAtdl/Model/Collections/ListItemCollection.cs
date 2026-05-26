@@ -16,8 +16,15 @@ using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Collections;
 
+/// <summary>
+/// Represents a keyed collection of <see cref="ListItem_t"/> instances.
+/// </summary>
 public class ListItemCollection : KeyedCollection<string, ListItem_t>
 {
+    /// <summary>
+    /// Copies the supplied items into the collection.
+    /// </summary>
+    /// <param name="items">The items to copy.</param>
     public void CopyFrom(List<ListItem_t> items)
     {
         foreach (ListItem_t item in items)
@@ -26,6 +33,10 @@ public class ListItemCollection : KeyedCollection<string, ListItem_t>
         }
     }
 
+    /// <summary>
+    /// Adds a list item to the collection.
+    /// </summary>
+    /// <param name="item">The item to add.</param>
     public new void Add(ListItem_t item)
     {
         try
@@ -39,13 +50,23 @@ public class ListItemCollection : KeyedCollection<string, ListItem_t>
         }
     }
 
+    /// <summary>
+    /// Gets the enum identifiers for all items in the collection.
+    /// </summary>
     public string[] EnumIds => [.. from item in Items select item.EnumId];
 
+    /// <summary>
+    /// Gets a value indicating whether the collection contains any items.
+    /// </summary>
     public bool HasItems => Count > 0;
 
+    /// <summary>
+    /// Gets the key for the specified list item.
+    /// </summary>
+    /// <param name="item">The list item.</param>
+    /// <returns>The enum identifier.</returns>
     protected override string GetKeyForItem(ListItem_t item)
     {
         return item.EnumId;
     }
 }
-

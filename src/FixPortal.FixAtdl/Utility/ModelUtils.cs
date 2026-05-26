@@ -13,6 +13,9 @@ using System.Reflection;
 
 namespace FixPortal.FixAtdl.Utility;
 
+/// <summary>
+/// Provides reflection-based helpers for working with the FIXatdl model.
+/// </summary>
 public static class ModelUtils
 {
     private static readonly IEnumerable<Type> _types;
@@ -25,6 +28,13 @@ public static class ModelUtils
                  select t;
     }
 
+    /// <summary>
+    /// Invokes a matching <c>Visit</c> overload on the supplied visitor for the target object.
+    /// </summary>
+    /// <param name="visitorType">The declared visitor type used as part of the cache key.</param>
+    /// <param name="visitor">The visitor instance.</param>
+    /// <param name="target">The target object to visit.</param>
+    /// <returns><see langword="true"/> if a matching <c>Visit</c> method was found and invoked; otherwise, <see langword="false"/>.</returns>
     public static bool VisitHelper(Type visitorType, object visitor, object target)
     {
         Type targetParamType = target.GetType();
@@ -55,6 +65,11 @@ public static class ModelUtils
     }
 
     // TODO: Move this somewhere better.
+    /// <summary>
+    /// Gets a FIXatdl model type by its CLR type name.
+    /// </summary>
+    /// <param name="typeName">The CLR type name to look up.</param>
+    /// <returns>The matching type, or <see langword="null"/> if no type matches.</returns>
     public static System.Type? GetTypeFromName(string typeName)
     {
         return _types.FirstOrDefault(t => t.Name == typeName);

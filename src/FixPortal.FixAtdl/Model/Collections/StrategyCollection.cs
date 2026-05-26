@@ -10,20 +10,36 @@ using FixPortal.FixAtdl.Model.Elements;
 
 namespace FixPortal.FixAtdl.Model.Collections;
 
+/// <summary>
+/// Represents the collection of strategies owned by a <see cref="Strategies_t"/>.
+/// </summary>
 public class StrategyCollection : KeyedCollection<string, Strategy_t>
 {
     private readonly Strategies_t _owner;
 
+    /// <summary>
+    /// Initializes a new <see cref="StrategyCollection"/>.
+    /// </summary>
+    /// <param name="owner">The owning strategies container.</param>
     public StrategyCollection(Strategies_t owner)
     {
         _owner = owner;
     }
 
+    /// <summary>
+    /// Gets the key for the specified strategy item.
+    /// </summary>
+    /// <param name="strategy">The strategy item.</param>
+    /// <returns>The strategy name.</returns>
     protected override string GetKeyForItem(Strategy_t strategy)
     {
         return strategy.Name;
     }
 
+    /// <summary>
+    /// Adds a strategy to the collection and assigns its parent container.
+    /// </summary>
+    /// <param name="item">The strategy to add.</param>
     public new void Add(Strategy_t item)
     {
         item.Parent = _owner;
@@ -31,4 +47,3 @@ public class StrategyCollection : KeyedCollection<string, Strategy_t>
         base.Add(item);
     }
 }
-

@@ -10,11 +10,24 @@ using FixPortal.FixAtdl.Model.Enumerations;
 
 namespace FixPortal.FixAtdl.Model.Elements;
 
+/// <summary>
+/// Represents a region inclusion or exclusion entry and its associated countries.
+/// </summary>
 public class Region_t
 {
+    /// <summary>
+    /// Gets or sets the region name.
+    /// </summary>
     public Region Name { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the region is included or excluded.
+    /// </summary>
     public Inclusion_t Inclusion { get; set; }
 
+    /// <summary>
+    /// Gets the countries associated with the region entry.
+    /// </summary>
     public CountryCollection Countries
     {
         get
@@ -26,4 +39,3 @@ public class Region_t
         }
     } = null!;
 }
-

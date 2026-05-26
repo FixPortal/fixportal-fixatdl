@@ -13,10 +13,18 @@ using FixPortal.FixAtdl.Resources;
 
 namespace FixPortal.FixAtdl.Utility;
 
+/// <summary>
+/// Provides helper methods for working with <see cref="Process"/> instances.
+/// </summary>
 public static class ProcessExtensions
 {
     private static readonly string ExceptionContext = "FixPortal.FixAtdl.Utility.ProcessExtensions";
 
+    /// <summary>
+    /// Determines whether the specified process is a Visual Studio designer process.
+    /// </summary>
+    /// <param name="process">The process to inspect.</param>
+    /// <returns><see langword="true"/> if the process appears to be Visual Studio; otherwise, <see langword="false"/>.</returns>
     public static bool IsVSDesigner(this Process process)
     {
         if (process == null)
@@ -32,4 +40,3 @@ public static class ProcessExtensions
         return false;
     }
 }
-

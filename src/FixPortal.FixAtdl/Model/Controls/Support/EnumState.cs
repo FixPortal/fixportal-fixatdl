@@ -24,7 +24,7 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 /// </summary>
 /// <remarks>During its existence, this type has at times been a class and at other times a struct.  It has settled on being
 /// a class because its key function is to represent changing state, and mutable structs are seen to be <i>a bad thing</i>.
-/// As it is a class, the <see cref="CopyTo"/> method is included to provide a means to copy the contents in order to avoid
+/// As it is a class, the <see cref="Copy"/> method is included to provide a means to copy the contents in order to avoid
 /// the scenario that two independent entities share a reference to a given EnumState.</remarks>
 public class EnumState
 {

@@ -14,7 +14,7 @@ namespace FixPortal.FixAtdl.Model.Types.Support;
 
 /// <summary>
 /// Interface that all parameter types (Amt_t, Boolean_t, etc.) must implement such that their values can be converted to a form accepted by
-/// <see cref="Control_t"/> instances.
+/// <see cref="FixPortal.FixAtdl.Model.Elements.Control_t"/> instances.
 /// </summary>
 /// <remarks>If the parameter's value cannot be converted to the target type, then an <see cref="InvalidCastException"/>
 /// is thrown.<br/>
@@ -53,4 +53,3 @@ public interface IControlConvertible
     /// <returns>A valid EnumState, assuming the source value can be correctly converted.</returns>
     EnumState ToEnumState(EnumPairCollection enumPairs);
 }
-

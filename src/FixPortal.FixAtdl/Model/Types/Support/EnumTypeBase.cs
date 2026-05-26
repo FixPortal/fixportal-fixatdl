@@ -14,6 +14,9 @@ using FixPortal.FixAtdl.Resources;
 
 namespace FixPortal.FixAtdl.Model.Types.Support;
 
+/// <summary>
+/// Provides shared conversion behavior for enum-backed FIXatdl value types.
+/// </summary>
 public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible where T : struct
 {
     #region IControlConvertible Members
@@ -80,4 +83,3 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible wh
 
     #endregion
 }
-

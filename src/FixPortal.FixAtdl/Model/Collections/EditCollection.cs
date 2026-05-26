@@ -28,6 +28,11 @@ public class EditCollection : KeyedCollection<string, Edit_t>
         return Contains(id);
     }
 
+    /// <summary>
+    /// Gets the key for the specified edit item.
+    /// </summary>
+    /// <param name="item">The edit item.</param>
+    /// <returns>The edit identifier.</returns>
     protected override string GetKeyForItem(Edit_t item)
     {
         return item.Id;
@@ -63,4 +68,3 @@ public class EditCollection : KeyedCollection<string, Edit_t>
         return target;
     }
 }
-

@@ -14,15 +14,33 @@ using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Xml.Serialization;
 
+/// <summary>
+/// Converts XML text values into CLR and FIXatdl types.
+/// </summary>
 public class ValueConverter
 {
+    /// <summary>
+    /// Gets the exception context used when reporting conversion failures.
+    /// </summary>
     public static readonly string ExceptionContext = typeof(ValueConverter).Name;
 
+    /// <summary>
+    /// Converts the supplied text value to the specified target type.
+    /// </summary>
+    /// <typeparam name="T">The requested target type.</typeparam>
+    /// <param name="value">The text value to convert.</param>
+    /// <returns>The converted value.</returns>
     public static T ConvertTo<T>(string value)
     {
         return (T)ConvertTo(value, typeof(T));
     }
 
+    /// <summary>
+    /// Converts the supplied text value to the specified target type.
+    /// </summary>
+    /// <param name="value">The text value to convert.</param>
+    /// <param name="targetType">The requested target type.</param>
+    /// <returns>The converted value.</returns>
     public static object ConvertTo(string value, System.Type targetType)
     {
         switch (targetType.FullName)

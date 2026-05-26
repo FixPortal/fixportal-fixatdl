@@ -19,11 +19,17 @@ using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 namespace FixPortal.FixAtdl.Validation;
 
 // TODO: Implement IDisposable
+/// <summary>
+/// Provides shared edit-evaluation behavior for state rules and strategy edits.
+/// </summary>
 public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : class, IValueProvider
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private readonly NullLogger _log = NullLogger.Instance;
 
+    /// <summary>
+    /// Gets the set of field sources referenced by the active edit or edit reference.
+    /// </summary>
     public HashSet<string> Sources
     {
         get
@@ -41,6 +47,9 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
         }
     }
 
+    /// <summary>
+    /// Gets the current evaluation state of the active edit or edit reference.
+    /// </summary>
     public bool CurrentState
     {
         get
@@ -58,6 +67,9 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
         }
     }
 
+    /// <summary>
+    /// Gets or sets the referenced edit wrapper.
+    /// </summary>
     public EditRef_t<T> EditRef
     {
         get;
@@ -73,6 +85,9 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
         }
     } = null!;
 
+    /// <summary>
+    /// Gets or sets the direct edit definition.
+    /// </summary>
     public Edit_t<T> Edit
     {
         get;
@@ -154,6 +169,8 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
     /// Resolves all interdependencies e.g. edits to edit refs, control values to edits, etc.  Called once
     /// all strategies have been loaded as there may be dependencies on EditRefs at the global level.
     /// </summary>
+    /// <param name="strategy">The strategy providing resolution context.</param>
+    /// <param name="sourceCollection">The value source collection used to resolve field references.</param>
     void IResolvable<Strategy_t, T>.Resolve(Strategy_t strategy, ISimpleDictionary<T> sourceCollection)
     {
         if (EditRef != null)

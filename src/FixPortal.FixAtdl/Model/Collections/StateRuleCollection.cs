@@ -14,6 +14,9 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Collections;
 
+/// <summary>
+/// Represents the collection of state rules associated with a control.
+/// </summary>
 public class StateRuleCollection : Collection<StateRule_t>
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
@@ -21,11 +24,19 @@ public class StateRuleCollection : Collection<StateRule_t>
 
     private readonly Control_t _owner;
 
+    /// <summary>
+    /// Initializes a new <see cref="StateRuleCollection"/>.
+    /// </summary>
+    /// <param name="owner">The control that owns the collection.</param>
     public StateRuleCollection(Control_t owner)
     {
         _owner = owner;
     }
 
+    /// <summary>
+    /// Adds a state rule to the collection and assigns its parent control.
+    /// </summary>
+    /// <param name="item">The state rule to add.</param>
     public new void Add(StateRule_t item)
     {
         (item as IParentable<Control_t>).Parent = _owner;
@@ -38,6 +49,9 @@ public class StateRuleCollection : Collection<StateRule_t>
         }
     }
 
+    /// <summary>
+    /// Evaluates all state rules in the collection.
+    /// </summary>
     public void EvaluateAll()
     {
         if (Items.Count > 0)
@@ -57,7 +71,7 @@ public class StateRuleCollection : Collection<StateRule_t>
     /// <summary>
     /// Resolves all edit refs, connects all edits to their controls.
     /// </summary>
-    /// <param name="strategy"></param>
+    /// <param name="strategy">The strategy that provides the control sources for resolution.</param>
     public void ResolveAll(Strategy_t strategy)
     {
         foreach (StateRule_t rule in Items)

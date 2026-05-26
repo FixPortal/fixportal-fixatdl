@@ -28,7 +28,7 @@ public abstract class InitializableControl<T> : Control_t
     private static readonly NullLogger _log = NullLogger.Instance;
 
     /// <summary>
-    /// Initializes a new <see cref="InitializableControl"/> instance with the specified identifier as id.
+    /// Initializes a new <see cref="InitializableControl{T}"/> instance with the specified identifier as id.
     /// </summary>
     /// <param name="id">Id of this control.</param>
     protected InitializableControl(string id)

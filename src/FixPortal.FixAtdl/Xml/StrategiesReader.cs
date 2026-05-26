@@ -30,8 +30,16 @@ public class StrategiesReader
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private readonly NullLogger _log = NullLogger.Instance;
 
+    /// <summary>
+    /// Occurs when a strategy has been deserialized.
+    /// </summary>
     public event System.EventHandler<StrategyLoadedEventArgs>? StrategyLoaded;
 
+    /// <summary>
+    /// Loads and deserializes strategies from a file path.
+    /// </summary>
+    /// <param name="path">The path to the FIXatdl XML file.</param>
+    /// <returns>The deserialized strategies collection.</returns>
     public Strategies_t Load(string path)
     {
         if (_log.IsEnabled(LogLevel.Debug))
@@ -51,6 +59,11 @@ public class StrategiesReader
         return strategies;
     }
 
+    /// <summary>
+    /// Loads and deserializes strategies from a stream.
+    /// </summary>
+    /// <param name="stream">The stream containing FIXatdl XML.</param>
+    /// <returns>The deserialized strategies collection.</returns>
     public Strategies_t Load(Stream stream)
     {
         if (_log.IsEnabled(LogLevel.Debug))
