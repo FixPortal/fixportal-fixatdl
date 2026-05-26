@@ -123,9 +123,6 @@
   <data name="InvalidPropertyIndirection" xml:space="preserve">
     <value>Only one level of property indirection is allowed - {0} is invalid (Value.SubValue is allowed, Value.SubValue.SubSubValue is not).</value>
   </data>
-  <data name="InvalidUseOfParseAsEnum" xml:space="preserve">
-    <value>Extension method String.ParseAsEnum&lt;T&gt;() can only be used with enum types.</value>
-  </data>
   <data name="NoConstructorFoundForSpecifiedArgumentTypes" xml:space="preserve">
     <value>No constructor was found for the type {0} that matched the arguments supplied.</value>
   </data>

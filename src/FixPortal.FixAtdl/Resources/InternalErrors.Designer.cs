@@ -79,15 +79,6 @@ namespace FixPortal.FixAtdl.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Extension method String.ParseAsEnum&lt;T&gt;() can only be used with enum types..
-        /// </summary>
-        internal static string InvalidUseOfParseAsEnum {
-            get {
-                return ResourceManager.GetString("InvalidUseOfParseAsEnum", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No constructor was found for the type {0} that matched the arguments supplied..
         /// </summary>
         internal static string NoConstructorFoundForSpecifiedArgumentTypes {
