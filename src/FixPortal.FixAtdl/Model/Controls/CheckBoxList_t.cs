@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
 using Microsoft.Extensions.Logging;

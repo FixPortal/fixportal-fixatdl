@@ -5,8 +5,6 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
 using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Xml.Serialization;
 

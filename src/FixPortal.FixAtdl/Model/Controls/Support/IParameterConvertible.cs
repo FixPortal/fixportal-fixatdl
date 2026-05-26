@@ -5,8 +5,6 @@
 //
 #endregion
 
-using System;
-using System.Linq;
 using FixPortal.FixAtdl.Model.Elements.Support;
 
 namespace FixPortal.FixAtdl.Model.Controls.Support;

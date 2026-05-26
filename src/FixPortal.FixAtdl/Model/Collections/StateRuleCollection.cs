@@ -6,7 +6,6 @@
 #endregion
 
 using System.Collections.ObjectModel;
-using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Utility;
 using Microsoft.Extensions.Logging;

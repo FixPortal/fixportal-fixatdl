@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
@@ -76,7 +75,7 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override MonthYear? ConvertFromWireValueFormat(string value)
     {
-        return value != null ? (MonthYear?)MonthYear.Parse(value) : null;
+        return value != null ? MonthYear.Parse(value) : null;
     }
 
     /// <summary>
@@ -102,7 +101,7 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     {
         string monthYear = value.ToString(hostParameter);
 
-        return monthYear != null ? (MonthYear?)MonthYear.Parse(monthYear) : null;
+        return monthYear != null ? MonthYear.Parse(monthYear) : null;
     }
 
     /// <summary>
@@ -136,7 +135,7 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     {
         MonthYear? value = ConstValue ?? _value;
 
-        return (value != null) ? ((MonthYear)value).ToString() : null;
+        return value != null ? ((MonthYear)value).ToString() : null;
     }
 
     /// <summary>

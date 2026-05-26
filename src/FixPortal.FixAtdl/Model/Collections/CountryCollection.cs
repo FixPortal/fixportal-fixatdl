@@ -5,8 +5,6 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Enumerations;
@@ -37,22 +35,13 @@ public class CountryCollection : HashSet<Country_t>
     /// <param name="item">The item.</param>
     public new void Add(Country_t item)
     {
-        bool countryOkay = false;
-
-        switch (_region)
+        bool countryOkay = _region switch
         {
-            case Region.AsiaPacificJapan:
-                countryOkay = Regions.AsiaPacificJapanCountries.Contains(item.CountryCode);
-                break;
-
-            case Region.EuropeMiddleEastAfrica:
-                countryOkay = Regions.EuropeMiddleEastAfricaCountries.Contains(item.CountryCode);
-                break;
-
-            case Region.TheAmericas:
-                countryOkay = Regions.TheAmericasCountries.Contains(item.CountryCode);
-                break;
-        }
+            Region.AsiaPacificJapan => Regions.AsiaPacificJapanCountries.Contains(item.CountryCode),
+            Region.EuropeMiddleEastAfrica => Regions.EuropeMiddleEastAfricaCountries.Contains(item.CountryCode),
+            Region.TheAmericas => Regions.TheAmericasCountries.Contains(item.CountryCode),
+            _ => false
+        };
 
         if (!countryOkay)
         {

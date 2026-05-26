@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
@@ -166,7 +165,7 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <returns>If the supplied value is non-null, the rounded value is returned; otherwise returns null.</returns>
     protected decimal? Round(decimal? value, int precision)
     {
-        return value != null ? (decimal?)Math.Round((decimal)value, precision, MidpointRounding.AwayFromZero) : null;
+        return value != null ? Math.Round((decimal)value, precision, MidpointRounding.AwayFromZero) : null;
     }
 
     #region IControlConvertible Members
@@ -189,7 +188,7 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     {
         decimal? value = ConstValue ?? _value;
 
-        return (value != null) ? ((decimal)value).ToString(provider) : null;
+        return value != null ? ((decimal)value).ToString(provider) : null;
     }
 
     /// <summary>

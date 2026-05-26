@@ -5,11 +5,8 @@
 //
 #endregion
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Controls;
@@ -45,7 +42,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         _owner = owner;
     }
 
-    internal void SourceCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    internal void SourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
         {
@@ -136,7 +133,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                 thisControl.LoadInitValue(controlInitValueProvider);
             }
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             throw ThrowHelper.Rethrow(this, ex, ErrorMessages.InitControlValueError, control != null ? control.Id : "(unknown)");
         }
@@ -196,7 +193,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         {
             bool hasParameterRef = control.ParameterRef != null;
             bool isValidParameter = hasParameterRef && parameters.Contains(control.ParameterRef!);
-            IParameter parameter = isValidParameter ? parameters[control.ParameterRef!]! : null!;
+            IParameter parameter = isValidParameter ? parameters[control.ParameterRef!] : null!;
             object parameterValue = isValidParameter ? parameter.GetCurrentValue() : null!;
 
             if (hasParameterRef && !isValidParameter)
@@ -304,18 +301,18 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         // Approach 1 - use the radio button group name
         if (radioButton.RadioGroup != null)
         {
-            radioButtons = (from c in _controls.Values
-                            where c.Id != radioButton.Id &&
-                                 c is RadioButton_t && (c as RadioButton_t)!.RadioGroup == radioButton.RadioGroup
-                            select c as RadioButton_t);
+            radioButtons = from c in _controls.Values
+                where c.Id != radioButton.Id &&
+                      c is RadioButton_t t && t.RadioGroup == radioButton.RadioGroup
+                select c as RadioButton_t;
         }
         else
         {
             // Approach 2 - look for radio buttons on the same panel
-            radioButtons = (from c in radioButton.OwningStrategyPanel!.Controls
-                            where c.Id != radioButton.Id &&
-                                 c is RadioButton_t
-                            select c as RadioButton_t);
+            radioButtons = from c in radioButton.OwningStrategyPanel.Controls
+                where c.Id != radioButton.Id &&
+                      c is RadioButton_t
+                select c as RadioButton_t;
         }
 
         if (radioButtons.Count() == 1)

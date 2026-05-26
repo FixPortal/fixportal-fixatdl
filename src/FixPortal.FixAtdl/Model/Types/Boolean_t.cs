@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -79,8 +78,8 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override bool? ConvertFromWireValueFormat(string value)
     {
-        string trueValue = (TrueWireValue != null) ? TrueWireValue : DefaultTrueValue;
-        string falseValue = (FalseWireValue != null) ? FalseWireValue : DefaultFalseValue;
+        string trueValue = TrueWireValue != null ? TrueWireValue : DefaultTrueValue;
+        string falseValue = FalseWireValue != null ? FalseWireValue : DefaultFalseValue;
 
         bool? result = value == trueValue
             ? true
@@ -110,7 +109,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
             return null!;
         }
 
-        return actualValue ? (TrueWireValue ?? DefaultTrueValue) : (FalseWireValue ?? DefaultFalseValue);
+        return actualValue ? TrueWireValue ?? DefaultTrueValue : FalseWireValue ?? DefaultFalseValue;
     }
 
     /// <summary>

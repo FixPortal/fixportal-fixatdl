@@ -5,9 +5,7 @@
 //
 #endregion
 
-using System;
 using System.Diagnostics;
-using System.Linq;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Resources;
 

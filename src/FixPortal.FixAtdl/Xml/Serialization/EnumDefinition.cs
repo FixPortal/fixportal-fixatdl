@@ -5,9 +5,6 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
-
 namespace FixPortal.FixAtdl.Xml.Serialization;
 
 /// <summary>

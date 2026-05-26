@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
@@ -28,7 +27,7 @@ public static class ThrowHelper
     /// <param name="source">The source.</param>
     /// <param name="message">The message.</param>
     /// <returns>A new exception of the specified type.</returns>
-    public static T New<T>(object? source, string message) where T : System.Exception
+    public static T New<T>(object? source, string message) where T : Exception
     {
         T ex = CreateException<T>(source, message, null);
 
@@ -45,7 +44,7 @@ public static class ThrowHelper
     /// <param name="innerException">The inner exception.</param>
     /// <param name="message">The message.</param>
     /// <returns>A new exception of the specified type.</returns>
-    public static T New<T>(object? source, Exception innerException, string message) where T : System.Exception
+    public static T New<T>(object? source, Exception innerException, string message) where T : Exception
     {
         T ex = CreateException<T>(source, message, innerException, null);
 
@@ -63,9 +62,9 @@ public static class ThrowHelper
     /// <param name="args">The args.</param>
     /// <returns>A new exception of the specified type.</returns>
     // FP Enhancement: 2026-05-23 — params object[] args -> params object?[] args to support nullable callers.
-    public static T New<T>(object? source, string format, params object?[] args) where T : System.Exception
+    public static T New<T>(object? source, string format, params object?[] args) where T : Exception
     {
-        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args!), null);
+        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args), null);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -81,9 +80,9 @@ public static class ThrowHelper
     /// <param name="format">The format.</param>
     /// <param name="args">The args.</param>
     /// <returns>A new exception of the specified type.</returns>
-    public static T New<T>(object? source, Exception innerException, string format, params object?[] args) where T : System.Exception
+    public static T New<T>(object? source, Exception innerException, string format, params object?[] args) where T : Exception
     {
-        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args!), innerException, null);
+        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args), innerException, null);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -98,7 +97,7 @@ public static class ThrowHelper
     /// <param name="info">The info.</param>
     /// <param name="message">The message.</param>
     /// <returns>A new exception of the specified type.</returns>
-    public static T New<T>(object? source, ExceptionInfo? info, string message) where T : System.Exception
+    public static T New<T>(object? source, ExceptionInfo? info, string message) where T : Exception
     {
         T ex = CreateException<T>(source, message, info);
 
@@ -116,7 +115,7 @@ public static class ThrowHelper
     /// <param name="info">The info.</param>
     /// <param name="message">The message.</param>
     /// <returns>A new exception of the specified type.</returns>
-    public static T New<T>(object? source, Exception innerException, ExceptionInfo? info, string message) where T : System.Exception
+    public static T New<T>(object? source, Exception innerException, ExceptionInfo? info, string message) where T : Exception
     {
         T ex = CreateException<T>(source, message, innerException, info);
 
@@ -134,9 +133,9 @@ public static class ThrowHelper
     /// <param name="format">The format.</param>
     /// <param name="args">The args.</param>
     /// <returns>A new exception of the specified type.</returns>
-    public static T New<T>(object? source, ExceptionInfo? info, string format, params object?[] args) where T : System.Exception
+    public static T New<T>(object? source, ExceptionInfo? info, string format, params object?[] args) where T : Exception
     {
-        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args!), info);
+        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args), info);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -153,9 +152,9 @@ public static class ThrowHelper
     /// <param name="format">The format.</param>
     /// <param name="args">The args.</param>
     /// <returns>A new exception of the specified type.</returns>
-    public static T New<T>(object? source, Exception innerException, ExceptionInfo? info, string format, params object?[] args) where T : System.Exception
+    public static T New<T>(object? source, Exception innerException, ExceptionInfo? info, string format, params object?[] args) where T : Exception
     {
-        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args!), innerException, info);
+        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args), innerException, info);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -224,7 +223,7 @@ public static class ThrowHelper
     }
 
     // Workaround limitation in C# 3.0/4.0 - can't create an instance of a generic type with parameters using new T().
-    private static T CreateException<T>(object? source, string message, ExceptionInfo? info) where T : System.Exception
+    private static T CreateException<T>(object? source, string message, ExceptionInfo? info) where T : Exception
     {
         Type classType = typeof(T);
 
@@ -256,7 +255,7 @@ public static class ThrowHelper
     }
 
     // Workaround limitation in C# 3.0/4.0 - can't create an instance of a generic type with parameters using new T().
-    private static T CreateException<T>(object? source, string message, Exception innerException, ExceptionInfo? info) where T : System.Exception
+    private static T CreateException<T>(object? source, string message, Exception innerException, ExceptionInfo? info) where T : Exception
     {
         Type classType = typeof(T);
 

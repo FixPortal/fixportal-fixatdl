@@ -5,10 +5,7 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
@@ -381,26 +378,14 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
         int compareResult = lhs.CompareTo(rhs);
 
-        bool finalResult = false;
-
-        switch (Operator)
+        bool finalResult = Operator switch
         {
-            case Operator_t.GreaterThan:
-                finalResult = compareResult > 0;
-                break;
-
-            case Operator_t.GreaterThanOrEqual:
-                finalResult = compareResult >= 0;
-                break;
-
-            case Operator_t.LessThan:
-                finalResult = compareResult < 0;
-                break;
-
-            case Operator_t.LessThanOrEqual:
-                finalResult = compareResult <= 0;
-                break;
-        }
+            Operator_t.GreaterThan => compareResult > 0,
+            Operator_t.GreaterThanOrEqual => compareResult >= 0,
+            Operator_t.LessThan => compareResult < 0,
+            Operator_t.LessThanOrEqual => compareResult <= 0,
+            _ => false
+        };
 
         if (_log.IsEnabled(LogLevel.Debug))
         {
@@ -450,7 +435,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
         // If the field value can be converted into a number, most likely it should be treated as one
         // for comparison purposes
-        result = fieldValue is string ? decimal.TryParse(fieldValue as string, out decimal number) ? number : fieldValue : fieldValue;
+        result = fieldValue is string value ? decimal.TryParse(value, out decimal number) ? number : value : fieldValue;
 
         return result;
     }
@@ -478,23 +463,22 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     private void CheckForUnsupportedComparisons(object lhs, object rhs)
     {
         // We don't currently support comparisons for type 'Data_t' which is represented by a char[].
-        if (lhs is char[])
+        if (lhs is char[] chars)
         {
-            throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, Value, new string(lhs as char[]));
+            throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, Value, new string(chars));
         }
 
-        if (rhs is char[])
+        if (rhs is char[] rhs1)
         {
-            throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, Value, new string(rhs as char[]));
+            throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, Value, new string(rhs1));
         }
     }
 
     private static object GetFixFieldValue(FixFieldValueProvider additionalValues, string fixField)
     {
         object? result;
-        string? value;
 
-        bool gotValue = additionalValues.TryGetValue(fixField, out value!);
+        bool gotValue = additionalValues.TryGetValue(fixField, out var value);
 
         // If the FIX value can be converted into a number, most likely it should be treated as one
         // for comparison purposes

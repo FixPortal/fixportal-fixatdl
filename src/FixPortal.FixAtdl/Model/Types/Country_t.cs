@@ -5,8 +5,6 @@
 //
 #endregion
 
-using System;
-using System.Linq;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Reference;
@@ -49,7 +47,7 @@ public class Country_t : EnumTypeBase<IsoCountryCode>
     /// <returns>Value converted from a string.</returns>
     protected override IsoCountryCode? ConvertFromWireValueFormat(string value)
     {
-        return (IsoCountryCode?)value.ParseAsEnum<IsoCountryCode>();
+        return value.ParseAsEnum<IsoCountryCode>();
     }
 
     /// <summary>

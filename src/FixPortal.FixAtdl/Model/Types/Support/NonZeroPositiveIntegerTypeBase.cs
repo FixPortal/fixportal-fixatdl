@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Validation;
 

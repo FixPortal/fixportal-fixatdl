@@ -1,4 +1,3 @@
-using System.IO;
 using System.Text;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -16,13 +15,13 @@ namespace FixPortal.FixAtdl.Tests.Validation;
 /// </summary>
 public class EditEvaluatorTests
 {
-    private static FixPortal.FixAtdl.Model.Elements.Strategies_t Load(string xml)
+    private static Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream);
     }
 
-    private static FixPortal.FixAtdl.Model.Elements.Strategy_t LoadTwap(string xml)
+    private static Strategy_t LoadTwap(string xml)
     {
         return Load(xml).Strategies[0];
     }

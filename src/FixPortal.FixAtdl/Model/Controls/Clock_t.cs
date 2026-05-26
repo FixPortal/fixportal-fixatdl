@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
@@ -63,7 +62,7 @@ public class Clock_t : InitializableControl<DateTime?>
 
         bool parsed = FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result);
 
-        _value = parsed ? (DateTime?)result : null;
+        _value = parsed ? result : null;
 
         return parsed;
     }

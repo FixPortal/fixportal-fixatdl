@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;

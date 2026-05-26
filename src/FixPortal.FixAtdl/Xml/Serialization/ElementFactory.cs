@@ -5,10 +5,7 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using FixPortal.FixAtdl.Diagnostics;
@@ -418,11 +415,12 @@ public class ElementFactory : INotifyClassDeserialized
 
             foreach (XElement childElement in matchingChildElements)
             {
-                object childObject = targetDefinition is GenericTypeElementDefinition genericDefinition
-                    ? CreateObject(genericDefinition, childElement, target)
-                    : targetDefinition is MultiTypeElementDefinition multiDefinition
-                        ? CreateObject(multiDefinition, childElement, target)
-                        : CreateObject(targetDefinition, childElement, target);
+                object childObject = targetDefinition switch
+                {
+                    GenericTypeElementDefinition genericDefinition => CreateObject(genericDefinition, childElement, target),
+                    MultiTypeElementDefinition multiDefinition => CreateObject(multiDefinition, childElement, target),
+                    _ => CreateObject(targetDefinition, childElement, target)
+                };
 
                 PropertyInfo property = targetType.GetProperty(childDefinition.ContainerProperty)!;
 
@@ -478,7 +476,7 @@ public class ElementFactory : INotifyClassDeserialized
             containerMethod = (childDefinition.ContainerMethod as string)!;
         }
 
-        MethodInfo targetMethod = property.PropertyType.GetMethod(containerMethod!, [targetType])!;
+        MethodInfo targetMethod = property.PropertyType.GetMethod(containerMethod, [targetType])!;
 
         if (targetMethod == null)
         {

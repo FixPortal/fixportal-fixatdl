@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
@@ -47,7 +46,7 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
     /// <returns>Value converted from a string.</returns>
     protected override uint? ConvertFromWireValueFormat(string value)
     {
-        return value != null ? (uint?)Convert.ToUInt32(value, CultureInfo.InvariantCulture) : null;
+        return value != null ? Convert.ToUInt32(value, CultureInfo.InvariantCulture) : null;
     }
 
     /// <summary>
@@ -105,7 +104,7 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
     {
         uint? value = ConstValue ?? _value;
 
-        return (value != null) ? ((uint)value).ToString(provider) : null;
+        return value != null ? ((uint)value).ToString(provider) : null;
     }
 
     /// <summary>

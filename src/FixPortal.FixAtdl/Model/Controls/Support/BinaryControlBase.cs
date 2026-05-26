@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
@@ -220,7 +219,7 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
         string? wireValue = _value != null ? ToString(targetParameter) : null;
 
 
-        return TryConvertToInt(wireValue, out int result) ? (int?)result : null;
+        return TryConvertToInt(wireValue, out int result) ? result : null;
     }
 
     /// <summary>
@@ -234,7 +233,7 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
         string? wireValue = _value != null ? ToString(targetParameter) : null;
 
 
-        return TryConvertToUint(wireValue, out uint result) ? (uint?)result : null;
+        return TryConvertToUint(wireValue, out uint result) ? result : null;
     }
 
     /// <summary>
@@ -246,9 +245,7 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     {
         string? wireValue = _value != null ? ToString(targetParameter) : null;
 
-        char result = char.MinValue;
-
-        return TryConvertToChar(wireValue, out result) ? (char?)result : null;
+        return TryConvertToChar(wireValue, out var result) ? result : null;
     }
 
     /// <summary>

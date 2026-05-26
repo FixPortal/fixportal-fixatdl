@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System.Collections.Generic;
 using FixPortal.FixAtdl.Model.Enumerations;
 
 namespace FixPortal.FixAtdl.Model.Reference;

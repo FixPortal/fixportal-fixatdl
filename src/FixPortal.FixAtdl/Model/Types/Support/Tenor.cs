@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
 using FixPortal.FixAtdl.Resources;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
@@ -86,12 +85,12 @@ public struct Tenor : IComparable
     /// <returns><see langword="true"/> if the supplied object is a matching <see cref="Tenor"/>; otherwise, <see langword="false"/>.</returns>
     public override readonly bool Equals(object? obj)
     {
-        if (obj == null || obj is not Tenor)
+        if (obj == null || obj is not Tenor tenor)
         {
             return false;
         }
 
-        return this == (Tenor)obj;
+        return this == tenor;
     }
 
     /// <summary>
@@ -115,24 +114,14 @@ public struct Tenor : IComparable
 
         if (value.Length >= 2)
         {
-            switch (value[0])
+            result.TenorType = value[0] switch
             {
-                case 'D':
-                    result.TenorType = TenorTypeValue.Day;
-                    break;
-
-                case 'W':
-                    result.TenorType = TenorTypeValue.Week;
-                    break;
-
-                case 'M':
-                    result.TenorType = TenorTypeValue.Month;
-                    break;
-
-                case 'Y':
-                    result.TenorType = TenorTypeValue.Year;
-                    break;
-            }
+                'D' => TenorTypeValue.Day,
+                'W' => TenorTypeValue.Week,
+                'M' => TenorTypeValue.Month,
+                'Y' => TenorTypeValue.Year,
+                _ => result.TenorType
+            };
 
             string number = value[1..];
 
@@ -183,7 +172,7 @@ public struct Tenor : IComparable
     /// <item><description>Zero - this instance occurs in the same position in the sort order as obj.</description></item>
     /// <item><description>Greater than zero - this instance follows obj in the sort order.</description></item>
     /// </list></returns>
-    public readonly int CompareTo(object? obj)
+    public int CompareTo(object? obj)
     {
         // Null references are by definition less than the current instance.
         if (obj == null)
@@ -191,12 +180,10 @@ public struct Tenor : IComparable
             return 1;
         }
 
-        if (obj is not Tenor)
+        if (obj is not Tenor rhs)
         {
             throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName!, GetType().FullName!);
         }
-
-        Tenor rhs = (Tenor)obj;
 
         if (rhs == this)
         {

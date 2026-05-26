@@ -4,7 +4,7 @@
 //   This software is released under the MIT License..
 //
 #endregion
-using System;
+
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -97,7 +97,7 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
     {
         string tenor = value.ToString(hostParameter);
 
-        return tenor != null ? (Tenor?)Tenor.Parse(tenor) : null;
+        return tenor != null ? Tenor.Parse(tenor) : null;
     }
 
     /// <summary>
@@ -131,7 +131,7 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
     {
         Tenor? value = ConstValue ?? _value;
 
-        return (value != null) ? ((Tenor)value).ToString() : null;
+        return value != null ? ((Tenor)value).ToString() : null;
     }
 
     /// <summary>

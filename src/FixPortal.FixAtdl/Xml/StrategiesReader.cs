@@ -10,7 +10,6 @@ using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Xml.Serialization;
-using System.IO;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -33,7 +32,7 @@ public class StrategiesReader
     /// <summary>
     /// Occurs when a strategy has been deserialized.
     /// </summary>
-    public event System.EventHandler<StrategyLoadedEventArgs>? StrategyLoaded;
+    public event EventHandler<StrategyLoadedEventArgs>? StrategyLoaded;
 
     /// <summary>
     /// Loads and deserializes strategies from a file path.
@@ -101,7 +100,7 @@ public class StrategiesReader
 
         ElementFactory factory = new(SchemaDefinitions.Strategies_t, typeof(Strategy_t));
 
-        factory.ClassDeserialized += new System.EventHandler<ClassDeserializedEventArgs>(OnStrategyDeserialized);
+        factory.ClassDeserialized += new EventHandler<ClassDeserializedEventArgs>(OnStrategyDeserialized);
 
         Strategies_t strategies = (Strategies_t)factory.DeserializeElement(element);
 
@@ -112,7 +111,7 @@ public class StrategiesReader
 
     private void OnStrategyDeserialized(object? sender, ClassDeserializedEventArgs args)
     {
-        NotifyStrategyLoaded(0, 0, (args.ExtraInfo as Strategy_t)!.Name!);
+        NotifyStrategyLoaded(0, 0, (args.ExtraInfo as Strategy_t)!.Name);
     }
 
     private void NotifyStrategyLoaded(int index, int total, string strategyName)

@@ -5,9 +5,7 @@
 //
 #endregion
 
-using System;
 using System.Globalization;
-using System.Linq;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -177,7 +175,7 @@ public class NumericControlBase : InitializableControl<decimal?>
     /// <returns>A nullable 32-bit signed integer equivalent to the value of this instance.</returns>
     public override int? ToInt32(IParameter targetParameter, IFormatProvider provider)
     {
-        return _value != null ? (int?)decimal.ToInt32((decimal)_value) : null;
+        return _value != null ? decimal.ToInt32((decimal)_value) : null;
     }
 
     /// <summary>
@@ -188,7 +186,7 @@ public class NumericControlBase : InitializableControl<decimal?>
     /// <returns>A nullable 32-bit unsigned integer equivalent to the value of this instance.</returns>
     public override uint? ToUInt32(IParameter targetParameter, IFormatProvider provider)
     {
-        return _value != null ? (uint?)decimal.ToUInt32((decimal)_value) : null;
+        return _value != null ? decimal.ToUInt32((decimal)_value) : null;
     }
 
     /// <summary>
@@ -208,7 +206,7 @@ public class NumericControlBase : InitializableControl<decimal?>
     /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
     public override string ToString(IParameter targetParameter)
     {
-        return _value != null ? ((decimal)_value).ToString(CultureInfo.InvariantCulture) : null!;
+        return _value?.ToString(CultureInfo.InvariantCulture) ?? "";
     }
 
     /// <summary>
