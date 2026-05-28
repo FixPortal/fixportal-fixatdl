@@ -95,6 +95,6 @@ public class ParameterCollectionTests
 
         parameters.ResetAll();
 
-        parameters.Should().OnlyContain(parameter => parameter.IsSet == false);
+        parameters.Should().OnlyContain(parameter => !parameter.IsSet);
     }
 }
