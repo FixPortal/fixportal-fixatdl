@@ -50,6 +50,25 @@ foreach (var tag in twap.Parameters.GetOutputValues())
 
 Files modified from upstream carry a `// FP Enhancement: <date> — <reason>` banner.
 
+## Mutation testing
+
+This repo includes a scoped Stryker pilot for the first part of the library the
+current characterization tests can prove well:
+
+- `Model/Collections/ParameterCollection.cs`
+
+Run it locally with:
+
+```powershell
+dotnet tool restore
+dotnet stryker --config-file stryker-config.json
+```
+
+CI uploads both the full Stryker output and compact summaries:
+
+- `mutation-summary.json`
+- `mutation-summary.md`
+
 ## Licence
 
 MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.
