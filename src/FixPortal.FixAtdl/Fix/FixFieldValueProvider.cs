@@ -112,7 +112,7 @@ public class FixFieldValueProvider
 
         if (_initialValueProvider != null && _initialValueProvider.InputFixValues != null)
         {
-            retrieved = _initialValueProvider != null && _initialValueProvider.InputFixValues.TryGetValue(fixField, out result);
+            retrieved = _initialValueProvider.InputFixValues.TryGetValue(fixField, out result);
 
             if (_log.IsEnabled(LogLevel.Debug))
             {
