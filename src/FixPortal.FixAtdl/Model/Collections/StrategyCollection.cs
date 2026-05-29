@@ -37,13 +37,24 @@ public class StrategyCollection : KeyedCollection<string, Strategy_t>
     }
 
     /// <summary>
-    /// Adds a strategy to the collection and assigns its parent container.
+    /// Inserts a strategy, assigning its parent container. Implemented as an override of the
+    /// KeyedCollection virtual hook (rather than a <c>new Add</c>) so the parent-wiring cannot be
+    /// bypassed by base-typed access or a collection initializer.
     /// </summary>
-    /// <param name="item">The strategy to add.</param>
-    public new void Add(Strategy_t item)
+    /// <param name="index">The insertion index.</param>
+    /// <param name="item">The strategy to insert.</param>
+    protected override void InsertItem(int index, Strategy_t item)
     {
         item.Parent = _owner;
 
-        base.Add(item);
+        base.InsertItem(index, item);
+    }
+
+    /// <inheritdoc />
+    protected override void SetItem(int index, Strategy_t item)
+    {
+        item.Parent = _owner;
+
+        base.SetItem(index, item);
     }
 }

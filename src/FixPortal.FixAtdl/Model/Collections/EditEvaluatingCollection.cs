@@ -45,12 +45,15 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
     public HashSet<string> Sources { get; } = [];
 
     /// <summary>
-    /// Adds the specified item.
+    /// Inserts an item, recording its evaluation sources. Implemented as an override of the
+    /// Collection&lt;T&gt; virtual hook (rather than a <c>new Add</c>) so the source-tracking side
+    /// effect cannot be bypassed by base-typed access or a collection initializer.
     /// </summary>
+    /// <param name="index">The insertion index.</param>
     /// <param name="item">The item.</param>
-    public new void Add(IEdit<T> item)
+    protected override void InsertItem(int index, IEdit<T> item)
     {
-        base.Add(item);
+        base.InsertItem(index, item);
 
         foreach (string source in item.Sources)
         {
@@ -114,7 +117,19 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
                     break;
 
                 case LogicOperator_t.Not:
-                    newState = !item.CurrentState;
+                    // The schema permits a single operand for NOT. Defensively, evaluate NOT as
+                    // "no operand is true" so a (schema-invalid) multi-operand NOT is deterministic
+                    // instead of "last operand wins"; this collapses to !operand for one operand.
+                    if (item.CurrentState)
+                    {
+                        newState = false;
+                        shortCircuit = true;
+                    }
+                    else
+                    {
+                        newState = true;
+                    }
+
                     break;
 
                 // From the spec: "As a convention we define XOR as 'one and only one', which means it evaluates to true when one
@@ -145,7 +160,12 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
     {
         foreach (IEdit<T> item in Items)
         {
-            (item as IResolvable<Strategy_t, T>)!.Resolve(strategy, sourceCollection);
+            // Add accepts any IEdit<T>; only resolve those that are resolvable rather than forcing
+            // the cast with ! and risking an NRE on a non-resolvable edit.
+            if (item is IResolvable<Strategy_t, T> resolvable)
+            {
+                resolvable.Resolve(strategy, sourceCollection);
+            }
         }
     }
 

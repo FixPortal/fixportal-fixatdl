@@ -37,14 +37,19 @@ public class EditRefCollection<T> : KeyedCollection<string, EditRef_t<T>> where 
     }
 
     /// <summary>
-    /// Adds the specified item.
+    /// Inserts an item, also registering it with the associated evaluating collection. Implemented
+    /// as an override of the KeyedCollection virtual hook (rather than a <c>new Add</c>) so the
+    /// registration cannot be bypassed by base-typed access or an initializer.
     /// </summary>
+    /// <param name="index">The insertion index.</param>
     /// <param name="item">The item.</param>
-    public new void Add(EditRef_t<T> item)
+    protected override void InsertItem(int index, EditRef_t<T> item)
     {
-        _evaluatingCollection?.Add(item);
+        // Insert into the keyed base FIRST: if the keyed insert throws (e.g. duplicate Id), the
+        // evaluating collection is not left holding an item the keyed collection rejected (M2).
+        base.InsertItem(index, item);
 
-        base.Add(item);
+        _evaluatingCollection?.Add(item);
     }
 
     /// <summary>

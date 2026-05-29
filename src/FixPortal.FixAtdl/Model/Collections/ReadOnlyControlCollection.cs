@@ -76,7 +76,14 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             case NotifyCollectionChangedAction.Replace:
                 for (int n = 0; n < e.OldItems!.Count; n++)
                 {
-                    _controls[((Control_t)e.OldItems[n]!).Id] = (Control_t)e.NewItems![n]!;
+                    string oldId = ((Control_t)e.OldItems[n]!).Id;
+                    Control_t newControl = (Control_t)e.NewItems![n]!;
+
+                    // Re-key under the replacement's OWN Id. Keying the new control under the old Id
+                    // (as before) left it unreachable by its real Id and returned it under a stale
+                    // key whenever the replacement carried a different Id.
+                    _controls.Remove(oldId);
+                    _controls[newControl.Id] = newControl;
                 }
                 break;
         }

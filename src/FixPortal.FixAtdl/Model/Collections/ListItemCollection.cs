@@ -31,14 +31,18 @@ public class ListItemCollection : KeyedCollection<string, ListItem_t>
     }
 
     /// <summary>
-    /// Adds a list item to the collection.
+    /// Inserts a list item, translating a duplicate-key collision into a domain
+    /// <see cref="DuplicateKeyException"/>. Implemented as an override of the KeyedCollection virtual
+    /// hook (rather than a <c>new Add</c>) so the translation cannot be bypassed by base-typed access
+    /// or a collection initializer.
     /// </summary>
-    /// <param name="item">The item to add.</param>
-    public new void Add(ListItem_t item)
+    /// <param name="index">The insertion index.</param>
+    /// <param name="item">The item to insert.</param>
+    protected override void InsertItem(int index, ListItem_t item)
     {
         try
         {
-            base.Add(item);
+            base.InsertItem(index, item);
         }
         catch (ArgumentException ex)
         {
