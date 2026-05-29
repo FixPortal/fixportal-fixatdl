@@ -66,8 +66,25 @@ public abstract class UTCDateTimeTypeBase : DateTimeTypeBase
 
     #endregion
 
-    private DateTime? GetAdjustedValue(DateTime? value)
+    private static DateTime? GetAdjustedValue(DateTime? value)
     {
-        return value != null ? ((DateTime)value).ToUniversalTime() : null;
+        if (value == null)
+        {
+            return null;
+        }
+
+        DateTime dateTime = value.Value;
+
+        // Adjust according to the source Kind. Values parsed from the wire arrive as Utc (AssumeUniversal)
+        // and need no change. Values set from a control via ConvertToNativeType arrive as Unspecified and
+        // represent a UTC-prefixed type, so they are taken to already be UTC rather than shifted by the
+        // host offset (the previous unconditional ToUniversalTime() corrupted those on a non-UTC host).
+        // A genuinely Local value is still converted.
+        return dateTime.Kind switch
+        {
+            DateTimeKind.Utc => dateTime,
+            DateTimeKind.Local => dateTime.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(dateTime, DateTimeKind.Utc),
+        };
     }
 }

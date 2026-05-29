@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Globalization;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
@@ -36,6 +37,15 @@ public class TZTimestamp_t : DateTimeTypeBase
     {
         return _formatStrings;
     }
+
+    /// <summary>
+    /// Normalise the explicit timezone offset carried by the wire value to UTC so that the
+    /// round-tripped value is canonical (emitted as 'Z') and independent of the parsing host's
+    /// local offset. The instant is preserved exactly; the original offset *representation*
+    /// (e.g. "-05") is not retained — full fidelity would require carrying a DateTimeOffset.
+    /// </summary>
+    protected override DateTimeStyles WireParseStyles =>
+        DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
 
     /// <summary>
     /// Gets the human-readable type name for use in error messages shown to the user.

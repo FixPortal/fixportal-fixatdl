@@ -31,8 +31,8 @@ public class UTCTimestamp_t : UTCDateTimeTypeBase
     /// names in the Olson time zone database. All are of the form Area/Location, where Area is the name of a continent 
     /// or ocean, and Location is the name of a specific location within that region. E.g. Americas/Chicago.
     /// Applicable when xsi:type is UTCTimestamp_t.</summary>
-    /// <value>The local market timezone.</value>
-    public string LocalMktTz { get; set; } = null!;
+    /// <value>The local market timezone; null when not supplied in the ATDL.</value>
+    public string? LocalMktTz { get; set; }
 
     private static readonly string[] _formatStrings = [FixDateTimeFormat.FixDateTime, FixDateTimeFormat.FixDateTimeMs];
 

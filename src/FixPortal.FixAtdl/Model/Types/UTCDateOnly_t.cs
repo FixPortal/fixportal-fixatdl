@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Globalization;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
@@ -33,6 +34,14 @@ public class UTCDateOnly_t : DateTimeTypeBase
     {
         return _formatStrings;
     }
+
+    /// <summary>
+    /// Parse the date as UTC (Kind=Utc) without shifting, so a UTCDateOnly value carries the same
+    /// Kind as the sibling UTCTimeOnly/UTCTimestamp types and a date+time recombination is coherent.
+    /// AssumeUniversal (no AdjustToUniversal) sets Kind=Utc for a date-only value with no offset.
+    /// </summary>
+    protected override DateTimeStyles WireParseStyles =>
+        DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal;
 
     /// <summary>
     /// Gets the human-readable type name for use in error messages shown to the user.

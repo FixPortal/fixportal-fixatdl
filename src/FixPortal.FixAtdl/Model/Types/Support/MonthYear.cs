@@ -149,6 +149,13 @@ public struct MonthYear : IComparable
             result.Year = ValidateRange(value[..4], 0, 9999);
             result.Month = ValidateRange(value.Substring(4, 2), 1, 12);
 
+            // Reject calendar-impossible days (e.g. 20260230 = 30 Feb). Year 0 has no Gregorian
+            // calendar, so DateTime.DaysInMonth cannot be consulted and the day check is skipped.
+            if (result.Day != null && result.Year >= 1 && result.Day.Value > DateTime.DaysInMonth(result.Year, result.Month))
+            {
+                throw ThrowHelper.New<ArgumentException>(ExceptionContext, ErrorMessages.InvalidMonthYearValue, value);
+            }
+
             return result;
         }
 
@@ -168,7 +175,7 @@ public struct MonthYear : IComparable
 
             throw ThrowHelper.New<ArgumentException>(ExceptionContext, ErrorMessages.InvalidMonthYearValue, value);
         }
-        catch (FormatException ex)
+        catch (Exception ex) when (ex is FormatException or OverflowException)
         {
             throw ThrowHelper.New<ArgumentException>(ExceptionContext, ex, ErrorMessages.InvalidMonthYearValue, value);
         }
@@ -223,24 +230,30 @@ public struct MonthYear : IComparable
             return lhs.Month.CompareTo(rhs.Month);
         }
 
-        bool lhsHasNoSuffix = lhs.Day == null && lhs.Week == null;
-        bool rhsHasNoSuffix = rhs.Day == null && rhs.Week == null;
+        // Same year and month: order by approximate intra-month position so that mixed suffixes
+        // (day-qualified vs week-qualified, or a suffix vs no suffix) compare deterministically
+        // instead of throwing NotSupportedException when reached via the </>=/<= operators that
+        // MonthYear_t.ValidateValue uses for Min/Max range checks.
+        return lhs.IntraMonthOrdinal().CompareTo(rhs.IntraMonthOrdinal());
+    }
 
-        if (lhsHasNoSuffix && rhsHasNoSuffix)
+    /// <summary>
+    /// Approximate position within the month used solely to give mixed-suffix comparisons a
+    /// deterministic total order: no suffix sorts first (whole month), a day maps to its 1-31
+    /// value, and a week maps to an approximate day (w1..w5 -> 7..35).
+    /// </summary>
+    private readonly int IntraMonthOrdinal()
+    {
+        if (Day != null)
         {
-            return 0;
+            return Day.Value;
         }
 
-        if (lhs.Day != null && rhs.Day != null)
+        if (Week != null)
         {
-            return lhs.Day.Value.CompareTo(rhs.Day.Value);
+            return Week.Value * 7;
         }
 
-        if (lhs.Week != null && rhs.Week != null)
-        {
-            return lhs.Week.Value.CompareTo(rhs.Week.Value);
-        }
-
-        throw ThrowHelper.New<NotSupportedException>(ExceptionContext, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
+        return 0;
     }
 }

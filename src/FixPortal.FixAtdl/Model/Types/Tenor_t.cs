@@ -45,17 +45,19 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
     /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
     protected override ValidationResult ValidateValue(Tenor? value, bool isRequired)
     {
-        if (MaxValue != null && value != null && !(value >= MaxValue))
+        if (value != null)
         {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, MaxValue);
-        }
+            if (MaxValue != null && value > MaxValue)
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, MaxValue);
+            }
 
-        if (MinValue != null && value != null && !(value <= MinValue))
-        {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+            if (MinValue != null && value < MinValue)
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+            }
         }
-
-        if (isRequired && value == null)
+        else if (isRequired)
         {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
         }

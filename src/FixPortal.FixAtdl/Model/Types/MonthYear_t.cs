@@ -49,17 +49,19 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
     protected override ValidationResult ValidateValue(MonthYear? value, bool isRequired)
     {
-        if (MaxValue != null && !(value >= MaxValue))
+        if (value != null)
         {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value.ToString()!, MaxValue);
-        }
+            if (MaxValue != null && value > MaxValue)
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value.ToString()!, MaxValue);
+            }
 
-        if (MinValue != null && !(value <= MinValue))
-        {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value.ToString()!, MinValue);
+            if (MinValue != null && value < MinValue)
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value.ToString()!, MinValue);
+            }
         }
-
-        if (isRequired && value == null)
+        else if (isRequired)
         {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
         }
@@ -75,7 +77,9 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override MonthYear? ConvertFromWireValueFormat(string value)
     {
-        return value != null ? MonthYear.Parse(value) : null;
+        // 'value' is non-nullable: an empty FIX field is invalid, and MonthYear.Parse rejects
+        // empty/short input via its own length guard, so no null branch is needed here.
+        return MonthYear.Parse(value);
     }
 
     /// <summary>

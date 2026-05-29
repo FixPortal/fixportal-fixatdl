@@ -134,7 +134,7 @@ public struct Tenor : IComparable
                     return result;
                 }
             }
-            catch (FormatException ex)
+            catch (Exception ex) when (ex is FormatException or OverflowException)
             {
                 throw ThrowHelper.New<ArgumentException>(ExceptionContext, ex, ErrorMessages.InvalidTenorValue, value);
             }
@@ -154,7 +154,10 @@ public struct Tenor : IComparable
             TenorTypeValue.Day => string.Format(CultureInfo.InvariantCulture, "D{0}", Offset),
             TenorTypeValue.Week => string.Format(CultureInfo.InvariantCulture, "W{0}", Offset),
             TenorTypeValue.Month => string.Format(CultureInfo.InvariantCulture, "M{0}", Offset),
-            _ => string.Format(CultureInfo.InvariantCulture, "Y{0}", Offset),
+            TenorTypeValue.Year => string.Format(CultureInfo.InvariantCulture, "Y{0}", Offset),
+            // A default/unparsed Tenor (TenorType=Invalid) must not be silently serialized as the
+            // syntactically-valid-but-wrong wire value "Y0"; surface it instead of corrupting the wire.
+            _ => throw new InvalidOperationException($"Cannot serialize a Tenor with an invalid tenor type (offset {Offset})."),
         };
     }
 
@@ -197,11 +200,31 @@ public struct Tenor : IComparable
 
     private static int Compare(Tenor lhs, Tenor rhs)
     {
-        if (lhs.TenorType != rhs.TenorType)
+        // Same unit: compare offsets exactly (D5 vs D7).
+        if (lhs.TenorType == rhs.TenorType)
         {
-            throw ThrowHelper.New<NotSupportedException>(ExceptionContext, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
+            return lhs.Offset.CompareTo(rhs.Offset);
         }
 
-        return lhs.Offset.CompareTo(rhs.Offset);
+        // Different units (e.g. D7 vs M1): order deterministically by approximate duration so that
+        // Min/Max range validation in Tenor_t.ValidateValue cannot throw NotSupportedException on a
+        // mixed-unit bound. Note equality (operator ==) remains exact (unit + offset).
+        return lhs.ApproximateDays().CompareTo(rhs.ApproximateDays());
+    }
+
+    /// <summary>
+    /// Approximate duration of this tenor expressed in days, used solely to give cross-unit
+    /// comparisons a deterministic total order (D=1, W=7, M=30, Y=365).
+    /// </summary>
+    private readonly double ApproximateDays()
+    {
+        return TenorType switch
+        {
+            TenorTypeValue.Day => Offset,
+            TenorTypeValue.Week => Offset * 7.0,
+            TenorTypeValue.Month => Offset * 30.0,
+            TenorTypeValue.Year => Offset * 365.0,
+            _ => double.NaN,
+        };
     }
 }

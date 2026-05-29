@@ -77,13 +77,21 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
         string[] formats = GetDateTimeFormatStrings();
 
 
-        if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime result))
+        if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, WireParseStyles, out DateTime result))
         {
             return result;
         }
 
         throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidDateOrTimeValue, value);
     }
+
+    /// <summary>
+    /// <see cref="DateTimeStyles"/> applied when parsing a wire value. The default preserves the
+    /// parsed text as-is (whitespace tolerated). Timezone-bearing types override this to normalise
+    /// an explicit offset to UTC so that round-trip output is canonical and host-offset-independent.
+    /// Date-only / local types deliberately do NOT adjust, so they must not change this.
+    /// </summary>
+    protected virtual DateTimeStyles WireParseStyles => DateTimeStyles.AllowWhiteSpaces;
 
     /// <summary>
     /// Converts the supplied value to a string, as might be used on the FIX wire.
@@ -170,10 +178,11 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     /// <summary>
     /// Gets the DateTime format strings to use when converting this date/time to a FIX string and vice versa.
     /// </summary>
-    /// <returns>Format strings suitable when calling DateTime.ToString().  At least one format string will be 
+    /// <returns>Format strings suitable when calling DateTime.ToString().  At least one format string will be
     /// returned.</returns>
     /// <remarks>When converting from DateTime to string, the first member of the returned array is used.  When
-    /// converting from string to DateTime, the member of the array that has the same length as the string
-    /// value is used.</remarks>
+    /// converting from string to DateTime, every member of the array is supplied to
+    /// <see cref="DateTime.TryParseExact(string, string[], IFormatProvider, DateTimeStyles, out DateTime)"/>,
+    /// which tries them in turn — the formats are not dispatched by string length.</remarks>
     protected abstract string[] GetDateTimeFormatStrings();
 }
