@@ -622,6 +622,15 @@ namespace FixPortal.FixAtdl.Resources {
                 return ResourceManager.GetString("UnsupportedParameterValueConversion", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The value supplied for this {0} field is invalid; it must not contain the FIX field delimiter (SOH)..
+        /// </summary>
+        internal static string ValueContainsDelimiter {
+            get {
+                return ResourceManager.GetString("ValueContainsDelimiter", resourceCulture);
+            }
+        }
     }
 }
 

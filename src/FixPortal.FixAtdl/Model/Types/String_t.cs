@@ -5,6 +5,7 @@
 //
 #endregion
 
+using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -52,6 +53,14 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
         if (MinLength != null && value != null && value.Length < MinLength)
         {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinLengthExceeded, value, MinLength);
+        }
+
+        // The type contract is "any character except the delimiter": a value carrying the FIX field
+        // delimiter (SOH) would corrupt framing / inject fields when emitted via FixMessage.ToFix, so
+        // reject it here. ('=' is intentionally allowed — FIX values may contain it; only SOH frames.)
+        if (value != null && value.Contains(FixMessage.SOH))
+        {
+            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.ValueContainsDelimiter, "string");
         }
 
         if (isRequired && string.IsNullOrEmpty(value))

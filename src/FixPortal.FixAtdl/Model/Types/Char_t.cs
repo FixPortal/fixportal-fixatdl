@@ -6,6 +6,7 @@
 #endregion
 
 using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -34,6 +35,13 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
     /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
     protected override ValidationResult ValidateValue(char? value, bool isRequired)
     {
+        // The type contract is "any character except the delimiter": the FIX field delimiter (SOH)
+        // would corrupt framing when emitted via FixMessage.ToFix, so reject it here.
+        if (value == FixMessage.SOH)
+        {
+            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.ValueContainsDelimiter, "char");
+        }
+
         if (isRequired && value == null)
         {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);

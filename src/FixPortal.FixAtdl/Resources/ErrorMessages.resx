@@ -161,6 +161,9 @@
   <data name="InvalidCharValue" xml:space="preserve">
     <value>The value supplied, '{0}' for this char field is invalid; it must be exactly one character in length.</value>
   </data>
+  <data name="ValueContainsDelimiter" xml:space="preserve">
+    <value>The value supplied for this {0} field is invalid; it must not contain the FIX field delimiter (SOH).</value>
+  </data>
   <data name="InvalidFIXTimeFormat" xml:space="preserve">
     <value>The timestamp supplied, '{0}', was not in a valid format.</value>
   </data>
