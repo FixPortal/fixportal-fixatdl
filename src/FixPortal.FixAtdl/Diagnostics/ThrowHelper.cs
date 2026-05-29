@@ -7,6 +7,7 @@
 
 using System.Globalization;
 using System.Reflection;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -19,6 +20,12 @@ public static class ThrowHelper
 {
     // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
     private static readonly ILogger _log = NullLogger.Instance;
+
+    // Format the message only when arguments are supplied. With zero args, string.Format would still
+    // parse the format string for placeholders and throw FormatException on literal braces (e.g.
+    // "{NULL}", "Nullable{Int32}", XML payloads), corrupting the error-reporting path (F1c).
+    private static string FormatMessage(string format, object?[] args)
+        => args.Length > 0 ? string.Format(CultureInfo.InvariantCulture, format, args) : format;
 
     /// <summary>
     /// Creates an exception of the specified type and initializes it using the values supplied.
@@ -64,7 +71,7 @@ public static class ThrowHelper
     // FP Enhancement: 2026-05-23 — params object[] args -> params object?[] args to support nullable callers.
     public static T New<T>(object? source, string format, params object?[] args) where T : Exception
     {
-        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args), null);
+        T ex = CreateException<T>(source, FormatMessage(format, args), null);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -82,7 +89,7 @@ public static class ThrowHelper
     /// <returns>A new exception of the specified type.</returns>
     public static T New<T>(object? source, Exception innerException, string format, params object?[] args) where T : Exception
     {
-        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args), innerException, null);
+        T ex = CreateException<T>(source, FormatMessage(format, args), innerException, null);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -135,7 +142,7 @@ public static class ThrowHelper
     /// <returns>A new exception of the specified type.</returns>
     public static T New<T>(object? source, ExceptionInfo? info, string format, params object?[] args) where T : Exception
     {
-        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args), info);
+        T ex = CreateException<T>(source, FormatMessage(format, args), info);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -154,7 +161,7 @@ public static class ThrowHelper
     /// <returns>A new exception of the specified type.</returns>
     public static T New<T>(object? source, Exception innerException, ExceptionInfo? info, string format, params object?[] args) where T : Exception
     {
-        T ex = CreateException<T>(source, string.Format(CultureInfo.InvariantCulture, format, args), innerException, info);
+        T ex = CreateException<T>(source, FormatMessage(format, args), innerException, info);
 
         _log.LogError(ex, "Exception created by ThrowHelper");
 
@@ -172,7 +179,14 @@ public static class ThrowHelper
     /// <returns>A new exception of the same type as the supplied exception.</returns>
     public static Exception Rethrow(object? source, Exception ex, string format, params object[] args)
     {
-        Exception newException = Rethrow(source, ex, string.Format(CultureInfo.InvariantCulture, format, args), new object());
+        // Format ONCE. Callers of this params overload supply every argument the template needs
+        // (including ex.Message where it is referenced). Routing the formatted result through another
+        // formatting overload — as the previous implementation did — string.Formats it a SECOND time,
+        // which throws FormatException on literal braces ({NULL}, XML) or silently substitutes a stray
+        // {0}/{1} (F1a / F1b). The no-args case skips formatting so a brace-bearing literal is safe (F1c).
+        string message = FormatMessage(format, args);
+
+        Exception newException = BuildRethrown(source, ex, null, message);
 
         _log.LogError(newException, "Exception rethrown by ThrowHelper");
 
@@ -209,11 +223,30 @@ public static class ThrowHelper
     /// <returns>A new exception of the same type as the supplied exception.</returns>
     public static Exception Rethrow(object? source, Exception ex, ExceptionInfo? info, string format, object arg)
     {
-        Type classType = ex.GetType();
+        // Single-arg convention: the template references the argument as {0} and ex.Message as {1}.
+        // Formatted exactly once here; BuildRethrown does no further formatting.
+        string message = string.Format(CultureInfo.InvariantCulture, format, arg, ex.Message);
 
-        ConstructorInfo classConstructor = classType.GetConstructor([typeof(string), typeof(Exception)])!;
+        Exception newException = BuildRethrown(source, ex, info, message);
 
-        Exception exception = (Exception)classConstructor.Invoke([string.Format(CultureInfo.InvariantCulture, format, arg, ex.Message), ex]);
+        _log.LogError(newException, "Exception rethrown by ThrowHelper");
+
+        return newException;
+    }
+
+    // Builds a replacement exception of the same runtime type as 'ex' from an ALREADY-FORMATTED
+    // message (no further string.Format). If that type has no (string, Exception) constructor the
+    // original exception is preserved rather than throwing a NullReferenceException off GetConstructor (F2).
+    private static Exception BuildRethrown(object? source, Exception ex, ExceptionInfo? info, string message)
+    {
+        ConstructorInfo? classConstructor = ex.GetType().GetConstructor([typeof(string), typeof(Exception)]);
+
+        if (classConstructor == null)
+        {
+            return ex;
+        }
+
+        Exception exception = (Exception)classConstructor.Invoke([message, ex]);
 
         exception.Source = source?.ToString();
 
@@ -234,7 +267,8 @@ public static class ThrowHelper
             case "ArgumentOutOfRangeException":
             case "ArgumentNullException":
                 {
-                    ConstructorInfo classConstructor = classType.GetConstructor([typeof(string), typeof(string)])!;
+                    ConstructorInfo classConstructor = classType.GetConstructor([typeof(string), typeof(string)])
+                        ?? throw new InternalErrorException($"Exception type '{classType.FullName}' has no (string, string) constructor required by ThrowHelper. Message: {message}");
                     T exception = (T)classConstructor.Invoke(["Value", message]);
                     exception.Source = source?.ToString();
                     info?.PopulateExceptionData(exception.Data);
@@ -244,7 +278,8 @@ public static class ThrowHelper
 
             default:
                 {
-                    ConstructorInfo classConstructor = classType.GetConstructor([typeof(string)])!;
+                    ConstructorInfo classConstructor = classType.GetConstructor([typeof(string)])
+                        ?? throw new InternalErrorException($"Exception type '{classType.FullName}' has no (string) constructor required by ThrowHelper. Message: {message}");
                     T exception = (T)classConstructor.Invoke([message]);
                     exception.Source = source?.ToString();
                     info?.PopulateExceptionData(exception.Data);
@@ -259,7 +294,8 @@ public static class ThrowHelper
     {
         Type classType = typeof(T);
 
-        ConstructorInfo classConstructor = classType.GetConstructor([typeof(string), typeof(Exception)])!;
+        ConstructorInfo classConstructor = classType.GetConstructor([typeof(string), typeof(Exception)])
+            ?? throw new InternalErrorException($"Exception type '{classType.FullName}' has no (string, Exception) constructor required by ThrowHelper. Message: {message}");
 
         T exception = (T)classConstructor.Invoke([message, innerException]);
 

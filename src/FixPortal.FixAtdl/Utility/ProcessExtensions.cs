@@ -27,14 +27,19 @@ public static class ProcessExtensions
     {
         if (process == null)
         {
-            throw ThrowHelper.New<NullReferenceException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
+            // Bad input is an argument error, not a manufactured NullReferenceException (F5).
+            throw ThrowHelper.New<ArgumentNullException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
         }
 
-        if (process.MainModule != null)
+        try
         {
-            return process.MainModule.ModuleName.Contains("devenv.exe");
+            return process.MainModule?.ModuleName.Contains("devenv.exe") ?? false;
         }
-
-        return false;
+        catch (Exception)
+        {
+            // Reading MainModule can itself throw (process exited, access denied, cross-bitness). A
+            // boolean probe must not raise framework exceptions of its own (G-E).
+            return false;
+        }
     }
 }
