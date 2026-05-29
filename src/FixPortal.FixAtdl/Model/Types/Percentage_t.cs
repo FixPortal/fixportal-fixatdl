@@ -42,18 +42,19 @@ public class Percentage_t : Float_t
     {
         if (value != null)
         {
-            int adjustmentFactor = MultiplyBy100 == true ? 1 : 100;
-
+            // The bound comparison is against the native fraction (0.75 == 75%); the error message,
+            // however, is shown in the user-facing whole-percent units the control uses, so always
+            // scale by 100 regardless of MultiplyBy100 (which governs only the wire representation).
             if (MaxValue != null && (decimal)value > MaxValue)
             {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded,
-                    RemoveTrailingZeroes(value * adjustmentFactor)!, RemoveTrailingZeroes(MaxValue.Value * adjustmentFactor)!);
+                    RemoveTrailingZeroes(value * 100)!, RemoveTrailingZeroes(MaxValue.Value * 100)!);
             }
 
             if (MinValue != null && (decimal)value < MinValue)
             {
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded,
-                    RemoveTrailingZeroes(value * adjustmentFactor)!, RemoveTrailingZeroes(MinValue.Value * adjustmentFactor)!);
+                    RemoveTrailingZeroes(value * 100)!, RemoveTrailingZeroes(MinValue.Value * 100)!);
             }
         }
         else if (isRequired)
@@ -121,7 +122,7 @@ public class Percentage_t : Float_t
     {
         decimal? convertedValue = value.ToDecimal(hostParameter, CultureInfo.InvariantCulture);
 
-        return convertedValue != null ? convertedValue /= 100 : null;
+        return convertedValue != null ? convertedValue / 100 : null;
     }
 
     /// <summary>
@@ -166,12 +167,11 @@ public class Percentage_t : Float_t
     {
         decimal? value = ConstValue ?? _value;
 
-        if (value == null || MultiplyBy100 == true)
-        {
-            return value;
-        }
-
-        return RemoveTrailingZeroes(value * 100);
+        // The control always works in whole-percent units (75 for 75%); MultiplyBy100 affects only
+        // the wire representation, not the control. The native value is always the fraction (0.75),
+        // so scale up by 100 in both cases. (Previously the MultiplyBy100==true branch returned the
+        // raw fraction, so a load/edit/save cycle shrank the displayed value 100x.)
+        return value != null ? RemoveTrailingZeroes(value * 100) : null;
     }
 
     /// <summary>

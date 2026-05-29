@@ -166,7 +166,7 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     /// <returns>A valid EnumState, assuming the source value can be correctly converted.</returns>
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
-        if (_value == null)
+        if ((ConstValue ?? _value) == null)
         {
             return new EnumState(enumPairs.EnumIds);
         }

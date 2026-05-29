@@ -5,6 +5,7 @@
 //
 #endregion
 
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -85,7 +86,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
             ? true
             : value == falseValue
             ? false
-            : throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.InvalidBooleanValue, value, trueValue, falseValue);
+            : throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InvalidBooleanValue, value, trueValue, falseValue);
 
         return result;
     }
@@ -144,7 +145,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <returns>One of true, false or null which is equivalent to the value of this instance.</returns>
     public bool? ToBoolean()
     {
-        return _value;
+        return ConstValue ?? _value;
     }
 
     /// <summary>
@@ -154,7 +155,9 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
     public string? ToString(IFormatProvider? provider)
     {
-        return _value != null ? ((bool)_value).ToString().ToLower() : null;
+        bool? value = ConstValue ?? _value;
+
+        return value != null ? ((bool)value).ToString().ToLowerInvariant() : null;
     }
 
     /// <summary>

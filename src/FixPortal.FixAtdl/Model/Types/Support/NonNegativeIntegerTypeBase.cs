@@ -16,7 +16,8 @@ using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 namespace FixPortal.FixAtdl.Model.Types.Support;
 
 /// <summary>
-/// Abstract base class for FIXatdl types that require positive integers.
+/// Abstract base class for FIXatdl types backed by a non-negative integer (zero or greater). Types
+/// that additionally forbid zero derive from <see cref="NonZeroPositiveIntegerTypeBase"/>.
 /// </summary>
 public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControlConvertible
 {
@@ -46,7 +47,9 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
     /// <returns>Value converted from a string.</returns>
     protected override uint? ConvertFromWireValueFormat(string value)
     {
-        return value != null ? Convert.ToUInt32(value, CultureInfo.InvariantCulture) : null;
+        // 'value' is non-nullable (an empty FIX field is invalid); the dead null branch is removed.
+        // Convert.ToUInt32 FormatException/OverflowException are translated at the SetWireValue boundary.
+        return Convert.ToUInt32(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -131,7 +134,9 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
     /// <returns>A valid EnumState, assuming the source value can be correctly converted.</returns>
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
-        if (_value == null)
+        uint? value = ConstValue ?? _value;
+
+        if (value == null)
         {
             return new EnumState(enumPairs.EnumIds);
         }

@@ -12,7 +12,8 @@ namespace FixPortal.FixAtdl.Model.Types;
 /// <summary>
 /// 'int field representing the length in bytes. Value must be positive.'
 /// </summary>
-public class Length_t : NonNegativeIntegerTypeBase
+/// <remarks>The FIX contract requires a positive (non-zero) value, hence the non-zero base.</remarks>
+public class Length_t : NonZeroPositiveIntegerTypeBase
 {
 }
 
