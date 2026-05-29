@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Reflection;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Resources;
 
@@ -30,14 +31,27 @@ public static class StringExtensions
             throw ThrowHelper.New<ArgumentNullException>(ExceptionContext, ErrorMessages.NullOrEmptyStringEnumParseFailure, typeof(T).Name);
         }
 
+        T result;
+
         try
         {
-            return Enum.Parse<T>(value, true);
+            result = Enum.Parse<T>(value, true);
         }
         catch (ArgumentException ex)
         {
             throw ThrowHelper.New<ArgumentException>(ExceptionContext, ex, ErrorMessages.InvalidValueEnumParseFailure, value, typeof(T).Name);
         }
+
+        // Enum.Parse accepts a raw underlying numeric value even when it is not a defined member
+        // (e.g. "999"), letting undefined enum values slip into the model. Reject anything that is
+        // not a defined member — except for [Flags] enums, where a combined value (the bitwise OR
+        // of several members) is legitimately not itself a single defined member.
+        if (!Enum.IsDefined(result) && typeof(T).GetCustomAttribute<FlagsAttribute>() is null)
+        {
+            throw ThrowHelper.New<ArgumentException>(ExceptionContext, ErrorMessages.InvalidValueEnumParseFailure, value, typeof(T).Name);
+        }
+
+        return result;
     }
 }
 

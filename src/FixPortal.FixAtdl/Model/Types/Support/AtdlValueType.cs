@@ -144,7 +144,7 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
                 ErrorMessages.InvalidParameterSetValue, hostParameter.Name, value, ex.Message);
         }
 
-        ValidationResult result = ValidateValue(convertedValue, true);
+        ValidationResult result = ValidateValue(convertedValue, hostParameter.Use == Use_t.Required);
 
         _value = result.IsValid
             ? convertedValue

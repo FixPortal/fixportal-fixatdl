@@ -63,9 +63,10 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
     /// desired type, provided that the underlying value supports that type.</remarks>
     public IControlConvertible GetValueForControl(IParameter hostParameter)
     {
-        // This base type doesn't know how to convert to control value types, but derived types must
-        // implement IControlConvertible.
-        return (this as IControlConvertible)!;
+        // Derived reference types must implement IControlConvertible; surface a clear diagnostic
+        // rather than a null-forgiving NRE should a future type fail to.
+        return this as IControlConvertible
+            ?? throw ThrowHelper.New<InternalErrorException>(this, $"Parameter type {GetType().Name} does not implement IControlConvertible.");
     }
 
     /// <summary>
@@ -84,32 +85,21 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
 
         try
         {
-            _value = ConvertToNativeType(hostParameter, value);
+            T? candidate = ConvertToNativeType(hostParameter, value);
 
-            return ValidateValue(_value, hostParameter.Use == Use_t.Required);
-        }
-        catch (InvalidFieldValueException ex)
-        {
-            _log.LogError(ex, "Invalid value of type {Arg0} for parameter {Arg1}; exception text: {Arg2}",
-                hostParameter.Type, hostParameter.Name, ex.Message);
+            ValidationResult result = ValidateValue(candidate!, hostParameter.Use == Use_t.Required);
 
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.DataConversionFailure, HumanReadableTypeName);
-        }
-        catch (FormatException ex)
-        {
-            _log.LogError(ex, "Unable to convert value '{Arg0}' to type {Arg1} for parameter {Arg2}; exception text: {Arg3}",
-                value, hostParameter.Type, hostParameter.Name, ex.Message);
+            // Commit the converted value only when it validates (or is a legitimate null/cleared
+            // state). A rejected candidate must NOT leave the parameter reporting IsSet==true with
+            // the bad value still stored.
+            if (result.IsValid || candidate == null)
+            {
+                _value = candidate;
+            }
 
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.DataConversionFailure, HumanReadableTypeName);
+            return result;
         }
-        catch (InvalidCastException ex)
-        {
-            _log.LogError(ex, "Unable to convert value '{Arg0}' to type {Arg1} for parameter {Arg2}; exception text: {Arg3}",
-                value, hostParameter.Type, hostParameter.Name, ex.Message);
-
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.DataConversionFailure, HumanReadableTypeName);
-        }
-        catch (ArgumentException ex)
+        catch (Exception ex) when (ex is InvalidFieldValueException or FormatException or InvalidCastException or ArgumentException or OverflowException)
         {
             _log.LogError(ex, "Unable to convert value '{Arg0}' to type {Arg1} for parameter {Arg2}; exception text: {Arg3}",
                 value, hostParameter.Type, hostParameter.Name, ex.Message);
@@ -139,9 +129,21 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.AttemptToSetConstValueParameter, ConstValue);
         }
 
-        T convertedValue = ConvertFromWireValueFormat(value);
+        T convertedValue;
 
-        ValidationResult result = ValidateValue(convertedValue, true);
+        try
+        {
+            convertedValue = ConvertFromWireValueFormat(value);
+        }
+        catch (Exception ex) when (ex is FormatException or OverflowException)
+        {
+            // Translate raw BCL conversion failures into a domain InvalidFieldValueException at the
+            // wire boundary, matching the control-set path rather than leaking a raw exception.
+            throw ThrowHelper.New<InvalidFieldValueException>(this, ex,
+                ErrorMessages.InvalidParameterSetValue, hostParameter.Name, value, ex.Message);
+        }
+
+        ValidationResult result = ValidateValue(convertedValue, hostParameter.Use == Use_t.Required);
 
         _value = result.IsValid
             ? convertedValue

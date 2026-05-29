@@ -123,7 +123,7 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
     public string? ToString(IFormatProvider? provider)
     {
-        return _value;
+        return ConstValue ?? _value;
     }
 
     /// <summary>
@@ -150,13 +150,15 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     /// <returns>A valid EnumState, assuming the source value can be correctly converted.</returns>
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
-        if (_value == null)
+        string? value = ConstValue ?? _value;
+
+        if (value == null)
         {
             return new EnumState(enumPairs.EnumIds);
         }
         else
         {
-            return EnumState.FromWireValue(enumPairs, _value.ToString());
+            return EnumState.FromWireValue(enumPairs, value);
         }
     }
 

@@ -55,6 +55,13 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
             throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.InvalidNullOrEmptyStringValue);
         }
 
+        // A Char value is exactly one character. Previously only null/empty was rejected, so a
+        // multi-character wire value such as "AB" was silently truncated to its first character.
+        if (value.Length != 1)
+        {
+            throw ThrowHelper.New<ArgumentException>(this, $"A Char value must be exactly one character; received '{value}'.");
+        }
+
         return value[0];
     }
 
@@ -111,7 +118,7 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
     /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
     public string? ToString(IFormatProvider? provider)
     {
-        return _value?.ToString();
+        return (ConstValue ?? _value)?.ToString();
     }
 
     /// <summary>
@@ -138,13 +145,15 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
     /// <returns>A valid EnumState, assuming the source value can be correctly converted.</returns>
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
-        if (_value == null)
+        char? value = ConstValue ?? _value;
+
+        if (value == null)
         {
             return new EnumState(enumPairs.EnumIds);
         }
         else
         {
-            return EnumState.FromWireValue(enumPairs, ((char)_value).ToString());
+            return EnumState.FromWireValue(enumPairs, ((char)value).ToString());
         }
     }
 

@@ -46,17 +46,19 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
     protected override ValidationResult ValidateValue(char[] value, bool isRequired)
     {
-        if (MaxLength != null && value != null && value.Length > MaxLength)
+        if (value != null)
         {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxLengthExceeded, value, MaxLength);
-        }
+            if (MaxLength != null && value.Length > MaxLength)
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxLengthExceeded, value, MaxLength);
+            }
 
-        if (MinLength != null && value != null && value.Length < MinLength)
-        {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinLengthExceeded, value, MinLength);
+            if (MinLength != null && value.Length < MinLength)
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinLengthExceeded, value, MinLength);
+            }
         }
-
-        if (isRequired && value == null)
+        else if (isRequired)
         {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
         }
