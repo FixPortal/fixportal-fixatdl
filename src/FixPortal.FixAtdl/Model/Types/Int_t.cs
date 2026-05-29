@@ -75,7 +75,9 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override int? ConvertFromWireValueFormat(string value)
     {
-        return value != null ? Convert.ToInt32(value, CultureInfo.InvariantCulture) : null;
+        // 'value' is non-nullable (an empty FIX field is invalid); the dead null branch is removed.
+        // Convert.ToInt32 FormatException/OverflowException are translated at the SetWireValue boundary.
+        return Convert.ToInt32(value, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -160,7 +162,9 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
     /// <returns>A valid EnumState, assuming the source value can be correctly converted.</returns>
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
-        if (_value == null)
+        int? value = ConstValue ?? _value;
+
+        if (value == null)
         {
             return new EnumState(enumPairs.EnumIds);
         }
