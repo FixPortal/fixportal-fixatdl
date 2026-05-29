@@ -51,6 +51,11 @@ indent_size = 4
 indent_style = space
 tab_width = 4
 
+# SonarAnalyzer cognitive-complexity gate (S3776, threshold 15) — prefer cognitive
+# over cyclomatic complexity, which over-counts flat switch/ternary dispatch.
+# Advisory only: warning, never build-breaking.
+dotnet_diagnostic.S3776.severity = warning
+
 #### .NET Coding Conventions ####
 
 # Organize usings
