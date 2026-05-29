@@ -7,6 +7,7 @@
 
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace FixPortal.FixAtdl.Utility;
 
@@ -15,14 +16,26 @@ namespace FixPortal.FixAtdl.Utility;
 /// </summary>
 public static class ModelUtils
 {
-    private static readonly IEnumerable<Type> _types;
+    private static readonly Type[] _types;
     private static readonly Dictionary<string, MethodInfo> _methodInfoCache = [];
 
     static ModelUtils()
     {
-        _types = from t in Assembly.GetExecutingAssembly().GetTypes()
-                 where t.IsClass && t.Namespace == "FixPortal.FixAtdl.Model.Types" && !t.IsAbstract
-                 select t;
+        Type[] allTypes;
+
+        try
+        {
+            allTypes = Assembly.GetExecutingAssembly().GetTypes();
+        }
+        catch (ReflectionTypeLoadException ex)
+        {
+            // One unloadable type would otherwise bubble a TypeInitializationException out of this
+            // static constructor and brick every consumer of ModelUtils for the process lifetime.
+            allTypes = [.. ex.Types.Where(t => t != null).Cast<Type>()];
+        }
+
+        // Materialise once so GetTypeFromName does not re-run the LINQ predicate on every call.
+        _types = [.. allTypes.Where(t => t.IsClass && t.Namespace == "FixPortal.FixAtdl.Model.Types" && !t.IsAbstract)];
     }
 
     /// <summary>
@@ -35,9 +48,13 @@ public static class ModelUtils
     public static bool VisitHelper(Type visitorType, object visitor, object target)
     {
         Type targetParamType = target.GetType();
-        string searchString = string.Format(CultureInfo.InvariantCulture, "{0}:{1}", visitorType.FullName, targetParamType.FullName);
 
-        MethodInfo? methodInfo = null;
+        // Include the CONCRETE visitor type in the key, not just the declared visitorType: two
+        // implementations of the same visitor interface would otherwise collide on one cache entry and
+        // the second would invoke the first's MethodInfo, throwing a TargetException (F3).
+        string searchString = string.Format(CultureInfo.InvariantCulture, "{0}:{1}:{2}", visitorType.FullName, visitor.GetType().FullName, targetParamType.FullName);
+
+        MethodInfo? methodInfo;
 
         lock (_methodInfoCache)
         {
@@ -52,11 +69,21 @@ public static class ModelUtils
                     return false;
                 }
 
-                _methodInfoCache.Add(searchString, methodInfo);
+                // Indexer rather than Add: idempotent if the same key is computed twice.
+                _methodInfoCache[searchString] = methodInfo;
             }
         }
 
-        methodInfo.Invoke(visitor, [target]);
+        try
+        {
+            methodInfo.Invoke(visitor, [target]);
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            // Surface the visitor's own exception (preserving its stack) rather than wrapping it in a
+            // TargetInvocationException from the reflective Invoke (G-C).
+            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+        }
 
         return true;
     }
