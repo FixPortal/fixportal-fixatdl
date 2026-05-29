@@ -30,25 +30,36 @@ public class ControlCollection : ObservableCollection<Control_t>
     }
 
     /// <summary>
-    /// Adds the specified item.
+    /// Inserts an item, parenting it to the owning panel and refreshing layout indexes. Implemented
+    /// as overrides of the ObservableCollection virtual hooks (rather than <c>new Add</c>/<c>new
+    /// Remove</c>) so the parent-wiring and index maintenance cannot be bypassed by base-typed
+    /// access, an initializer or AddRange.
     /// </summary>
+    /// <param name="index">The insertion index.</param>
     /// <param name="item">The item.</param>
-    public new void Add(Control_t item)
+    protected override void InsertItem(int index, Control_t item)
     {
-        (item as IParentable<StrategyPanel_t>).Parent = _owner;
+        ((IParentable<StrategyPanel_t>)item).Parent = _owner;
 
-        base.Add(item);
+        base.InsertItem(index, item);
 
-        item.Index = Count - 1;
+        RefreshIndexes();
     }
 
-    /// <summary>
-    /// Removes the specified item.
-    /// </summary>
-    /// <param name="item">The item.</param>
-    public new void Remove(Control_t item)
+    /// <inheritdoc />
+    protected override void SetItem(int index, Control_t item)
     {
-        base.Remove(item);
+        ((IParentable<StrategyPanel_t>)item).Parent = _owner;
+
+        base.SetItem(index, item);
+
+        RefreshIndexes();
+    }
+
+    /// <inheritdoc />
+    protected override void RemoveItem(int index)
+    {
+        base.RemoveItem(index);
 
         RefreshIndexes();
     }

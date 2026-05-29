@@ -48,14 +48,14 @@ public class EnumPairCollection : KeyedCollection<string, EnumPair_t>
     /// <returns></returns>
     public string GetWireValueFromEnumId(string enumId)
     {
-        EnumPair_t enumPair = this[enumId];
-
-        if (enumPair == null)
+        // The KeyedCollection indexer throws a raw KeyNotFoundException on a miss (it never returns
+        // null), so the old null-check was dead. Check membership first and surface the domain error.
+        if (!Contains(enumId))
         {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.EnumerationNotFound, enumId);
         }
 
-        return enumPair.WireValue;
+        return this[enumId].WireValue;
     }
 
     /// <summary>
