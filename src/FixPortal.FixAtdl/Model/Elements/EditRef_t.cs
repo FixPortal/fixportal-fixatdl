@@ -31,6 +31,13 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
     private Edit_t<T> _referencedEdit = null!;
 
     /// <summary>
+    /// The resolved referenced edit. Accessing this before <see cref="IResolvable{Strategy_t,T}.Resolve"/>
+    /// has linked the EditRef surfaces a clear diagnostic rather than a bare NullReferenceException.
+    /// </summary>
+    private Edit_t<T> ReferencedEdit => _referencedEdit
+        ?? throw ThrowHelper.New<InternalErrorException>(this, $"EditRef '{Id}' has not been resolved; Resolve must be called before the referenced edit is accessed.");
+
+    /// <summary>
     /// Initializes a new <see cref="EditRef_t{T}"/>.
     /// </summary>
     /// <param name="id">The identifier of the referenced edit.</param>
@@ -58,7 +65,7 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
     /// </summary>
     public void Evaluate()
     {
-        _referencedEdit.Evaluate(FixFieldValueProvider.Empty);
+        ReferencedEdit.Evaluate(FixFieldValueProvider.Empty);
     }
 
     /// <summary>
@@ -69,7 +76,7 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
     /// <inheritdoc />
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
-        _referencedEdit.Evaluate(additionalValues);
+        ReferencedEdit.Evaluate(additionalValues);
     }
 
     #region IEdit_t Members
@@ -77,47 +84,47 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
     /// <inheritdoc />
     public string Field
     {
-        get => _referencedEdit.Field; set => _referencedEdit.Field = value;
+        get => ReferencedEdit.Field; set => ReferencedEdit.Field = value;
     }
 
     /// <inheritdoc />
     public string Field2
     {
-        get => _referencedEdit.Field2; set => _referencedEdit.Field2 = value;
+        get => ReferencedEdit.Field2; set => ReferencedEdit.Field2 = value;
     }
 
     /// <inheritdoc />
     public Operator_t? Operator
     {
-        get => _referencedEdit.Operator; set => _referencedEdit.Operator = value;
+        get => ReferencedEdit.Operator; set => ReferencedEdit.Operator = value;
     }
 
     /// <inheritdoc />
     public LogicOperator_t? LogicOperator
     {
-        get => _referencedEdit.LogicOperator; set => _referencedEdit.LogicOperator = value;
+        get => ReferencedEdit.LogicOperator; set => ReferencedEdit.LogicOperator = value;
     }
 
     /// <inheritdoc />
     public string Value
     {
-        get => _referencedEdit.Value; set => _referencedEdit.Value = value;
+        get => ReferencedEdit.Value; set => ReferencedEdit.Value = value;
     }
 
     /// <inheritdoc />
-    public object FieldValue => _referencedEdit.FieldValue;
+    public object FieldValue => ReferencedEdit.FieldValue;
 
     /// <inheritdoc />
-    public object Field2Value => _referencedEdit.Field2Value;
+    public object Field2Value => ReferencedEdit.Field2Value;
 
     /// <inheritdoc />
-    public bool CurrentState => _referencedEdit.CurrentState;
+    public bool CurrentState => ReferencedEdit.CurrentState;
 
     /// <inheritdoc />
-    public EditEvaluatingCollection<T> Edits => _referencedEdit.Edits;
+    public EditEvaluatingCollection<T> Edits => ReferencedEdit.Edits;
 
     /// <inheritdoc />
-    public HashSet<string> Sources => _referencedEdit.Sources;
+    public HashSet<string> Sources => ReferencedEdit.Sources;
 
     #endregion
 

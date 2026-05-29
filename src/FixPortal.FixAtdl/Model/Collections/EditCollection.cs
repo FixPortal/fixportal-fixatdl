@@ -6,7 +6,10 @@
 #endregion
 
 using System.Collections.ObjectModel;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Validation;
 
 namespace FixPortal.FixAtdl.Model.Collections;
@@ -46,6 +49,14 @@ public class EditCollection : KeyedCollection<string, Edit_t>
     /// <returns></returns>
     public Edit_t<T> Clone<T>(string Id) where T : class, IValueProvider
     {
+        // Surface a located domain error for a dangling EditRef rather than a raw KeyNotFoundException
+        // from the indexer (Theme G). Callers normally pre-check Contains, but Clone may be reached
+        // directly.
+        if (!Contains(Id))
+        {
+            throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefResolutionFailure, Id);
+        }
+
         Edit_t sourceEdit = this[Id];
 
         return Copy<T>(sourceEdit);
@@ -58,7 +69,9 @@ public class EditCollection : KeyedCollection<string, Edit_t>
     /// <returns>Copy of source Edit_t instance.</returns>
     private Edit_t<T> Copy<T>(Edit_t source) where T : class, IValueProvider
     {
-        Edit_t<T> target = new() { Field = source.Field, Field2 = source.Field2, LogicOperator = source.LogicOperator, Operator = source.Operator, Value = source.Value };
+        // Carry the source Id across — Clone previously dropped it, producing an anonymous copy (M1).
+        // (The non-generic Edit_t source carries no EditRefs, so there are none to copy here.)
+        Edit_t<T> target = new() { Id = source.Id, Field = source.Field, Field2 = source.Field2, LogicOperator = source.LogicOperator, Operator = source.Operator, Value = source.Value };
 
         foreach (Edit_t child in source.Edits)
         {

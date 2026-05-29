@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
@@ -237,7 +238,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
         result = 0;
         bool hasValue = !string.IsNullOrEmpty(value);
 
-        if (hasValue && !int.TryParse(value, out result))
+        if (hasValue && !int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out result))
         {
             throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidNumericValue, value);
         }
@@ -257,7 +258,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
         result = 0;
         bool hasValue = !string.IsNullOrEmpty(value);
 
-        if (hasValue && !uint.TryParse(value, out result))
+        if (hasValue && !uint.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out result))
         {
             throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidNumericValue, value);
         }
@@ -277,7 +278,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
         result = 0;
         bool hasValue = !string.IsNullOrEmpty(value);
 
-        if (hasValue && !decimal.TryParse(value, out result))
+        if (hasValue && !decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out result))
         {
             throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidNumericValue, value);
         }

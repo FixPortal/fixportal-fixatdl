@@ -19,6 +19,7 @@ namespace FixPortal.FixAtdl.Model.Elements;
 public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrategyPanel
 {
     private StrategyPanel_t? _owningStrategyPanel;
+    private bool _disposed;
 
     /// <summary>
     /// Gets or sets the border applied to the panel.
@@ -113,10 +114,27 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
     /// <param name="disposing"><see langword="true"/> to release managed resources; otherwise, <see langword="false"/>.</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (disposing && OwningStrategy != null)
+        if (_disposed)
         {
-            Controls.CollectionChanged -= new NotifyCollectionChangedEventHandler(OwningStrategy.Controls.SourceCollectionChanged);
+            return;
         }
+
+        if (disposing)
+        {
+            if (OwningStrategy != null)
+            {
+                Controls.CollectionChanged -= new NotifyCollectionChangedEventHandler(OwningStrategy.Controls.SourceCollectionChanged);
+            }
+
+            // Recurse over child panels so their Controls -> OwningStrategy subscriptions are released
+            // too; disposing only the root panel otherwise leaks every descendant panel's subscription.
+            foreach (StrategyPanel_t childPanel in StrategyPanels)
+            {
+                childPanel.Dispose();
+            }
+        }
+
+        _disposed = true;
     }
 
     /// <summary>

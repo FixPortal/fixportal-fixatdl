@@ -146,7 +146,9 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         // Convert to string so we can remove trailing ', '
         string text = sb.ToString();
 
-        return string.Format(CultureInfo.InvariantCulture, "{0})", text[..^2]);
+        // Guard the trailing ", " trim: an empty edit leaves the buffer as just "(", so text[..^2]
+        // would throw ArgumentOutOfRangeException.
+        return text.Length > 1 ? string.Format(CultureInfo.InvariantCulture, "{0})", text[..^2]) : "()";
     }
 
     /// <summary>
@@ -165,7 +167,12 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
             if (Operator != null)
             {
-                sources.Add(Field);
+                // Field may be unset (e.g. only Field2 is configured); never add a null into the
+                // HashSet<string>, which would NRE in consumers / pollute subscription wiring.
+                if (Field != null)
+                {
+                    sources.Add(Field);
+                }
 
                 if (Field2 != null)
                 {
@@ -374,6 +381,15 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             }
 
             return false;
+        }
+
+        // Operands of different runtime types (e.g. a decimal LHS vs a non-numeric string RHS, after
+        // NormaliseNumericString) cannot be ordered: IComparable.CompareTo would throw a raw
+        // ArgumentException. Surface a clear domain error instead. (A null RHS is left to CompareTo,
+        // preserving the existing null-RHS handling.)
+        if (rhs != null && lhs.GetType() != rhs.GetType())
+        {
+            throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
         }
 
         int compareResult = lhs.CompareTo(rhs);
