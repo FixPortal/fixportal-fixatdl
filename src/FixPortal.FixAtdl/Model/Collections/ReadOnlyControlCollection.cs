@@ -16,8 +16,6 @@ using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Validation;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Collections;
@@ -27,9 +25,6 @@ namespace FixPortal.FixAtdl.Model.Collections;
 /// </summary>
 public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Control_t>, ISimpleDictionary<Control_t>
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly NullLogger _log = NullLogger.Instance;
-
     private Strategy_t _owner;
     private readonly Dictionary<string, Control_t> _controls = [];
 
@@ -211,11 +206,6 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             // We only want to update the control value if the parameter has a value
             if (parameterValue != null)
             {
-                if (_log.IsEnabled(LogLevel.Debug))
-                {
-                    _log.LogDebug("Updating control {ControlId} value from parameter {ParameterName}", control.Id, parameter.Name);
-                }
-
                 control.SetValueFromParameter(parameter);
 
                 UpdateRelatedHelperControls(control);

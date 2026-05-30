@@ -13,8 +13,6 @@ using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Validation;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Types.Support;
@@ -32,8 +30,6 @@ namespace FixPortal.FixAtdl.Model.Types.Support;
 /// other uses T.)</remarks>
 public abstract class AtdlValueType<T> : IParameterType where T : struct
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly ILogger _log = NullLogger.Instance;
     private static readonly CompositeFormat _attemptToSetConstValueParameterFormat = CompositeFormat.Parse(ErrorMessages.AttemptToSetConstValueParameter);
 
     /// <summary>
@@ -101,9 +97,6 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
         }
         catch (Exception ex) when (ex is InvalidFieldValueException or FormatException or InvalidCastException or ArgumentException or OverflowException)
         {
-            _log.LogError(ex, "Unable to convert value '{Arg0}' to type {Arg1} for parameter {Arg2}; exception text: {Arg3}",
-                value, hostParameter.Type, hostParameter.Name, ex.Message);
-
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.DataConversionFailure, HumanReadableTypeName);
         }
     }

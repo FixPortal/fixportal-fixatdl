@@ -14,8 +14,6 @@ using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Validation;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Elements;
@@ -27,9 +25,6 @@ namespace FixPortal.FixAtdl.Model.Elements;
 /// <example>To create a parameter with underlying type Amt_t, use <c>new Parameter_t&lt;Amt_t&gt;</c>.</example>
 public class Parameter_t<T> : IParameter where T : IParameterType, new()
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// The underlying value of this parameter.
     /// </summary>
@@ -41,11 +36,6 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     /// <param name="name">Name of this parameter. See <see cref="IParameter.Name"/> for constraints on parameter names.</param>
     public Parameter_t(string name)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("New Parameter_t<{Arg0}> created, Name='{Arg1}'.", typeof(T).Name, name);
-        }
-
         Name = name;
         Type = typeof(T).Name;
 
@@ -69,11 +59,6 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     /// </summary>
     public void Reset()
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Parameter_t<{Arg0}> {Arg1} reset.", typeof(T).Name, Name);
-        }
-
         _value.Reset();
     }
 

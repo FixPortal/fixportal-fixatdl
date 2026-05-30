@@ -14,8 +14,6 @@ using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Validation;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Elements;
 
@@ -25,9 +23,6 @@ namespace FixPortal.FixAtdl.Model.Elements;
 public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, IValueProvider
 {
     // Use FixPortal.FixAtdl.Validation namespace rather than FixPortal.FixAtdl.Model.Elements for debugging purposes
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     private Edit_t<T> _referencedEdit = null!;
 
     /// <summary>
@@ -135,29 +130,14 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
         if (strategy.Edits.Contains(Id))
         {
             _referencedEdit = strategy.Edits.Clone<T>(Id);
-
-            if (_log.IsEnabled(LogLevel.Debug))
-            {
-                _log.LogDebug("EditRef Id {Arg0} linked to new Edit_t resolved from Strategy '{Arg1}'", Id, strategy.Name);
-            }
         }
         else
         {
             Strategies_t strategies = strategy.Parent;
 
-            if (strategies != null && strategies.Edits.Contains(Id))
-            {
-                _referencedEdit = strategies.Edits.Clone<T>(Id);
-
-                if (_log.IsEnabled(LogLevel.Debug))
-                {
-                    _log.LogDebug("EditRef Id {Arg0} linked to new Edit_t resolved resolved from Strategies level", Id);
-                }
-            }
-            else
-            {
-                throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefResolutionFailure, Id);
-            }
+            _referencedEdit = strategies != null && strategies.Edits.Contains(Id)
+                ? strategies.Edits.Clone<T>(Id)
+                : throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefResolutionFailure, Id);
         }
 
         (_referencedEdit as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);

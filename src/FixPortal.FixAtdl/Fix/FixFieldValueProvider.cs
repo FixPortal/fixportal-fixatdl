@@ -10,8 +10,6 @@ using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Types;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Fix;
 
@@ -20,8 +18,6 @@ namespace FixPortal.FixAtdl.Fix;
 /// </summary>
 public class FixFieldValueProvider
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly NullLogger _log = NullLogger.Instance;
     private readonly IInitialFixValueProvider? _initialValueProvider;
 
     /// <summary>
@@ -72,23 +68,11 @@ public class FixFieldValueProvider
             {
                 string wireValue = result;
 
-                if (_log.IsEnabled(LogLevel.Debug))
-                {
-                    _log.LogDebug("Attempting to find EnumID for FIX field {FixField} using parameter {ParameterName} with wire value '{WireValue}'",
-                        fixField, targetParameterName, wireValue);
-                }
-
                 retrieved = parameter.EnumPairs.TryParseWireValue(wireValue, out result);
             }
             else if (parameter is Parameter_t<Percentage_t> t)
             {
                 retrieved = ProcessPercentageValue(t, ref result);
-            }
-
-            if (_log.IsEnabled(LogLevel.Debug))
-            {
-                _log.LogDebug("FIX enumerated value lookup for field {FixField} returning {Retrieved}; value = '{Value}'", fixField,
-                    retrieved, retrieved ? result : "N/A");
             }
         }
 
@@ -113,12 +97,6 @@ public class FixFieldValueProvider
         if (_initialValueProvider != null && _initialValueProvider.InputFixValues != null)
         {
             retrieved = _initialValueProvider.InputFixValues.TryGetValue(fixField, out result);
-
-            if (_log.IsEnabled(LogLevel.Debug))
-            {
-                _log.LogDebug("FIX value lookup for field {FixField} returning {Retrieved}; value = '{Value}'", fixField,
-                    retrieved, retrieved ? result : "N/A");
-            }
         }
 
         value = retrieved ? result! : null!;

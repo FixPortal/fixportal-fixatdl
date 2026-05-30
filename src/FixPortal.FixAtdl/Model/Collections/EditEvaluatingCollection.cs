@@ -13,8 +13,6 @@ using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Utility;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Collections;
 
@@ -26,9 +24,6 @@ namespace FixPortal.FixAtdl.Model.Collections;
 /// <typeparam name="T"></typeparam>
 public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Strategy_t, T>
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// Logic operator for this collection of Edits.
     /// </summary>
@@ -59,11 +54,6 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
         {
             Sources.Add(source);
         }
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Edit_t {Edit} added to EditEvaluatingCollection", item);
-        }
     }
 
     /// <summary>
@@ -73,11 +63,6 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
     /// <param name="additionalValues">Any additional FIX field values that may be required in the Edit evaluation.</param>
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Evaluating EditEvaluatingCollection with {Count} elements; current state = {CurrentState}", Count, CurrentState);
-        }
-
         if (LogicOperator == null)
         {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.MissingLogicalOperatorOnSetOfEdits);
@@ -142,11 +127,6 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
 
                     newState = xorCount == 1;
                     break;
-            }
-
-            if (_log.IsEnabled(LogLevel.Debug))
-            {
-                _log.LogDebug("EditEvaluatingCollection state is now {NewState}", newState);
             }
         }
 

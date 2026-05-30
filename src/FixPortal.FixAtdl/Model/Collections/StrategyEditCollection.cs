@@ -10,8 +10,6 @@ using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Utility;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Collections;
 
@@ -20,9 +18,6 @@ namespace FixPortal.FixAtdl.Model.Collections;
 /// </summary>
 public class StrategyEditCollection : Collection<StrategyEdit_t>
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// Validates all the <see cref="StrategyEdit_t">StrategyEdit</see>s in this collection.
     /// </summary>
@@ -58,11 +53,6 @@ public class StrategyEditCollection : Collection<StrategyEdit_t>
     /// <param name="item">The strategy edit to insert.</param>
     protected override void InsertItem(int index, StrategyEdit_t item)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("StrategyEdit added");
-        }
-
         base.InsertItem(index, item);
     }
 

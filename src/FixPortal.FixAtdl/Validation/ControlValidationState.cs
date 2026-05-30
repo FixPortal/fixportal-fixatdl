@@ -8,8 +8,6 @@
 using System.Text;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Elements;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Validation;
 
@@ -18,20 +16,22 @@ namespace FixPortal.FixAtdl.Validation;
 /// </summary>
 public class ControlValidationState
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly NullLogger _log = NullLogger.Instance;
     private ValidationResult _parameterValidationResult = null!;
-    private readonly string _controlId;
     private readonly List<StrategyEdit_t> _strategyEdits = [];
 
     /// <summary>
     /// Initializes a new <see cref="ControlValidationState"/>.
     /// </summary>
-    /// <param name="controlId"></param>
+    /// <param name="controlId">The identifier of the control whose validation state this represents.</param>
     public ControlValidationState(string controlId)
     {
-        _controlId = controlId;
+        ControlId = controlId;
     }
+
+    /// <summary>
+    /// The identifier of the control whose validation state this represents.
+    /// </summary>
+    public string ControlId { get; }
 
     /// <summary>
     /// Gets the current state of this set of StrategyEdits.
@@ -90,11 +90,6 @@ public class ControlValidationState
     /// <remarks>See <see cref="CurrentState"/> for an explanation of why we don't cache the state locally within the class.</remarks>
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Evaluating ValidationState for control {ControlId}, CurrentState = {CurrentState}", _controlId, CurrentState);
-        }
-
         bool state = ControlValidationResult == null || ControlValidationResult.IsValid;
 
         // Evaluating the StrategyEdits may give us meaningless information if the parameter value
@@ -106,11 +101,6 @@ public class ControlValidationState
         {
             strategyEdit.Evaluate(additionalValues);
             state &= strategyEdit.CurrentState;
-        }
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Evaluated ValidationState for control {ControlId}, CurrentState = {CurrentState}", _controlId, state);
         }
     }
 
@@ -156,11 +146,6 @@ public class ControlValidationState
                 {
                     sb.AppendLine();
                 }
-            }
-
-            if (_log.IsEnabled(LogLevel.Debug))
-            {
-                _log.LogDebug("ValidationState for control {ControlId} = '{ValidationState}'", _controlId, sb);
             }
 
             return sb.ToString();

@@ -16,8 +16,6 @@ using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Validation;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Elements;
@@ -84,8 +82,6 @@ public class Edit_t
 public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, IValueProvider
 {
     // Use FixPortal.FixAtdl.Validation namespace rather than FixPortal.FixAtdl.Model.Elements for debugging purposes
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
     private static readonly bool isPartOfStrategyEdit = typeof(T) == typeof(IParameter);
     private T _fieldSource = null!;
     private T _field2Source = null!;
@@ -291,11 +287,6 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     /// <param name="additionalValues">Any additional FIX field values that may be required in the Edit evaluation.</param>
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Evaluating Edit_t {Arg0}; current state is {Arg1}", this, CurrentState);
-        }
-
         if (Operator != null)
         {
             object lhs = GetLhsValue(additionalValues);
@@ -317,11 +308,6 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.MissingOperatorsOnEdit);
         }
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Evaluation of Edit_t {Arg0} yielded state of {Arg1}", this, CurrentState);
-        }
     }
 
     #endregion IEdit_t Members
@@ -334,52 +320,26 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
         bool result = checkingForExist ? !empty : empty;
 
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Evaluated whether Field {Arg0} {Arg1} a value; result is {Arg2} (value was '{Arg3}')", Field,
-                checkingForExist ? "has" : "does not have", result, empty ? "N/A" : value);
-        }
-
         return result;
     }
 
     private bool EvaluateEquality(object lhs, object rhs)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Comparing values operand1={Arg0}, operand2={Arg1} for equality with operator {Arg2}", lhs, rhs, Operator);
-        }
-
         CheckForUnsupportedComparisons(lhs, rhs);
 
         bool equal = AreEqual(lhs, rhs);
 
         bool finalResult = Operator == Operator_t.Equal ? equal : !equal;
 
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Result of equality comparison = {Arg0}", finalResult);
-        }
-
         return finalResult;
     }
 
     private bool EvaluateInequalityComparison(IComparable lhs, IComparable rhs)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Comparing values lhs='{Arg0}', rhs='{Arg1}' for inequality with operator {Arg2}", lhs, rhs, Operator);
-        }
-
         // It's not clear what the right thing is to do with a null LHS and an inequality operator
         // so we return false anyway
         if (lhs == null)
         {
-            if (_log.IsEnabled(LogLevel.Debug))
-            {
-                _log.LogDebug("Left hand side of inequality comparison is null so returning false");
-            }
-
             return false;
         }
 
@@ -402,12 +362,6 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             Operator_t.LessThanOrEqual => compareResult <= 0,
             _ => false
         };
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Compared values '{Arg0}' and '{Arg1}' as part of Edit_t evaluation; result was {Arg2}",
-                lhs, rhs, finalResult);
-        }
 
         return finalResult;
     }
@@ -504,12 +458,6 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         result = gotValue
             ? decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal number) ? number : value
             : null;
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Looked up FIX field {Arg0} for comparison; field was {Arg1}, value={Arg2}",
-                fixField, gotValue ? "found" : "not found", gotValue ? result : "N/A");
-        }
 
         return result!;
     }

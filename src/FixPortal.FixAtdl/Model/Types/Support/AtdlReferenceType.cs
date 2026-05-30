@@ -13,8 +13,6 @@ using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Validation;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Types.Support;
@@ -32,8 +30,6 @@ namespace FixPortal.FixAtdl.Model.Types.Support;
 /// other uses T.)</remarks>
 public abstract class AtdlReferenceType<T> : IParameterType where T : class
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
     private static readonly CompositeFormat _attemptToSetConstValueParameterFormat = CompositeFormat.Parse(ErrorMessages.AttemptToSetConstValueParameter);
 
     /// <summary>
@@ -101,9 +97,6 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
         }
         catch (Exception ex) when (ex is InvalidFieldValueException or FormatException or InvalidCastException or ArgumentException or OverflowException)
         {
-            _log.LogError(ex, "Unable to convert value '{Arg0}' to type {Arg1} for parameter {Arg2}; exception text: {Arg3}",
-                value, hostParameter.Type, hostParameter.Name, ex.Message);
-
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.DataConversionFailure, HumanReadableTypeName);
         }
     }
@@ -177,11 +170,6 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
         }
 
         string wireValue = ConvertToWireValueFormat(value!);
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Wire value for parameter {Arg0} = '{Arg1}'", hostParameter.Name, wireValue);
-        }
 
         return wireValue;
     }
