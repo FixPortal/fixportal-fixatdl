@@ -40,7 +40,7 @@ public class EnumState
     {
         // Guard up front: Count, the indexer and ToString all dereference _enumIds unconditionally,
         // so a null array would surface as an opaque NRE far from here.
-        _enumIds = enumIds ?? throw ThrowHelper.New<ArgumentNullException>(typeof(EnumState), "A valid array of EnumIDs must be supplied.");
+        _enumIds = enumIds ?? throw ThrowHelper.NewWithParamName<ArgumentNullException>(typeof(EnumState), nameof(enumIds), "A valid array of EnumIDs must be supplied.");
         _enumStates = new BitArray(_enumIds.Length);
         _nonEnumValue = null;
     }
@@ -80,7 +80,7 @@ public class EnumState
     {
         if (source == null)
         {
-            throw ThrowHelper.New<ArgumentNullException>(this, "A valid EnumState must be supplied");
+            throw ThrowHelper.NewWithParamName<ArgumentNullException>(this, nameof(source), "A valid EnumState must be supplied");
         }
 
         if (_enumIds.Length != source._enumIds.Length)

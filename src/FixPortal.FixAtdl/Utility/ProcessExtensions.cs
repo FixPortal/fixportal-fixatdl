@@ -28,7 +28,7 @@ public static class ProcessExtensions
         if (process == null)
         {
             // Bad input is an argument error, not a manufactured NullReferenceException (F5).
-            throw ThrowHelper.New<ArgumentNullException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
+            throw ThrowHelper.NewWithParamName<ArgumentNullException>(ExceptionContext, nameof(process), ErrorMessages.IllegalUseOfNullError);
         }
 
         try
