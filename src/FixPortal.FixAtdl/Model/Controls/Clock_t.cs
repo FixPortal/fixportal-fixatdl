@@ -13,8 +13,6 @@ using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Controls;
 
@@ -23,9 +21,6 @@ namespace FixPortal.FixAtdl.Model.Controls;
 /// </summary>
 public class Clock_t : InitializableControl<DateTime?>
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     private DateTime? _value;
 
     /// <summary>
@@ -35,10 +30,6 @@ public class Clock_t : InitializableControl<DateTime?>
     public Clock_t(string id)
         : base(id)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("New Clock_t created as control {Arg0}", id);
-        }
     }
 
     // TODO: Implement LocalMktTz as a type.
@@ -49,6 +40,13 @@ public class Clock_t : InitializableControl<DateTime?>
     /// <summary>Defines the treatment of initValue time. 0: use initValue; 1: use current time if initValue time has passed.
     /// The default value is 0.</summary>
     public int? InitValueMode { get; set; }
+
+    /// <summary>
+    /// The time source used when <see cref="InitValueMode"/> == 1. Defaults to the system clock;
+    /// assign a fake in tests. (LocalMktTz timezone resolution is not yet applied — see remarks on
+    /// LoadDefaultFromInitValue; both values are still compared in the host's local representation.)
+    /// </summary>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
 
     #region InitializableControl<T> Overrides
 
@@ -90,8 +88,9 @@ public class Clock_t : InitializableControl<DateTime?>
         if (InitValueMode == 1)
         {
             // initValueMode 1: use the current time if the initValue time has already passed. Snapshot
-            // "now" ONCE (the original read DateTime.Now twice, risking a sub-tick inconsistency).
-            DateTime now = GetCurrentTime();
+            // "now" ONCE from the injected TimeProvider (the original read DateTime.Now twice, risking a
+            // sub-tick inconsistency, and was untestable).
+            DateTime now = TimeProvider.GetLocalNow().DateTime;
 
             _value = now > InitValue.Value ? now : InitValue;
         }
@@ -100,15 +99,6 @@ public class Clock_t : InitializableControl<DateTime?>
             _value = InitValue;
         }
     }
-
-    /// <summary>
-    /// Returns the current time used by initValueMode==1. Exposed as a virtual seam so the time-based
-    /// behaviour is testable without a static DateTime.Now read.
-    /// </summary>
-    /// <remarks>LocalMktTz (the timezone in which initValue is expressed) is not yet applied to this
-    /// comparison: both values are compared in the host's local representation. Full timezone-aware
-    /// comparison requires resolving LocalMktTz against a timezone database and is left as future work.</remarks>
-    protected virtual DateTime GetCurrentTime() => DateTime.Now;
 
     #endregion
 
@@ -123,11 +113,6 @@ public class Clock_t : InitializableControl<DateTime?>
         IControlConvertible value = parameter.GetValueForControl();
 
         _value = value.ToDateTime();
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Clock_t control value is now {Value}", _value);
-        }
     }
 
     /// <summary>
