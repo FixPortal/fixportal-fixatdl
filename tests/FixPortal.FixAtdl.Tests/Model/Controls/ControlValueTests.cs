@@ -1,3 +1,4 @@
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls;
@@ -556,7 +557,7 @@ public class EnumStateTests
     {
         var state = new EnumState(["A"]);
         var act = () => { _ = state["INVALID"]; };
-        act.Should().Throw<Exception>();
+        act.Should().Throw<ArgumentException>();
     }
 
     [Fact]
@@ -564,7 +565,7 @@ public class EnumStateTests
     {
         var state = new EnumState(["A"]);
         var act = () => { state["INVALID"] = true; };
-        act.Should().Throw<Exception>();
+        act.Should().Throw<ArgumentException>();
     }
 
     [Fact]
@@ -652,7 +653,7 @@ public class EnumStateTests
     {
         var state = new EnumState(["A", "B"]);
         var act = () => state.LoadInitValue("INVALID", false);
-        act.Should().Throw<Exception>();
+        act.Should().Throw<ArgumentException>();
     }
 
     [Fact]
@@ -781,7 +782,7 @@ public class ClockControlTests
             InitValueMode = 2
         };
         var act = () => clock.LoadInitValue(FixFieldValueProvider.Empty);
-        act.Should().Throw<Exception>();
+        act.Should().Throw<InvalidFieldValueException>();
     }
 
     [Fact]
