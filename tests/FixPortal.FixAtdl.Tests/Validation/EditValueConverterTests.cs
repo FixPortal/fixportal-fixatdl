@@ -19,6 +19,27 @@ public class EditValueConverterTests
         result.Should().Be("hello");
     }
 
+    // ── Null value (O-G2): a missing operand must fail fast, not coerce to 0 ──
+
+    [Theory]
+    [InlineData(typeof(decimal))]   // was: Convert.ToDecimal(null) => 0m  (silent)
+    [InlineData(typeof(int))]       // was: Convert.ToInt32(null)   => 0   (silent)
+    [InlineData(typeof(uint))]      // was: Convert.ToUInt32(null)  => 0u  (silent)
+    public void Null_value_throws_InvalidFieldValueException_for_numeric_types(Type prototypeType)
+    {
+        object prototype = Activator.CreateInstance(prototypeType)!;
+        var act = () => EditValueConverter.ConvertToComparableType(prototype, null!);
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Null_value_throws_InvalidFieldValueException_not_NullReference_for_month_year()
+    {
+        // Previously NRE inside MonthYear.Parse(null).
+        var act = () => EditValueConverter.ConvertToComparableType(default(MonthYear), null!);
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
     // ── Decimal ─────────────────────────────────────────────────────────────
 
     [Theory]

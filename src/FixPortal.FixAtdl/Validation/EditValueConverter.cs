@@ -39,6 +39,15 @@ public static class EditValueConverter
             return value;
         }
 
+        // A null operand is a missing Edit value, not a zero. The numeric Convert.To* paths would
+        // silently coerce null to 0 (masking a missing right-hand side and making comparisons pass
+        // spuriously) while the enum/MonthYear/Tenor paths would NRE. Reject it consistently with a
+        // domain exception, matching ConvertToBool's null handling (O-G2).
+        if (value == null)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
+        }
+
         string? type = typeInstanceToMatch.GetType().FullName;
 
         try
