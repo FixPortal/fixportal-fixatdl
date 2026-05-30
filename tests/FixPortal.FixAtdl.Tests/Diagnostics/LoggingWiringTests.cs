@@ -24,4 +24,18 @@ public class LoggingWiringTests
         categories.Should().Contain(typeof(StrategiesReader).FullName);
         categories.Should().Contain(typeof(ElementFactory).FullName);
     }
+
+    [Fact]
+    public async Task Load_without_factory_parses_successfully()
+    {
+        // The ILoggerFactory ctor parameter is optional: supplying nothing must keep the original
+        // behaviour — a successful parse using the silent NullLoggerFactory default. Guards that the
+        // additive ctor change did not break the default (no-factory) path.
+        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+        var strategies = new StrategiesReader().Load(stream);
+
+        strategies.Count.Should().Be(1);
+    }
 }
