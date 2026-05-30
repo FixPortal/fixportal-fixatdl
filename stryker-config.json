@@ -12,7 +12,7 @@
     ],
     "report-file-name": "mutation-report",
     "mutation-level": "Standard",
-    "coverage-analysis": "off",
+    "coverage-analysis": "perTest",
     "test-runner": "mtp",
     "concurrency": 4,
     "thresholds": {
@@ -21,7 +21,10 @@
       "break": 0
     },
     "mutate": [
-      "**/ParameterCollection.cs"
+      "**/Model/Types/**/*.cs",
+      "**/Validation/**/*.cs",
+      "**/Fix/**/*.cs",
+      "**/Model/Collections/**/*.cs"
     ]
   }
 }

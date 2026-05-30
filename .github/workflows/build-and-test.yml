@@ -33,6 +33,28 @@ jobs:
       - name: Test
         run: dotnet test FixPortal.FixAtdl.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
 
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool --ignore-failed-sources
+
+      - name: Generate coverage summary
+        run: reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:TextSummary
+
+      - name: Check coverage floor
+        shell: pwsh
+        run: |
+          $summary = Get-Content coverage-report/Summary.txt -Raw
+          if ($summary -match 'Line coverage:\s+([\d.]+)%') {
+            $line = [double]$Matches[1]
+            Write-Host "Line coverage: $line%"
+            if ($line -lt 65.0) {
+              Write-Host "::error::Line coverage $line% is below the 65% floor"
+              exit 1
+            }
+          } else {
+            Write-Host "::error::Could not parse line coverage from summary"
+            exit 1
+          }
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4

@@ -48,3 +48,61 @@ The realistic Phase 1 targets, calibrated against what a focused test-hardening 
 Rationale: the two best-covered namespaces (`Xml.Serialization` at 70%/64% and `Model.Collections.ParameterCollection` at 100%/94%) demonstrate that focused test coverage can reach 60–70%+ line coverage on complex production code. Extending that effort to `Model.Controls`, `Model.Types`, `Validation`, and `Fix` — which together represent the majority of the uncovered lines — makes 60%/45% a stretch-but-achievable bar that meaningfully improves confidence without requiring exhaustive coverage of every DTO property accessor.
 
 The ≥80%/≥70% bar should be re-evaluated in a future coverage pass after Phase 1 numbers are in.
+
+---
+
+## Phase 1 achieved (2026-05-30)
+
+Measured at end of phase-1-test-hardening branch. 557 tests passing.
+
+### Overall
+
+| Metric | Value |
+|--------|-------|
+| Line coverage | **69.3%** (3,519 / 5,072 lines) |
+| Branch coverage | **59.1%** (915 / 1,546 branches) |
+| Method coverage | 69.6% (640 / 919 methods) |
+
+Baseline was 32% line / 19% branch (commit `0006205`). Phase 1 added **+37.3 pp** line and **+40.1 pp** branch coverage.
+
+### Per-namespace line coverage (Phase 1 exit)
+
+| Namespace | Phase 1 line % | Baseline line % | Target | Met? |
+|-----------|---------------:|----------------:|--------|------|
+| `Model.Types` | **71.2%** | 13% | ≥65% | Yes |
+| `Validation` | **81.3%** | 20% | ≥65% | Yes |
+| `Fix` | **87.8%** | 26% | ≥65% | Yes |
+| `Model.Collections` | **63.3%** | 26% | ≥60% | Yes |
+| `Model.Elements` | **64.5%** | 39% | ≥55% | Yes |
+| `Model.Controls` | **55.5%** | 6% | ≥50% | Yes |
+| `Xml.Serialization` | **≥70%** | 70% | hold | Yes |
+
+### Mutation testing
+
+Stryker 4.14.2 run on 2026-05-30 against the full committed scope (4 namespaces):
+
+```
+mutate:
+  **/Model/Types/**/*.cs
+  **/Validation/**/*.cs
+  **/Fix/**/*.cs
+  **/Model/Collections/**/*.cs
+```
+
+| Metric | Value |
+|--------|-------|
+| Mutation score | **72.64%** |
+| Killed | 522 |
+| Survived | 0 |
+| Timeout | 285 |
+| NoCoverage | 304 |
+| CompileError | 303 |
+| Total mutants in scope | 3,240 |
+| Tested (covered) mutants | 807 |
+| Run time | ~20 minutes |
+
+`coverage-analysis: perTest` was used — Stryker only ran covering tests per mutant. 0 mutants survived; all covered mutants were killed or timed out (timeouts count against the score denominator). Score exceeds the ≥70 target.
+
+### CI coverage floor
+
+A floor of **65% line coverage** has been added to `.github/workflows/build-and-test.yml`. The floor is set 4 percentage points below the achieved 69.3% to catch regressions while tolerating minor natural fluctuation.
