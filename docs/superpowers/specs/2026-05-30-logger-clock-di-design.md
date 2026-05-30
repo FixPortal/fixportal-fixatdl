@@ -90,10 +90,21 @@ surface for a parsing library.
 
 From every reflectively-constructed model object and static utility listed
 below, delete: the `// FP Enhancement … TODO wire injected logger` comment, the
-`NullLogger _log` field, and the guarded
-`if (_log.IsEnabled(LogLevel.Debug)) { _log.LogDebug(...); }` blocks. Remove the
-now-unused `Microsoft.Extensions.Logging[.Abstractions]` usings where they become
-redundant.
+`NullLogger _log` field, and **all** `_log.*` call sites — both the guarded
+`if (_log.IsEnabled(LogLevel.Debug)) { _log.LogDebug(...); }` tracing blocks
+**and** the unguarded `LogWarning`/`LogError` calls. Remove the now-unused
+`Microsoft.Extensions.Logging[.Abstractions]` usings where they become redundant.
+
+> **Note — non-Debug calls.** A handful of model classes carry `LogWarning` /
+> `LogError` (not just `LogDebug`) in **log-and-swallow** failure paths:
+> `InitializableControl` (2× `LogWarning` when a control cannot init from a FIX
+> field), `BinaryControlBase` / `NumericControlBase` / `ListControlBase` (1× each,
+> `LogError` then `return false`), and `AtdlValueType` / `AtdlReferenceType` (1×
+> each, conversion failure). All are against `NullLogger` today, so removing them
+> is **behaviour-preserving** — the method still returns `false` / continues. It
+> does, however, drop the latent intent to surface *why* a load/convert failed;
+> restoring that visibility is exactly what the deferred model-service seam would
+> enable, and is the concrete motivation recorded under "out of scope".
 
 - **Controls (15):** `CheckBox_t`, `CheckBoxList_t`, `Clock_t`, `DoubleSpinner_t`,
   `DropDownList_t`, `EditableDropDownList_t`, `HiddenField_t`, `Label_t`,
