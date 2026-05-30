@@ -37,6 +37,17 @@ public static class ThrowHelper
     }
 
     /// <summary>
+    /// Creates an exception of type <typeparamref name="T"/> carrying an explicit parameter name, for the
+    /// ArgumentException family whose (string, string) constructor is (paramName, message). Use this
+    /// instead of <see cref="New{T}(object?, string)"/> when the offending parameter name is known, so the
+    /// exception reports it rather than the synthetic default "Value".
+    /// </summary>
+    public static T NewWithParamName<T>(object? source, string paramName, string message) where T : Exception
+    {
+        return CreateException<T>(source, message, null, paramName);
+    }
+
+    /// <summary>
     /// Creates an exception of the specified type and initializes it using the values supplied.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -229,7 +240,7 @@ public static class ThrowHelper
     }
 
     // Workaround limitation in C# 3.0/4.0 - can't create an instance of a generic type with parameters using new T().
-    private static T CreateException<T>(object? source, string message, ExceptionInfo? info) where T : Exception
+    private static T CreateException<T>(object? source, string message, ExceptionInfo? info, string paramName = "Value") where T : Exception
     {
         Type classType = typeof(T);
 
@@ -242,7 +253,7 @@ public static class ThrowHelper
                 {
                     ConstructorInfo classConstructor = classType.GetConstructor([typeof(string), typeof(string)])
                         ?? throw new InternalErrorException($"Exception type '{classType.FullName}' has no (string, string) constructor required by ThrowHelper. Message: {message}");
-                    T exception = (T)classConstructor.Invoke(["Value", message]);
+                    T exception = (T)classConstructor.Invoke([paramName, message]);
                     exception.Source = source?.ToString();
                     info?.PopulateExceptionData(exception.Data);
 

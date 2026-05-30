@@ -175,7 +175,7 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
             // Wire value of null is not allowed (as it is equivalent to writing FIX tag=<SOH>)
             if (value == null)
             {
-                throw ThrowHelper.New<ArgumentNullException>(this, ErrorMessages.IllegalUseOfNullError);
+                throw ThrowHelper.NewWithParamName<ArgumentNullException>(this, nameof(value), ErrorMessages.IllegalUseOfNullError);
             }
 
             _value.SetWireValue(this, value);
