@@ -85,7 +85,7 @@ public struct Tenor : IComparable
     /// <returns><see langword="true"/> if the supplied object is a matching <see cref="Tenor"/>; otherwise, <see langword="false"/>.</returns>
     public override readonly bool Equals(object? obj)
     {
-        if (obj == null || obj is not Tenor tenor)
+        if (obj is not Tenor tenor)
         {
             return false;
         }

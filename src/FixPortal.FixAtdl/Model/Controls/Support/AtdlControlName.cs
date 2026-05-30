@@ -11,7 +11,7 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 /// Helper class containing the names of all the valid FIXatdl control types.
 /// </summary>
 /// <remarks>NB We use const here rather than static readonly so the values can be used in a switch statement.</remarks>
-public class AtdlControlName
+public static class AtdlControlName
 {
     /// <summary>CheckBox_t type.</summary>
     public const string CheckBox_t = "CheckBox_t";

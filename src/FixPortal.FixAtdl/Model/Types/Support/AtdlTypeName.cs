@@ -10,7 +10,7 @@ namespace FixPortal.FixAtdl.Model.Types.Support;
 /// <summary>
 /// Helper class containing the names of all the valid FIXatdl data types.
 /// </summary>
-public class AtdlTypeName
+public static class AtdlTypeName
 {
     /// <summary>Amt_t type.</summary>
     public const string Amt_t = "Amt_t";

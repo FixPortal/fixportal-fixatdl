@@ -79,16 +79,20 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override bool? ConvertFromWireValueFormat(string value)
     {
-        string trueValue = TrueWireValue != null ? TrueWireValue : DefaultTrueValue;
-        string falseValue = FalseWireValue != null ? FalseWireValue : DefaultFalseValue;
+        string trueValue = TrueWireValue ?? DefaultTrueValue;
+        string falseValue = FalseWireValue ?? DefaultFalseValue;
 
-        bool? result = value == trueValue
-            ? true
-            : value == falseValue
-            ? false
-            : throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InvalidBooleanValue, value, trueValue, falseValue);
+        if (value == trueValue)
+        {
+            return true;
+        }
 
-        return result;
+        if (value == falseValue)
+        {
+            return false;
+        }
+
+        throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InvalidBooleanValue, value, trueValue, falseValue);
     }
 
     /// <summary>

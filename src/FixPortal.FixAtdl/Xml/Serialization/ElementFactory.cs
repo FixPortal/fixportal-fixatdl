@@ -376,7 +376,7 @@ public class ElementFactory : INotifyClassDeserialized
             // Process indirect properties (only one level of indirect is supported).
             if (attrDefn.Property.Contains('.'))
             {
-                string[] names = attrDefn.Property.Split(['.']);
+                string[] names = attrDefn.Property.Split('.');
 
                 if (names.Length != 2)
                 {

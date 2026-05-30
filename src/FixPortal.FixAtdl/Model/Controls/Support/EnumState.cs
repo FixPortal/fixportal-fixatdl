@@ -116,7 +116,7 @@ public class EnumState
     /// <remarks>This method assumes that both operands have the same set of EnumID values.</remarks>
     public override bool Equals(object? obj)
     {
-        if (obj == null || obj is not EnumState state)
+        if (obj is not EnumState state)
         {
             return false;
         }

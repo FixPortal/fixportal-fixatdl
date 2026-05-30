@@ -16,7 +16,7 @@ namespace FixPortal.FixAtdl.Xml.Serialization;
 /// <summary>
 /// Converts XML text values into CLR and FIXatdl types.
 /// </summary>
-public class ValueConverter
+public static class ValueConverter
 {
     /// <summary>
     /// Gets the exception context used when reporting conversion failures.

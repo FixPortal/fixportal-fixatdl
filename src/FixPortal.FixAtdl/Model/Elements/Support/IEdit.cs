@@ -11,7 +11,6 @@ using FixPortal.FixAtdl.Model.Enumerations;
 
 namespace FixPortal.FixAtdl.Model.Elements.Support;
 
-// 
 /// <summary>
 /// Interface to allow both Edits and EditRefs to be put in the Edit collections.  The type parameter
 /// specifies whether the Edit relates to a StateRule or to a StrategyEdit.

@@ -12,7 +12,7 @@ namespace FixPortal.FixAtdl.Xml;
 /// <summary>
 /// Provides the XML namespaces used by FIXatdl documents.
 /// </summary>
-public class AtdlNamespaces
+public static class AtdlNamespaces
 {
     /// <summary>
     /// The FIXatdl core namespace.
