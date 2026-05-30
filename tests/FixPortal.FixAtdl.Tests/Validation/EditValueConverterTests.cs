@@ -32,11 +32,13 @@ public class EditValueConverterTests
         act.Should().Throw<InvalidFieldValueException>();
     }
 
-    [Fact]
-    public void Null_value_throws_InvalidFieldValueException_not_NullReference_for_month_year()
+    [Theory]
+    [InlineData(typeof(MonthYear))] // was: NRE inside MonthYear.Parse(null)
+    [InlineData(typeof(Tenor))]     // was: NRE inside Tenor.Parse(null)
+    public void Null_value_throws_InvalidFieldValueException_not_NullReference_for_parsed_struct_types(Type prototypeType)
     {
-        // Previously NRE inside MonthYear.Parse(null).
-        var act = () => EditValueConverter.ConvertToComparableType(default(MonthYear), null!);
+        object prototype = Activator.CreateInstance(prototypeType)!;
+        var act = () => EditValueConverter.ConvertToComparableType(prototype, null!);
         act.Should().Throw<InvalidFieldValueException>();
     }
 
