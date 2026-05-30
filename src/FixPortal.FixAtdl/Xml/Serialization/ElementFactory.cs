@@ -22,8 +22,7 @@ namespace FixPortal.FixAtdl.Xml.Serialization;
 /// </summary>
 public class ElementFactory : INotifyClassDeserialized
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
+    private readonly ILogger<ElementFactory> _log;
 
     private const string ExceptionContext = "ElementFactory";
 
@@ -40,8 +39,11 @@ public class ElementFactory : INotifyClassDeserialized
     /// </summary>
     /// <param name="elementDefinition">The root element definition used for deserialization.</param>
     /// <param name="notifyCreationOfType">The type whose creation should raise <see cref="ClassDeserialized"/>.</param>
-    public ElementFactory(ElementDefinition elementDefinition, Type notifyCreationOfType)
+    /// <param name="loggerFactory">Optional logger factory; when null, no logging is produced.</param>
+    public ElementFactory(ElementDefinition elementDefinition, Type notifyCreationOfType, ILoggerFactory? loggerFactory = null)
     {
+        _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<ElementFactory>();
+
         if (_log.IsEnabled(LogLevel.Debug))
         {
             _log.LogDebug("ElementFactory created; root ElementName='{ElementName}'.", elementDefinition.ElementName);
@@ -257,7 +259,7 @@ public class ElementFactory : INotifyClassDeserialized
         return newObject;
     }
 
-    private static object CreateRawObject(Type outerType, Type[] innerTypes, Type[] argTypes, params object[] args)
+    private object CreateRawObject(Type outerType, Type[] innerTypes, Type[] argTypes, params object[] args)
     {
         if (_log.IsEnabled(LogLevel.Debug))
         {
@@ -276,7 +278,7 @@ public class ElementFactory : INotifyClassDeserialized
         return classConstructor.Invoke(args);
     }
 
-    private static object CreateRawObject(Type targetType, Type[] argTypes, params object[] args)
+    private object CreateRawObject(Type targetType, Type[] argTypes, params object[] args)
     {
         if (_log.IsEnabled(LogLevel.Debug))
         {
@@ -551,7 +553,7 @@ public class ElementFactory : INotifyClassDeserialized
         }
     }
 
-    private static object ReadAttribute(IEnumerable<XAttribute> attributes, XName attributeName, Type type)
+    private object ReadAttribute(IEnumerable<XAttribute> attributes, XName attributeName, Type type)
     {
         if (_log.IsEnabled(LogLevel.Debug))
         {
@@ -591,7 +593,7 @@ public class ElementFactory : INotifyClassDeserialized
         }
     }
 
-    private static object ReadAttribute(IEnumerable<XAttribute> attributes, XName attributeName, Type enumType, Dictionary<string, Enum> enumValues)
+    private object ReadAttribute(IEnumerable<XAttribute> attributes, XName attributeName, Type enumType, Dictionary<string, Enum> enumValues)
     {
         if (_log.IsEnabled(LogLevel.Debug))
         {
@@ -613,7 +615,7 @@ public class ElementFactory : INotifyClassDeserialized
         return Enum.ToObject(enumType, enumValue);
     }
 
-    private static void SetPropertyValue(PropertyInfo property, object target, object value)
+    private void SetPropertyValue(PropertyInfo property, object target, object value)
     {
         if (_log.IsEnabled(LogLevel.Debug))
         {
