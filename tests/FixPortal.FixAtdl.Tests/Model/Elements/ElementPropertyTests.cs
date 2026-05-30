@@ -72,9 +72,10 @@ public class ElementPropertyTests
     public void StateRule_t_ToString_with_no_fields_set_shows_null_owner()
     {
         var rule = new StateRule_t();
-        // _owner is null before parenting; ToString should not throw
+        // _owner is null before parenting (_owner?.Id => empty), and no state fields set,
+        // so ToString renders just the id fragment with an empty value.
         var result = rule.ToString();
-        result.Should().Contain("Control.ID=");
+        result.Should().Be("(Control.ID=\"\")");
     }
 
     [Fact]

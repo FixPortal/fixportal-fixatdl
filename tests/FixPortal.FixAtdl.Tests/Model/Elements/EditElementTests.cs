@@ -36,7 +36,7 @@ public class EditElementTests
     // ── Edit_t (non-generic) defaults ────────────────────────────────────────
 
     [Fact]
-    public void Edit_t_nongenerc_all_nullable_props_are_null_by_default()
+    public void Edit_t_nongeneric_all_nullable_props_are_null_by_default()
     {
         var edit = new Edit_t();
         edit.Field.Should().BeNull();
@@ -147,8 +147,6 @@ public class EditElementTests
 
         edit.Sources.Should().Contain("FIX_OrderQty");
     }
-
-    // ── Edit_t<T> Evaluate with FIX_ field ───────────────────────────────────
 
     // ── EditRef_t<T> pre-resolve throws InternalErrorException ───────────────
 
