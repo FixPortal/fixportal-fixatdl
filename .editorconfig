@@ -56,6 +56,38 @@ tab_width = 4
 # Advisory only: warning, never build-breaking.
 dotnet_diagnostic.S3776.severity = warning
 
+# --- SonarAnalyzer suppressions justified by the FIXatdl domain (batch 4) ---
+# These are not defects; each conflicts with a deliberate FIXatdl design decision.
+#
+# S101 — "type name should be PascalCase". Every FIXatdl element/type/control name
+#   carries the spec's mandatory '_t' suffix (Clock_t, Qty_t, Strategy_t, …). The
+#   suffix is part of the XML xsi:type contract, not a style slip; renaming would
+#   break the spec-to-CLR mapping. (~128 occurrences, the bulk of the warnings.)
+dotnet_diagnostic.S101.severity = none
+#
+# S2225 — "ToString() should not return null". For the FIXatdl value/control types a
+#   null ToString result is the protocol signal "omit this field from the FIX wire"
+#   (a non-present optional tag), distinct from an empty string. Returning "" would
+#   change wire semantics.
+dotnet_diagnostic.S2225.severity = none
+#
+# S3925 — "implement the full ISerializable pattern". Demands the legacy
+#   (SerializationInfo, StreamingContext) constructor for BinaryFormatter-style
+#   serialization, which is obsolete and disabled on modern .NET. The exceptions are
+#   never binary-serialized; the pattern would be dead ceremony.
+dotnet_diagnostic.S3925.severity = none
+#
+# S2094 — "remove this empty class". The empty types are intentional spec markers
+#   (e.g. TagNum_t : NonZeroPositiveIntegerTypeBase) that give each FIXatdl type a
+#   distinct CLR identity for the xsi:type dispatch; they are deliberately bodyless.
+dotnet_diagnostic.S2094.severity = none
+#
+# S2743 — "static field in a generic type is not shared across closed types". The
+#   per-closed-type behaviour is exactly what AtdlValueType<T>/AtdlReferenceType<T>
+#   rely on (one cache slot per concrete value type). The rule's concern is the
+#   intended design here.
+dotnet_diagnostic.S2743.severity = none
+
 #### .NET Coding Conventions ####
 
 # Organize usings
