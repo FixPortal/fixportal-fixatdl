@@ -443,3 +443,7 @@ MSBuild_Logs/
 
 # Don't ignore VS Code snippet files (overrides .vscode/* above)
 !.vscode/*.code-snippets
+
+# Coverage output (Phase 0 baseline + CI)
+coverage/
+TestResults/
