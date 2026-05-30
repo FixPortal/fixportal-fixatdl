@@ -6,8 +6,6 @@
 #endregion
 
 using FixPortal.FixAtdl.Model.Controls.Support;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Controls;
 
@@ -16,9 +14,6 @@ namespace FixPortal.FixAtdl.Model.Controls;
 /// </summary>
 public class TextField_t : TextControlBase
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// Initializes a new instance of <see cref="TextField_t"/> using the supplied ID.
     /// </summary>
@@ -26,9 +21,5 @@ public class TextField_t : TextControlBase
     public TextField_t(string id)
         : base(id)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("New TextField_t created as control {Arg0}", id);
-        }
     }
 }

@@ -11,8 +11,6 @@ using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Resources;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Controls.Support;
@@ -28,9 +26,6 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 public class EnumState
 {
     private const string ExceptionContext = "EnumState";
-
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
 
     private readonly BitArray _enumStates;
     private readonly string[] _enumIds;
@@ -91,11 +86,6 @@ public class EnumState
         if (_enumIds.Length != source._enumIds.Length)
         {
             throw ThrowHelper.New<ArgumentException>(this, "Unable to update this EnumState from supplied EnumState as the number of EnumIDs was not consistent");
-        }
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Updating EnumState from {Arg0} to {Arg1}", this, source);
         }
 
         // Validate that every EnumID lines up BEFORE mutating any bit, so a mismatch leaves this
@@ -218,11 +208,6 @@ public class EnumState
                 {
                     _enumStates[n] = value;
 
-                    if (_log.IsEnabled(LogLevel.Debug))
-                    {
-                        _log.LogDebug("EnumState state now {State}", this);
-                    }
-
                     return;
                 }
             }
@@ -337,11 +322,6 @@ public class EnumState
     /// values whereas this method parses the string for EnumIDs.</remarks>
     public void LoadInitValue(string initValues, bool allowNonEnumValue)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Loading EnumState with InitValue '{InitValue}'", initValues);
-        }
-
         string[] enumIds = initValues.Split([';', ' ', ','], StringSplitOptions.RemoveEmptyEntries);
 
         bool allAreValid = true;
@@ -373,11 +353,6 @@ public class EnumState
                 this[enumId] = true;
             }
         }
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("EnumState is now {State}", this);
-        }
     }
 
     /// <summary>
@@ -388,11 +363,6 @@ public class EnumState
     /// then null is returned.</returns>
     public string ToWireValue(EnumPairCollection enumPairs)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Converting EnumState to WireValue; current state is {State}", this);
-        }
-
         if (enumPairs.Count != _enumStates.Count)
         {
             throw ThrowHelper.New<InvalidOperationException>(ExceptionContext, ErrorMessages.InconsistentEnumPairsListItemsError);
@@ -432,11 +402,6 @@ public class EnumState
             }
         }
 
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("EnumState as WireValue is {WireValue}", sb);
-        }
-
         return hasAtLeastOneValue ? sb.ToString() : null!;
     }
 
@@ -448,11 +413,6 @@ public class EnumState
     /// <returns></returns>
     public static EnumState FromWireValue(EnumPairCollection enumPairs, string multiValueString)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Converting WireValue '{WireValue}' to EnumState", multiValueString);
-        }
-
         // Drop empty tokens so a blank, double-delimited or trailing-delimiter input does not yield
         // a "" token that TryParseWireValue would reject.
         string[] inputValues = multiValueString.Split([';', ' ', ','], StringSplitOptions.RemoveEmptyEntries);
@@ -468,11 +428,6 @@ public class EnumState
             }
 
             result[enumId!] = true;
-        }
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Converting EnumState from WireValue; state is {State}", result);
         }
 
         return result;

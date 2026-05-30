@@ -6,8 +6,6 @@
 #endregion
 
 using FixPortal.FixAtdl.Model.Controls.Support;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Controls;
 
@@ -18,9 +16,6 @@ namespace FixPortal.FixAtdl.Model.Controls;
 /// selecting from a set of options (ListItems) but not selecting a numerical value.</remarks>
 public class Slider_t : ListControlBase
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// Initializes a new instance of <see cref="Slider_t"/> using the supplied ID.
     /// </summary>
@@ -28,9 +23,5 @@ public class Slider_t : ListControlBase
     public Slider_t(string id)
         : base(id)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("New Slider_t created as control {Arg0}", id);
-        }
     }
 }

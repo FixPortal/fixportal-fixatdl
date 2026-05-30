@@ -12,8 +12,6 @@ using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Controls.Support;
 
@@ -22,9 +20,6 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 /// </summary>
 public abstract class BinaryControlBase : InitializableControl<bool?>
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// The state value for this control.
     /// </summary>
@@ -59,10 +54,8 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
 
             return true;
         }
-        catch (InvalidFieldValueException ex)
+        catch (InvalidFieldValueException)
         {
-            _log.LogError(ex, "Unable to set control {Arg0} from FIX field value '{Arg1}'; reason: {Arg2}", Id, value, ex.Message);
-
             return false;
         }
     }
@@ -124,11 +117,6 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
         {
             _value = value.ToBoolean();
         }
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Binary control value is now {Value}", _value);
-        }
     }
 
     /// <summary>
@@ -141,11 +129,6 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     {
         bool isString = newValue is string;
         bool isBool = newValue is bool;
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Setting binary control {Arg0} using value {Arg1} (of type {Arg2})", Id, newValue, newValue?.GetType().Name ?? "N/A");
-        }
 
         // Strictly this is a bit of a hack as the right thing to do when implementing CheckBoxes and RadioButtons is
         // to enforce the use of boolean inputs.  However as atdl4j supports setting of these controls' state via
@@ -186,11 +169,6 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
             ? null
             : throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
                 newValue.GetType().FullName!, "System.String, System.Boolean");
-        }
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Binary control value is now {Value}", _value);
         }
     }
 

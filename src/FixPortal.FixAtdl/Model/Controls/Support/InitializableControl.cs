@@ -8,8 +8,6 @@
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Enumerations;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Controls.Support;
 
@@ -22,9 +20,6 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 /// control uses EnumState to store its state.</typeparam>
 public abstract class InitializableControl<T> : Control_t
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// Initializes a new <see cref="InitializableControl{T}"/> instance with the specified identifier as id.
     /// </summary>
@@ -52,42 +47,12 @@ public abstract class InitializableControl<T> : Control_t
     public override void LoadInitValue(FixFieldValueProvider controlInitValueProvider)
     {
         // If UseFixField, then attempt to initialize with FIX field...
-        if (InitPolicy == InitPolicy_t.UseFixField)
+        if (InitPolicy == InitPolicy_t.UseFixField
+            && !string.IsNullOrEmpty(InitFixField)
+            && controlInitValueProvider.TryGetValue(InitFixField, ParameterRef, out string value)
+            && LoadDefaultFromFixValue(value))
         {
-            if (_log.IsEnabled(LogLevel.Debug))
-            {
-                _log.LogDebug("Attempting to initialize control {Arg0} from FIX field...", Id);
-            }
-
-            if (!string.IsNullOrEmpty(InitFixField))
-            {
-
-                if (controlInitValueProvider.TryGetValue(InitFixField, ParameterRef, out string value))
-                {
-                    if (LoadDefaultFromFixValue(value))
-                    {
-                        if (_log.IsEnabled(LogLevel.Debug))
-                        {
-                            _log.LogDebug("Control {Arg0} successfully initialized with value '{Arg1}' from FIX field {Arg2}", Id, value, InitFixField);
-                        }
-
-                        return;
-                    }
-                }
-                else
-                {
-                    _log.LogWarning("Unable to initialize control {Arg0} with FIX field {Arg1} as no valid value was found", Id, InitFixField);
-                }
-            }
-            else
-            {
-                _log.LogWarning("Unable to initialize control {Arg0} with initPolicy = UseFixField as no valid initFixField was supplied", Id);
-            }
-        }
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Initializing control {Arg0} with InitValue '{Arg1}'...", Id, InitValue);
+            return;
         }
 
         // Unable to initialize with FIX field so let's try using InitValue.  If InitValue is null, then control value will

@@ -12,8 +12,6 @@ using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Controls.Support;
 
@@ -27,9 +25,6 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 /// </summary>
 public abstract class TextControlBase : InitializableControl<string>
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// The state value for this control; null when the control has no value set.
     /// </summary>
@@ -85,11 +80,6 @@ public abstract class TextControlBase : InitializableControl<string>
             _ => throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
                 newValue.GetType().FullName!, "System.String")
         };
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Control value is now '{Value}'", _value ?? "null");
-        }
     }
 
     /// <summary>
@@ -109,11 +99,6 @@ public abstract class TextControlBase : InitializableControl<string>
         IControlConvertible value = parameter.GetValueForControl();
 
         _value = value.ToString(CultureInfo.InvariantCulture);
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Text control {Arg0} value is now {Arg1}", Id, _value);
-        }
     }
 
     /// <summary>

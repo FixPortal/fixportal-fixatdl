@@ -7,8 +7,6 @@
 
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Controls;
 
@@ -17,9 +15,6 @@ namespace FixPortal.FixAtdl.Model.Controls;
 /// </summary>
 public class SingleSpinner_t : NumericControlBase
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// Initializes a new instance of <see cref="SingleSpinner_t"/> using the supplied ID.
     /// </summary>
@@ -27,10 +22,6 @@ public class SingleSpinner_t : NumericControlBase
     public SingleSpinner_t(string id)
         : base(id)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("New SingleSpinner_t created as control {Arg0}", id);
-        }
     }
 
     /// <summary>Limits the granularity of a spinner control. Useful in spinner objects to enforce odd-lot and sub-penny

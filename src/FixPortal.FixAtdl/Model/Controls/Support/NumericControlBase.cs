@@ -11,8 +11,6 @@ using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Controls.Support;
 
@@ -22,9 +20,6 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 /// <remarks>Note that decimal.MaxValue is used to represent an invalid value.</remarks>
 public class NumericControlBase : InitializableControl<decimal?>
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     private const decimal InvalidValue = decimal.MaxValue;
 
     /// <summary>
@@ -58,8 +53,6 @@ public class NumericControlBase : InitializableControl<decimal?>
         }
         catch (Exception ex) when (ex is FormatException or OverflowException)
         {
-            _log.LogError("Unable to set control {Arg0} to value '{Arg1}' as the value could not be converted to a valid number", Id, value);
-
             return false;
         }
     }
@@ -125,11 +118,6 @@ public class NumericControlBase : InitializableControl<decimal?>
             : throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnexpectedArgumentType,
                 newValue.GetType().FullName, "System.String, System.Decimal");
         }
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Control value is now {Value}", _value);
-        }
     }
 
     /// <summary>
@@ -149,11 +137,6 @@ public class NumericControlBase : InitializableControl<decimal?>
         IControlConvertible value = parameter.GetValueForControl();
 
         _value = value.ToDecimal();
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("Numeric control {Arg0} value is now {Arg1}", Id, _value);
-        }
     }
 
     /// <summary>

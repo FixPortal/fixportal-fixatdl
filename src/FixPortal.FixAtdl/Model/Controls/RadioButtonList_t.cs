@@ -7,8 +7,6 @@
 
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Controls;
 
@@ -17,9 +15,6 @@ namespace FixPortal.FixAtdl.Model.Controls;
 /// </summary>
 public class RadioButtonList_t : ListControlBase, IOrientableControl
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// Initializes a new instance of <see cref="RadioButtonList_t"/> using the supplied ID.
     /// </summary>
@@ -27,10 +22,6 @@ public class RadioButtonList_t : ListControlBase, IOrientableControl
     public RadioButtonList_t(string id)
         : base(id)
     {
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("New RadioButtonList_t created as control {Arg0}", id);
-        }
     }
 
     #region IOrientableControl Members

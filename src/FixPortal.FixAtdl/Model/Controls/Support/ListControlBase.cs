@@ -11,8 +11,6 @@ using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FixPortal.FixAtdl.Model.Controls.Support;
 
@@ -32,9 +30,6 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 /// </remarks>
 public abstract class ListControlBase : InitializableControl<string>
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private static readonly NullLogger _log = NullLogger.Instance;
-
     /// <summary>
     /// EnumState for this control which provides storage of the state of each ListItem.
     /// </summary>
@@ -86,8 +81,6 @@ public abstract class ListControlBase : InitializableControl<string>
         {
             // Honour the bool contract: an invalid EnumID falls back to "not initialised" rather than
             // aborting initialisation by throwing (as BinaryControlBase already does).
-            _log.LogError(ex, "Unable to initialise control {Arg0} from FIX value '{Arg1}'", Id, value);
-
             return false;
         }
 
@@ -177,11 +170,6 @@ public abstract class ListControlBase : InitializableControl<string>
         IControlConvertible value = parameter.GetValueForControl();
 
         _value = value.ToEnumState(parameter.EnumPairs);
-
-        if (_log.IsEnabled(LogLevel.Debug))
-        {
-            _log.LogDebug("List control {Arg0} value is now {Arg1}", Id, _value);
-        }
     }
 
     /// <summary>
