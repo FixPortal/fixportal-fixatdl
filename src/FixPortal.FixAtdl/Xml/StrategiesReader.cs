@@ -23,8 +23,19 @@ namespace FixPortal.FixAtdl.Xml;
 /// </summary>
 public class StrategiesReader
 {
-    // FP Enhancement: 2026-05-23 — TODO wire injected logger when refactoring class to accept ILogger.
-    private readonly NullLogger _log = NullLogger.Instance;
+    private readonly ILoggerFactory _loggerFactory;
+    private readonly ILogger<StrategiesReader> _log;
+
+    /// <summary>
+    /// Initializes a new <see cref="StrategiesReader"/>.
+    /// </summary>
+    /// <param name="loggerFactory">Optional logger factory. When null, no logging is produced
+    /// (<see cref="NullLoggerFactory"/>). Supply one to trace loading and deserialization.</param>
+    public StrategiesReader(ILoggerFactory? loggerFactory = null)
+    {
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+        _log = _loggerFactory.CreateLogger<StrategiesReader>();
+    }
 
     // Hardened reader settings shared by both Load overloads: prohibit DTD processing and use no
     // external resolver (defence-in-depth against XXE / external-entity expansion).
@@ -110,7 +121,7 @@ public class StrategiesReader
             throw ThrowHelper.New<FixAtdlException>(this, ErrorMessages.StrategiesLoadFailure);
         }
 
-        ElementFactory factory = new(SchemaDefinitions.Strategies_t, typeof(Strategy_t));
+        ElementFactory factory = new(SchemaDefinitions.Strategies_t, typeof(Strategy_t), _loggerFactory);
 
         _strategyLoadedCount = 0;
 
