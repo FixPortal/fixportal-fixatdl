@@ -1,12 +1,13 @@
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Parsing;
 
 public class StrategiesParserRejectionTests
 {
-    private static Model.Elements.Strategies_t Load(string xml)
+    private static Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream);
