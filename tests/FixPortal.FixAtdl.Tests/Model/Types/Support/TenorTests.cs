@@ -105,4 +105,21 @@ public class TenorTests
     [Fact]
     public void Equals_false_for_non_Tenor_object()
         => Tenor.Parse("M3").Equals("M3").Should().BeFalse();
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Characterization — batch-3 finding #7 (CLOSED)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    // Characterization (batch-3 finding #7, deliberately CLOSED — see docs/batch-3-findings-disposition.md):
+    // Tenor.Parse intentionally accepts non-positive offsets. D0 means "same day" in several FIX
+    // implementations and numeric-range enforcement is a business-layer concern, not a parser invariant.
+    // This pins that decision so a future "tighten the parser" change is a conscious one.
+    [Theory]
+    [InlineData("D0")]
+    [InlineData("M-3")]
+    public void Parse_accepts_non_positive_offsets_by_design(string wire)
+    {
+        var act = () => Tenor.Parse(wire);
+        act.Should().NotThrow();
+    }
 }

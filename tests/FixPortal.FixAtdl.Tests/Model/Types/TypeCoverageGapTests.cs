@@ -347,4 +347,18 @@ public class TypeCoverageGapTests
         var act = () => _ = p.WireValue;
         act.Should().Throw<MissingMandatoryValueException>();
     }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Characterization — batch-3 finding F7 (CLOSED)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    // Characterization (batch-3 finding F7, deliberately CLOSED — see docs/batch-3-findings-disposition.md):
+    // TagNum_t parses leading-zero wire values to their numeric value (no leading-zero rejection).
+    // Rejecting them is enforcement-tightening, not a correctness fix; the parsed value is correct.
+    [Fact]
+    public void TagNum_t_parses_leading_zero_wire_value_to_numeric_value()
+    {
+        var parameter = new Parameter_t<TagNum_t>("p") { WireValue = "0044" };
+        parameter.GetCurrentValue().Should().Be(44u);
+    }
 }
