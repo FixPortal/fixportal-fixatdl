@@ -31,6 +31,7 @@ public static class EditValueConverter
     /// <returns>Converted value as an <see cref="IComparable"/>.</returns>
     /// <exception cref="InvalidCastException">Thrown if the value cannot be converted to the target type.</exception>
     /// <exception cref="FormatException">Thrown if the value cannot be converted into a valid numeric type.</exception>
+    /// <exception cref="Diagnostics.Exceptions.InvalidFieldValueException">Thrown if <paramref name="value"/> is null (a missing operand), or if a conversion fails for the matched type.</exception>
     public static IComparable ConvertToComparableType(object typeInstanceToMatch, string value)
     {
         // If we don't have a valid type to convert to, then best leave the value alone.
