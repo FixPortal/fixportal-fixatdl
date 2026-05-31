@@ -55,24 +55,21 @@ public sealed class InitValueClock
         ArgumentNullException.ThrowIfNull(raw);
         Raw = raw;
 
-        foreach (LocalTimePattern pattern in TimePatterns)
+        // Try each pattern set in turn and take the first that parses. Select is lazy and
+        // FirstOrDefault short-circuits, so no pattern past the first match is evaluated. A
+        // ParseResult is a reference type, so a null result means "no pattern matched".
+        ParseResult<LocalTime>? timeMatch = TimePatterns.Select(pattern => pattern.Parse(raw)).FirstOrDefault(result => result.Success);
+        if (timeMatch is not null)
         {
-            ParseResult<LocalTime> result = pattern.Parse(raw);
-            if (result.Success)
-            {
-                TimeOfDay = result.Value;
-                return;
-            }
+            TimeOfDay = timeMatch.Value;
+            return;
         }
 
-        foreach (LocalDateTimePattern pattern in DateTimePatterns)
+        ParseResult<LocalDateTime>? dateTimeMatch = DateTimePatterns.Select(pattern => pattern.Parse(raw)).FirstOrDefault(result => result.Success);
+        if (dateTimeMatch is not null)
         {
-            ParseResult<LocalDateTime> result = pattern.Parse(raw);
-            if (result.Success)
-            {
-                DateTime = result.Value;
-                return;
-            }
+            DateTime = dateTimeMatch.Value;
+            return;
         }
 
         throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.InvalidDateOrTimeValue, raw);
