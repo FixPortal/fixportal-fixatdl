@@ -316,7 +316,12 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     {
         bool checkingForExist = Operator == Operator_t.Exist;
 
-        bool empty = value == null || value as string == string.Empty;
+        // A list control returns a never-null EnumState; "nothing selected" is an all-false EnumState
+        // (not null and not ""), so it must be treated as absent here or EX/NX would always be wrong
+        // for list controls. Scalar/text/clock controls already return null when unset.
+        bool empty = value == null
+            || value as string == string.Empty
+            || value is EnumState enumState && !enumState.HasSelection;
 
         bool result = checkingForExist ? !empty : empty;
 

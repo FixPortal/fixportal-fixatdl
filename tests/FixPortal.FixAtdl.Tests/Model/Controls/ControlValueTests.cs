@@ -713,6 +713,28 @@ public class EnumStateTests
         state["C"] = true;
         state.GetFirstSelectedEnumIdIndex().Should().Be(2);
     }
+
+    [Fact]
+    public void EnumState_has_selection_is_false_when_empty()
+    {
+        var state = new EnumState(["A", "B", "C"]);
+        state.HasSelection.Should().BeFalse();
+    }
+
+    [Fact]
+    public void EnumState_has_selection_is_true_when_a_bit_is_set()
+    {
+        var state = new EnumState(["A", "B", "C"]);
+        state["B"] = true;
+        state.HasSelection.Should().BeTrue();
+    }
+
+    [Fact]
+    public void EnumState_has_selection_is_true_when_non_enum_value_set()
+    {
+        var state = new EnumState(["A", "B"]) { NonEnumValue = "freetext" };
+        state.HasSelection.Should().BeTrue();
+    }
 }
 
 // ============================================================

@@ -222,6 +222,13 @@ public class EnumState
     public int Count => _enumIds.Length;
 
     /// <summary>
+    /// Gets a value indicating whether this EnumState represents a real selection — i.e., at least one
+    /// enumerated value is enabled, or a non-enum (free-text) value is present. An all-false EnumState
+    /// with no non-enum value represents "nothing selected" and is treated as absent by EX/NX edits.
+    /// </summary>
+    public bool HasSelection => GetFirstSelectedEnumIdIndex() != -1 || !string.IsNullOrEmpty(_nonEnumValue);
+
+    /// <summary>
     /// Determines whether the supplied EnumID value is valid for this EnumState instance.
     /// </summary>
     /// <param name="enumId">EnumID value to evaluate.</param>
