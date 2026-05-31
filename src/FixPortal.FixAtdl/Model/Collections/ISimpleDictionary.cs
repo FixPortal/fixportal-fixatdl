@@ -11,7 +11,7 @@ namespace FixPortal.FixAtdl.Model.Collections;
 /// Accessor interface that simple dictionary collections must implement.  Lookup is via string-based key.
 /// </summary>
 /// <typeparam name="T">Type of item that this SimpleDictionary provides access to.</typeparam>
-public interface ISimpleDictionary<T>
+public interface ISimpleDictionary<out T>
 {
     /// <summary>
     /// Gets the item specified by the supplied key.

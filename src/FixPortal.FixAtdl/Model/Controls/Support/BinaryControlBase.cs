@@ -23,12 +23,11 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     /// <summary>
     /// The state value for this control.
     /// </summary>
-    // Default to a concrete false (not null) so an unset binary control reads as "false" for
-    // EQ "false" StateRules even before LoadDefaults runs (matching the post-LoadDefaults default).
+    // Defaults to a concrete false (not null) so an unset binary control reads as "false" for
+    // EQ "false" StateRules even before LoadDefaults runs, matching the post-LoadDefaults default.
     // Because false is a value that IS sent over FIX, an unset control also reads as present for
-    // EX/NX edits (EX true / NX false). Reset() still sets null deliberately (null = "do not send";
-    // EX false / NX true) — that construct-vs-Reset asymmetry is intentional. The three-state
-    // contract is otherwise unchanged.
+    // EX and NX edits, giving EX true and NX false. The reset path deliberately restores null,
+    // meaning "do not send"; that asymmetry between construction and reset is intentional.
     protected bool? _value = false;
 
     /// <summary>
@@ -307,6 +306,9 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     /// requires special conversion, or if instead a regular value conversion is appropriate).
     /// </summary>
     public override bool HasEnumeratedState => CheckedEnumRef != null && UncheckedEnumRef != null;
+
+    /// <summary>Binary controls (CheckBox_t/RadioButton_t) are toggleable.</summary>
+    public override bool IsToggleable => true;
 
     #endregion
 }

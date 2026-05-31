@@ -78,7 +78,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// <summary>
     /// Indicates whether this control can be toggled (i.e., is a checkbox or radiobutton).
     /// </summary>
-    public bool IsToggleable => this is BinaryControlBase;
+    public virtual bool IsToggleable => false;
 
     /// <summary>
     /// Gets the StrategyPanel that this control belongs to.

@@ -19,7 +19,7 @@ namespace FixPortal.FixAtdl.Model.Elements;
 /// </summary>
 public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
 {
-    private Control_t _owner = null!;
+    private Control_t Owner { get; set; } = null!;
 
     /// <summary>
     /// Enabled state for this state rule.
@@ -44,9 +44,9 @@ public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
     {
         StringBuilder sb = new();
 
-        // _owner is unset until the rule is parented; ToString is a debug/logging path, so guard the
+        // Owner is unset until the rule is parented; ToString is a debug/logging path, so guard the
         // deref to avoid an NRE when a rule is logged before it is attached to its Control_t.
-        sb.AppendFormat(CultureInfo.InvariantCulture, "(Control.ID=\"{0}\"", _owner?.Id);
+        sb.AppendFormat(CultureInfo.InvariantCulture, "(Control.ID=\"{0}\"", Owner?.Id);
 
         if (Enabled != null)
         {
@@ -72,7 +72,7 @@ public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
 
     Control_t IParentable<Control_t>.Parent
     {
-        get => _owner; set => _owner = value;
+        get => Owner; set => Owner = value;
     }
 
     #endregion IParentable<Control_t> Members

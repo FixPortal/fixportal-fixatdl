@@ -37,17 +37,6 @@ public static class ThrowHelper
     }
 
     /// <summary>
-    /// Creates an exception of type <typeparamref name="T"/> carrying an explicit parameter name, for the
-    /// ArgumentException family whose (string, string) constructor is (paramName, message). Use this
-    /// instead of <see cref="New{T}(object?, string)"/> when the offending parameter name is known, so the
-    /// exception reports it rather than the synthetic default "Value".
-    /// </summary>
-    public static T NewWithParamName<T>(object? source, string paramName, string message) where T : Exception
-    {
-        return CreateException<T>(source, message, null, paramName);
-    }
-
-    /// <summary>
     /// Creates an exception of the specified type and initializes it using the values supplied.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -156,6 +145,17 @@ public static class ThrowHelper
         T ex = CreateException<T>(source, FormatMessage(format, args), innerException, info);
 
         return ex;
+    }
+
+    /// <summary>
+    /// Creates an exception of type <typeparamref name="T"/> carrying an explicit parameter name, for the
+    /// ArgumentException family whose (string, string) constructor is (paramName, message). Use this
+    /// instead of <see cref="New{T}(object?, string)"/> when the offending parameter name is known, so the
+    /// exception reports it rather than the synthetic default "Value".
+    /// </summary>
+    public static T NewWithParamName<T>(object? source, string paramName, string message) where T : Exception
+    {
+        return CreateException<T>(source, message, null, paramName);
     }
 
     /// <summary>

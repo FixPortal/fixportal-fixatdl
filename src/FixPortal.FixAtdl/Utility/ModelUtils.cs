@@ -16,10 +16,10 @@ namespace FixPortal.FixAtdl.Utility;
 /// </summary>
 public static class ModelUtils
 {
-    private static readonly Type[] _types;
+    private static readonly Type[] _types = BuildModelTypes();
     private static readonly Dictionary<string, MethodInfo> _methodInfoCache = [];
 
-    static ModelUtils()
+    private static Type[] BuildModelTypes()
     {
         Type[] allTypes;
 
@@ -29,13 +29,13 @@ public static class ModelUtils
         }
         catch (ReflectionTypeLoadException ex)
         {
-            // One unloadable type would otherwise bubble a TypeInitializationException out of this
-            // static constructor and brick every consumer of ModelUtils for the process lifetime.
+            // One unloadable type would otherwise bubble a TypeInitializationException out of the type
+            // initializer and brick every consumer of ModelUtils for the process lifetime.
             allTypes = [.. ex.Types.Where(t => t != null).Cast<Type>()];
         }
 
         // Materialise once so GetTypeFromName does not re-run the LINQ predicate on every call.
-        _types = [.. allTypes.Where(t => t.IsClass && t.Namespace == "FixPortal.FixAtdl.Model.Types" && !t.IsAbstract)];
+        return [.. allTypes.Where(t => t.IsClass && t.Namespace == "FixPortal.FixAtdl.Model.Types" && !t.IsAbstract)];
     }
 
     /// <summary>

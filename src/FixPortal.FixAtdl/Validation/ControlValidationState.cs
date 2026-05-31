@@ -16,7 +16,6 @@ namespace FixPortal.FixAtdl.Validation;
 /// </summary>
 public class ControlValidationState
 {
-    private ValidationResult _parameterValidationResult = null!;
     private readonly List<StrategyEdit_t> _strategyEdits = [];
 
     /// <summary>
@@ -44,7 +43,7 @@ public class ControlValidationState
         {
             bool state = ControlValidationResult == null || ControlValidationResult.IsValid;
 
-            state &= _parameterValidationResult == null || _parameterValidationResult.IsValid;
+            state &= ParameterValidationResult == null || ParameterValidationResult.IsValid;
 
             foreach (StrategyEdit_t strategyEdit in _strategyEdits)
             {
@@ -63,7 +62,7 @@ public class ControlValidationState
     /// <summary>
     /// Used to hold the results obtained from the parameter set and validation operation.
     /// </summary>
-    public ValidationResult ParameterValidationResult { set => _parameterValidationResult = value; }
+    public ValidationResult ParameterValidationResult { get; set; } = null!;
 
     /// <summary>
     /// Adds the supplied StrategyEdit_t to this <see cref="ControlValidationState"/>.
@@ -95,7 +94,7 @@ public class ControlValidationState
         // Evaluating the StrategyEdits may give us meaningless information if the parameter value
         // didn't validate, but we go ahead and do it anyway because failing to do leaves us in an
         // indeterminate state from this value change.
-        state &= _parameterValidationResult == null || _parameterValidationResult.IsValid;
+        state &= ParameterValidationResult == null || ParameterValidationResult.IsValid;
 
         foreach (StrategyEdit_t strategyEdit in _strategyEdits)
         {
@@ -116,7 +115,7 @@ public class ControlValidationState
             IEnumerable<StrategyEdit_t> strategyEditsInError = from s in _strategyEdits where !s.CurrentState select s;
 
             int count = strategyEditsInError.Count();
-            bool parameterIsInvalid = _parameterValidationResult != null && !_parameterValidationResult.IsValid;
+            bool parameterIsInvalid = ParameterValidationResult != null && !ParameterValidationResult.IsValid;
 
             if (ControlValidationResult != null && !ControlValidationResult.IsValid)
             {
@@ -130,7 +129,7 @@ public class ControlValidationState
 
             if (parameterIsInvalid)
             {
-                sb.Append(_parameterValidationResult!.ErrorText);
+                sb.Append(ParameterValidationResult!.ErrorText);
 
                 if (count > 0)
                 {

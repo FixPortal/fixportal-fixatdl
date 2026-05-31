@@ -150,6 +150,11 @@ public class EnumState
     /// </summary>
     /// <returns>A hash code for the current Object.</returns>
     /// <remarks>The value 251 is used here because it is a prime number, helpful for generating unique hash values.</remarks>
+#pragma warning disable S2328 // "GetHashCode" should not reference mutable fields
+    // EnumState is a deliberately mutable control-state holder and is never used as a hash-table key.
+    // Equals and GetHashCode are kept consistent over the SAME field set (_enumStates, _nonEnumValue) so
+    // the contract holds at any instant; making the type immutable purely to satisfy this rule would be a
+    // disproportionate redesign of list-control state (batch 5, Sonar disposition).
     public override int GetHashCode()
     {
         unchecked // No issue with int overflow
@@ -179,6 +184,7 @@ public class EnumState
             return hashCode;
         }
     }
+#pragma warning restore S2328
 
     /// <summary>
     /// Gets/sets the boolean state of the enumerated element specified by the supplied EnumID value.

@@ -25,7 +25,7 @@ namespace FixPortal.FixAtdl.Model.Collections;
 /// </summary>
 public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Control_t>, ISimpleDictionary<Control_t>
 {
-    private Strategy_t _owner;
+    private Strategy_t Owner { get; set; }
     private readonly Dictionary<string, Control_t> _controls = [];
 
     /// <summary>
@@ -34,7 +34,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     /// <param name="owner">The owning strategy.</param>
     public ReadOnlyControlCollection(Strategy_t owner)
     {
-        _owner = owner;
+        Owner = owner;
     }
 
     internal void SourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -242,7 +242,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     {
         foreach (Control_t control in this)
         {
-            control.StateRules.ResolveAll(_owner);
+            control.StateRules.ResolveAll(Owner);
         }
     }
 
@@ -325,7 +325,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     /// </summary>
     Strategy_t IParentable<Strategy_t>.Parent
     {
-        get => _owner; set => _owner = value;
+        get => Owner; set => Owner = value;
     }
 
     #endregion
