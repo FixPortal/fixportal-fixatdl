@@ -95,4 +95,21 @@ public class RealWorldSpecConformanceTests
             .ToDateTime(null!, CultureInfo.InvariantCulture)
             .Should().Be(new DateTime(2026, 7, 15, 6, 0, 0, DateTimeKind.Utc));
     }
+
+    [Fact]
+    public void C2_time_only_maxValue_is_captured_as_text()
+    {
+        var endTime = (Parameter_t<UTCTimestamp_t>)Load(TzClockFixture)["VWAP"].Parameters["p_EndTime"];
+        endTime.Value.MaxValueText.Should().Be("23:59:59");
+    }
+
+    [Theory]
+    [InlineData("20260101-23:59:59")]
+    [InlineData("20991231-23:59:59")]
+    public void C2_time_only_maxValue_accepts_valid_time_on_any_date(string wireValue)
+    {
+        var endTime = Load(TzClockFixture)["VWAP"].Parameters["p_EndTime"];
+        var act = () => endTime.WireValue = wireValue;
+        act.Should().NotThrow();
+    }
 }
