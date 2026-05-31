@@ -30,10 +30,12 @@ public static class FixDateTime
     {
         result = DateTime.MinValue;
 
-        // Try the exact FIX formats first (with AssumeUniversal so an offset-less value is treated as
-        // UTC rather than host-local), and only fall back to a loose locale parse for non-FIX input.
-        // Exact-first avoids a locale-dependent loose parse silently winning over a valid FIX format.
-        return DateTime.TryParseExact(value, FixDateTimeFormat.AllFormats, provider, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal, out result) ||
+        // Try the exact FIX formats first (with AssumeUniversal so an offset-less value is treated as UTC
+        // rather than host-local, plus AdjustToUniversal so the result is canonically Kind=Utc — independent
+        // of the host offset — aligning with the UTC-family WireParseStyles (M1)). Only fall back to a loose
+        // locale parse for non-FIX input. Exact-first avoids a locale-dependent loose parse silently winning
+        // over a valid FIX format.
+        return DateTime.TryParseExact(value, FixDateTimeFormat.AllFormats, provider, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out result) ||
             DateTime.TryParse(value, provider, DateTimeStyles.AllowWhiteSpaces, out result);
     }
 

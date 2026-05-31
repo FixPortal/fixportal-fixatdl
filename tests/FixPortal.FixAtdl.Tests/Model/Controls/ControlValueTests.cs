@@ -4,6 +4,7 @@ using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Enumerations;
 using NodaTime;
 using NodaTime.Testing;
 
@@ -852,5 +853,29 @@ public class ClockControlTests
     {
         var clock = new Clock_t("clk") { LocalMktTz = "America/New_York" };
         clock.LocalMktTz.Should().Be("America/New_York");
+    }
+
+    [Fact]
+    public void Clock_load_default_from_fix_value_yields_utc_instant()
+    {
+        // Drive the production LoadDefaultFromFixValue path: a UseFixField clock with a UTCTimestamp wire
+        // value supplied via a real FixFieldValueProvider. With no localMktTz, GetCurrentValue() returns the
+        // UTC DateTime, so an offset-less FIX timestamp must round-trip as Kind=Utc (FixDateTime.TryParse).
+        FixTagValuesCollection fixValues = [];
+        fixValues.Add(60, "20260601-08:00:00");
+
+        var initialProvider = Substitute.For<IInitialFixValueProvider>();
+        initialProvider.InputFixValues.Returns(fixValues);
+        var provider = new FixFieldValueProvider(initialProvider, null);
+
+        var clock = new Clock_t("clk")
+        {
+            InitPolicy = InitPolicy_t.UseFixField,
+            InitFixField = "FIX_TransactTime",
+        };
+
+        clock.LoadInitValue(provider);
+
+        ((DateTime?)clock.GetCurrentValue()).Should().Be(new DateTime(2026, 6, 1, 8, 0, 0, DateTimeKind.Utc));
     }
 }
