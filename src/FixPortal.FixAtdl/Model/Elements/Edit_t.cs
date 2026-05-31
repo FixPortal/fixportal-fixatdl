@@ -348,11 +348,18 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             return false;
         }
 
+        // A null RHS — e.g. an inequality against a missing FIX field — is an indeterminate
+        // comparison, not an ordering. Short-circuit it to false symmetrically with the null-LHS
+        // guard above, rather than letting lhs.CompareTo(null) fabricate a definite (+1) result.
+        if (rhs == null)
+        {
+            return false;
+        }
+
         // Operands of different runtime types (e.g. a decimal LHS vs a non-numeric string RHS, after
         // NormaliseNumericString) cannot be ordered: IComparable.CompareTo would throw a raw
-        // ArgumentException. Surface a clear domain error instead. (A null RHS is left to CompareTo,
-        // preserving the existing null-RHS handling.)
-        if (rhs != null && lhs.GetType() != rhs.GetType())
+        // ArgumentException. Surface a clear domain error instead.
+        if (lhs.GetType() != rhs.GetType())
         {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
         }

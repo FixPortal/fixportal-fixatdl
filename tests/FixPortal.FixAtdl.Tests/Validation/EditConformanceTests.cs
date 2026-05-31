@@ -65,4 +65,30 @@ public class EditConformanceTests
 
         edit.CurrentState.Should().Be(expected);
     }
+
+    // ── H2 — inequality against a missing FIX field is indeterminate ──────────
+
+    [Theory]
+    [InlineData(Operator_t.GreaterThan)]
+    [InlineData(Operator_t.GreaterThanOrEqual)]
+    [InlineData(Operator_t.LessThan)]
+    [InlineData(Operator_t.LessThanOrEqual)]
+    public async Task Inequality_against_missing_fix_field_is_false(Operator_t op)
+    {
+        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var twap = LoadFirst(xml);
+        twap.Parameters["Participation"].WireValue = "50";
+
+        // Field2 is a FIX_ field that is never supplied → the RHS resolves to null.
+        var edit = new Edit_t<IParameter>
+        {
+            Field = "Participation",
+            Operator = op,
+            Field2 = "FIX_DoesNotExist",
+        };
+        ((IResolvable<Strategy_t, IParameter>)edit).Resolve(twap, twap.Parameters);
+        edit.Evaluate(FixFieldValueProvider.Empty);
+
+        edit.CurrentState.Should().BeFalse();
+    }
 }
