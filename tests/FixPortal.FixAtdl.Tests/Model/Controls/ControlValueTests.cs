@@ -207,6 +207,22 @@ public class BinaryControlTests
         control.Reset();
         control.GetCurrentValue().Should().BeNull();
     }
+
+    [Fact]
+    public void CheckBox_defaults_to_concrete_false_before_load()
+    {
+        // M3: a freshly-constructed binary control must read as concrete false (not null) so an
+        // EQ "false" StateRule fires deterministically even before LoadDefaults is called.
+        var control = new CheckBox_t("chk");
+        control.GetCurrentValue().Should().Be(false);
+    }
+
+    [Fact]
+    public void RadioButton_defaults_to_concrete_false_before_load()
+    {
+        var control = new RadioButton_t("rb");
+        control.GetCurrentValue().Should().Be(false);
+    }
 }
 
 // ============================================================

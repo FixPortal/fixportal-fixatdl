@@ -113,4 +113,44 @@ public class EditConformanceTests
         act.Should().Throw<InconsistentStrategyException>()
             .WithMessage("*value*field2*", because: "the M2 guard should name both mutually-exclusive attributes");
     }
+
+    // ── M3 — EQ "false" fires for a default (unset) binary control ────────────
+
+    private const string CheckBoxStrategyXml =
+        """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+                    xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+                    xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+                    xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    strategyIdentifierTag="5001">
+          <Strategy name="S" version="1" wireValue="S" uiRep="S" providerID="DEMO">
+            <Parameter name="P" xsi:type="Int_t" fixTag="9001" use="optional"/>
+            <lay:StrategyLayout>
+              <lay:StrategyPanel title="P" orientation="VERTICAL" collapsible="false" border="Line">
+                <lay:Control ID="EnableStartTime" xsi:type="lay:CheckBox_t" label=""/>
+              </lay:StrategyPanel>
+            </lay:StrategyLayout>
+          </Strategy>
+        </Strategies>
+        """;
+
+    [Fact]
+    public void Eq_false_fires_for_default_unset_checkbox()
+    {
+        var strategy = LoadFirst(CheckBoxStrategyXml);
+
+        // Deliberately do NOT call LoadDefaults — represents a default/unset checkbox.
+        var edit = new Edit_t<Control_t>
+        {
+            Field = "EnableStartTime",
+            Operator = Operator_t.Equal,
+            Value = "false",
+        };
+        ((IResolvable<Strategy_t, Control_t>)edit).Resolve(strategy, strategy.Controls);
+        edit.Evaluate();
+
+        edit.CurrentState.Should().BeTrue();
+    }
 }

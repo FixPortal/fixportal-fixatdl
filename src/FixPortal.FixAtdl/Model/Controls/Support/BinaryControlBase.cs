@@ -23,7 +23,10 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     /// <summary>
     /// The state value for this control.
     /// </summary>
-    protected bool? _value;
+    // Default to a concrete false (not null) so an unset binary control reads as "false" for
+    // EQ "false" StateRules even before LoadDefaults runs. Reset() still sets null deliberately
+    // (null = "do not send over FIX"); the three-state contract is otherwise unchanged.
+    protected bool? _value = false;
 
     /// <summary>
     /// Initializes a new instance of <see cref="BinaryControlBase"/> using the supplied ID.
