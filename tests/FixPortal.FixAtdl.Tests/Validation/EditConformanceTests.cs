@@ -153,4 +153,36 @@ public class EditConformanceTests
 
         edit.CurrentState.Should().BeTrue();
     }
+
+    [Theory]
+    [InlineData(Operator_t.Exist, true)]
+    [InlineData(Operator_t.NotExist, false)]
+    public void Default_unset_checkbox_reports_exists(Operator_t op, bool expected)
+    {
+        // M3 × H1 interaction, locked deliberately: a default binary control holds concrete false,
+        // which is a value that IS sent over FIX, so it reads as present (EX true / NX false) —
+        // consistent with the post-LoadDefaults state. Only an explicit Reset() reads as absent.
+        var strategy = LoadFirst(CheckBoxStrategyXml);
+
+        var edit = new Edit_t<Control_t> { Field = "EnableStartTime", Operator = op };
+        ((IResolvable<Strategy_t, Control_t>)edit).Resolve(strategy, strategy.Controls);
+        edit.Evaluate();
+
+        edit.CurrentState.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Reset_checkbox_reports_not_exists()
+    {
+        // The construct-vs-Reset asymmetry is deliberate: Reset() sets null ("do not send"), which
+        // EX/NX read as absent — unlike the concrete-false construction default above.
+        var strategy = LoadFirst(CheckBoxStrategyXml);
+        strategy.Controls["EnableStartTime"].Reset();
+
+        var edit = new Edit_t<Control_t> { Field = "EnableStartTime", Operator = Operator_t.NotExist };
+        ((IResolvable<Strategy_t, Control_t>)edit).Resolve(strategy, strategy.Controls);
+        edit.Evaluate();
+
+        edit.CurrentState.Should().BeTrue();
+    }
 }

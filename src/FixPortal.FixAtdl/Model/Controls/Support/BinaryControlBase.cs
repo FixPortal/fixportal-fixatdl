@@ -24,8 +24,11 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     /// The state value for this control.
     /// </summary>
     // Default to a concrete false (not null) so an unset binary control reads as "false" for
-    // EQ "false" StateRules even before LoadDefaults runs. Reset() still sets null deliberately
-    // (null = "do not send over FIX"); the three-state contract is otherwise unchanged.
+    // EQ "false" StateRules even before LoadDefaults runs (matching the post-LoadDefaults default).
+    // Because false is a value that IS sent over FIX, an unset control also reads as present for
+    // EX/NX edits (EX true / NX false). Reset() still sets null deliberately (null = "do not send";
+    // EX false / NX true) — that construct-vs-Reset asymmetry is intentional. The three-state
+    // contract is otherwise unchanged.
     protected bool? _value = false;
 
     /// <summary>
