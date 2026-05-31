@@ -144,14 +144,9 @@ public class Percentage_t : Float_t
         {
             decimal adjustedValue = MultiplyBy100 == true ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value;
 
-            if (Precision != null)
-            {
-                return Math.Round(adjustedValue, Precision.Value, MidpointRounding.AwayFromZero);
-            }
-            else
-            {
-                return adjustedValue;
-            }
+            return Precision != null
+                ? Math.Round(adjustedValue, Precision.Value, MidpointRounding.AwayFromZero)
+                : adjustedValue;
         }
         else
         {

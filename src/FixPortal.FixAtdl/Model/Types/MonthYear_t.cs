@@ -148,7 +148,7 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
-        throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.UnsupportedParameterValueConversion, _value, "DateTime");
+        throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.UnsupportedParameterValueConversion, _value, "Decimal");
     }
 
     /// <summary>
