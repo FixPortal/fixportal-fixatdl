@@ -878,4 +878,22 @@ public class ClockControlTests
 
         ((DateTime?)clock.GetCurrentValue()).Should().Be(new DateTime(2026, 6, 1, 8, 0, 0, DateTimeKind.Utc));
     }
+
+    [Fact]
+    public void Clock_to_string_includes_milliseconds_when_present()
+    {
+        var clock = new Clock_t("clk");
+        clock.SetValue(new DateTime(2026, 6, 1, 8, 0, 0, 250, DateTimeKind.Utc));
+
+        clock.ToString(null!).Should().Be("20260601-08:00:00.250");
+    }
+
+    [Fact]
+    public void Clock_to_string_omits_milliseconds_when_whole_second()
+    {
+        var clock = new Clock_t("clk");
+        clock.SetValue(new DateTime(2026, 6, 1, 8, 0, 0, DateTimeKind.Utc));
+
+        clock.ToString(null!).Should().Be("20260601-08:00:00");
+    }
 }

@@ -264,9 +264,18 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// <returns>A string value equivalent to the value of this instance. May be null.</returns>
     public override string ToString(IParameter targetParameter)
     {
-        return _value != null
-            ? _value.Value.ToDateTimeUtc().ToString(FixDateTimeFormat.FixDateTime, CultureInfo.InvariantCulture)
-            : null!;
+        if (_value == null)
+        {
+            return null!;
+        }
+
+        DateTime utc = _value.Value.ToDateTimeUtc();
+
+        // Emit milliseconds only when present, so whole-second values keep the compact seconds form
+        // while sub-second precision is no longer silently dropped (batch 5, Phase-A follow-up).
+        string format = utc.Millisecond == 0 ? FixDateTimeFormat.FixDateTime : FixDateTimeFormat.FixDateTimeMs;
+
+        return utc.ToString(format, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
