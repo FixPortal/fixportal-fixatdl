@@ -314,4 +314,7 @@
   <data name="OneOrMoreInvalidControlValues" xml:space="preserve">
     <value>One or more controls have invalid values.</value>
   </data>
+  <data name="InvalidFixTagForSerialization" xml:space="preserve">
+    <value>Unable to serialize FIX message: the tag '{0}' is not a positive integer.</value>
+  </data>
 </root>

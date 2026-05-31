@@ -35,8 +35,14 @@ public static class FixDateTime
         // of the host offset — aligning with the UTC-family WireParseStyles (M1)). Only fall back to a loose
         // locale parse for non-FIX input. Exact-first avoids a locale-dependent loose parse silently winning
         // over a valid FIX format.
-        return DateTime.TryParseExact(value, FixDateTimeFormat.AllFormats, provider, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out result) ||
-            DateTime.TryParse(value, provider, DateTimeStyles.AllowWhiteSpaces, out result);
+        // Apply the SAME styles to both the exact-FIX-format path and the loose fallback so that a value
+        // only the fallback can parse still yields a canonical Kind=Utc result. Previously the fallback
+        // omitted AssumeUniversal/AdjustToUniversal, so its result Kind drifted to Unspecified (or Local
+        // when the input carried an offset) — inconsistent with the exact path's documented UTC contract.
+        const DateTimeStyles styles = DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
+
+        return DateTime.TryParseExact(value, FixDateTimeFormat.AllFormats, provider, styles, out result) ||
+            DateTime.TryParse(value, provider, styles, out result);
     }
 
     /// <summary>

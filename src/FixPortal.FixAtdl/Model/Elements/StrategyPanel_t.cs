@@ -68,8 +68,12 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
         OwningStrategy = owningStrategy;
         _owningStrategyPanel = parent as StrategyPanel_t;
 
-        // Set defaults
-        Collapsed = true;
+        // Defaults per the FIXatdl Layout schema: both collapsed and collapsible default to false, i.e.
+        // a panel is shown expanded and is not user-collapsible unless the document states otherwise.
+        // (Previously Collapsed defaulted to true, which both deviated from the schema and was
+        // self-contradictory against the non-collapsible default — a panel stuck closed with no
+        // affordance to open it.)
+        Collapsed = false;
         Collapsible = false;
 
         StrategyPanels = [];

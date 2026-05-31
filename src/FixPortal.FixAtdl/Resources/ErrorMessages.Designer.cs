@@ -640,6 +640,15 @@ namespace FixPortal.FixAtdl.Resources {
                 return ResourceManager.GetString("ValueContainsDelimiter", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to serialize FIX message: the tag &apos;{0}&apos; is not a positive integer..
+        /// </summary>
+        internal static string InvalidFixTagForSerialization {
+            get {
+                return ResourceManager.GetString("InvalidFixTagForSerialization", resourceCulture);
+            }
+        }
     }
 }
 

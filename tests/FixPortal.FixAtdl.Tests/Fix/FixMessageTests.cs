@@ -253,4 +253,47 @@ public class FixMessageTests
 
         provider.Parameters.Should().BeSameAs(parameters);
     }
+
+    // FixMessage.ToFix tag guard (M4) ----------------------------------------
+
+    [Fact]
+    public void ToFix_throws_for_non_positive_tag_injected_via_indexer()
+    {
+        // The inherited Dictionary surface lets a caller inject a non-positive tag that the string ctor
+        // would have rejected; ToFix must refuse to serialize it rather than emit a (uint)-corrupted tag.
+        var message = new FixMessage { [(FixField)(-1)] = "x" };
+
+        var act = () => message.ToFix();
+
+        act.Should().Throw<InvalidOperationException>();
+    }
+
+    // FixFieldValueProvider percentage init-value scaling (H3) ----------------
+
+    [Theory]
+    // multiplyBy100=false (the default): the wire carries the fraction 0.75; the control works in
+    // whole-percent units, so the init value is scaled up by 100 to 75.
+    [InlineData(false, "0.75", "75")]
+    // multiplyBy100=true: the wire already carries the whole number 75; no scaling is applied so the
+    // control still shows 75. (Confirms the wire->control direction is correct, not inverted.)
+    [InlineData(true, "75", "75")]
+    public void FixFieldValueProvider_scales_percentage_init_value_to_whole_percent(bool multiplyBy100, string wireValue, string expected)
+    {
+        FixTagValuesCollection fixValues = [];
+        fixValues.Add(35, wireValue);
+
+        var initialProvider = Substitute.For<IInitialFixValueProvider>();
+        initialProvider.InputFixValues.Returns(fixValues);
+
+        var percentageParameter = new Parameter_t<Percentage_t>("Pct");
+        percentageParameter.Value.MultiplyBy100 = multiplyBy100;
+
+        ParameterCollection parameters = [];
+        parameters.Add(percentageParameter);
+
+        var provider = new FixFieldValueProvider(initialProvider, parameters);
+
+        provider.TryGetValue("FIX_MsgType", "Pct", out var value).Should().BeTrue();
+        value.Should().Be(expected);
+    }
 }
