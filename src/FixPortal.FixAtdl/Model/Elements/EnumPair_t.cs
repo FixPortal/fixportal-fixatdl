@@ -19,5 +19,13 @@ public class EnumPair_t
 
     /// <summary>The corresponding value that is used to populate the FIX message.</summary>
     public string WireValue { get; set; } = null!;
+
+    /// <summary>
+    /// Optional vendor extension attribute: an integer ordering hint for this enum pair. Standard
+    /// FIXatdl 1.1 <c>EnumPair</c> carries only <c>enumID</c> and <c>wireValue</c>; <c>index</c> is a
+    /// captured extension for lossless fidelity and does NOT affect the FIX wire value. Null when the
+    /// source ATDL did not supply an <c>index</c>.
+    /// </summary>
+    public int? Index { get; set; }
 }
 

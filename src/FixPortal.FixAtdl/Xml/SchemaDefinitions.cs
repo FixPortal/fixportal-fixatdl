@@ -221,7 +221,8 @@ public static class SchemaDefinitions
         new ElementDefinition(AtdlNamespaces.core + "EnumPair", typeof(Model.Elements.EnumPair_t),
             [
                 new ElementAttribute("enumID", "EnumId", typeof(string), Required.Mandatory),
-                new ElementAttribute("wireValue", "WireValue", typeof(string), Required.Mandatory)
+                new ElementAttribute("wireValue", "WireValue", typeof(string), Required.Mandatory),
+                new ElementAttribute("index", "Index", typeof(int), Required.Optional)
             ]),
             "EnumPairs", typeof(Model.Collections.EnumPairCollection), StandardContainerMethod.Add);
 
