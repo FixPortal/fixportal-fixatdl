@@ -49,13 +49,13 @@ public class DateTimeTypeTests
     [Fact]
     public void UTCTimestamp_t_GetCurrentValue_returns_non_null_DateTime()
     {
-        // NOTE: DateTime.TryParseExact with AssumeUniversal (without AdjustToUniversal) can return
-        // Kind=Local on some platforms/TZ configurations. GetAdjustedValue then calls ToUniversalTime().
-        // We pin the round-trip (WireValue) rather than the internal Kind, which is host-dependent.
+        // NOTE: UTC wire parse now uses AssumeUniversal | AdjustToUniversal, so the parsed
+        // DateTime always carries Kind=Utc — no longer host-dependent.
+        // This test pins both the wire round-trip and the canonical Kind=Utc contract.
         var p = new Parameter_t<UTCTimestamp_t>("Ts") { WireValue = "20260101-09:30:00" };
         var value = (DateTime?)p.GetCurrentValue();
         value.Should().NotBeNull();
-        // The round-trip wire value is stable regardless of intermediate Kind.
+        value!.Value.Kind.Should().Be(DateTimeKind.Utc);
         p.WireValue.Should().Be("20260101-09:30:00");
     }
 
