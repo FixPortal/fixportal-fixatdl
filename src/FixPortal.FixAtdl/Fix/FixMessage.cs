@@ -105,6 +105,16 @@ public class FixMessage : Dictionary<FixField, string>
 
         foreach (KeyValuePair<FixField, string> item in this)
         {
+            // The string-parsing constructor rejects non-positive tags, but the inherited
+            // Dictionary<FixField, string> surface (indexer / Add) can still admit one programmatically
+            // (e.g. (FixField)(-1)). Guard at this single serialization chokepoint so such a tag cannot be
+            // emitted and silently corrupted by the (uint) cast below (-1 -> 4294967295).
+            if ((int)item.Key <= 0)
+            {
+                throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.InvalidFixTagForSerialization,
+                    ((int)item.Key).ToString(CultureInfo.InvariantCulture));
+            }
+
             sb.AppendFormat(CultureInfo.InvariantCulture, "{0}{1}{2}{3}", ((uint)item.Key).ToString(CultureInfo.InvariantCulture), Separator, item.Value, SOH);
         }
 

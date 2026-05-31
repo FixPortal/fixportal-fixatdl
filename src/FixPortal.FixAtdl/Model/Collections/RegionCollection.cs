@@ -31,27 +31,39 @@ public class RegionCollection : KeyedCollection<Region, Region_t>
     /// Gets a bitmask of the applicable regions for a given strategy.
     /// </summary>
     /// <returns>A bitmask of applicable Regions.</returns>
-    /// <remarks>If no region information is provided, Atdl4net assumes that the strategy is applicable to all regions.</remarks>
+    /// <remarks>If no region information is provided, the strategy is assumed applicable to all regions. If the
+    /// collection contains only excluded regions, then all regions <em>except</em> those excluded are applicable
+    /// (per the FIXatdl inclusion/exclusion semantics); if it contains any included region, that union forms the
+    /// base set (Include takes precedence over Exclude) from which any excluded regions are then removed.</remarks>
     public Region GetApplicableRegions()
     {
         if (Count == 0)
         {
             return Region.All;
         }
-        else
+
+        Region includes = Region.None;
+        Region excludes = Region.None;
+
+        foreach (Region_t region in this)
         {
-            Region applicableRegions = Region.None;
-
-            foreach (Region_t region in Items)
+            if (region.Inclusion == Inclusion_t.Include)
             {
-                if (region.Inclusion == Inclusion_t.Include)
-                {
-                    applicableRegions |= region.Name;
-                }
+                includes |= region.Name;
             }
-
-            return applicableRegions;
+            else
+            {
+                excludes |= region.Name;
+            }
         }
+
+        // An exclude-only configuration means "all regions except those excluded", so the base set is every
+        // region; otherwise the explicitly-included union is the base set. Excluded regions are then removed
+        // from whichever base applies. (Previously only Include entries were ORed in, so an exclude-only
+        // configuration incorrectly resolved to Region.None — applicable to nothing.)
+        Region baseRegions = includes != Region.None ? includes : Region.All;
+
+        return baseRegions & ~excludes;
     }
 
     /// <summary>
@@ -59,12 +71,26 @@ public class RegionCollection : KeyedCollection<Region, Region_t>
     /// </summary>
     /// <param name="country">Country to check for.</param>
     /// <returns>true if the strategy is applicable for the specified country; false otherwise.</returns>
+    /// <remarks>A country-level entry (a <see cref="Country_t"/> inside a region) is the most specific statement
+    /// and overrides the region-level disposition for that country — for example an excluded country inside an
+    /// otherwise-included region, or an included country inside an otherwise-excluded region. When no country-level
+    /// entry matches, applicability is decided at region granularity.</remarks>
     public bool IsApplicableTo(IsoCountryCode country)
     {
-        Region applicableRegions = GetApplicableRegions();
+        foreach (Region_t region in this)
+        {
+            foreach (Country_t countryEntry in region.Countries)
+            {
+                if (countryEntry.CountryCode == country)
+                {
+                    return countryEntry.Inclusion == Inclusion_t.Include;
+                }
+            }
+        }
 
+        Region applicableRegions = GetApplicableRegions();
         Region targetRegion = Regions.GetRegionForCountry(country);
 
-        return (applicableRegions & targetRegion) != 0;
+        return (applicableRegions & targetRegion) != Region.None;
     }
 }

@@ -243,4 +243,18 @@ public class ElementPropertyTests
         string s = d;
         s.Should().Be("Hello");
     }
+
+    // ── StrategyPanel_t defaults (C2) ─────────────────────────────────────────
+
+    [Fact]
+    public void StrategyPanel_t_defaults_to_expanded_and_non_collapsible()
+    {
+        // Per the FIXatdl Layout schema both attributes default to false. A non-collapsible panel that
+        // defaulted to collapsed (the previous behaviour) was self-contradictory — stuck closed with no
+        // affordance to open it.
+        var panel = new StrategyPanel_t(new Strategy_t());
+
+        panel.Collapsed.Should().Be(false);
+        panel.Collapsible.Should().Be(false);
+    }
 }

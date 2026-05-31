@@ -144,15 +144,64 @@ public class KeyedCollectionTests
     }
 
     [Fact]
-    public void RegionCollection_exclude_only_returns_no_applicable_region()
+    public void RegionCollection_exclude_only_returns_all_other_regions()
     {
-        // NOTE: Only excluded entries → result is Region.None (no ORed-in includes).
+        // Exclude-only semantics: every region EXCEPT the excluded one is applicable. (Previously this
+        // incorrectly returned Region.None because only Include entries were ORed into the result.)
         var regions = new RegionCollection
         {
             new Region_t { Name = Region.TheAmericas, Inclusion = Inclusion_t.Exclude },
         };
 
-        regions.GetApplicableRegions().Should().Be(Region.None);
+        regions.GetApplicableRegions().Should().Be(Region.EuropeMiddleEastAfrica | Region.AsiaPacificJapan);
+    }
+
+    [Fact]
+    public void RegionCollection_include_takes_precedence_over_unrelated_exclude()
+    {
+        // With an explicit include present, the applicable set is the included union; an exclude of a
+        // different region adds nothing (Include takes precedence over Exclude).
+        var regions = new RegionCollection
+        {
+            new Region_t { Name = Region.EuropeMiddleEastAfrica, Inclusion = Inclusion_t.Include },
+            new Region_t { Name = Region.AsiaPacificJapan, Inclusion = Inclusion_t.Exclude },
+        };
+
+        regions.GetApplicableRegions().Should().Be(Region.EuropeMiddleEastAfrica);
+    }
+
+    [Fact]
+    public void RegionCollection_exclude_only_applies_to_country_outside_excluded_region()
+    {
+        var regions = new RegionCollection
+        {
+            new Region_t { Name = Region.TheAmericas, Inclusion = Inclusion_t.Exclude },
+        };
+
+        regions.IsApplicableTo(IsoCountryCode.GB).Should().BeTrue();   // EMEA — not excluded
+        regions.IsApplicableTo(IsoCountryCode.US).Should().BeFalse();  // TheAmericas — excluded
+    }
+
+    [Fact]
+    public void RegionCollection_country_exclude_overrides_included_region()
+    {
+        var emea = new Region_t { Name = Region.EuropeMiddleEastAfrica, Inclusion = Inclusion_t.Include };
+        emea.Countries.Add(new Country_t { CountryCode = IsoCountryCode.GB, Inclusion = Inclusion_t.Exclude });
+        var regions = new RegionCollection { emea };
+
+        regions.IsApplicableTo(IsoCountryCode.GB).Should().BeFalse();  // explicitly excluded country
+        regions.IsApplicableTo(IsoCountryCode.DE).Should().BeTrue();   // region applies, no override
+    }
+
+    [Fact]
+    public void RegionCollection_country_include_overrides_excluded_region()
+    {
+        var emea = new Region_t { Name = Region.EuropeMiddleEastAfrica, Inclusion = Inclusion_t.Exclude };
+        emea.Countries.Add(new Country_t { CountryCode = IsoCountryCode.GB, Inclusion = Inclusion_t.Include });
+        var regions = new RegionCollection { emea };
+
+        regions.IsApplicableTo(IsoCountryCode.GB).Should().BeTrue();   // explicitly included country
+        regions.IsApplicableTo(IsoCountryCode.DE).Should().BeFalse();  // region excluded, no override
     }
 
     [Fact]
