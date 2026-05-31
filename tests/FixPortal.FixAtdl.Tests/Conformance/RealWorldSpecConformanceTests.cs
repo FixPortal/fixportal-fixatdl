@@ -67,4 +67,32 @@ public class RealWorldSpecConformanceTests
         dark.Regions.Select(r => r.Name).Should().Contain(Region.TheAmericas);
         dark.Parameters["Urgency"].EnumPairs.Count.Should().Be(6);
     }
+
+    private static Clock_t StartTimeClock(Instant now)
+    {
+        var clock = Load(TzClockFixture)["VWAP"].Controls
+            .OfType<Clock_t>().First(c => c.Id == "i_StartTime");
+        clock.Clock = new FakeClock(now);
+        clock.InitValueMode = 0;
+        clock.LoadInitValue(FixFieldValueProvider.Empty);
+        return clock;
+    }
+
+    [Fact]
+    public void C1_berlin_0800_initValue_emits_0700_utc_in_winter()
+    {
+        // 2026-01-15 CET (UTC+1): 08:00 Berlin -> 07:00Z.
+        StartTimeClock(Instant.FromUtc(2026, 1, 15, 12, 0, 0))
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should().Be(new DateTime(2026, 1, 15, 7, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void C1_berlin_0800_initValue_emits_0600_utc_in_summer()
+    {
+        // 2026-07-15 CEST (UTC+2): 08:00 Berlin -> 06:00Z.
+        StartTimeClock(Instant.FromUtc(2026, 7, 15, 12, 0, 0))
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should().Be(new DateTime(2026, 7, 15, 6, 0, 0, DateTimeKind.Utc));
+    }
 }
