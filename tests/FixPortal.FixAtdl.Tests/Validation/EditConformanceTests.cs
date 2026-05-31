@@ -91,4 +91,25 @@ public class EditConformanceTests
 
         edit.CurrentState.Should().BeFalse();
     }
+
+    // ── M2 — both 'value' and 'field2' set is rejected at resolve ─────────────
+
+    [Fact]
+    public async Task Edit_with_both_value_and_field2_is_rejected_on_resolve()
+    {
+        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var twap = LoadFirst(xml);
+
+        var edit = new Edit_t<IParameter>
+        {
+            Field = "Participation",
+            Operator = Operator_t.Equal,
+            Value = "50",
+            Field2 = "FIX_OrderQty",
+        };
+
+        var act = () => ((IResolvable<Strategy_t, IParameter>)edit).Resolve(twap, twap.Parameters);
+
+        act.Should().Throw<InconsistentStrategyException>();
+    }
 }

@@ -140,7 +140,16 @@ namespace FixPortal.FixAtdl.Resources {
                 return ResourceManager.GetString("EditRefResolutionFailure", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to An Edit (Id &apos;{0}&apos;) specifies both a &apos;value&apos; and a &apos;field2&apos; attribute; these are mutually exclusive forms of the right-hand side and may not both be supplied..
+        /// </summary>
+        internal static string EditValueAndField2BothSet {
+            get {
+                return ResourceManager.GetString("EditValueAndField2BothSet", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to An error occurred setting the value of an enumerated field; &apos;{0}&apos; is not a valid enumeration value for this field..
         /// </summary>

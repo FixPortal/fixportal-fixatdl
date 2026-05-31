@@ -138,6 +138,9 @@
   <data name="EditRefResolutionFailure" xml:space="preserve">
     <value>The EditRef with Id '{0}' could not be found.</value>
   </data>
+  <data name="EditValueAndField2BothSet" xml:space="preserve">
+    <value>An Edit (Id '{0}') specifies both a 'value' and a 'field2' attribute; these are mutually exclusive forms of the right-hand side and may not both be supplied.</value>
+  </data>
   <data name="EnumerationNotFound" xml:space="preserve">
     <value>An error occurred setting the value of an enumerated field; '{0}' is not a valid enumeration value for this field.</value>
   </data>
