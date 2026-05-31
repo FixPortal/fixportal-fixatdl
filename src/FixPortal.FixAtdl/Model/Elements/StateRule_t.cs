@@ -12,7 +12,8 @@ using FixPortal.FixAtdl.Validation;
 
 namespace FixPortal.FixAtdl.Model.Elements;
 
-// TODO: Implement IDisposable
+// IDisposable is not needed: StateRule_t inherits only EditEvaluator's edit references and subscribes to
+// no events (see EditEvaluator). Vestige of the removed Notification assembly (Task A8).
 /// <summary>
 /// Represents a FIXatdl state rule that updates control state from edit evaluation.
 /// </summary>

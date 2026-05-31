@@ -88,7 +88,7 @@ public static class ModelUtils
         return true;
     }
 
-    // TODO: Move this somewhere better.
+    // GetTypeFromName lives here by design: ModelUtils owns the _types cache it reads.
     /// <summary>
     /// Gets a FIXatdl model type by its CLR type name.
     /// </summary>

@@ -135,7 +135,9 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
 
     #region IResolvable<Strategy_t, T> Members
 
-    // TODO: Unbind needed?
+    // No unbind: Resolve only forwards to each child's Resolve (idempotent), establishing no binding to
+    // tear down. The model is rebuilt fresh per parse, and the IBindable<T> mechanism this question
+    // referred to was unused and has been removed.
     void IResolvable<Strategy_t, T>.Resolve(Strategy_t strategy, ISimpleDictionary<T> sourceCollection)
     {
         foreach (IEdit<T> item in Items)

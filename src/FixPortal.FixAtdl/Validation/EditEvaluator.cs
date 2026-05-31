@@ -14,7 +14,8 @@ using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Validation;
 
-// TODO: Implement IDisposable
+// IDisposable is not needed: this type holds only Edit_t/EditRef_t references (no unmanaged resources,
+// no event subscriptions). The disposal contract existed for the removed Notification assembly (Task A8).
 /// <summary>
 /// Provides shared edit-evaluation behavior for state rules and strategy edits.
 /// </summary>
