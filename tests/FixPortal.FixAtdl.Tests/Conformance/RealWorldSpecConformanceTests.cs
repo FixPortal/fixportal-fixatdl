@@ -112,4 +112,29 @@ public class RealWorldSpecConformanceTests
         var act = () => endTime.WireValue = wireValue;
         act.Should().NotThrow();
     }
+
+    [Fact]
+    public void H3_enumPair_index_is_captured_including_non_contiguous_values()
+    {
+        var ordType = Load(RegionsEnumsFixture)["SOR_NA"].Parameters["OrdType"];
+
+        ordType.EnumPairs["o1"].Index.Should().Be(0);
+        ordType.EnumPairs["o2"].Index.Should().Be(1);
+        ordType.EnumPairs["o3"].Index.Should().Be(3); // non-contiguous: index 2 is skipped
+        ordType.EnumPairs["o4"].Index.Should().Be(4);
+    }
+
+    [Fact]
+    public void H3_enumPair_index_does_not_perturb_wire_value()
+    {
+        var ordType = Load(RegionsEnumsFixture)["SOR_NA"].Parameters["OrdType"];
+        ordType.EnumPairs["o1"].WireValue.Should().Be("1");
+    }
+
+    [Fact]
+    public void H3_enumPair_index_is_null_when_attribute_absent()
+    {
+        var benchmark = Load(TzClockFixture)["VWAP"].Parameters["p_Benchmark"];
+        benchmark.EnumPairs["e_Default"].Index.Should().BeNull();
+    }
 }
