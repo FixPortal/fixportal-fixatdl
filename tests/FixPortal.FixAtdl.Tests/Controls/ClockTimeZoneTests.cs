@@ -125,4 +125,62 @@ public class ClockTimeZoneTests
         clock.ToDateTime(null!, CultureInfo.InvariantCulture).Should().BeNull();
         clock.GetCurrentValue().Should().BeNull();
     }
+
+    [Fact]
+    public void Date_bearing_initValue_uses_its_own_date_not_the_clock_today()
+    {
+        // initValue carries 2026-01-15 (CET, UTC+1) -> 07:00Z, regardless of the FakeClock being in September.
+        var clock = BerlinClock(new InitValueClock("20260115-08:00:00"), Instant.FromUtc(2026, 9, 1, 0, 0, 0));
+
+        clock.LoadInitValue(FixFieldValueProvider.Empty);
+
+        clock.ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should().Be(new DateTime(2026, 1, 15, 7, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void Mode1_with_date_bearing_initValue_uses_now_when_passed()
+    {
+        // init = 2026-01-15 08:00 Berlin = 07:00Z; now = 2026-06-01 00:00Z is later -> use now.
+        var clock = BerlinClock(new InitValueClock("20260115-08:00:00"), Instant.FromUtc(2026, 6, 1, 0, 0, 0), mode: 1);
+
+        clock.LoadInitValue(FixFieldValueProvider.Empty);
+
+        clock.ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should().Be(new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void Market_today_is_derived_in_the_zone_not_in_utc()
+    {
+        // now = 2026-01-15 20:00Z; in Pacific/Auckland (NZDT, UTC+13) that is 2026-01-16 09:00, so the
+        // market "today" is the 16th. initValue 06:00 -> 2026-01-16 06:00 Auckland -> 2026-01-15 17:00Z.
+        // (If "today" were taken in UTC (the 15th) the result would be a day earlier — this pins the zone derivation.)
+        var clock = new Clock_t("clk")
+        {
+            InitValue = new InitValueClock("06:00:00"),
+            LocalMktTz = "Pacific/Auckland",
+            InitValueMode = 0,
+            Clock = new FakeClock(Instant.FromUtc(2026, 1, 15, 20, 0, 0)),
+        };
+
+        clock.LoadInitValue(FixFieldValueProvider.Empty);
+
+        clock.ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should().Be(new DateTime(2026, 1, 15, 17, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void Spring_forward_gap_initValue_resolves_leniently_without_throwing()
+    {
+        // Europe/Berlin spring-forward 2026-03-29: 02:00->03:00 local; 02:30 does not exist.
+        // LenientResolver maps the gap time forward; assert the resolved UTC instant (and that it does not throw).
+        var clock = BerlinClock(new InitValueClock("02:30:00"), Instant.FromUtc(2026, 3, 29, 12, 0, 0));
+
+        var act = () => clock.LoadInitValue(FixFieldValueProvider.Empty);
+        act.Should().NotThrow();
+
+        clock.ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should().Be(new DateTime(2026, 3, 29, 1, 30, 0, DateTimeKind.Utc));
+    }
 }

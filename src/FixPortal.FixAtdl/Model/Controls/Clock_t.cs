@@ -117,11 +117,17 @@ public class Clock_t : InitializableControl<InitValueClock?>
         }
 
         Instant nowInstant = Clock.GetCurrentInstant();
-        LocalDate marketToday = nowInstant.InZone(zone).Date;
 
-        LocalDateTime localDt = InitValue.IsTimeOnly
-            ? marketToday.At(InitValue.TimeOfDay!.Value)
-            : InitValue.DateTime!.Value;
+        LocalDateTime localDt;
+        if (InitValue.IsTimeOnly)
+        {
+            LocalDate marketToday = nowInstant.InZone(zone).Date;
+            localDt = marketToday.At(InitValue.TimeOfDay!.Value);
+        }
+        else
+        {
+            localDt = InitValue.DateTime!.Value;
+        }
 
         // LenientResolver maps DST gaps forward and overlaps to the earlier offset, so resolution never
         // throws on a spring-forward / fall-back wall-clock time.
@@ -287,6 +293,11 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// Gets the current value of this control (the LOCAL-market representation for display / Edits), for
     /// use in Edits as part of StateRules.
     /// </summary>
+    /// <remarks>
+    /// The returned value is the local-market wall-clock representation intended for DISPLAY and Edit-rule
+    /// evaluation only. It must NOT be fed back into <see cref="SetValue"/>, which interprets an inbound
+    /// DateTime as UTC — round-tripping it that way would shift the instant by the zone offset.
+    /// </remarks>
     /// <returns>Either a valid DateTime (local-market wall-clock when <see cref="LocalMktTz"/> is set,
     /// otherwise UTC) or null.</returns>
     public override object GetCurrentValue()
