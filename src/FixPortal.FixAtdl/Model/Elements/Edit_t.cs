@@ -484,7 +484,8 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     {
         // 'value' and 'field2' are mutually exclusive right-hand-side forms; both being present is a
         // malformed edit. Reject it here (fail fast at resolve) rather than silently letting 'value'
-        // win in GetRhsValue. Both default to null! and are only non-null when the attribute was present.
+        // win in GetRhsValue. Both default to null! and are non-null once the attribute is present (an
+        // explicit empty-string value="" also counts as "set" — conservative fail-fast).
         if (Value != null && Field2 != null)
         {
             throw ThrowHelper.New<InconsistentStrategyException>(this, ErrorMessages.EditValueAndField2BothSet, Id ?? "(unnamed)");
