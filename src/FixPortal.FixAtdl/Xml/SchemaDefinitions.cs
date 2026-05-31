@@ -394,7 +394,7 @@ public static class SchemaDefinitions
 
     private static readonly ElementAttribute[] ClockAttributes =
     [
-        new ElementAttribute("initValue", "InitValue", typeof(DateTime), Required.Optional),
+        new ElementAttribute("initValue", "InitValue", typeof(Model.Controls.InitValueClock), Required.Optional),
         new ElementAttribute("initValueMode", "InitValueMode", typeof(int), Required.Optional),
         new ElementAttribute("localMktTz", "LocalMktTz", typeof(string), Required.Optional)
     ];

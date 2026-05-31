@@ -4,6 +4,8 @@ using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements;
+using NodaTime;
+using NodaTime.Testing;
 
 namespace FixPortal.FixAtdl.Tests.Model.Controls;
 
@@ -729,36 +731,46 @@ public class ClockControlTests
     [Fact]
     public void Clock_init_value_mode_0_uses_init_value()
     {
-        var dt = new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Unspecified);
-        var clock = new Clock_t("clk") { InitValue = dt, InitValueMode = 0 };
+        var clock = new Clock_t("clk")
+        {
+            InitValue = new InitValueClock("09:00:00"),
+            LocalMktTz = "Etc/UTC",
+            InitValueMode = 0,
+            Clock = new FakeClock(Instant.FromUtc(2026, 6, 1, 0, 0, 0)),
+        };
         clock.LoadInitValue(FixFieldValueProvider.Empty);
-        clock.GetCurrentValue().Should().Be(dt);
+        // Etc/UTC: local display == 09:00 on the FakeClock's "today" (2026-06-01).
+        ((DateTime)clock.GetCurrentValue()).Should().Be(new DateTime(2026, 6, 1, 9, 0, 0));
     }
 
     [Fact]
     public void Clock_init_value_mode_null_uses_init_value()
     {
-        var dt = new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Unspecified);
-        var clock = new Clock_t("clk") { InitValue = dt, InitValueMode = null };
+        var clock = new Clock_t("clk")
+        {
+            InitValue = new InitValueClock("09:00:00"),
+            LocalMktTz = "Etc/UTC",
+            InitValueMode = null,
+            Clock = new FakeClock(Instant.FromUtc(2026, 6, 1, 0, 0, 0)),
+        };
         clock.LoadInitValue(FixFieldValueProvider.Empty);
-        clock.GetCurrentValue().Should().Be(dt);
+        ((DateTime)clock.GetCurrentValue()).Should().Be(new DateTime(2026, 6, 1, 9, 0, 0));
     }
 
     [Fact]
     public void Clock_set_value_datetime_round_trips()
     {
         var clock = new Clock_t("clk");
-        var dt = new DateTime(2026, 6, 1, 10, 30, 0, DateTimeKind.Unspecified);
+        var dt = new DateTime(2026, 6, 1, 10, 30, 0, DateTimeKind.Utc);
         clock.SetValue(dt);
-        clock.GetCurrentValue().Should().Be(dt);
+        ((DateTime?)clock.GetCurrentValue()).Should().Be(dt);
     }
 
     [Fact]
     public void Clock_set_value_null_yields_null()
     {
         var clock = new Clock_t("clk");
-        var dt = new DateTime(2026, 6, 1, 10, 30, 0, DateTimeKind.Unspecified);
-        clock.SetValue(dt);
+        clock.SetValue(new DateTime(2026, 6, 1, 10, 30, 0, DateTimeKind.Utc));
         clock.SetValue((object)null!);
         clock.GetCurrentValue().Should().BeNull();
     }
@@ -766,8 +778,12 @@ public class ClockControlTests
     [Fact]
     public void Clock_reset_yields_null()
     {
-        var dt = new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Unspecified);
-        var clock = new Clock_t("clk") { InitValue = dt };
+        var clock = new Clock_t("clk")
+        {
+            InitValue = new InitValueClock("09:00:00"),
+            LocalMktTz = "Etc/UTC",
+            Clock = new FakeClock(Instant.FromUtc(2026, 6, 1, 0, 0, 0)),
+        };
         clock.LoadInitValue(FixFieldValueProvider.Empty);
         clock.Reset();
         clock.GetCurrentValue().Should().BeNull();
@@ -778,8 +794,9 @@ public class ClockControlTests
     {
         var clock = new Clock_t("clk")
         {
-            InitValue = new DateTime(2026, 1, 1, 9, 0, 0, DateTimeKind.Unspecified),
-            InitValueMode = 2
+            InitValue = new InitValueClock("09:00:00"),
+            LocalMktTz = "Etc/UTC",
+            InitValueMode = 2,
         };
         var act = () => clock.LoadInitValue(FixFieldValueProvider.Empty);
         act.Should().Throw<InvalidFieldValueException>();
