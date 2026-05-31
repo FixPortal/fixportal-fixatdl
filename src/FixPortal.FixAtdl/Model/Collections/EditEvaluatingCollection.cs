@@ -68,69 +68,53 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.MissingLogicalOperatorOnSetOfEdits);
         }
 
-        bool shortCircuit = false;
         bool newState = LogicOperator == LogicOperator_t.And;
         int xorCount = 0;
 
         foreach (IEdit<T> item in Items)
         {
-            if (shortCircuit)
-            {
-                break;
-            }
-
             item.Evaluate(additionalValues);
 
-            switch (LogicOperator)
+            if (ApplyOperator(LogicOperator.Value, item.CurrentState, ref newState, ref xorCount))
             {
-                case LogicOperator_t.And:
-                    newState &= item.CurrentState;
-                    if (!newState)
-                    {
-                        shortCircuit = true;
-                    }
-
-                    break;
-
-                case LogicOperator_t.Or:
-                    newState |= item.CurrentState;
-                    if (newState)
-                    {
-                        shortCircuit = true;
-                    }
-
-                    break;
-
-                case LogicOperator_t.Not:
-                    // The schema permits a single operand for NOT. Defensively, evaluate NOT as
-                    // "no operand is true" so a (schema-invalid) multi-operand NOT is deterministic
-                    // instead of "last operand wins"; this collapses to !operand for one operand.
-                    if (item.CurrentState)
-                    {
-                        newState = false;
-                        shortCircuit = true;
-                    }
-                    else
-                    {
-                        newState = true;
-                    }
-
-                    break;
-
-                // From the spec: "As a convention we define XOR as 'one and only one', which means it evaluates to true when one
-                // and only one of its operands is true. If none or more than one of its operands is true then XOR is false."
-                case LogicOperator_t.Xor:
-                    if (item.CurrentState)
-                    {
-                        xorCount++;
-                    }
-
-                    newState = xorCount == 1;
-                    break;
+                break;
             }
         }
 
         CurrentState = newState;
+    }
+
+    private static bool ApplyOperator(LogicOperator_t logicOperator, bool itemState, ref bool newState, ref int xorCount)
+    {
+        switch (logicOperator)
+        {
+            case LogicOperator_t.And:
+                newState &= itemState;
+                return !newState;
+            case LogicOperator_t.Or:
+                newState |= itemState;
+                return newState;
+            case LogicOperator_t.Not:
+                // Schema permits a single operand; evaluate as "no operand is true" so a (schema-invalid)
+                // multi-operand NOT is deterministic. Collapses to !operand for one operand.
+                if (itemState)
+                {
+                    newState = false;
+                    return true;
+                }
+                newState = true;
+                return false;
+            case LogicOperator_t.Xor:
+                // "one and only one": true iff exactly one operand is true.
+                if (itemState)
+                {
+                    xorCount++;
+                }
+                newState = xorCount == 1;
+                return false;
+            default:
+                return false;
+        }
     }
 
     #region IResolvable<Strategy_t, T> Members

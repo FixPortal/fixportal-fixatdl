@@ -73,24 +73,10 @@ public static class ValueConverter
                 }
 
             case "System.Int32":
-                try
-                {
-                    return Convert.ToInt32(value, CultureInfo.InvariantCulture);
-                }
-                catch (Exception ex) when (ex is FormatException or OverflowException)
-                {
-                    throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError1, value, targetType.Name);
-                }
+                return ParseOrThrow(value, targetType, v => Convert.ToInt32(v, CultureInfo.InvariantCulture));
 
             case "System.Decimal":
-                try
-                {
-                    return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
-                }
-                catch (Exception ex) when (ex is FormatException or OverflowException)
-                {
-                    throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError1, value, targetType.Name);
-                }
+                return ParseOrThrow(value, targetType, v => Convert.ToDecimal(v, CultureInfo.InvariantCulture));
 
             case "System.DateTime":
                 {
@@ -104,14 +90,7 @@ public static class ValueConverter
                 }
 
             case "FixPortal.FixAtdl.Fix.FixTag":
-                try
-                {
-                    return new FixTag(Convert.ToInt32(value, CultureInfo.InvariantCulture));
-                }
-                catch (Exception ex) when (ex is FormatException or OverflowException)
-                {
-                    throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError1, value, targetType.Name);
-                }
+                return ParseOrThrow(value, targetType, v => new FixTag(Convert.ToInt32(v, CultureInfo.InvariantCulture)));
 
             default:
                 if (targetType.FullName!.StartsWith("FixPortal.FixAtdl.Model.Controls.InitValue", StringComparison.Ordinal))
@@ -122,6 +101,18 @@ public static class ValueConverter
                 {
                     throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.UnrecognisedAttributeType, targetType.FullName!);
                 }
+        }
+    }
+
+    private static object ParseOrThrow(string value, Type targetType, Func<string, object> convert)
+    {
+        try
+        {
+            return convert(value);
+        }
+        catch (Exception ex) when (ex is FormatException or OverflowException)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError1, value, targetType.Name);
         }
     }
 }

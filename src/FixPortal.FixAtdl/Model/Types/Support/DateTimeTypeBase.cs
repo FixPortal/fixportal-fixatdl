@@ -40,15 +40,23 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
 
     private static readonly string[] _timeOnlyBoundFormats = ["HH:mm:ss.fff", "HH:mm:ss"];
 
-    /// <summary>Deserialization-only. Receives the raw <c>maxValue</c> attribute text and parses it with
-    /// time-only awareness (C2). Not intended for programmatic use; set <see cref="MaxValue"/> directly
-    /// for a full date+time bound.</summary>
-    public string MaxValueText { set => SetBound(value, isMax: true); }
+    /// <summary>Deserialization-only round-trip of the raw <c>maxValue</c> attribute text; parsed with
+    /// time-only awareness on set (C2). The getter returns the last raw text set (or null). Not intended
+    /// for programmatic use; set <see cref="MaxValue"/> directly for a full date+time bound.</summary>
+    public string? MaxValueText
+    {
+        get;
+        set { field = value; SetBound(value!, isMax: true); }
+    }
 
-    /// <summary>Deserialization-only. Receives the raw <c>minValue</c> attribute text and parses it with
-    /// time-only awareness (C2). Not intended for programmatic use; set <see cref="MinValue"/> directly
-    /// for a full date+time bound.</summary>
-    public string MinValueText { set => SetBound(value, isMax: false); }
+    /// <summary>Deserialization-only round-trip of the raw <c>minValue</c> attribute text; parsed with
+    /// time-only awareness on set (C2). The getter returns the last raw text set (or null). Not intended
+    /// for programmatic use; set <see cref="MinValue"/> directly for a full date+time bound.</summary>
+    public string? MinValueText
+    {
+        get;
+        set { field = value; SetBound(value!, isMax: false); }
+    }
 
     private void SetBound(string text, bool isMax)
     {
@@ -86,26 +94,10 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
                 return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.InvalidDateOrTimeValueUnknown);
             }
 
-            if (MaxValue != null && (DateTime)value > MaxValue)
+            ValidationResult? boundViolation = CheckBounds((DateTime)value);
+            if (boundViolation != null)
             {
-                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, MaxValue);
-            }
-
-            if (MinValue != null && (DateTime)value < MinValue)
-            {
-                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
-            }
-
-            TimeOnly valueTimeOfDay = TimeOnly.FromDateTime((DateTime)value);
-
-            if (_maxTimeOfDay != null && valueTimeOfDay > _maxTimeOfDay)
-            {
-                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, _maxTimeOfDay);
-            }
-
-            if (_minTimeOfDay != null && valueTimeOfDay < _minTimeOfDay)
-            {
-                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, _minTimeOfDay);
+                return boundViolation;
             }
         }
         else if (isRequired)
@@ -114,6 +106,33 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
         }
 
         return ValidationResult.ValidResult;
+    }
+
+    private ValidationResult? CheckBounds(DateTime value)
+    {
+        if (MaxValue != null && value > MaxValue)
+        {
+            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, MaxValue);
+        }
+
+        if (MinValue != null && value < MinValue)
+        {
+            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+        }
+
+        TimeOnly valueTimeOfDay = TimeOnly.FromDateTime(value);
+
+        if (_maxTimeOfDay != null && valueTimeOfDay > _maxTimeOfDay)
+        {
+            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, _maxTimeOfDay);
+        }
+
+        if (_minTimeOfDay != null && valueTimeOfDay < _minTimeOfDay)
+        {
+            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, _minTimeOfDay);
+        }
+
+        return null;
     }
 
     /// <summary>

@@ -393,29 +393,37 @@ public class EnumState
 
         for (int n = 0; n < _enumStates.Length; n++)
         {
-            if (_enumStates[n])
+            if (!_enumStates[n])
             {
-                string value = enumPairs.GetWireValueFromEnumId(_enumIds[n]);
-
-                // Typically {NULL} will only be used in a mutually exclusive fashion, although nothing enforces this
-                if (value != Atdl.NullValue)
-                {
-                    // Only prepend a space after the first entry
-                    if (hasAtLeastOneValue)
-                    {
-                        sb.AppendFormat(CultureInfo.InvariantCulture, " {0}", value);
-                    }
-                    else
-                    {
-                        sb.Append(value);
-
-                        hasAtLeastOneValue = true;
-                    }
-                }
+                continue;
             }
+
+            string value = enumPairs.GetWireValueFromEnumId(_enumIds[n]);
+
+            // Typically {NULL} will only be used in a mutually exclusive fashion, although nothing enforces this
+            if (value == Atdl.NullValue)
+            {
+                continue;
+            }
+
+            AppendWireValue(sb, value, ref hasAtLeastOneValue);
         }
 
         return hasAtLeastOneValue ? sb.ToString() : null!;
+    }
+
+    private static void AppendWireValue(StringBuilder sb, string value, ref bool hasAtLeastOneValue)
+    {
+        // Only prepend a space after the first entry.
+        if (hasAtLeastOneValue)
+        {
+            sb.AppendFormat(CultureInfo.InvariantCulture, " {0}", value);
+        }
+        else
+        {
+            sb.Append(value);
+            hasAtLeastOneValue = true;
+        }
     }
 
     /// <summary>

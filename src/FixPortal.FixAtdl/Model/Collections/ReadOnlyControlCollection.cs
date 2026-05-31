@@ -257,30 +257,31 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         {
             Edit_t<Control_t> edit = stateRule.Edit;
 
-            if (stateRule.Value == Atdl.NullValue && edit.Operator == Operator_t.Equal)
+            if (stateRule.Value != Atdl.NullValue || edit.Operator != Operator_t.Equal)
             {
-                string sourceControlId = edit.Field;
-
-                if (IsValidControlId(sourceControlId))
-                {
-                    Control_t sourceControl = this[sourceControlId];
-
-
-                    if (sourceControl.IsToggleable && bool.TryParse(edit.Value, out bool result))
-                    {
-                        // If the control is a radio button, then we can only set directly, un-set
-                        // has be done by setting its companion control
-                        if (sourceControl is CheckBox_t || !result)
-                        {
-                            sourceControl.SetValue(!result);
-                        }
-                        else
-                        {
-                            SetCompanionRadioButton((sourceControl as RadioButton_t)!);
-                        }
-                    }
-                }
+                continue;
             }
+
+            string sourceControlId = edit.Field;
+
+            if (IsValidControlId(sourceControlId) && this[sourceControlId].IsToggleable
+                && bool.TryParse(edit.Value, out bool result))
+            {
+                ApplyHelperControlToggle(this[sourceControlId], result);
+            }
+        }
+    }
+
+    private void ApplyHelperControlToggle(Control_t sourceControl, bool result)
+    {
+        // Radio buttons can only be set directly; un-setting is done via the companion control.
+        if (sourceControl is CheckBox_t || !result)
+        {
+            sourceControl.SetValue(!result);
+        }
+        else
+        {
+            SetCompanionRadioButton((sourceControl as RadioButton_t)!);
         }
     }
 

@@ -376,48 +376,58 @@ public class ElementFactory : INotifyClassDeserialized
             // Process indirect properties (only one level of indirect is supported).
             if (attrDefn.Property.Contains('.'))
             {
-                string[] names = attrDefn.Property.Split('.');
-
-                if (names.Length != 2)
-                {
-                    throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.InvalidPropertyIndirection, attrDefn.Property);
-                }
-
-                PropertyInfo outerProperty = targetType.GetProperty(names[0])!;
-
-                if (outerProperty == null)
-                {
-                    throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal, names[0], targetType.FullName!);
-                }
-
-                object innerObject = outerProperty.GetValue(target, null)!;
-
-                if (innerObject == null)
-                {
-                    throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnableToRetrievePropertyValueOnObject, attrDefn.Property, targetType.FullName!);
-                }
-
-                PropertyInfo property = outerProperty.PropertyType.GetProperty(names[1])!;
-
-                if (property == null)
-                {
-                    throw ThrowHelper.New<InvalidPropertyOnObjectException>(this, ErrorMessages.PropertyNotFoundOnObject, attrDefn.Property, targetType.Name);
-                }
-
-                SetPropertyValue(property, innerObject, value);
+                SetIndirectPropertyValue(targetType, attrDefn, target, value);
             }
             else
             {
-                PropertyInfo property = targetType.GetProperty(attrDefn.Property)!;
-
-                if (property == null)
-                {
-                    throw ThrowHelper.New<InvalidPropertyOnObjectException>(this, ErrorMessages.PropertyNotFoundOnObject, attrDefn.Property, targetType.Name);
-                }
-
-                SetPropertyValue(property, target, value);
+                SetDirectPropertyValue(targetType, attrDefn, target, value);
             }
         }
+    }
+
+    private void SetIndirectPropertyValue(Type targetType, ElementAttribute attrDefn, object target, object value)
+    {
+        string[] names = attrDefn.Property.Split('.');
+
+        if (names.Length != 2)
+        {
+            throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.InvalidPropertyIndirection, attrDefn.Property);
+        }
+
+        PropertyInfo outerProperty = targetType.GetProperty(names[0])!;
+
+        if (outerProperty == null)
+        {
+            throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal, names[0], targetType.FullName!);
+        }
+
+        object innerObject = outerProperty.GetValue(target, null)!;
+
+        if (innerObject == null)
+        {
+            throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.UnableToRetrievePropertyValueOnObject, attrDefn.Property, targetType.FullName!);
+        }
+
+        PropertyInfo property = outerProperty.PropertyType.GetProperty(names[1])!;
+
+        if (property == null)
+        {
+            throw ThrowHelper.New<InvalidPropertyOnObjectException>(this, ErrorMessages.PropertyNotFoundOnObject, attrDefn.Property, targetType.Name);
+        }
+
+        SetPropertyValue(property, innerObject, value);
+    }
+
+    private void SetDirectPropertyValue(Type targetType, ElementAttribute attrDefn, object target, object value)
+    {
+        PropertyInfo property = targetType.GetProperty(attrDefn.Property)!;
+
+        if (property == null)
+        {
+            throw ThrowHelper.New<InvalidPropertyOnObjectException>(this, ErrorMessages.PropertyNotFoundOnObject, attrDefn.Property, targetType.Name);
+        }
+
+        SetPropertyValue(property, target, value);
     }
 
     private void ProcessChildren(ElementDefinition definition, XElement sourceElement, object target)
@@ -435,60 +445,65 @@ public class ElementFactory : INotifyClassDeserialized
         {
             bool isRecursiveDefinition = childDefinition.ElementDefinition is RecursiveTypeElementDefinition;
             bool hasContainerElement = !isRecursiveDefinition && childDefinition.ContainerElementName != null;
-
-            IEnumerable<XElement> matchingChildElements;
-
             ElementDefinition targetDefinition = isRecursiveDefinition ? definition : childDefinition.ElementDefinition;
 
-            if (hasContainerElement)
+            foreach (XElement childElement in GetMatchingChildElements(childDefinition, targetDefinition, hasContainerElement, sourceElement))
             {
-                XElement? containerElement = (from e in sourceElement.Elements(childDefinition.ContainerElementName) select e).FirstOrDefault();
-
-                if (containerElement == null)
-                {
-                    continue;
-                }
-
-                matchingChildElements = from e in containerElement.Elements(childDefinition.ElementDefinition.ElementName) select e;
+                ProcessMatchingChild(definition, childDefinition, targetDefinition, targetType, target, childElement);
             }
-            else
+        }
+    }
+
+    private static IEnumerable<XElement> GetMatchingChildElements(ChildElementDefinition childDefinition, ElementDefinition targetDefinition,
+        bool hasContainerElement, XElement sourceElement)
+    {
+        if (hasContainerElement)
+        {
+            XElement? containerElement = (from e in sourceElement.Elements(childDefinition.ContainerElementName) select e).FirstOrDefault();
+
+            if (containerElement == null)
             {
-                matchingChildElements = from e in sourceElement.Elements(targetDefinition.ElementName) select e;
+                return [];
             }
 
-            foreach (XElement childElement in matchingChildElements)
-            {
-                object childObject = targetDefinition switch
-                {
-                    GenericTypeElementDefinition genericDefinition => CreateObject(genericDefinition, childElement, target),
-                    MultiTypeElementDefinition multiDefinition => CreateObject(multiDefinition, childElement, target),
-                    _ => CreateObject(targetDefinition, childElement, target)
-                };
+            return from e in containerElement.Elements(childDefinition.ElementDefinition.ElementName) select e;
+        }
 
-                PropertyInfo property = targetType.GetProperty(childDefinition.ContainerProperty)!;
+        return from e in sourceElement.Elements(targetDefinition.ElementName) select e;
+    }
 
-                if (property == null)
-                {
-                    throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal,
-                        childDefinition.ContainerProperty, targetType.FullName!);
-                }
+    private void ProcessMatchingChild(ElementDefinition definition, ChildElementDefinition childDefinition, ElementDefinition targetDefinition,
+        Type targetType, object target, XElement childElement)
+    {
+        object childObject = targetDefinition switch
+        {
+            GenericTypeElementDefinition genericDefinition => CreateObject(genericDefinition, childElement, target),
+            MultiTypeElementDefinition multiDefinition => CreateObject(multiDefinition, childElement, target),
+            _ => CreateObject(targetDefinition, childElement, target)
+        };
 
-                try
-                {
-                    // For the case of MultiTypeElementDefinition we must use the reflected type
-                    ProcessChildProperty(childDefinition, property, targetDefinition.TargetType ?? childObject.GetType(), target, childObject);
-                }
-                catch (FixAtdlException ex)
-                {
-                    throw ThrowHelper.Rethrow(this, ex, new ExceptionInfo(childElement), ErrorMessages.GeneralElementProcessingError,
-                        definition.ElementName!.LocalName);
-                }
-                catch (ArgumentException ex)
-                {
-                    throw ThrowHelper.New<FixAtdlException>(this, ex, new ExceptionInfo(childElement), ErrorMessages.GeneralElementProcessingError,
-                        definition.ElementName!.LocalName, ex.Message);
-                }
-            }
+        PropertyInfo property = targetType.GetProperty(childDefinition.ContainerProperty)!;
+
+        if (property == null)
+        {
+            throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal,
+                childDefinition.ContainerProperty, targetType.FullName!);
+        }
+
+        try
+        {
+            // For the case of MultiTypeElementDefinition we must use the reflected type
+            ProcessChildProperty(childDefinition, property, targetDefinition.TargetType ?? childObject.GetType(), target, childObject);
+        }
+        catch (FixAtdlException ex)
+        {
+            throw ThrowHelper.Rethrow(this, ex, new ExceptionInfo(childElement), ErrorMessages.GeneralElementProcessingError,
+                definition.ElementName!.LocalName);
+        }
+        catch (ArgumentException ex)
+        {
+            throw ThrowHelper.New<FixAtdlException>(this, ex, new ExceptionInfo(childElement), ErrorMessages.GeneralElementProcessingError,
+                definition.ElementName!.LocalName, ex.Message);
         }
     }
 
