@@ -110,8 +110,9 @@ public class EditConformanceTests
 
         var act = () => ((IResolvable<Strategy_t, IParameter>)edit).Resolve(twap, twap.Parameters);
 
-        act.Should().Throw<InconsistentStrategyException>()
-            .WithMessage("*value*field2*", because: "the M2 guard should name both mutually-exclusive attributes");
+        var ex = act.Should().Throw<InconsistentStrategyException>().Which;
+        ex.Message.Should().Contain("value", because: "the M2 guard should name both mutually-exclusive attributes");
+        ex.Message.Should().Contain("field2", because: "the M2 guard should name both mutually-exclusive attributes");
     }
 
     // ── M3 — EQ "false" fires for a default (unset) binary control ────────────
@@ -163,6 +164,23 @@ public class EditConformanceTests
         // which is a value that IS sent over FIX, so it reads as present (EX true / NX false) —
         // consistent with the post-LoadDefaults state. Only an explicit Reset() reads as absent.
         var strategy = LoadFirst(CheckBoxStrategyXml);
+
+        var edit = new Edit_t<Control_t> { Field = "EnableStartTime", Operator = op };
+        ((IResolvable<Strategy_t, Control_t>)edit).Resolve(strategy, strategy.Controls);
+        edit.Evaluate();
+
+        edit.CurrentState.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData(Operator_t.Exist, true)]
+    [InlineData(Operator_t.NotExist, false)]
+    public void Post_loadinit_checkbox_reports_exists(Operator_t op, bool expected)
+    {
+        // The post-LoadInitValue state must match the construction-default above: an unset binary control
+        // resolves to concrete false (a value that IS sent over FIX), so it still reads as present.
+        var strategy = LoadFirst(CheckBoxStrategyXml);
+        strategy.Controls["EnableStartTime"].LoadInitValue(FixFieldValueProvider.Empty);
 
         var edit = new Edit_t<Control_t> { Field = "EnableStartTime", Operator = op };
         ((IResolvable<Strategy_t, Control_t>)edit).Resolve(strategy, strategy.Controls);

@@ -99,19 +99,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     /// </summary>
     /// <param name="key">The control identifier.</param>
     public Control_t this[string key]
-    {
-        get
-        {
-            if (_controls.TryGetValue(key, out Control_t? value))
-            {
-                return value;
-            }
-            else
-            {
-                return null!;
-            }
-        }
-    }
+        => _controls.TryGetValue(key, out Control_t? value) ? value : null!;
 
     /// <summary>
     /// Loads the initial values for each control based on the InitPolicy, InitFixField and InitValue attributes.
@@ -313,9 +301,13 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                 select c as RadioButton_t;
         }
 
-        if (radioButtons.Count() == 1)
+        // The query is lazy; Count() + First() would enumerate it twice. Materialise once
+        // (Take(2) is enough to distinguish "exactly one companion").
+        List<RadioButton_t> companions = radioButtons.Take(2).ToList();
+
+        if (companions.Count == 1)
         {
-            radioButtons.First().SetValue(true);
+            companions[0].SetValue(true);
         }
     }
 

@@ -124,14 +124,11 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
     // referred to was unused and has been removed.
     void IResolvable<Strategy_t, T>.Resolve(Strategy_t strategy, ISimpleDictionary<T> sourceCollection)
     {
-        foreach (IEdit<T> item in Items)
+        // Add accepts any IEdit<T>; OfType resolves only the resolvable ones, avoiding a cast with !
+        // (and the NRE risk) on a non-resolvable edit.
+        foreach (IResolvable<Strategy_t, T> resolvable in Items.OfType<IResolvable<Strategy_t, T>>())
         {
-            // Add accepts any IEdit<T>; only resolve those that are resolvable rather than forcing
-            // the cast with ! and risking an NRE on a non-resolvable edit.
-            if (item is IResolvable<Strategy_t, T> resolvable)
-            {
-                resolvable.Resolve(strategy, sourceCollection);
-            }
+            resolvable.Resolve(strategy, sourceCollection);
         }
     }
 
