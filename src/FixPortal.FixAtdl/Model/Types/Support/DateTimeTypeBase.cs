@@ -66,10 +66,11 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
         }
         else
         {
-            // FixDateTime.Parse uses AssumeUniversal (no AdjustToUniversal), so on a non-UTC host the
-            // moment is correct but expressed with Kind=Local — its wall-clock is host-offset-shifted.
-            // Normalise to UTC so a full-datetime bound's wall-clock matches the canonically-UTC value
-            // it is compared against; otherwise the comparison is host-timezone-dependent.
+            // FixDateTime.Parse normalises FIX-format input to canonical Kind=Utc (AdjustToUniversal), so
+            // the exact-format path already yields a UTC wall-clock. The Local-kind branch is a defensive
+            // guard for the loose-locale fallback parse, which may still return Kind=Local; normalise it to
+            // UTC so a full-datetime bound's wall-clock matches the canonically-UTC value it is compared
+            // against, keeping the comparison host-timezone-independent.
             DateTime parsed = FixDateTime.Parse(text, CultureInfo.InvariantCulture);
             DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
             if (isMax) { MaxValue = normalised; } else { MinValue = normalised; }

@@ -178,3 +178,34 @@ silently dropped, and most "suspect" attributes are correctly mapped. The real d
 
 Fixes, fixtures (broker-82 + broker-431), and conformance tests land on this branch; merged to
 `main` via rebase-merge PR.
+
+---
+
+## Resolution log
+
+All actionable findings are now resolved across three phases (each merged to `main` via its own
+rebase-merge PR):
+
+| ID | Phase | Resolution |
+|---|---|---|
+| C1 | A | `Clock_t` applies `localMktTz` via NodaTime (zone→UTC); emits UTC at the wire boundary. |
+| M1 | A | UTC family routes through `WireParseStyles` + `AdjustToUniversal`. |
+| C2 (clock half) | A | `InitValueClock` holds `LocalTime`/`LocalDateTime` — no injected date. |
+| H1 | B | `EnumState.HasSelection`; `EvaluateExists` treats an unselected list control as absent. |
+| H2 | B | `EvaluateInequalityComparison` null-RHS → `false` (symmetric with null-LHS). |
+| M2 | B | `Edit_t<T>.Resolve` rejects both `value` + `field2` (mutually exclusive RHS forms). |
+| M3 | B | `BinaryControlBase._value` defaults to concrete `false`. |
+| H3 | C | `EnumPair@index` captured as `int? Index` (optional; does not affect wire output). |
+| H4 | C | `Parameter_t.DefinedByFix` is a documented, deliberately-inert contract (no validation gate). |
+| M4 | C | `Float_t.Round` documents the `MidpointRounding.AwayFromZero` convention (and is now `static`). |
+| C2 (bound half) | C | Time-only `maxValue`/`minValue` on UTC/TZ timestamp types compare on the time-of-day component only — no injected-date contamination. |
+
+**Phase-C follow-ups also delivered:** `FixDateTime.TryParse` now normalises to canonical `Kind=Utc`
+(`AdjustToUniversal`), with `Clock_t.LoadDefaultFromFixValue` pinned by test; `Clock_t.ToString`
+preserves sub-second precision. The SonarAnalyzer backlog (24 src findings + the test-project
+CA1859/CS8601/Sonar warnings surfaced once src compiled clean) was cleared, and
+`TreatWarningsAsErrors` is now enforced solution-wide (clean `--no-incremental` build is 0/0).
+
+**Still deferred (not batch 5):** N1/N2 remain by-design (see above); the broker-82/broker-431
+conformance **fixtures** are deferred to Phase D (real client data — must be obfuscated before
+committing); the adversarial-review panel (Phase 3) remains deferred.
