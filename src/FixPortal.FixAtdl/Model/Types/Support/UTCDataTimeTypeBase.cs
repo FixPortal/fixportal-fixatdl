@@ -6,8 +6,6 @@
 #endregion
 
 using System.Globalization;
-using FixPortal.FixAtdl.Diagnostics;
-using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Validation;
 
 namespace FixPortal.FixAtdl.Model.Types.Support;
@@ -32,24 +30,14 @@ public abstract class UTCDateTimeTypeBase : DateTimeTypeBase
     }
 
     /// <summary>
-    /// Converts the supplied value from string format (as might be used on the FIX wire) into the type of the type
-    /// parameter for this type.  
+    /// <see cref="DateTimeStyles"/> applied when parsing a UTC-family wire value. The value is assumed to
+    /// be UTC when no offset is present (FIX UTCTimestamp is by definition UTC) and any explicit offset is
+    /// normalised to UTC (<see cref="DateTimeStyles.AdjustToUniversal"/>), so the result is canonically
+    /// <see cref="DateTimeKind.Utc"/> and host-offset-independent. Replaces the former hardcoded
+    /// AssumeUniversal-only parse, which produced a Kind=Local value (M1).
     /// </summary>
-    /// <param name="value">Type to convert from string, cannot be null.</param>
-    /// <returns>Value converted from a string if the conversion succeeded; otherwise an exception is thrown.</returns>
-    protected override DateTime? ConvertFromWireValueFormat(string value)
-    {
-        string[] formats = GetDateTimeFormatStrings();
-
-
-        // Unless instructed otherwise, DateTime.TryParseExact returns a DateTime with Kind = Local
-        if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal, out DateTime result))
-        {
-            return result;
-        }
-
-        throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidDateOrTimeValue, value);
-    }
+    protected override DateTimeStyles WireParseStyles =>
+        DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
 
     /// <summary>
     /// Converts the supplied value to a string, as might be used on the FIX wire.
