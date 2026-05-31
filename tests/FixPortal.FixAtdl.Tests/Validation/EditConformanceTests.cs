@@ -110,6 +110,7 @@ public class EditConformanceTests
 
         var act = () => ((IResolvable<Strategy_t, IParameter>)edit).Resolve(twap, twap.Parameters);
 
-        act.Should().Throw<InconsistentStrategyException>();
+        act.Should().Throw<InconsistentStrategyException>()
+            .WithMessage("*value*field2*", because: "the M2 guard should name both mutually-exclusive attributes");
     }
 }
