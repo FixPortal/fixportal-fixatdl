@@ -20,6 +20,14 @@ internal static class FixtureFiles
     private static string GetPath(string relativePath)
     {
         string normalizedPath = relativePath.Replace('/', Path.DirectorySeparatorChar);
+
+        if (Path.IsPathRooted(normalizedPath))
+        {
+            throw new ArgumentException(
+                $"Fixture path must be relative to the test base directory, but was rooted: '{relativePath}'.",
+                nameof(relativePath));
+        }
+
         return Path.Combine(AppContext.BaseDirectory, normalizedPath);
     }
 }
