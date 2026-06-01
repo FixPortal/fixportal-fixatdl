@@ -75,5 +75,5 @@ MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.
 
 ## Status
 
-Pre-1.0; the public surface may evolve as the QFSIM ATDL Examiner exercises it.
+Pre-1.0; the public surface may evolve as the FPSIM ATDL Examiner exercises it.
 Issues and PRs welcome at https://github.com/FixPortal/FixAtdl.

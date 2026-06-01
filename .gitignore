@@ -447,3 +447,6 @@ MSBuild_Logs/
 # Coverage output (Phase 0 baseline + CI)
 coverage/
 TestResults/
+
+# Local package distribution
+_pkgout/
