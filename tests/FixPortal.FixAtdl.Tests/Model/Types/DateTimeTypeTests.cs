@@ -53,7 +53,7 @@ public class DateTimeTypeTests
         // DateTime always carries Kind=Utc — no longer host-dependent.
         // This test pins both the wire round-trip and the canonical Kind=Utc contract.
         var p = new Parameter_t<UTCTimestamp_t>("Ts") { WireValue = "20260101-09:30:00" };
-        var value = (DateTime?)p.GetCurrentValue();
+        var value = p.GetCurrentValue();
         value.Should().BeOfType<DateTime>().Which.Kind.Should().Be(DateTimeKind.Utc);
         p.WireValue.Should().Be("20260101-09:30:00");
     }
@@ -85,7 +85,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<UTCTimeOnly_t>("T") { WireValue = "09:30:00" };
 
-        var value = (DateTime?)p.GetCurrentValue();
+        var value = p.GetCurrentValue();
 
         value.Should().BeOfType<DateTime>().Which.Date.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
     }
