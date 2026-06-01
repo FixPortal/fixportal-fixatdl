@@ -33,7 +33,7 @@ public class EditEvaluatingCollectionTests
     public void LoadTwap_is_not_cwd_dependent()
     {
         string originalDirectory = Environment.CurrentDirectory;
-        string isolatedDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        string isolatedDirectory = Path.Join(Path.GetTempPath(), Path.GetRandomFileName());
         Directory.CreateDirectory(isolatedDirectory);
 
         try
