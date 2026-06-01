@@ -7,6 +7,7 @@ using FixPortal.FixAtdl.Model.Types;
 using FixPortal.FixAtdl.Xml;
 using NodaTime;
 using NodaTime.Testing;
+
 // AwesomeAssertions and Xunit are global usings (see GlobalUsings.cs).
 
 namespace FixPortal.FixAtdl.Tests.Conformance;

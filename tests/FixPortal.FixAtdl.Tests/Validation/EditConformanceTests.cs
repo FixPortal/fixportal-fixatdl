@@ -55,8 +55,10 @@ public class EditConformanceTests
         var dropdown = pov.Controls["c_Aggression"];
         dropdown.LoadInitValue(FixFieldValueProvider.Empty);
 
-        var selected = new EnumState(["PASSIVE", "NEUTRAL", "AGGRESSIVE"]);
-        selected["NEUTRAL"] = true;
+        var selected = new EnumState(["PASSIVE", "NEUTRAL", "AGGRESSIVE"])
+        {
+            ["NEUTRAL"] = true
+        };
         dropdown.SetValue(selected);
 
         var edit = new Edit_t<Control_t> { Field = "c_Aggression", Operator = op };

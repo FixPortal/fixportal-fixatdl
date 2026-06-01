@@ -159,10 +159,8 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
         {
             return new EnumState(enumPairs.EnumIds);
         }
-        else
-        {
-            return EnumState.FromWireValue(enumPairs, ((char)value).ToString());
-        }
+
+        return EnumState.FromWireValue(enumPairs, ((char)value).ToString());
     }
 
     #endregion

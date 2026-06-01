@@ -1,6 +1,5 @@
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
-using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements;
@@ -143,7 +142,7 @@ public class BinaryControlTests
     {
         var control = new CheckBox_t("chk") { InitValue = true };
         control.LoadInitValue(FixFieldValueProvider.Empty);
-        control.SetValue((object)null!);
+        control.SetValue(null!);
         control.GetCurrentValue().Should().BeNull();
     }
 
@@ -281,7 +280,7 @@ public class NumericControlTests
     {
         var control = new SingleSpinner_t("ss") { InitValue = 5m };
         control.LoadInitValue(FixFieldValueProvider.Empty);
-        control.SetValue((object)null!);
+        control.SetValue(null!);
         control.GetCurrentValue().Should().BeNull();
     }
 
@@ -472,8 +471,10 @@ public class ListControlTests
         var ctrl = MakeDropDown("A");
         ctrl.LoadInitValue(FixFieldValueProvider.Empty);
 
-        var newState = new EnumState(["A", "B", "C"]);
-        newState["C"] = true;
+        var newState = new EnumState(["A", "B", "C"])
+        {
+            ["C"] = true
+        };
         ctrl.SetValue(newState);
 
         var state = (EnumState)ctrl.GetCurrentValue();
@@ -520,8 +521,10 @@ public class EnumStateTests
     [Fact]
     public void EnumState_indexer_set_and_get()
     {
-        var state = new EnumState(["A", "B"]);
-        state["A"] = true;
+        var state = new EnumState(["A", "B"])
+        {
+            ["A"] = true
+        };
         state["A"].Should().BeTrue();
         state["B"].Should().BeFalse();
     }
@@ -529,8 +532,10 @@ public class EnumStateTests
     [Fact]
     public void EnumState_copy_ctor_deep_clones()
     {
-        var original = new EnumState(["A", "B"]);
-        original["A"] = true;
+        var original = new EnumState(["A", "B"])
+        {
+            ["A"] = true
+        };
 
         var copy = new EnumState(original);
         copy["A"].Should().BeTrue();
@@ -557,8 +562,10 @@ public class EnumStateTests
     [Fact]
     public void EnumState_clear_all_resets_bits()
     {
-        var state = new EnumState(["A", "B"]);
-        state["A"] = true;
+        var state = new EnumState(["A", "B"])
+        {
+            ["A"] = true
+        };
         state.ClearAll();
         state["A"].Should().BeFalse();
     }
@@ -597,8 +604,10 @@ public class EnumStateTests
     [Fact]
     public void EnumState_get_first_selected_enum_id_returns_id()
     {
-        var state = new EnumState(["A", "B", "C"]);
-        state["B"] = true;
+        var state = new EnumState(["A", "B", "C"])
+        {
+            ["B"] = true
+        };
         state.GetFirstSelectedEnumId().Should().Be("B");
     }
 
@@ -613,9 +622,11 @@ public class EnumStateTests
     [Fact]
     public void EnumState_non_enum_value_clears_bits()
     {
-        var state = new EnumState(["A", "B"]);
-        state["A"] = true;
-        state.NonEnumValue = "custom";
+        var state = new EnumState(["A", "B"])
+        {
+            ["A"] = true,
+            NonEnumValue = "custom"
+        };
         state["A"].Should().BeFalse();
         state.NonEnumValue.Should().Be("custom");
     }
@@ -623,20 +634,28 @@ public class EnumStateTests
     [Fact]
     public void EnumState_equals_same_state()
     {
-        var a = new EnumState(["X", "Y"]);
-        a["X"] = true;
-        var b = new EnumState(["X", "Y"]);
-        b["X"] = true;
+        var a = new EnumState(["X", "Y"])
+        {
+            ["X"] = true
+        };
+        var b = new EnumState(["X", "Y"])
+        {
+            ["X"] = true
+        };
         a.Equals(b).Should().BeTrue();
     }
 
     [Fact]
     public void EnumState_not_equals_different_state()
     {
-        var a = new EnumState(["X", "Y"]);
-        a["X"] = true;
-        var b = new EnumState(["X", "Y"]);
-        b["Y"] = true;
+        var a = new EnumState(["X", "Y"])
+        {
+            ["X"] = true
+        };
+        var b = new EnumState(["X", "Y"])
+        {
+            ["Y"] = true
+        };
         a.Equals(b).Should().BeFalse();
     }
 
@@ -644,16 +663,21 @@ public class EnumStateTests
     public void EnumState_equals_non_enum_state_returns_false()
     {
         var state = new EnumState(["A"]);
-        state.Equals("A string").Should().BeFalse();
+        object other = "A string";
+        state.Equals(other).Should().BeFalse();
     }
 
     [Fact]
     public void EnumState_get_hash_code_equal_states_same_hash()
     {
-        var a = new EnumState(["X", "Y"]);
-        a["X"] = true;
-        var b = new EnumState(["X", "Y"]);
-        b["X"] = true;
+        var a = new EnumState(["X", "Y"])
+        {
+            ["X"] = true
+        };
+        var b = new EnumState(["X", "Y"])
+        {
+            ["X"] = true
+        };
         a.GetHashCode().Should().Be(b.GetHashCode());
     }
 
@@ -686,8 +710,10 @@ public class EnumStateTests
     [Fact]
     public void EnumState_copy_method_deep_clones()
     {
-        var original = new EnumState(["A", "B"]);
-        original["B"] = true;
+        var original = new EnumState(["A", "B"])
+        {
+            ["B"] = true
+        };
         var copy = original.Copy();
         copy["B"].Should().BeTrue();
         copy["A"] = true;
@@ -698,8 +724,10 @@ public class EnumStateTests
     public void EnumState_update_from_copies_state()
     {
         var target = new EnumState(["A", "B"]);
-        var source = new EnumState(["A", "B"]);
-        source["A"] = true;
+        var source = new EnumState(["A", "B"])
+        {
+            ["A"] = true
+        };
 
         target.UpdateFrom(source);
         target["A"].Should().BeTrue();
@@ -709,8 +737,10 @@ public class EnumStateTests
     [Fact]
     public void EnumState_to_string_formats_correctly()
     {
-        var state = new EnumState(["A", "B"]);
-        state["A"] = true;
+        var state = new EnumState(["A", "B"])
+        {
+            ["A"] = true
+        };
         var s = state.ToString();
         s.Should().Contain("A=true");
         s.Should().Contain("B=false");
@@ -726,8 +756,10 @@ public class EnumStateTests
     [Fact]
     public void EnumState_get_first_selected_index_returns_correct_index()
     {
-        var state = new EnumState(["A", "B", "C"]);
-        state["C"] = true;
+        var state = new EnumState(["A", "B", "C"])
+        {
+            ["C"] = true
+        };
         state.GetFirstSelectedEnumIdIndex().Should().Be(2);
     }
 
@@ -741,8 +773,10 @@ public class EnumStateTests
     [Fact]
     public void EnumState_has_selection_is_true_when_a_bit_is_set()
     {
-        var state = new EnumState(["A", "B", "C"]);
-        state["B"] = true;
+        var state = new EnumState(["A", "B", "C"])
+        {
+            ["B"] = true
+        };
         state.HasSelection.Should().BeTrue();
     }
 
@@ -812,7 +846,7 @@ public class ClockControlTests
     {
         var clock = new Clock_t("clk");
         clock.SetValue(new DateTime(2026, 6, 1, 10, 30, 0, DateTimeKind.Utc));
-        clock.SetValue((object)null!);
+        clock.SetValue(null!);
         clock.GetCurrentValue().Should().BeNull();
     }
 

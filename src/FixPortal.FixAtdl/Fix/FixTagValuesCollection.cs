@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Collections;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Utility;
@@ -161,7 +162,7 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
         return _message.GetEnumerator();
     }
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    IEnumerator IEnumerable.GetEnumerator()
     {
         return _message.GetEnumerator();
     }

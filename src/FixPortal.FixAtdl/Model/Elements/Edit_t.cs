@@ -248,10 +248,8 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             {
                 return _fieldSource.GetCurrentValue();
             }
-            else
-            {
-                throw ThrowHelper.New<InvalidOperationException>(this, "Edit attempted to access FieldValue but requisite control was not set.");
-            }
+
+            throw ThrowHelper.New<InvalidOperationException>(this, "Edit attempted to access FieldValue but requisite control was not set.");
         }
     }
 
@@ -266,10 +264,8 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             {
                 return _field2Source.GetCurrentValue();
             }
-            else
-            {
-                throw ThrowHelper.New<InvalidOperationException>(this, "Edit attempted to access Field2Value but requisite control was not set.");
-            }
+
+            throw ThrowHelper.New<InvalidOperationException>(this, "Edit attempted to access Field2Value but requisite control was not set.");
         }
     }
 
@@ -493,7 +489,8 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         // explicit empty-string value="" also counts as "set" — conservative fail-fast).
         if (Value != null && Field2 != null)
         {
-            throw ThrowHelper.New<InconsistentStrategyException>(this, ErrorMessages.EditValueAndField2BothSet, Id ?? "(unnamed)");
+            throw ThrowHelper.New<InconsistentStrategyException>(this, ErrorMessages.EditValueAndField2BothSet,
+                string.IsNullOrEmpty(Id) ? "(unnamed)" : Id);
         }
 
         (Edits as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);

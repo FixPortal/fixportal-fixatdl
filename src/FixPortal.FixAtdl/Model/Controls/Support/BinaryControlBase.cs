@@ -284,10 +284,8 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
             // It is possible for '{NULL}' to be provided as one of the enum wire values, so we have to act accordingly
             return value != Atdl.NullValue ? value : null!;
         }
-        else
-        {
-            return _value != null ? _value.Value.ToString().ToLower() : null!;
-        }
+
+        return _value != null ? _value.Value.ToString().ToLower() : null!;
     }
 
     /// <summary>

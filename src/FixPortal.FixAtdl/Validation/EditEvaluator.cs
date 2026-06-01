@@ -32,7 +32,8 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
             {
                 return EditRef.Sources;
             }
-            else if (Edit != null)
+
+            if (Edit != null)
             {
                 return Edit.Sources;
             }
@@ -52,7 +53,8 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
             {
                 return Edit.CurrentState;
             }
-            else if (EditRef != null)
+
+            if (EditRef != null)
             {
                 return EditRef.CurrentState;
             }

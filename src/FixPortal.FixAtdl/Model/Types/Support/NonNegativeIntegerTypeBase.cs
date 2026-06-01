@@ -140,10 +140,8 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
         {
             return new EnumState(enumPairs.EnumIds);
         }
-        else
-        {
-            return EnumState.FromWireValue(enumPairs, ToString(CultureInfo.InvariantCulture)!);
-        }
+
+        return EnumState.FromWireValue(enumPairs, ToString(CultureInfo.InvariantCulture)!);
     }
 
     #endregion

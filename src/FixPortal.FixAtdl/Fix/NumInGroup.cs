@@ -37,7 +37,7 @@ public readonly struct NumInGroup
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator NumInGroup(int value) => new NumInGroup(value);
+    public static implicit operator NumInGroup(int value) => new(value);
 
     /// <summary>
     /// Performs an implicit conversion from <see cref="FixPortal.FixAtdl.Fix.NumInGroup"/> to <see cref="int"/>.

@@ -95,7 +95,7 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <returns>If input value is not null, returns value converted to T?; null otherwise.</returns>
     protected override char[] ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
     {
-        string? result = value?.ToString(hostParameter);
+        string? result = value.ToString(hostParameter);
 
         return result != null ? result.ToCharArray() : null!;
     }

@@ -55,7 +55,7 @@ public class DateTimeTypeTests
         var p = new Parameter_t<UTCTimestamp_t>("Ts") { WireValue = "20260101-09:30:00" };
         var value = (DateTime?)p.GetCurrentValue();
         value.Should().NotBeNull();
-        value!.Value.Kind.Should().Be(DateTimeKind.Utc);
+        value.Value.Kind.Should().Be(DateTimeKind.Utc);
         p.WireValue.Should().Be("20260101-09:30:00");
     }
 
@@ -89,7 +89,7 @@ public class DateTimeTypeTests
         var value = (DateTime?)p.GetCurrentValue();
 
         value.Should().NotBeNull();
-        value!.Value.Date.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        value.Value.Date.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -143,7 +143,7 @@ public class DateTimeTypeTests
         var p = new Parameter_t<TZTimeOnly_t>("T") { WireValue = "15:39+08" };
 
         p.WireValue.Should().Be("07:39:00Z");
-        ((DateTime?)p.GetCurrentValue())!.Value.Date.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        ((DateTime?)p.GetCurrentValue()).Value.Date.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
     }
 
     [Fact]

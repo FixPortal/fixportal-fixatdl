@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Collections;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
 
@@ -105,7 +106,7 @@ public class Strategies_t : IEnumerable<Strategy_t>
     /// Returns an enumerator that iterates through all the <see cref="Strategy_t"/> instances in this collection.
     /// </summary>
     /// <returns>An IEnumerator object that can be used to iterate through the collection.</returns>
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    IEnumerator IEnumerable.GetEnumerator()
     {
         return Strategies.GetEnumerator();
     }

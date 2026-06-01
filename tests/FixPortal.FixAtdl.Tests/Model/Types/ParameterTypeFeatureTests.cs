@@ -3,6 +3,7 @@ using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Types;
 using FixPortal.FixAtdl.Model.Types.Support;
+using Country_t = FixPortal.FixAtdl.Model.Types.Country_t;
 
 namespace FixPortal.FixAtdl.Tests.Model.Types;
 
@@ -419,7 +420,7 @@ public class ParameterTypeFeatureTests
     [Fact]
     public void Country_t_IControlConvertible_ToString_returns_code_string()
     {
-        var p = new Parameter_t<FixPortal.FixAtdl.Model.Types.Country_t>("X") { WireValue = "US" };
+        var p = new Parameter_t<Country_t>("X") { WireValue = "US" };
         var cc = p.Value;
         cc.ToString(null).Should().Be("US");
     }
@@ -427,7 +428,7 @@ public class ParameterTypeFeatureTests
     [Fact]
     public void Country_t_IControlConvertible_ToBoolean_throws()
     {
-        var p = new Parameter_t<FixPortal.FixAtdl.Model.Types.Country_t>("X") { WireValue = "US" };
+        var p = new Parameter_t<Country_t>("X") { WireValue = "US" };
         var cc = p.Value;
         var act = () => cc.ToBoolean();
         act.Should().Throw<InvalidCastException>();
@@ -436,7 +437,7 @@ public class ParameterTypeFeatureTests
     [Fact]
     public void Country_t_IControlConvertible_ToDecimal_throws()
     {
-        var p = new Parameter_t<FixPortal.FixAtdl.Model.Types.Country_t>("X") { WireValue = "US" };
+        var p = new Parameter_t<Country_t>("X") { WireValue = "US" };
         var cc = p.Value;
         var act = () => cc.ToDecimal();
         act.Should().Throw<InvalidCastException>();
@@ -445,7 +446,7 @@ public class ParameterTypeFeatureTests
     [Fact]
     public void Country_t_IControlConvertible_ToDateTime_throws()
     {
-        var p = new Parameter_t<FixPortal.FixAtdl.Model.Types.Country_t>("X") { WireValue = "US" };
+        var p = new Parameter_t<Country_t>("X") { WireValue = "US" };
         var cc = p.Value;
         var act = () => cc.ToDateTime();
         act.Should().Throw<InvalidCastException>();

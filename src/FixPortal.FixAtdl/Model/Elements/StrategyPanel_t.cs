@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System.Collections.Specialized;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
@@ -103,7 +102,7 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
 
                 // Provide a mechanism for the Controls collection of the Strategy_t (as opposed to the StrategyPanel_t) to be
                 // notified as controls are added to and removed from this StrategyPanel_t.
-                field.CollectionChanged += new NotifyCollectionChangedEventHandler(OwningStrategy.Controls.SourceCollectionChanged);
+                field.CollectionChanged += OwningStrategy.Controls.SourceCollectionChanged;
             }
 
             return field;
@@ -127,7 +126,7 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
         {
             if (OwningStrategy != null)
             {
-                Controls.CollectionChanged -= new NotifyCollectionChangedEventHandler(OwningStrategy.Controls.SourceCollectionChanged);
+                Controls.CollectionChanged -= OwningStrategy.Controls.SourceCollectionChanged;
             }
 
             // Recurse over child panels so their Controls -> OwningStrategy subscriptions are released

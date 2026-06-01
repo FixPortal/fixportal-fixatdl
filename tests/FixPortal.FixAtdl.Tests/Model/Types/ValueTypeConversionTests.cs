@@ -1,6 +1,7 @@
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Types;
+using Country_t = FixPortal.FixAtdl.Model.Types.Country_t;
 
 namespace FixPortal.FixAtdl.Tests.Model.Types;
 
@@ -372,7 +373,7 @@ public class ValueTypeConversionTests
     [Fact]
     public void Country_t_round_trips_valid_iso_country_code()
     {
-        var p = new Parameter_t<FixPortal.FixAtdl.Model.Types.Country_t>("Cty") { WireValue = "US" };
+        var p = new Parameter_t<Country_t>("Cty") { WireValue = "US" };
         p.WireValue.Should().Be("US");
     }
 

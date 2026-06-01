@@ -125,7 +125,7 @@ public class StrategiesReader
 
         _strategyLoadedCount = 0;
 
-        factory.ClassDeserialized += new EventHandler<ClassDeserializedEventArgs>(OnStrategyDeserialized);
+        factory.ClassDeserialized += OnStrategyDeserialized;
 
         Strategies_t strategies;
 
@@ -136,7 +136,7 @@ public class StrategiesReader
         finally
         {
             // Unsubscribe so the handler does not linger if the factory is ever retained.
-            factory.ClassDeserialized -= new EventHandler<ClassDeserializedEventArgs>(OnStrategyDeserialized);
+            factory.ClassDeserialized -= OnStrategyDeserialized;
         }
 
         strategies.ResolveAll();

@@ -106,10 +106,8 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
         {
             return ((decimal)value).ToString(CultureInfo.InvariantCulture);
         }
-        else
-        {
-            return Round(value, Precision.Value)!.Value.ToString(CultureInfo.InvariantCulture);
-        }
+
+        return Round(value, Precision.Value)!.Value.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -140,10 +138,8 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
         {
             return Round(value, (int)Precision)!;
         }
-        else
-        {
-            return value!;
-        }
+
+        return value!;
     }
 
     /// <summary>

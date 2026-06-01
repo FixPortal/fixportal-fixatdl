@@ -31,7 +31,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// must use “N”.<br/>
     /// If it is desired that the FIX message is not to be populated with this tag when the value of the parameter is 
     /// false, then falseWireValue should be defined as “{NULL}”.</summary>
-    public string FalseWireValue { get; set; } = null!;
+    public string? FalseWireValue { get; set; }
 
     /// <summary>
     /// Applicable only when xsi:type is Boolean_t.
@@ -50,7 +50,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// If it is desired that the FIX message is not to be populated with this tag when the value of the parameter 
     /// is true, then trueWireValue should be defined as “{NULL}”.
     /// </summary>
-    public string TrueWireValue { get; set; } = null!;
+    public string? TrueWireValue { get; set; }
 
     #region AtdlValueType<T> Overrides
 
@@ -193,4 +193,3 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
 
     #endregion
 }
-

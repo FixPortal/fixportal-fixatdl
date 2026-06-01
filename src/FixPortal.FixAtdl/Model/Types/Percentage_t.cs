@@ -100,10 +100,8 @@ public class Percentage_t : Float_t
         {
             return adjustedValue.ToString(CultureInfo.InvariantCulture);
         }
-        else
-        {
-            return Round(adjustedValue, Precision.Value)!.Value.ToString(CultureInfo.InvariantCulture);
-        }
+
+        return Round(adjustedValue, Precision.Value)!.Value.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -148,10 +146,8 @@ public class Percentage_t : Float_t
                 ? Math.Round(adjustedValue, Precision.Value, MidpointRounding.AwayFromZero)
                 : adjustedValue;
         }
-        else
-        {
-            return value!;
-        }
+
+        return value!;
     }
 
     #endregion

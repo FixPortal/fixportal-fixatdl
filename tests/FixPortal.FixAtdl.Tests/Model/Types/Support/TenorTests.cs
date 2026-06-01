@@ -104,7 +104,10 @@ public class TenorTests
 
     [Fact]
     public void Equals_false_for_non_Tenor_object()
-        => Tenor.Parse("M3").Equals("M3").Should().BeFalse();
+    {
+        object other = "M3";
+        Tenor.Parse("M3").Equals(other).Should().BeFalse();
+    }
 
     // ──────────────────────────────────────────────────────────────────────────
     // Characterization — batch-3 finding #7 (CLOSED)
