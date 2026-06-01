@@ -5,13 +5,13 @@
 //
 #endregion
 
+using System.Xml;
+using System.Xml.Linq;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Xml.Serialization;
-using System.Xml;
-using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 

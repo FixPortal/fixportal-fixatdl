@@ -24,7 +24,16 @@ namespace FixPortal.FixAtdl.Model.Types;
 /// </summary>
 public class TZTimestamp_t : DateTimeTypeBase
 {
-    private static readonly string[] _formatStrings = [FixDateTimeFormat.FixDateTimeWithTz];
+    private static readonly string[] _formatStrings =
+    [
+        FixDateTimeFormat.FixDateTimeWithTz,
+        FixDateTimeFormat.FixDateTimeMinutesWithUtcDesignator,
+        FixDateTimeFormat.FixDateTimeMinutesWithHourOffset,
+        FixDateTimeFormat.FixDateTimeMinutesWithMinuteOffset,
+        FixDateTimeFormat.FixDateTimeWithHourOffset,
+        FixDateTimeFormat.FixDateTimeFractionalWithHourOffset,
+        FixDateTimeFormat.FixDateTimeFractionalWithMinuteOffset
+    ];
 
     /// <summary>
     /// Gets the DateTime format strings to use when converting this date/time to a FIX string and vice versa.
@@ -55,5 +64,23 @@ public class TZTimestamp_t : DateTimeTypeBase
     {
         return HumanReadableTypeNames.TimestampType;
     }
-}
 
+    /// <summary>
+    /// Converts the supplied value to a string, preserving fractional seconds when present.
+    /// </summary>
+    /// <param name="value">Value to convert, may be null.</param>
+    /// <returns>The FIX wire representation, or null.</returns>
+    protected override string ConvertToWireValueFormat(DateTime? value)
+    {
+        if (value == null)
+        {
+            return null!;
+        }
+
+        string format = value.Value.Ticks % TimeSpan.TicksPerSecond == 0
+            ? FixDateTimeFormat.FixDateTimeWithTz
+            : FixDateTimeFormat.FixDateTimeFractionalWithMinuteOffset;
+
+        return value.Value.ToString(format, CultureInfo.InvariantCulture);
+    }
+}

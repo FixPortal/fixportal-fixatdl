@@ -29,7 +29,7 @@ public class EditConformanceTests
     [InlineData(Operator_t.Exist, false)]
     public async Task Unselected_list_control_reports_not_exists(Operator_t op, bool expected)
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/pov.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/pov.xml", TestContext.Current.CancellationToken);
         var pov = LoadFirst(xml);
 
         // Materialise the (all-false) EnumState — without this GetCurrentValue() is null and the
@@ -49,7 +49,7 @@ public class EditConformanceTests
     [InlineData(Operator_t.NotExist, false)]
     public async Task Selected_list_control_reports_exists(Operator_t op, bool expected)
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/pov.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/pov.xml", TestContext.Current.CancellationToken);
         var pov = LoadFirst(xml);
 
         var dropdown = pov.Controls["c_Aggression"];
@@ -75,7 +75,7 @@ public class EditConformanceTests
     [InlineData(Operator_t.LessThanOrEqual)]
     public async Task Inequality_against_missing_fix_field_is_false(Operator_t op)
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadFirst(xml);
         twap.Parameters["Participation"].WireValue = "50";
 
@@ -97,7 +97,7 @@ public class EditConformanceTests
     [Fact]
     public async Task Edit_with_both_value_and_field2_is_rejected_on_resolve()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadFirst(xml);
 
         var edit = new Edit_t<IParameter>

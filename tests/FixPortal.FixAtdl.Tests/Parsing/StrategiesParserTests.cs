@@ -16,7 +16,7 @@ public class StrategiesParserTests
     [Fact]
     public async Task Parse_twap_fixture_yields_one_strategy_named_TWAP()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
 
         var strategies = Load(xml);
 
@@ -27,7 +27,7 @@ public class StrategiesParserTests
     [Fact]
     public async Task Parse_twap_extracts_three_parameters_with_correct_fix_tags()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var strategies = Load(xml);
 
         var twap = strategies.Strategies[0];
@@ -41,7 +41,7 @@ public class StrategiesParserTests
     [Fact]
     public async Task Parse_twap_extracts_strategy_layout_with_three_controls()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var strategies = Load(xml);
 
         var layout = strategies.Strategies[0].StrategyLayout;
@@ -54,7 +54,7 @@ public class StrategiesParserTests
     [Fact]
     public async Task Parse_pov_extracts_state_rule_on_target_percentage()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/pov.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/pov.xml", TestContext.Current.CancellationToken);
         var strategies = Load(xml);
 
         var pov = strategies.Strategies[0];
@@ -63,4 +63,3 @@ public class StrategiesParserTests
         targetCtrl.StateRules.Should().HaveCount(1);
     }
 }
-

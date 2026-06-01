@@ -24,7 +24,16 @@ namespace FixPortal.FixAtdl.Model.Types;
 /// </summary>
 public class TZTimeOnly_t : DateTimeTypeBase
 {
-    private static readonly string[] _formatStrings = [FixDateTimeFormat.FixTimeOnlyWithTz];
+    private static readonly string[] _formatStrings =
+    [
+        FixDateTimeFormat.FixTimeOnlyWithTz,
+        FixDateTimeFormat.FixTimeOnlyMinutesWithUtcDesignator,
+        FixDateTimeFormat.FixTimeOnlyMinutesWithHourOffset,
+        FixDateTimeFormat.FixTimeOnlyMinutesWithMinuteOffset,
+        FixDateTimeFormat.FixTimeOnlyWithHourOffset,
+        FixDateTimeFormat.FixTimeOnlyFractionalWithHourOffset,
+        FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset
+    ];
 
     /// <summary>
     /// Gets the DateTime format strings to use when converting this date/time to a FIX string and vice versa.
@@ -55,5 +64,42 @@ public class TZTimeOnly_t : DateTimeTypeBase
     {
         return HumanReadableTypeNames.TimeType;
     }
-}
 
+    /// <summary>
+    /// Converts the supplied wire value to a canonical UTC time-only value with a stable sentinel date.
+    /// </summary>
+    /// <param name="value">Wire-formatted time value.</param>
+    /// <returns>The parsed time anchored to <c>0001-01-01</c>.</returns>
+    protected override DateTime? ConvertFromWireValueFormat(string value)
+    {
+        DateTime? parsed = base.ConvertFromWireValueFormat(value);
+
+        if (parsed == null)
+        {
+            return null;
+        }
+
+        DateTime result = parsed.Value;
+        return new DateTime(1, 1, 1, result.Hour, result.Minute, result.Second, result.Millisecond, result.Kind)
+            .AddTicks(result.Ticks % TimeSpan.TicksPerMillisecond);
+    }
+
+    /// <summary>
+    /// Converts the supplied value to a string, preserving fractional seconds when present.
+    /// </summary>
+    /// <param name="value">Value to convert, may be null.</param>
+    /// <returns>The FIX wire representation, or null.</returns>
+    protected override string ConvertToWireValueFormat(DateTime? value)
+    {
+        if (value == null)
+        {
+            return null!;
+        }
+
+        string format = value.Value.Ticks % TimeSpan.TicksPerSecond == 0
+            ? FixDateTimeFormat.FixTimeOnlyWithTz
+            : FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset;
+
+        return value.Value.ToString(format, CultureInfo.InvariantCulture);
+    }
+}

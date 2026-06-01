@@ -35,26 +35,26 @@ public class EditEvaluationTests
     // ── Comparison operators (full matrix) ───────────────────────────────────
 
     [Theory]
-    [InlineData(Operator_t.Equal,              "100", "100", true)]
-    [InlineData(Operator_t.Equal,              "100", "101", false)]
-    [InlineData(Operator_t.NotEqual,           "100", "100", false)]
-    [InlineData(Operator_t.NotEqual,           "100", "101", true)]
-    [InlineData(Operator_t.GreaterThan,        "101", "100", true)]
-    [InlineData(Operator_t.GreaterThan,        "100", "100", false)]
-    [InlineData(Operator_t.GreaterThan,        "99",  "100", false)]
-    [InlineData(Operator_t.LessThan,           "99",  "100", true)]
-    [InlineData(Operator_t.LessThan,           "100", "100", false)]
-    [InlineData(Operator_t.LessThan,           "101", "100", false)]
+    [InlineData(Operator_t.Equal, "100", "100", true)]
+    [InlineData(Operator_t.Equal, "100", "101", false)]
+    [InlineData(Operator_t.NotEqual, "100", "100", false)]
+    [InlineData(Operator_t.NotEqual, "100", "101", true)]
+    [InlineData(Operator_t.GreaterThan, "101", "100", true)]
+    [InlineData(Operator_t.GreaterThan, "100", "100", false)]
+    [InlineData(Operator_t.GreaterThan, "99", "100", false)]
+    [InlineData(Operator_t.LessThan, "99", "100", true)]
+    [InlineData(Operator_t.LessThan, "100", "100", false)]
+    [InlineData(Operator_t.LessThan, "101", "100", false)]
     [InlineData(Operator_t.GreaterThanOrEqual, "100", "100", true)]
     [InlineData(Operator_t.GreaterThanOrEqual, "101", "100", true)]
-    [InlineData(Operator_t.GreaterThanOrEqual, "99",  "100", false)]
-    [InlineData(Operator_t.LessThanOrEqual,    "100", "100", true)]
-    [InlineData(Operator_t.LessThanOrEqual,    "99",  "100", true)]
-    [InlineData(Operator_t.LessThanOrEqual,    "101", "100", false)]
+    [InlineData(Operator_t.GreaterThanOrEqual, "99", "100", false)]
+    [InlineData(Operator_t.LessThanOrEqual, "100", "100", true)]
+    [InlineData(Operator_t.LessThanOrEqual, "99", "100", true)]
+    [InlineData(Operator_t.LessThanOrEqual, "101", "100", false)]
     public async Task Comparison_operator_evaluates_correctly(
         Operator_t op, string paramValue, string editValue, bool expected)
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         twap.Parameters["Participation"].WireValue = paramValue;
 
@@ -69,7 +69,7 @@ public class EditEvaluationTests
     [Fact]
     public async Task Exist_is_true_when_parameter_has_value()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         twap.Parameters["Participation"].WireValue = "50";
 
@@ -82,7 +82,7 @@ public class EditEvaluationTests
     [Fact]
     public async Task Exist_is_false_when_parameter_was_never_set()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         // Participation is optional; don't assign WireValue — GetCurrentValue returns null.
 
@@ -95,7 +95,7 @@ public class EditEvaluationTests
     [Fact]
     public async Task NotExist_is_true_when_parameter_was_never_set()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         // Participation is optional; don't assign WireValue — GetCurrentValue returns null.
 
@@ -108,7 +108,7 @@ public class EditEvaluationTests
     [Fact]
     public async Task NotExist_is_false_when_parameter_has_value()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         twap.Parameters["Participation"].WireValue = "50";
 
@@ -151,7 +151,7 @@ public class EditEvaluationTests
     public async Task And_logic_operator_evaluates_correctly(
         string paramVal, string editVal1, string editVal2, bool expected)
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         twap.Parameters["Participation"].WireValue = paramVal;
 
@@ -174,7 +174,7 @@ public class EditEvaluationTests
     public async Task Or_logic_operator_evaluates_correctly(
         string paramVal, string editVal1, string editVal2, bool expected)
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         twap.Parameters["Participation"].WireValue = paramVal;
 
@@ -195,7 +195,7 @@ public class EditEvaluationTests
     public async Task Not_logic_operator_evaluates_correctly(
         string paramVal, string editVal, bool expected)
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         twap.Parameters["Participation"].WireValue = paramVal;
 
@@ -216,7 +216,7 @@ public class EditEvaluationTests
     public async Task Xor_logic_operator_evaluates_correctly(
         string paramVal, string editVal1, string editVal2, bool expected)
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         twap.Parameters["Participation"].WireValue = paramVal;
 
@@ -234,7 +234,7 @@ public class EditEvaluationTests
     [Fact]
     public async Task StrategyEdit_CurrentState_follows_wrapped_edit()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         twap.Parameters["Participation"].WireValue = "50";
 
@@ -254,7 +254,7 @@ public class EditEvaluationTests
     [Fact]
     public async Task StrategyEdit_CurrentState_is_false_when_edit_fails()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         twap.Parameters["Participation"].WireValue = "30";
 
@@ -276,7 +276,7 @@ public class EditEvaluationTests
     [Fact]
     public async Task Sources_contains_field_name_after_resolve()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
         twap.Parameters["Participation"].WireValue = "50";
 

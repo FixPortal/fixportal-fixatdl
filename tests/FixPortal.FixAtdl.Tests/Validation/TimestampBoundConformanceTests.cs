@@ -15,8 +15,10 @@ public class TimestampBoundConformanceTests
     private static Parameter_t<UTCTimestamp_t> Param(string? minText, string? maxText)
     {
         var p = new Parameter_t<UTCTimestamp_t>("ts");
-        if (minText != null) { p.Value.MinValueText = minText; }
-        if (maxText != null) { p.Value.MaxValueText = maxText; }
+        if (minText != null)
+        { p.Value.MinValueText = minText; }
+        if (maxText != null)
+        { p.Value.MaxValueText = maxText; }
         return p;
     }
 

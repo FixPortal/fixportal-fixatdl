@@ -81,6 +81,17 @@ public class DateTimeTypeTests
         act.Should().Throw<InvalidCastException>();
     }
 
+    [Fact]
+    public void UTCTimeOnly_t_normalises_time_only_values_to_a_stable_date()
+    {
+        var p = new Parameter_t<UTCTimeOnly_t>("T") { WireValue = "09:30:00" };
+
+        var value = (DateTime?)p.GetCurrentValue();
+
+        value.Should().NotBeNull();
+        value!.Value.Date.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // UTCDateOnly_t  format: yyyyMMdd
     // ──────────────────────────────────────────────────────────────────────────
@@ -127,6 +138,31 @@ public class DateTimeTypeTests
     }
 
     [Fact]
+    public void TZTimeOnly_t_accepts_documented_optional_seconds_and_bare_hour_offsets()
+    {
+        var p = new Parameter_t<TZTimeOnly_t>("T") { WireValue = "15:39+08" };
+
+        p.WireValue.Should().Be("07:39:00Z");
+        ((DateTime?)p.GetCurrentValue())!.Value.Date.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void TZTimeOnly_t_accepts_fractional_seconds_with_offsets()
+    {
+        var p = new Parameter_t<TZTimeOnly_t>("T") { WireValue = "13:09:00.123456+05:30" };
+
+        p.WireValue.Should().Be("07:39:00.123456Z");
+    }
+
+    [Fact]
+    public void TZTimeOnly_t_accepts_whole_second_bare_hour_offsets()
+    {
+        var p = new Parameter_t<TZTimeOnly_t>("T") { WireValue = "02:39:00-05" };
+
+        p.WireValue.Should().Be("07:39:00Z");
+    }
+
+    [Fact]
     public void TZTimeOnly_t_rejects_truly_invalid_wire_value()
     {
         // NOTE: The 'K' specifier in "HH:mm:ssK" is OPTIONAL — "09:30:00" without a
@@ -154,6 +190,30 @@ public class DateTimeTypeTests
     {
         // NOTE: "20060901-02:39:00-05:00" normalised: 02:39 + 5h = 07:39 UTC on same date.
         var p = new Parameter_t<TZTimestamp_t>("Ts") { WireValue = "20060901-02:39:00-05:00" };
+        p.WireValue.Should().Be("20060901-07:39:00Z");
+    }
+
+    [Fact]
+    public void TZTimestamp_t_accepts_documented_bare_hour_offsets()
+    {
+        var p = new Parameter_t<TZTimestamp_t>("Ts") { WireValue = "20060901-15:39+08" };
+
+        p.WireValue.Should().Be("20060901-07:39:00Z");
+    }
+
+    [Fact]
+    public void TZTimestamp_t_accepts_fractional_seconds_with_offsets()
+    {
+        var p = new Parameter_t<TZTimestamp_t>("Ts") { WireValue = "20060901-13:09:00.123456+05:30" };
+
+        p.WireValue.Should().Be("20060901-07:39:00.123456Z");
+    }
+
+    [Fact]
+    public void TZTimestamp_t_accepts_whole_second_bare_hour_offsets()
+    {
+        var p = new Parameter_t<TZTimestamp_t>("Ts") { WireValue = "20060901-02:39:00-05" };
+
         p.WireValue.Should().Be("20060901-07:39:00Z");
     }
 

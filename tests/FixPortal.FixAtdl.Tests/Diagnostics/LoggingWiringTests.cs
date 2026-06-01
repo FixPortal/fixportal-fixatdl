@@ -15,7 +15,7 @@ public class LoggingWiringTests
     public async Task Load_with_supplied_factory_records_from_reader_and_factory()
     {
         var recorder = new RecordingLoggerFactory();
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
 
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         new StrategiesReader(recorder).Load(stream);
@@ -31,7 +31,7 @@ public class LoggingWiringTests
         // The ILoggerFactory ctor parameter is optional: supplying nothing must keep the original
         // behaviour — a successful parse using the silent NullLoggerFactory default. Guards that the
         // additive ctor change did not break the default (no-factory) path.
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
 
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         var strategies = new StrategiesReader().Load(stream);

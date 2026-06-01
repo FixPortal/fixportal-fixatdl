@@ -313,7 +313,7 @@ public class ElementFactory : INotifyClassDeserialized
                 switch (elementDefinition.ConstructorParameters[n].SourceType)
                 {
                     case SourceType.ElementAttribute:
-                        constructorParameterValues[n] = ReadAttribute(sourceElement.Attributes(), elementDefinition.ConstructorParameters[n].Source, elementDefinition.ConstructorParameters[n].Type);
+                        constructorParameterValues[n] = ReadMandatoryConstructorAttribute(sourceElement, elementDefinition, n);
                         break;
 
                     case SourceType.ParentObject:
@@ -347,6 +347,20 @@ public class ElementFactory : INotifyClassDeserialized
             constructorParameterValues = [];
             constructorParameterTypes = [];
         }
+    }
+
+    private object ReadMandatoryConstructorAttribute(XElement sourceElement, ElementDefinition elementDefinition, int parameterIndex)
+    {
+        ConstructorParameter constructorParameter = elementDefinition.ConstructorParameters![parameterIndex];
+        object? value = ReadAttribute(sourceElement.Attributes(), constructorParameter.Source, constructorParameter.Type);
+
+        if (value != null)
+        {
+            return value;
+        }
+
+        throw ThrowHelper.New<MissingMandatoryValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.MissingMandatoryAttribute,
+            constructorParameter.Source, elementDefinition.ElementName!.LocalName);
     }
 
     private void ProcessAttributes(Type targetType, ElementAttribute[] attributeDefinitions, IEnumerable<XAttribute> attributes, object target)

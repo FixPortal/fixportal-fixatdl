@@ -288,17 +288,17 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         if (radioButton.RadioGroup != null)
         {
             radioButtons = from c in _controls.Values
-                where c.Id != radioButton.Id &&
-                      c is RadioButton_t t && t.RadioGroup == radioButton.RadioGroup
-                select c as RadioButton_t;
+                           where c.Id != radioButton.Id &&
+                                 c is RadioButton_t t && t.RadioGroup == radioButton.RadioGroup
+                           select c as RadioButton_t;
         }
         else
         {
             // Approach 2 - look for radio buttons on the same panel
             radioButtons = from c in radioButton.OwningStrategyPanel.Controls
-                where c.Id != radioButton.Id &&
-                      c is RadioButton_t
-                select c as RadioButton_t;
+                           where c.Id != radioButton.Id &&
+                                 c is RadioButton_t
+                           select c as RadioButton_t;
         }
 
         // The query is lazy; Count() + First() would enumerate it twice. Materialise once

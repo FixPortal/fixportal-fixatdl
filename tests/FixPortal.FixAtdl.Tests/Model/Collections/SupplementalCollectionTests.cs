@@ -22,7 +22,7 @@ public class SupplementalCollectionTests
 
     private static Strategy_t LoadTwap()
     {
-        string xml = File.ReadAllText("Fixtures/twap.xml");
+        string xml = FixtureFiles.ReadAllText("Fixtures/twap.xml");
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream).Strategies[0];
     }

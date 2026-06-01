@@ -1,10 +1,10 @@
 using System.Text;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Model.Types;
-using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Fix;
@@ -19,7 +19,7 @@ public class ParameterCollectionTests
 
     private static async Task<FixPortal.FixAtdl.Model.Collections.ParameterCollection> LoadTwapParametersAsync()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         return Load(xml).Strategies[0].Parameters;
     }
 

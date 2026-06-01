@@ -24,9 +24,31 @@ public class EditEvaluatingCollectionTests
         // We need the real fixture on disk so we spin up the fixture reader.
         // ReadAllText is synchronous-friendly from a [Fact]; the async variant is
         // used in integration tests where the TestContext is available.
-        string xml = File.ReadAllText("Fixtures/twap.xml");
+        string xml = FixtureFiles.ReadAllText("Fixtures/twap.xml");
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         return new StrategiesReader().Load(stream).Strategies[0];
+    }
+
+    [Fact]
+    public void LoadTwap_is_not_cwd_dependent()
+    {
+        string originalDirectory = Environment.CurrentDirectory;
+        string isolatedDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(isolatedDirectory);
+
+        try
+        {
+            Environment.CurrentDirectory = isolatedDirectory;
+
+            var act = () => LoadTwap();
+
+            act.Should().NotThrow();
+        }
+        finally
+        {
+            Environment.CurrentDirectory = originalDirectory;
+            Directory.Delete(isolatedDirectory);
+        }
     }
 
     /// <summary>

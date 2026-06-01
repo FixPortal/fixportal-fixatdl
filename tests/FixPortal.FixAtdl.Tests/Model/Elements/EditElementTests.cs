@@ -106,7 +106,7 @@ public class EditElementTests
     [Fact]
     public async Task Edit_t_Evaluate_with_neither_operator_nor_logic_operator_throws_InvalidOperationException()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
 
         // Edit with no Operator and no LogicOperator
@@ -123,7 +123,7 @@ public class EditElementTests
     [Fact]
     public async Task Sources_with_operator_and_field_only_contains_field()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
 
         var edit = MakeResolvedEdit(twap, "Participation", Operator_t.Exist);
@@ -134,7 +134,7 @@ public class EditElementTests
     [Fact]
     public async Task Sources_with_FIX_prefixed_field_is_included_in_sources()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
 
         // FIX_ prefix fields are resolved via FixFieldValueProvider, not Parameters
@@ -189,7 +189,7 @@ public class EditElementTests
     [Fact]
     public async Task EditRef_t_Resolve_with_unknown_id_throws_ReferencedObjectNotFoundException()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
 
         var editRef = new EditRef_t<IParameter>("nonExistentEdit");
@@ -205,7 +205,7 @@ public class EditElementTests
     [Fact]
     public async Task EditRef_t_after_resolve_delegates_Evaluate_to_referenced_edit()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
 
         // Inject a named Edit_t (non-generic) into the strategy's Edits collection.
@@ -233,7 +233,7 @@ public class EditElementTests
     [Fact]
     public async Task EditRef_t_after_resolve_ToString_shows_referenced_edit_details()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
 
         var sourceEdit = new Edit_t
@@ -256,7 +256,7 @@ public class EditElementTests
     [Fact]
     public async Task EditRef_t_evaluate_with_false_result_reflects_in_CurrentState()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
 
         var sourceEdit = new Edit_t
