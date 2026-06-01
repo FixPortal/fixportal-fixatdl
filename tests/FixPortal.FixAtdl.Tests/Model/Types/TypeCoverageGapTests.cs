@@ -1,12 +1,11 @@
-using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements;
-using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Model.Types;
 using FixPortal.FixAtdl.Model.Types.Support;
-using FixPortal.FixAtdl.Validation;
+using Country_t = FixPortal.FixAtdl.Model.Types.Country_t;
 
 namespace FixPortal.FixAtdl.Tests.Model.Types;
 
@@ -91,7 +90,7 @@ public class TypeCoverageGapTests
         // delimiter (SOH, \x01). Accepting SOH would corrupt FIX framing on wire emission.
         // AtdlReferenceType.SetWireValue wraps validation failures as InvalidFieldValueException.
         var p = new Parameter_t<String_t>("Text");
-        var act = () => p.WireValue = "bad\x01value";
+        var act = () => p.WireValue = "bad\x01" + "value";
         act.Should().Throw<InvalidFieldValueException>();
     }
 
@@ -132,7 +131,7 @@ public class TypeCoverageGapTests
         // Enum.GetName, then looks it up in the EnumPairCollection by wire value.
         // Country_t stores an IsoCountryCode enum; EnumPairCollection.WireValue
         // must match the enum member name exactly for TryParseWireValue to find it.
-        var p = new Parameter_t<FixPortal.FixAtdl.Model.Types.Country_t>("Cty") { WireValue = "US" };
+        var p = new Parameter_t<Country_t>("Cty") { WireValue = "US" };
         // The stored enum name is the IsoCountryCode member name (e.g. "US").
         var pairs = BuildEnumPairs(("United States", "US"), ("Great Britain", "GB"));
         var state = ((IControlConvertible)p.Value).ToEnumState(pairs);
@@ -146,7 +145,7 @@ public class TypeCoverageGapTests
     {
         // When the stored enum name does not match any wire value, TryParseWireValue returns
         // false and all enum state entries remain false.
-        var p = new Parameter_t<FixPortal.FixAtdl.Model.Types.Country_t>("Cty") { WireValue = "US" };
+        var p = new Parameter_t<Country_t>("Cty") { WireValue = "US" };
         var pairs = BuildEnumPairs(("SomeOther", "ZZ"));
         var state = ((IControlConvertible)p.Value).ToEnumState(pairs);
         state["SomeOther"].Should().Be(false);
@@ -296,7 +295,7 @@ public class TypeCoverageGapTests
         // NOTE: NonNegativeIntegerTypeBase.ConvertToNativeType calls value.ToUInt32.
         var p = new Parameter_t<SeqNum_t>("X");
         var convertible = Substitute.For<IParameterConvertible>();
-        convertible.ToUInt32(p, Arg.Any<IFormatProvider>()).Returns((uint?)5u);
+        convertible.ToUInt32(p, Arg.Any<IFormatProvider>()).Returns(5u);
 
         var result = p.Value.SetValueFromControl(p, convertible);
 
@@ -326,7 +325,7 @@ public class TypeCoverageGapTests
     {
         // NOTE: EnumTypeBase<T>.ToString(provider) returns Enum.GetName(typeof(T), value).
         // For Country_t, that is the IsoCountryCode member name (e.g. "US" not "United States").
-        var p = new Parameter_t<FixPortal.FixAtdl.Model.Types.Country_t>("X") { WireValue = "US" };
+        var p = new Parameter_t<Country_t>("X") { WireValue = "US" };
         var cc = p.Value;
         // Enum.GetName returns the member name as declared in the IsoCountryCode enum.
         // We pin the actual behaviour: the return value matches the enum identifier for "US".
@@ -343,7 +342,7 @@ public class TypeCoverageGapTests
     {
         // NOTE: AtdlReferenceType.GetWireValue checks ValidateValue. When Use = Required and
         // no value is set, it throws MissingMandatoryValueException (not InvalidFieldValueException).
-        var p = new Parameter_t<String_t>("X") { Use = FixPortal.FixAtdl.Model.Enumerations.Use_t.Required };
+        var p = new Parameter_t<String_t>("X") { Use = Use_t.Required };
         var act = () => _ = p.WireValue;
         act.Should().Throw<MissingMandatoryValueException>();
     }

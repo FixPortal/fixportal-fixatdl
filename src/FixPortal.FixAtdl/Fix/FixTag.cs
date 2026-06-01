@@ -38,14 +38,14 @@ public readonly struct FixTag
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator FixTag(int value) => new FixTag(value);
+    public static implicit operator FixTag(int value) => new(value);
 
     /// <summary>
     /// Performs an implicit conversion from <see cref="FixPortal.FixAtdl.Fix.FixField"/> to <see cref="FixPortal.FixAtdl.Fix.FixTag"/>.
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The result of the conversion.</returns>
-    public static implicit operator FixTag(FixField value) => new FixTag((int)value);
+    public static implicit operator FixTag(FixField value) => new((int)value);
 
     /// <summary>
     /// Performs an implicit conversion from <see cref="FixPortal.FixAtdl.Fix.FixTag"/> to <see cref="int"/>.

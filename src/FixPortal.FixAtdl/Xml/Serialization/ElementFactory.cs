@@ -173,8 +173,9 @@ public class ElementFactory : INotifyClassDeserialized
 
         try
         {
-            ProcessAttributes(newObject.GetType(), genericTypeDefinition.Attributes!, attributes, newObject);
-            ProcessAttributes(newObject.GetType(), innerTypeAttributes, attributes, newObject);
+            var xAttributes = attributes as XAttribute[] ?? attributes.ToArray();
+            ProcessAttributes(newObject.GetType(), genericTypeDefinition.Attributes!, xAttributes, newObject);
+            ProcessAttributes(newObject.GetType(), innerTypeAttributes, xAttributes, newObject);
         }
         catch (FixAtdlException ex)
         {
@@ -241,8 +242,9 @@ public class ElementFactory : INotifyClassDeserialized
 
         try
         {
-            ProcessAttributes(newObject.GetType(), multiTypeDefinition.Attributes!, attributes, newObject);
-            ProcessAttributes(newObject.GetType(), typeAttributes, attributes, newObject);
+            var xAttributes = attributes as XAttribute[] ?? attributes.ToArray();
+            ProcessAttributes(newObject.GetType(), multiTypeDefinition.Attributes!, xAttributes, newObject);
+            ProcessAttributes(newObject.GetType(), typeAttributes, xAttributes, newObject);
         }
         catch (FixAtdlException ex)
         {
@@ -370,11 +372,13 @@ public class ElementFactory : INotifyClassDeserialized
             _log.LogDebug("ProcessAttributes called; Target type={TargetType}.", targetType.FullName);
         }
 
+        var xAttributes = attributes as XAttribute[] ?? attributes.ToArray();
+        
         foreach (ElementAttribute attrDefn in attributeDefinitions)
         {
             object? value = attrDefn.Type.IsEnum && attrDefn.EnumValues != null
-                ? ReadAttribute(attributes, attrDefn.XmlName, attrDefn.Type, attrDefn.EnumValues)
-                : ReadAttribute(attributes, attrDefn.XmlName, attrDefn.Type);
+                ? ReadAttribute(xAttributes, attrDefn.XmlName, attrDefn.Type, attrDefn.EnumValues)
+                : ReadAttribute(xAttributes, attrDefn.XmlName, attrDefn.Type);
 
             if (attrDefn.Required == Required.Mandatory && value == null)
             {
@@ -538,10 +542,8 @@ public class ElementFactory : INotifyClassDeserialized
 
                 return;
             }
-            else
-            {
-                containerMethod = Enum.GetName(typeof(StandardContainerMethod), childDefinition.ContainerMethod)!;
-            }
+
+            containerMethod = Enum.GetName(typeof(StandardContainerMethod), childDefinition.ContainerMethod)!;
         }
         else if (childDefinition.ContainerMethod is string methodName)
         {
@@ -575,10 +577,8 @@ public class ElementFactory : INotifyClassDeserialized
                 throw ThrowHelper.Rethrow(this, ex.InnerException, ErrorMessages.UnableToInvokeMethodError,
                     string.Format(CultureInfo.InvariantCulture, "the {0} method on the {1} property", containerMethod, property.Name));
             }
-            else
-            {
-                throw;
-            }
+
+            throw;
         }
     }
 
@@ -608,17 +608,15 @@ public class ElementFactory : INotifyClassDeserialized
                 throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.InvalidValueEnumParseFailure, attribute.Value, type.Name);
             }
         }
-        else
+
+        try
         {
-            try
-            {
-                return ValueConverter.ConvertTo(attribute.Value, type);
-            }
-            catch (Exception ex) when (ex is FormatException or OverflowException)
-            {
-                throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError2,
-                    attribute.Value, type.Name, attributeName.LocalName);
-            }
+            return ValueConverter.ConvertTo(attribute.Value, type);
+        }
+        catch (Exception ex) when (ex is FormatException or OverflowException)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError2,
+                attribute.Value, type.Name, attributeName.LocalName);
         }
     }
 

@@ -1,6 +1,5 @@
 using System.Text;
 using FixPortal.FixAtdl.Fix;
-using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;

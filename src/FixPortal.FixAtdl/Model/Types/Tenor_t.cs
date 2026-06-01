@@ -164,10 +164,8 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
         {
             return new EnumState(enumPairs.EnumIds);
         }
-        else
-        {
-            return EnumState.FromWireValue(enumPairs, ToString(null)!);
-        }
+
+        return EnumState.FromWireValue(enumPairs, ToString(null)!);
     }
 
     #endregion

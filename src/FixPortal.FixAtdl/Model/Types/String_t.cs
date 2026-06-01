@@ -165,10 +165,8 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
         {
             return new EnumState(enumPairs.EnumIds);
         }
-        else
-        {
-            return EnumState.FromWireValue(enumPairs, value);
-        }
+
+        return EnumState.FromWireValue(enumPairs, value);
     }
 
     #endregion

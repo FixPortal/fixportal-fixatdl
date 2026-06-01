@@ -1,4 +1,3 @@
-using AwesomeAssertions;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Controls;
 using NodaTime;

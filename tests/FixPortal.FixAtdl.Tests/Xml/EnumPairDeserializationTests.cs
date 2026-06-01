@@ -1,6 +1,7 @@
 using System.Text;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Xml;
+
 // AwesomeAssertions, Xunit are global usings (see GlobalUsings.cs).
 
 namespace FixPortal.FixAtdl.Tests.Xml;

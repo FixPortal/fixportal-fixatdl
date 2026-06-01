@@ -47,16 +47,6 @@ public class StrategyEditCollection : Collection<StrategyEdit_t>
     }
 
     /// <summary>
-    /// Inserts a strategy edit into the collection.
-    /// </summary>
-    /// <param name="index">The insertion index.</param>
-    /// <param name="item">The strategy edit to insert.</param>
-    protected override void InsertItem(int index, StrategyEdit_t item)
-    {
-        base.InsertItem(index, item);
-    }
-
-    /// <summary>
     /// Resolves all interdependencies e.g. edits to edit refs, control values to edits, etc.  Called once
     /// all strategies have been loaded as there may be dependencies on EditRefs at the global level.
     /// </summary>

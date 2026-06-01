@@ -91,5 +91,8 @@ public class MonthYearTests
 
     [Fact]
     public void Equals_false_for_different_type()
-        => MonthYear.Parse("202601").Equals("202601").Should().BeFalse();
+    {
+        object other = "202601";
+        MonthYear.Parse("202601").Equals(other).Should().BeFalse();
+    }
 }

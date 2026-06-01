@@ -10,7 +10,5 @@ namespace FixPortal.FixAtdl.Model.Elements;
 /// <summary>
 /// Represents the FIXatdl RepeatingGroup element.
 /// </summary>
-public class RepeatingGroup_t
-{
-}
+public class RepeatingGroup_t;
 

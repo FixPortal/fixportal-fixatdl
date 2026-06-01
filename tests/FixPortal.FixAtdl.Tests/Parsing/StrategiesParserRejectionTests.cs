@@ -1,4 +1,5 @@
 using System.Text;
+using System.Xml;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Xml;
@@ -16,9 +17,9 @@ public class StrategiesParserRejectionTests
     [Fact]
     public async Task Parse_malformed_xml_throws_xml_exception()
     {
-        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/malformed.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/malformed.xml.txt", TestContext.Current.CancellationToken);
         var act = () => Load(xml);
-        act.Should().Throw<System.Xml.XmlException>();
+        act.Should().Throw<XmlException>();
     }
 
     [Fact]

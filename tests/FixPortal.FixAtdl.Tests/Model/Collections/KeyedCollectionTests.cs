@@ -4,7 +4,6 @@ using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Model.Reference;
-using FixPortal.FixAtdl.Validation;
 
 namespace FixPortal.FixAtdl.Tests.Model.Collections;
 

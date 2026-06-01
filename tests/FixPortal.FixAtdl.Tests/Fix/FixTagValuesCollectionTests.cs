@@ -97,7 +97,7 @@ public class FixTagValuesCollectionTests
         FixTagValuesCollection col = [];
         col.Add(168, "val");
 
-        col.TryGetValue((FixTag)168, out var v).Should().BeTrue();
+        col.TryGetValue(168, out var v).Should().BeTrue();
         v.Should().Be("val");
     }
 
@@ -106,7 +106,7 @@ public class FixTagValuesCollectionTests
     {
         FixTagValuesCollection col = [];
 
-        col.TryGetValue((FixTag)168, out _).Should().BeFalse();
+        col.TryGetValue(168, out _).Should().BeFalse();
     }
 
     [Fact]
@@ -162,9 +162,9 @@ public class FixTagValuesCollectionTests
         var wire = original.ToFix();
         var parsed = new FixTagValuesCollection(wire);
 
-        parsed.TryGetValue((FixTag)35, out var v35).Should().BeTrue();
+        parsed.TryGetValue(35, out var v35).Should().BeTrue();
         v35.Should().Be("D");
-        parsed.TryGetValue((FixTag)49, out var v49).Should().BeTrue();
+        parsed.TryGetValue(49, out var v49).Should().BeTrue();
         v49.Should().Be("SENDER");
     }
 
@@ -174,7 +174,7 @@ public class FixTagValuesCollectionTests
         var msg = new FixMessage($"35{FixMessage.Separator}D{FixMessage.SOH}");
         var col = new FixTagValuesCollection(msg);
 
-        col.TryGetValue((FixTag)35, out var v).Should().BeTrue();
+        col.TryGetValue(35, out var v).Should().BeTrue();
         v.Should().Be("D");
     }
 

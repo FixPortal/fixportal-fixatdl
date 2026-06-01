@@ -105,7 +105,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// <returns>An <see cref="IParameterConvertible"/> object through which the control's value can be accessed.</returns>
     public virtual IParameterConvertible GetValueForParameter()
     {
-        return this as IParameterConvertible;
+        return this;
     }
 
     /// <summary>

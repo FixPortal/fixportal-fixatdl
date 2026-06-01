@@ -19,7 +19,7 @@ namespace FixPortal.FixAtdl.Model.Elements;
 /// </summary>
 public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
 {
-    private Control_t Owner { get; set; } = null!;
+    private Control_t? Owner { get; set; }
 
     /// <summary>
     /// Enabled state for this state rule.
@@ -72,7 +72,8 @@ public class StateRule_t : EditEvaluator<Control_t>, IParentable<Control_t>
 
     Control_t IParentable<Control_t>.Parent
     {
-        get => Owner; set => Owner = value;
+        get => Owner!;
+        set => Owner = value;
     }
 
     #endregion IParentable<Control_t> Members

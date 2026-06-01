@@ -58,10 +58,8 @@ public static class ValueConverter
                 {
                     return Convert.ToChar(value);
                 }
-                else
-                {
-                    throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.InvalidCharValue, value);
-                }
+
+                throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.InvalidCharValue, value);
 
             case "System.Char[]":
                 return value.ToCharArray();
@@ -110,10 +108,8 @@ public static class ValueConverter
                 {
                     return value;
                 }
-                else
-                {
-                    throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.UnrecognisedAttributeType, targetType.FullName!);
-                }
+
+                throw ThrowHelper.New<InternalErrorException>(ExceptionContext, InternalErrors.UnrecognisedAttributeType, targetType.FullName!);
         }
     }
 

@@ -83,7 +83,7 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
         {
             T? candidate = ConvertToNativeType(hostParameter, value);
 
-            ValidationResult result = ValidateValue(candidate!, hostParameter.Use == Use_t.Required);
+            ValidationResult result = ValidateValue(candidate, hostParameter.Use == Use_t.Required);
 
             // Commit the converted value only when it validates (or is a legitimate null/cleared
             // state). A rejected candidate must NOT leave the parameter reporting IsSet==true with

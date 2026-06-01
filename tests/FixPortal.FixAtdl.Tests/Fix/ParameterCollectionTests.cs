@@ -17,7 +17,7 @@ public class ParameterCollectionTests
         return new StrategiesReader().Load(stream);
     }
 
-    private static async Task<FixPortal.FixAtdl.Model.Collections.ParameterCollection> LoadTwapParametersAsync()
+    private static async Task<ParameterCollection> LoadTwapParametersAsync()
     {
         var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         return Load(xml).Strategies[0].Parameters;

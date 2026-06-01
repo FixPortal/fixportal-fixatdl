@@ -12,7 +12,5 @@ namespace FixPortal.FixAtdl.Model.Types;
 /// <summary>
 /// 'int field representing a message sequence number. Value must be positive.'
 /// </summary>
-public class SeqNum_t : NonZeroPositiveIntegerTypeBase
-{
-}
+public class SeqNum_t : NonZeroPositiveIntegerTypeBase;
 

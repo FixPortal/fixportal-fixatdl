@@ -22,7 +22,7 @@ public class Description_t
     /// </summary>
     /// <param name="value">String value to be assigned to the newly created Description.</param>
     /// <returns>New Description with the supplied string as the Content.</returns>
-    public static implicit operator Description_t(string value) => new Description_t { Content = value };
+    public static implicit operator Description_t(string value) => new() { Content = value };
 
     /// <summary>
     ///  Implicit case operator that enables a Description to be used where a string is expected.

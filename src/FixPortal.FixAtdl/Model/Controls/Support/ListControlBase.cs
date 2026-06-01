@@ -148,7 +148,7 @@ public abstract class ListControlBase : InitializableControl<string>
     /// </summary>
     public override void Reset()
     {
-        _value?.ClearAll();
+        _value.ClearAll();
     }
 
     /// <summary>

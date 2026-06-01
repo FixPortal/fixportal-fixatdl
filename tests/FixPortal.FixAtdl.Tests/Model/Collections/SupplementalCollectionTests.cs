@@ -5,7 +5,6 @@ using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
-using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Model.Collections;
@@ -67,8 +66,8 @@ public class SupplementalCollectionTests
     {
         var source = new List<ListItem_t>
         {
-            new ListItem_t { EnumId = "X", UiRep = "Ex" },
-            new ListItem_t { EnumId = "Y", UiRep = "Why" },
+            new() { EnumId = "X", UiRep = "Ex" },
+            new() { EnumId = "Y", UiRep = "Why" },
         };
 
         var items = new ListItemCollection();
@@ -81,6 +80,7 @@ public class SupplementalCollectionTests
     [Fact]
     public void ListItemCollection_duplicate_key_throws_DuplicateKeyException()
     {
+        // ReSharper disable once CollectionNeverQueried.Local
         var items = new ListItemCollection
         {
             new ListItem_t { EnumId = "DUP", UiRep = "First" },

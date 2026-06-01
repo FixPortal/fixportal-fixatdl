@@ -51,6 +51,10 @@ indent_size = 4
 indent_style = space
 tab_width = 4
 
+dotnet_style_null_propagation = false
+dotnet_diagnostic.IDE0031.severity = none
+resharper_inconsistent_naming_highlighting = none
+
 # SonarAnalyzer cognitive-complexity gate (S3776, threshold 15) — prefer cognitive
 # over cyclomatic complexity, which over-counts flat switch/ternary dispatch.
 # Advisory only: warning, never build-breaking.
@@ -333,5 +337,4 @@ dotnet_diagnostic.CA1707.severity = none
 
 [**/tests/**.cs]
 dotnet_diagnostic.CA1707.severity = none
-
 

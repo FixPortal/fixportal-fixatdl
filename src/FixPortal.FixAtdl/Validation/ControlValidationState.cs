@@ -89,17 +89,12 @@ public class ControlValidationState
     /// <remarks>See <see cref="CurrentState"/> for an explanation of why we don't cache the state locally within the class.</remarks>
     public void Evaluate(FixFieldValueProvider additionalValues)
     {
-        bool state = ControlValidationResult == null || ControlValidationResult.IsValid;
-
         // Evaluating the StrategyEdits may give us meaningless information if the parameter value
         // didn't validate, but we go ahead and do it anyway because failing to do leaves us in an
         // indeterminate state from this value change.
-        state &= ParameterValidationResult == null || ParameterValidationResult.IsValid;
-
         foreach (StrategyEdit_t strategyEdit in _strategyEdits)
         {
             strategyEdit.Evaluate(additionalValues);
-            state &= strategyEdit.CurrentState;
         }
     }
 
@@ -115,9 +110,9 @@ public class ControlValidationState
             IEnumerable<StrategyEdit_t> strategyEditsInError = from s in _strategyEdits where !s.CurrentState select s;
 
             int count = strategyEditsInError.Count();
-            bool parameterIsInvalid = ParameterValidationResult != null && !ParameterValidationResult.IsValid;
+            bool parameterIsInvalid = ParameterValidationResult is { IsValid: false };
 
-            if (ControlValidationResult != null && !ControlValidationResult.IsValid)
+            if (ControlValidationResult is { IsValid: false })
             {
                 sb.Append(ControlValidationResult.ErrorText);
 
