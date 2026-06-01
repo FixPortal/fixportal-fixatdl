@@ -54,8 +54,7 @@ public class DateTimeTypeTests
         // This test pins both the wire round-trip and the canonical Kind=Utc contract.
         var p = new Parameter_t<UTCTimestamp_t>("Ts") { WireValue = "20260101-09:30:00" };
         var value = (DateTime?)p.GetCurrentValue();
-        value.Should().NotBeNull();
-        value.Value.Kind.Should().Be(DateTimeKind.Utc);
+        value.Should().BeOfType<DateTime>().Which.Kind.Should().Be(DateTimeKind.Utc);
         p.WireValue.Should().Be("20260101-09:30:00");
     }
 
@@ -88,8 +87,7 @@ public class DateTimeTypeTests
 
         var value = (DateTime?)p.GetCurrentValue();
 
-        value.Should().NotBeNull();
-        value.Value.Date.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+        value.Should().BeOfType<DateTime>().Which.Date.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
     }
 
     // ──────────────────────────────────────────────────────────────────────────
