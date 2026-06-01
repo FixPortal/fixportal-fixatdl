@@ -16,7 +16,7 @@ public class StrategiesParserRejectionTests
     [Fact]
     public async Task Parse_malformed_xml_throws_xml_exception()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/malformed.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/malformed.xml", TestContext.Current.CancellationToken);
         var act = () => Load(xml);
         act.Should().Throw<System.Xml.XmlException>();
     }
@@ -24,9 +24,8 @@ public class StrategiesParserRejectionTests
     [Fact]
     public async Task Parse_schema_invalid_xml_throws_or_records_validation_error()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/invalid-schema.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/invalid-schema.xml", TestContext.Current.CancellationToken);
         var act = () => Load(xml);
         act.Should().Throw<FixAtdlException>();
     }
 }
-

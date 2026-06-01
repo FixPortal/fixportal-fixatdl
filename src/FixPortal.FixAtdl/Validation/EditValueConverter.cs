@@ -71,7 +71,7 @@ public static class EditValueConverter
                 _ => throw ThrowHelper.New<InvalidCastException>(ExceptionContext, ErrorMessages.DataConversionError1, value, type),
             };
         }
-        catch (Exception ex) when (ex is FormatException or OverflowException)
+        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException)
         {
             // Translate raw Convert.* conversion failures into a domain InvalidFieldValueException,
             // matching the boundary established elsewhere rather than leaking a raw BCL exception (M4).

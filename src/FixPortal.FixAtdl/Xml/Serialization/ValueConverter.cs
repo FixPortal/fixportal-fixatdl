@@ -8,6 +8,7 @@
 using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
 using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
@@ -62,6 +63,9 @@ public static class ValueConverter
                     throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.InvalidCharValue, value);
                 }
 
+            case "System.Char[]":
+                return value.ToCharArray();
+
             case "System.Boolean":
                 try
                 {
@@ -92,6 +96,15 @@ public static class ValueConverter
             case "FixPortal.FixAtdl.Fix.FixTag":
                 return ParseOrThrow(value, targetType, v => new FixTag(Convert.ToInt32(v, CultureInfo.InvariantCulture)));
 
+            case "FixPortal.FixAtdl.Fix.NumInGroup":
+                return ParseOrThrow(value, targetType, v => new NumInGroup(Convert.ToInt32(v, CultureInfo.InvariantCulture)));
+
+            case "FixPortal.FixAtdl.Model.Types.Support.MonthYear":
+                return ParseOrThrow(value, targetType, v => MonthYear.Parse(v));
+
+            case "FixPortal.FixAtdl.Model.Types.Support.Tenor":
+                return ParseOrThrow(value, targetType, v => Tenor.Parse(v));
+
             default:
                 if (targetType.FullName!.StartsWith("FixPortal.FixAtdl.Model.Controls.InitValue", StringComparison.Ordinal))
                 {
@@ -110,7 +123,7 @@ public static class ValueConverter
         {
             return convert(value);
         }
-        catch (Exception ex) when (ex is FormatException or OverflowException)
+        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException)
         {
             throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.DataConversionError1, value, targetType.Name);
         }

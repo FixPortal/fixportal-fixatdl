@@ -24,7 +24,7 @@ public class RealWorldSpecConformanceTests
 
     private static Strategies_t Load(string relativePath)
     {
-        using var stream = File.OpenRead(relativePath);
+        using var stream = FixtureFiles.OpenRead(relativePath);
         return new StrategiesReader().Load(stream);
     }
 

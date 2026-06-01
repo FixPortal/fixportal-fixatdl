@@ -62,7 +62,10 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     {
         if (TimeOnly.TryParseExact(text, _timeOnlyBoundFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out TimeOnly timeOfDay))
         {
-            if (isMax) { _maxTimeOfDay = timeOfDay; } else { _minTimeOfDay = timeOfDay; }
+            if (isMax)
+            { _maxTimeOfDay = timeOfDay; }
+            else
+            { _minTimeOfDay = timeOfDay; }
         }
         else
         {
@@ -73,7 +76,10 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
             // against, keeping the comparison host-timezone-independent.
             DateTime parsed = FixDateTime.Parse(text, CultureInfo.InvariantCulture);
             DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
-            if (isMax) { MaxValue = normalised; } else { MinValue = normalised; }
+            if (isMax)
+            { MaxValue = normalised; }
+            else
+            { MinValue = normalised; }
         }
     }
 

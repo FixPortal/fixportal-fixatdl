@@ -37,7 +37,7 @@ public class EditEvaluatorTests
     public async Task Single_edit_on_parameter_evaluates_comparison_correctly(
         Operator_t op, string paramValue, string editValue, bool expected)
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
 
         // Wire up: set a numeric wire value on the Participation parameter (tag 7700).
@@ -58,4 +58,3 @@ public class EditEvaluatorTests
         edit.CurrentState.Should().Be(expected);
     }
 }
-

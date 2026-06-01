@@ -26,7 +26,7 @@ public class SchemaValidationTests
     [InlineData("Fixtures/pov.xml")]
     public async Task Canonical_fixture_deserializes_without_throwing(string path)
     {
-        var xml = await File.ReadAllTextAsync(path, TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync(path, TestContext.Current.CancellationToken);
         var act = () => Load(xml);
         act.Should().NotThrow();
     }
@@ -34,9 +34,19 @@ public class SchemaValidationTests
     [Fact]
     public async Task Schema_invalid_fixture_throws_on_load()
     {
-        var xml = await File.ReadAllTextAsync("Fixtures/invalid-schema.xml", TestContext.Current.CancellationToken);
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/invalid-schema.xml", TestContext.Current.CancellationToken);
         var act = () => Load(xml);
         act.Should().Throw<FixAtdlException>();
     }
-}
 
+    [Fact]
+    public async Task Missing_constructor_fed_parameter_name_throws_MissingMandatoryValueException()
+    {
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        xml = xml.Replace("<Parameter name=\"StartTime\"", "<Parameter", StringComparison.Ordinal);
+
+        var act = () => Load(xml);
+
+        act.Should().Throw<MissingMandatoryValueException>();
+    }
+}

@@ -187,6 +187,22 @@ public class EditValueConverterTests
         result.Should().BeAssignableTo<MonthYear>();
     }
 
+    [Fact]
+    public void Wraps_invalid_month_year_values_in_InvalidFieldValueException()
+    {
+        var act = () => EditValueConverter.ConvertToComparableType(default(MonthYear), "not-a-month-year");
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Wraps_invalid_tenor_values_in_InvalidFieldValueException()
+    {
+        var act = () => EditValueConverter.ConvertToComparableType(default(Tenor), "not-a-tenor");
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
     // ── Unknown type → InvalidCastException ──────────────────────────────────
 
     [Fact]

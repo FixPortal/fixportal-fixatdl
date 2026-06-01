@@ -43,5 +43,23 @@ public class UTCTimeOnly_t : UTCDateTimeTypeBase
     {
         return HumanReadableTypeNames.TimeType;
     }
-}
 
+    /// <summary>
+    /// Converts the supplied wire value to a canonical UTC time-only value with a stable sentinel date.
+    /// </summary>
+    /// <param name="value">Wire-formatted time value.</param>
+    /// <returns>The parsed time anchored to <c>0001-01-01</c>.</returns>
+    protected override DateTime? ConvertFromWireValueFormat(string value)
+    {
+        DateTime? parsed = base.ConvertFromWireValueFormat(value);
+
+        if (parsed == null)
+        {
+            return null;
+        }
+
+        DateTime result = parsed.Value;
+        return new DateTime(1, 1, 1, result.Hour, result.Minute, result.Second, result.Millisecond, result.Kind)
+            .AddTicks(result.Ticks % TimeSpan.TicksPerMillisecond);
+    }
+}
