@@ -23,7 +23,7 @@ public class Exchange_t : String_t
     /// <param name="value">Value to validate, may be null in which case no validation is applied.</param>
     /// <param name="isRequired">Set to true to check that this parameter is non-null.</param>
     /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
-    protected override ValidationResult ValidateValue(string value, bool isRequired)
+    protected override ValidationResult ValidateValue(string? value, bool isRequired)
     {
         ValidationResult baseResult = base.ValidateValue(value, isRequired);
         if (!baseResult.IsValid)

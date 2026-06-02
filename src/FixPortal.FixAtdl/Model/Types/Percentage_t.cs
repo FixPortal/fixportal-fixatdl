@@ -101,7 +101,8 @@ public class Percentage_t : Float_t
             return adjustedValue.ToString(CultureInfo.InvariantCulture);
         }
 
-        return Round(adjustedValue, Precision.Value)!.Value.ToString(CultureInfo.InvariantCulture);
+        int effectivePrecision = MultiplyBy100 == true ? Precision.Value : Precision.Value + 2;
+        return Round(adjustedValue, effectivePrecision)!.Value.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -138,9 +139,12 @@ public class Percentage_t : Float_t
         {
             decimal adjustedValue = MultiplyBy100 == true ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value;
 
-            return Precision != null
-                ? Round(adjustedValue, Precision.Value)!
-                : adjustedValue;
+            if (Precision != null)
+            {
+                int effectivePrecision = MultiplyBy100 == true ? Precision.Value : Precision.Value + 2;
+                return Round(adjustedValue, effectivePrecision)!;
+            }
+            return adjustedValue;
         }
 
         return value!;

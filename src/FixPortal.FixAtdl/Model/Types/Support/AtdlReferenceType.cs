@@ -122,7 +122,7 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.AttemptToSetConstValueParameter, ConstValue);
         }
 
-        T convertedValue;
+        T? convertedValue;
 
         try
         {
@@ -165,7 +165,7 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
                 throw ThrowHelper.New<MissingMandatoryValueException>(this, ErrorMessages.NonOptionalParameterNotSupplied, hostParameter.Name);
             }
 
-            throw ThrowHelper.New<InvalidFieldValueException>(ErrorMessages.InvalidGetParameterValue,
+            throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InvalidGetParameterValue,
                 hostParameter.Name, value, validity.ErrorText);
         }
 
@@ -209,7 +209,7 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
     /// <param name="value">Value to validate, may be null in which case no validation is applied.</param>
     /// <param name="isRequired">Set to true to check that this parameter is non-null.</param>
     /// <returns>Value passed in is returned if it is valid; otherwise an appropriate exception is thrown.</returns>
-    protected abstract ValidationResult ValidateValue(T value, bool isRequired);
+    protected abstract ValidationResult ValidateValue(T? value, bool isRequired);
 
     /// <summary>
     /// Converts the supplied value from string format (as might be used on the FIX wire) into the type of the type
@@ -217,14 +217,14 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
     /// </summary>
     /// <param name="value">Type to convert from string, may be null.</param>
     /// <returns>If input value is not null, returns value converted from a string; null otherwise.</returns>
-    protected abstract T ConvertFromWireValueFormat(string value);
+    protected abstract T? ConvertFromWireValueFormat(string value);
 
     /// <summary>
     /// Converts the supplied value to a string, as might be used on the FIX wire.
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected abstract string? ConvertToWireValueFormat(T value);
+    protected abstract string? ConvertToWireValueFormat(T? value);
 
     /// <summary>
     /// Converts the supplied value to the type parameter type (T) for this class.
@@ -232,7 +232,7 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
     /// <param name="hostParameter"><see cref="IParameter"/> that hosts this value.</param>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to T; null otherwise.</returns>
-    protected abstract T ConvertToNativeType(IParameter hostParameter, IParameterConvertible value);
+    protected abstract T? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value);
 
     /// <summary>
     /// Gets the human-readable type name for use in error messages shown to the user.

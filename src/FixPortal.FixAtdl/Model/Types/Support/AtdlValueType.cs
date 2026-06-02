@@ -166,7 +166,7 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
                 throw ThrowHelper.New<MissingMandatoryValueException>(this, ErrorMessages.NonOptionalParameterNotSupplied, hostParameter.Name);
             }
 
-            throw ThrowHelper.New<InvalidFieldValueException>(ErrorMessages.InvalidGetParameterValue,
+            throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InvalidGetParameterValue,
                 hostParameter.Name, value, validity.ErrorText);
         }
 

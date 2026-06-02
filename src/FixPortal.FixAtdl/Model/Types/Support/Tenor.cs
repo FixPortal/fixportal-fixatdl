@@ -200,9 +200,19 @@ public struct Tenor : IComparable
 
     private static int Compare(Tenor lhs, Tenor rhs)
     {
-        if (lhs.TenorType == TenorTypeValue.Invalid || rhs.TenorType == TenorTypeValue.Invalid)
+        if (lhs.TenorType == TenorTypeValue.Invalid && rhs.TenorType == TenorTypeValue.Invalid)
         {
-            throw ThrowHelper.New<ArgumentException>(ExceptionContext, "Cannot compare invalid Tenor values.");
+            return 0;
+        }
+
+        if (lhs.TenorType == TenorTypeValue.Invalid)
+        {
+            return -1;
+        }
+
+        if (rhs.TenorType == TenorTypeValue.Invalid)
+        {
+            return 1;
         }
 
         // Same unit: compare offsets exactly (D5 vs D7).

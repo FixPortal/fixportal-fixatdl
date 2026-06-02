@@ -127,16 +127,15 @@ public class TenorTests
     }
 
     [Fact]
-    public void Compare_invalid_tenor_throws_ArgumentException()
+    public void Compare_invalid_tenor_is_less_than_valid_tenor()
     {
         var invalid = default(Tenor); // default has TenorType = Invalid
         var valid = Tenor.Parse("M3");
 
-        var act1 = () => invalid < valid;
-        act1.Should().Throw<ArgumentException>();
-
-        var act2 = () => valid >= invalid;
-        act2.Should().Throw<ArgumentException>();
+        (invalid < valid).Should().BeTrue();
+        (valid >= invalid).Should().BeTrue();
+        invalid.CompareTo(valid).Should().BeNegative();
+        valid.CompareTo(invalid).Should().BePositive();
     }
 
     [Fact]

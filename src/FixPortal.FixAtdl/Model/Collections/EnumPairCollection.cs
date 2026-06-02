@@ -55,7 +55,13 @@ public class EnumPairCollection : KeyedCollection<string, EnumPair_t>
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.EnumerationNotFound, enumId);
         }
 
-        return this[enumId].WireValue;
+        string wireValue = this[enumId].WireValue;
+        if (string.IsNullOrEmpty(wireValue))
+        {
+            throw ThrowHelper.New<InvalidOperationException>(this, "EnumPair '{0}' has a null or empty wireValue.", enumId);
+        }
+
+        return wireValue;
     }
 
     /// <summary>

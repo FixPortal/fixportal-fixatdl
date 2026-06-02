@@ -291,7 +291,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             {
                 Operator_t.Exist or Operator_t.NotExist => EvaluateExists(lhs),
                 Operator_t.Equal or Operator_t.NotEqual => EvaluateEquality(lhs, GetRhsValue(additionalValues, lhs)),
-                _ => EvaluateInequalityComparison((lhs as IComparable)!, (GetRhsValue(additionalValues, lhs) as IComparable)!),
+                _ => EvaluateInequalityComparison(lhs, GetRhsValue(additionalValues, lhs)),
             };
         }
         else if (LogicOperator != null)
@@ -335,7 +335,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         return finalResult;
     }
 
-    private bool EvaluateInequalityComparison(IComparable lhs, IComparable rhs)
+    private bool EvaluateInequalityComparison(object? lhs, object? rhs)
     {
         // It's not clear what the right thing is to do with a null LHS and an inequality operator
         // so we return false anyway
@@ -352,13 +352,13 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             return false;
         }
 
+        CheckForUnsupportedComparisons(lhs, rhs);
+
         object? normLhs = NormaliseValue(lhs);
         object? normRhs = NormaliseValue(rhs);
 
-        // Operands of different runtime types (e.g. a decimal LHS vs a non-numeric string RHS, after
-        // NormaliseNumericString) cannot be ordered: IComparable.CompareTo would throw a raw
-        // ArgumentException. Surface a clear domain error instead.
-        if (normLhs == null || normRhs == null || normLhs.GetType() != normRhs.GetType())
+        // Operands of different runtime types or non-comparable types cannot be ordered
+        if (normLhs == null || normRhs == null || normLhs is not IComparable || normRhs is not IComparable || normLhs.GetType() != normRhs.GetType())
         {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
         }
@@ -468,6 +468,16 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             return null;
         }
 
+        if (val is double d && (double.IsNaN(d) || double.IsInfinity(d)))
+        {
+            throw ThrowHelper.New<InvalidOperationException>(null, "Cannot compare NaN or Infinity values.");
+        }
+
+        if (val is float f && (float.IsNaN(f) || float.IsInfinity(f)))
+        {
+            throw ThrowHelper.New<InvalidOperationException>(null, "Cannot compare NaN or Infinity values.");
+        }
+
         if (val is string str)
         {
             return decimal.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal dec) ? dec : str;
@@ -479,9 +489,9 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             {
                 return Convert.ToDecimal(val, CultureInfo.InvariantCulture);
             }
-            catch
+            catch (Exception ex)
             {
-                return val;
+                throw ThrowHelper.New<InvalidOperationException>(null, ex, "Numeric conversion failed for comparison value: {0}", val);
             }
         }
 

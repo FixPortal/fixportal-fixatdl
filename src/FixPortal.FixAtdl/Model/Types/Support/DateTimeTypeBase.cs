@@ -228,7 +228,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     {
         DateTime? value = ConstValue ?? _value;
 
-        return value != null ? ((DateTime)value).ToString(GetDateTimeFormatStrings()[0], CultureInfo.InvariantCulture) : null;
+        return ConvertToWireValueFormat(value);
     }
 
     /// <summary>
