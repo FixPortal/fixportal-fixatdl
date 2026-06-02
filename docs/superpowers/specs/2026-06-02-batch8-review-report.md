@@ -4,7 +4,7 @@ date: 2026-06-02
 reviewer: Claude Sonnet 4.6 (code-review skill, high + full-bore workflow)
 branch: reviewer-findings-batch8
 method: 7-angle standard pass → 12-finder workflow (62 agents, 70 raw candidates, 38 verified surviving)
-status: awaiting remediation
+status: resolved
 ---
 
 # Batch 8 — Code Review Report

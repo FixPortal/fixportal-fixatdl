@@ -15,10 +15,10 @@ namespace FixPortal.FixAtdl.Model.Elements;
 public class EnumPair_t
 {
     /// <summary>A unique identifier of an enumPair element per parameter.</summary>
-    public string EnumId { get; set; } = null!;
+    public string EnumId { get; set; } = string.Empty;
 
     /// <summary>The corresponding value that is used to populate the FIX message.</summary>
-    public string WireValue { get; set; } = null!;
+    public string WireValue { get; set; } = string.Empty;
 
     /// <summary>
     /// Optional vendor extension attribute: an integer ordering hint for this enum pair. Standard

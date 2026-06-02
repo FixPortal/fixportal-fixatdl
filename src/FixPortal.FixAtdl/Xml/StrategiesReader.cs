@@ -114,16 +114,16 @@ public class StrategiesReader
 
     private Strategies_t LoadStrategies(XDocument document)
     {
-        if (document.Descendants().Any(e => e.Name.LocalName == "RepeatingGroup"))
-        {
-            throw ThrowHelper.New<FixAtdlException>(this, "RepeatingGroup elements are not supported.");
-        }
-
         XElement? element = document.Element(AtdlNamespaces.core + "Strategies");
 
         if (element == null)
         {
             throw ThrowHelper.New<FixAtdlException>(this, ErrorMessages.StrategiesLoadFailure);
+        }
+
+        if (element.Descendants(AtdlNamespaces.core + "RepeatingGroup").Any())
+        {
+            throw ThrowHelper.New<FixAtdlException>(this, "RepeatingGroup elements are not supported.");
         }
 
         ElementFactory factory = new(SchemaDefinitions.Strategies_t, typeof(Strategy_t), _loggerFactory);

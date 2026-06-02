@@ -44,7 +44,7 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <param name="value">Value to validate, may be null in which case no validation is applied.</param>
     /// <param name="isRequired">Set to true to check that this parameter is non-null.</param>
     /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
-    protected override ValidationResult ValidateValue(char[] value, bool isRequired)
+    protected override ValidationResult ValidateValue(char[]? value, bool isRequired)
     {
         if (value != null)
         {
@@ -72,9 +72,9 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// </summary>
     /// <param name="value">Type to convert from string; cannot be null as empty fields are invalid in FIX.</param>
     /// <returns>Value converted from a string.</returns>
-    protected override char[] ConvertFromWireValueFormat(string value)
+    protected override char[]? ConvertFromWireValueFormat(string value)
     {
-        return value != null ? value.ToCharArray() : null!;
+        return string.IsNullOrEmpty(value) || value == Atdl.NullValue ? null : value.ToCharArray();
     }
 
     /// <summary>
@@ -82,9 +82,9 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string? ConvertToWireValueFormat(char[] value)
+    protected override string? ConvertToWireValueFormat(char[]? value)
     {
-        return value != null ? new string(value) : null;
+        return value != null && value.Length > 0 ? new string(value) : null;
     }
 
     /// <summary>
@@ -93,11 +93,11 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <param name="hostParameter">Parameter that this value belongs to.</param>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to T?; null otherwise.</returns>
-    protected override char[] ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
+    protected override char[]? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
     {
         string? result = value.ToString(hostParameter);
 
-        return result != null ? result.ToCharArray() : null!;
+        return result != null ? result.ToCharArray() : null;
     }
 
     /// <summary>

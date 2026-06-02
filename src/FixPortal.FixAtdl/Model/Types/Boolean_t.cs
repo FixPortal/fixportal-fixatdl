@@ -41,7 +41,9 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
         get => _falseWireValue;
         set
         {
-            if (value != null && value == _trueWireValue)
+            string effectiveTrue = _trueWireValue ?? DefaultTrueValue;
+            string effectiveValue = value ?? DefaultFalseValue;
+            if (effectiveValue == effectiveTrue)
             {
                 throw new ArgumentException("trueWireValue and falseWireValue cannot be equal.");
             }
@@ -71,7 +73,9 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
         get => _trueWireValue;
         set
         {
-            if (value != null && value == _falseWireValue)
+            string effectiveFalse = _falseWireValue ?? DefaultFalseValue;
+            string effectiveValue = value ?? DefaultTrueValue;
+            if (effectiveValue == effectiveFalse)
             {
                 throw new ArgumentException("trueWireValue and falseWireValue cannot be equal.");
             }

@@ -43,27 +43,29 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     /// <param name="value">Value to validate, may be null in which case no validation is applied.</param>
     /// <param name="isRequired">Set to true to check that this parameter is non-null.</param>
     /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
-    protected override ValidationResult ValidateValue(string value, bool isRequired)
+    protected override ValidationResult ValidateValue(string? value, bool isRequired)
     {
-        if (MaxLength != null && value != null && value.Length > MaxLength)
+        if (value != null)
         {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxLengthExceeded, value, MaxLength);
-        }
+            // The type contract is "any character except the delimiter": a value carrying the FIX field
+            // delimiter (SOH) would corrupt framing / inject fields when emitted via FixMessage.ToFix, so
+            // reject it here. ('=' is intentionally allowed — FIX values may contain it; only SOH frames.)
+            if (value.Contains(FixMessage.SOH))
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.ValueContainsDelimiter, "string");
+            }
 
-        if (MinLength != null && value != null && value.Length < MinLength)
-        {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinLengthExceeded, value, MinLength);
-        }
+            if (MaxLength != null && value.Length > MaxLength)
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxLengthExceeded, value, MaxLength);
+            }
 
-        // The type contract is "any character except the delimiter": a value carrying the FIX field
-        // delimiter (SOH) would corrupt framing / inject fields when emitted via FixMessage.ToFix, so
-        // reject it here. ('=' is intentionally allowed — FIX values may contain it; only SOH frames.)
-        if (value != null && value.Contains(FixMessage.SOH))
-        {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.ValueContainsDelimiter, "string");
+            if (MinLength != null && value.Length < MinLength)
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinLengthExceeded, value, MinLength);
+            }
         }
-
-        if (isRequired && string.IsNullOrEmpty(value))
+        else if (isRequired)
         {
             return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
         }
@@ -77,9 +79,9 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     /// </summary>
     /// <param name="value">Type to convert from string; cannot be null as empty fields are invalid in FIX.</param>
     /// <returns>Value converted from a string.</returns>
-    protected override string ConvertFromWireValueFormat(string value)
+    protected override string? ConvertFromWireValueFormat(string value)
     {
-        return value;
+        return string.IsNullOrEmpty(value) || value == Atdl.NullValue ? null : value;
     }
 
     /// <summary>
@@ -87,9 +89,9 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string? ConvertToWireValueFormat(string value)
+    protected override string? ConvertToWireValueFormat(string? value)
     {
-        return string.IsNullOrEmpty(value) ? null : value;
+        return string.IsNullOrEmpty(value) || value == Atdl.NullValue ? null : value;
     }
 
     /// <summary>
@@ -98,7 +100,7 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     /// <param name="hostParameter"><see cref="IParameter"/> that hosts this value.</param>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to string; null otherwise.</returns>
-    protected override string ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
+    protected override string? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
     {
         return value.ToString(hostParameter);
     }
