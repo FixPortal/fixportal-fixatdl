@@ -2,6 +2,7 @@ using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
@@ -189,5 +190,21 @@ public class SupplementalCollectionTests
         var control = twap.Controls["c_StartTime"];
         control.Should().NotBeNull();
         control.Id.Should().Be("c_StartTime");
+    }
+
+    [Fact]
+    public void ReadOnlyControlCollection_replace_with_duplicate_id_throws_DuplicateKeyException()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var ctrl1 = new TextField_t("c_One");
+        var ctrl2 = new TextField_t("c_Two");
+        panel.Controls.Add(ctrl1);
+        panel.Controls.Add(ctrl2);
+
+        // ctrlDup has same ID as ctrl2
+        var ctrlDup = new TextField_t("c_Two");
+        var act = () => panel.Controls[0] = ctrlDup; // set ctrl1 to ctrlDup, triggering Replace
+        act.Should().Throw<DuplicateKeyException>();
     }
 }

@@ -320,10 +320,13 @@ public class Clock_t : InitializableControl<InitValueClock?>
         {
             DateTimeZone? zone = TimeZoneProvider.GetZoneOrNull(LocalMktTz);
 
-            if (zone != null)
+            if (zone == null)
             {
-                return _value.Value.InZone(zone).ToDateTimeUnspecified();
+                throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InitControlValueError,
+                    Id, string.Format(CultureInfo.InvariantCulture, "localMktTz '{0}' is not a recognised IANA time zone", LocalMktTz));
             }
+
+            return _value.Value.InZone(zone).ToDateTimeUnspecified();
         }
 
         return _value.Value.ToDateTimeUtc();
@@ -334,12 +337,12 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// <summary>
     /// Converts an inbound BCL <see cref="DateTime"/> (from a FIX wire value or a UI/StateRule set) to a
     /// NodaTime <see cref="Instant"/>. These values are UTC by convention; a Local value is converted and an
-    /// Unspecified value is taken to be UTC.
+    /// Unspecified value throws an exception to prevent timezone shift bugs.
     /// </summary>
     private static Instant ToInstant(DateTime dateTime) => dateTime.Kind switch
     {
         DateTimeKind.Utc => Instant.FromDateTimeUtc(dateTime),
         DateTimeKind.Local => Instant.FromDateTimeUtc(dateTime.ToUniversalTime()),
-        _ => Instant.FromDateTimeUtc(DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)),
+        _ => throw ThrowHelper.New<ArgumentException>(null, "DateTimeKind.Unspecified is not supported to avoid timezone ambiguity; Kind must be Utc or Local")
     };
 }

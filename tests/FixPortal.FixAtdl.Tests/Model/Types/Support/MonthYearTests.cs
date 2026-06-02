@@ -95,4 +95,16 @@ public class MonthYearTests
         object other = "202601";
         MonthYear.Parse("202601").Equals(other).Should().BeFalse();
     }
+
+    [Fact]
+    public void Mixed_suffix_comparison_tiebreaker_prevents_spurious_equality()
+    {
+        // 20260107 (Day=7) vs 202601w1 (Week=1 -> ordinal 7)
+        var day7 = MonthYear.Parse("20260107");
+        var week1 = MonthYear.Parse("202601w1");
+
+        (day7 == week1).Should().BeFalse();
+        (day7 > week1).Should().BeTrue();
+        (week1 < day7).Should().BeTrue();
+    }
 }

@@ -69,9 +69,14 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible wh
     {
         EnumState state = new(enumPairs.EnumIds);
 
-        string wireValue = ToString(null)!;
+        T? val = ConstValue ?? _value;
+        if (val == null)
+        {
+            return state;
+        }
 
-        if (enumPairs.TryParseWireValue(wireValue, out string? enumId))
+        string? wireValue = ToString(null);
+        if (wireValue != null && enumPairs.TryParseWireValue(wireValue, out string? enumId))
         {
             state[enumId!] = true;
         }

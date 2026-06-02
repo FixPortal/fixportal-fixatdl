@@ -24,6 +24,11 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     private const string DefaultTrueValue = "Y";
     private const string DefaultFalseValue = "N";
 
+#pragma warning disable IDE0032
+    private string? _falseWireValue;
+    private string? _trueWireValue;
+#pragma warning restore IDE0032
+
     /// <summary>Gets or sets the false wire value (for use with Boolean type parameters).<br/>
     /// <b>This attribute is targeted for deprecation.</b><br/>
     /// Defines the value with which to populate the FIX message when the boolean parameter is False. Overrides the 
@@ -31,7 +36,18 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// must use “N”.<br/>
     /// If it is desired that the FIX message is not to be populated with this tag when the value of the parameter is 
     /// false, then falseWireValue should be defined as “{NULL}”.</summary>
-    public string? FalseWireValue { get; set; }
+    public string? FalseWireValue
+    {
+        get => _falseWireValue;
+        set
+        {
+            if (value != null && value == _trueWireValue)
+            {
+                throw new ArgumentException("trueWireValue and falseWireValue cannot be equal.");
+            }
+            _falseWireValue = value;
+        }
+    }
 
     /// <summary>
     /// Applicable only when xsi:type is Boolean_t.
@@ -50,7 +66,18 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// If it is desired that the FIX message is not to be populated with this tag when the value of the parameter 
     /// is true, then trueWireValue should be defined as “{NULL}”.
     /// </summary>
-    public string? TrueWireValue { get; set; }
+    public string? TrueWireValue
+    {
+        get => _trueWireValue;
+        set
+        {
+            if (value != null && value == _falseWireValue)
+            {
+                throw new ArgumentException("trueWireValue and falseWireValue cannot be equal.");
+            }
+            _trueWireValue = value;
+        }
+    }
 
     #region AtdlValueType<T> Overrides
 
@@ -79,6 +106,11 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override bool? ConvertFromWireValueFormat(string value)
     {
+        if (value == null || value == Atdl.NullValue)
+        {
+            return null;
+        }
+
         string trueValue = TrueWireValue ?? DefaultTrueValue;
         string falseValue = FalseWireValue ?? DefaultFalseValue;
 
@@ -100,18 +132,18 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string ConvertToWireValueFormat(bool? value)
+    protected override string? ConvertToWireValueFormat(bool? value)
     {
         if (value == null)
         {
-            return null!;
+            return null;
         }
 
         bool actualValue = (bool)value;
 
         if (actualValue && TrueWireValue == Atdl.NullValue || !actualValue && FalseWireValue == Atdl.NullValue)
         {
-            return null!;
+            return null;
         }
 
         return actualValue ? TrueWireValue ?? DefaultTrueValue : FalseWireValue ?? DefaultFalseValue;
@@ -161,7 +193,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     {
         bool? value = ConstValue ?? _value;
 
-        return value != null ? ((bool)value).ToString().ToLowerInvariant() : null;
+        return ConvertToWireValueFormat(value);
     }
 
     /// <summary>

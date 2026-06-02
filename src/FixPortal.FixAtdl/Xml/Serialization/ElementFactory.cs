@@ -601,7 +601,12 @@ public class ElementFactory : INotifyClassDeserialized
         {
             try
             {
-                return Enum.Parse(type, attribute.Value);
+                object result = Enum.Parse(type, attribute.Value);
+                if (!Enum.IsDefined(type, result))
+                {
+                    throw new ArgumentException("Parsed enum value is not defined in the enum type.");
+                }
+                return result;
             }
             catch (ArgumentException ex)
             {

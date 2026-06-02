@@ -151,6 +151,16 @@ public class TypeCoverageGapTests
         state["SomeOther"].Should().Be(false);
     }
 
+    [Fact]
+    public void Country_t_ToEnumState_with_null_value_returns_all_false_even_with_null_pair()
+    {
+        var p = new Parameter_t<Country_t>("Cty");
+        var pairs = BuildEnumPairs(("United States", "US"), ("NullPair", "{NULL}"));
+        var state = ((IControlConvertible)p.Value).ToEnumState(pairs);
+        state["United States"].Should().Be(false);
+        state["NullPair"].Should().Be(false);
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // NonNegativeIntegerTypeBase — ToEnumState (lines 136-147 via SeqNum_t)
     // ──────────────────────────────────────────────────────────────────────────

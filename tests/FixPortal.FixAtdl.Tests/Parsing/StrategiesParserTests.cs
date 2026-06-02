@@ -62,4 +62,24 @@ public class StrategiesParserTests
             .Single(c => c.ParameterRef == "TargetPercentage");
         targetCtrl.StateRules.Should().HaveCount(1);
     }
+
+    [Fact]
+    public void Optional_parameter_not_set_has_null_wire_value()
+    {
+        var xml = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+                        strategyIdentifierTag="958">
+                <Strategy name="TestOptional" version="1" uiRep="TestOptional" wireValue="TestOptional" providerID="DEMO" lclMktTz="Europe/London">
+                    <Parameter name="OptParam" xsi:type="Boolean_t" fixTag="999" use="optional" />
+                </Strategy>
+            </Strategies>
+            """;
+        var strategies = Load(xml);
+        var param = strategies.Strategies[0].Parameters["OptParam"];
+        param.WireValue.Should().BeNull();
+        param.IsSet.Should().BeFalse();
+    }
 }

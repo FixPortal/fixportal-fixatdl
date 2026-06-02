@@ -125,4 +125,29 @@ public class TenorTests
         var act = () => Tenor.Parse(wire);
         act.Should().NotThrow();
     }
+
+    [Fact]
+    public void Compare_invalid_tenor_throws_ArgumentException()
+    {
+        var invalid = default(Tenor); // default has TenorType = Invalid
+        var valid = Tenor.Parse("M3");
+
+        var act1 = () => invalid < valid;
+        act1.Should().Throw<ArgumentException>();
+
+        var act2 = () => valid >= invalid;
+        act2.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void Cross_unit_comparison_tiebreaker_prevents_spurious_equality()
+    {
+        // D30 (~30 days) and M1 (~30 days) have same approximate days but different units
+        var d30 = Tenor.Parse("D30");
+        var m1 = Tenor.Parse("M1");
+
+        (d30 == m1).Should().BeFalse();
+        (d30 < m1).Should().BeTrue();
+        (m1 > d30).Should().BeTrue();
+    }
 }

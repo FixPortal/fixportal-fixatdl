@@ -87,9 +87,9 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string ConvertToWireValueFormat(string value)
+    protected override string? ConvertToWireValueFormat(string value)
     {
-        return string.IsNullOrEmpty(value) ? null! : value;
+        return string.IsNullOrEmpty(value) ? null : value;
     }
 
     /// <summary>

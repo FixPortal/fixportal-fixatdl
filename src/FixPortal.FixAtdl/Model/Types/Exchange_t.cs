@@ -25,16 +25,17 @@ public class Exchange_t : String_t
     /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
     protected override ValidationResult ValidateValue(string value, bool isRequired)
     {
+        ValidationResult baseResult = base.ValidateValue(value, isRequired);
+        if (!baseResult.IsValid)
+        {
+            return baseResult;
+        }
+
         // A MIC is exactly 4 characters and cannot be all-whitespace (which would pass a bare
         // Length==4 check but is not a valid ISO 10383 code).
         if (value != null && (value.Length != 4 || string.IsNullOrWhiteSpace(value)))
         {
             return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.InvalidExchangeCode);
-        }
-
-        if (isRequired && value == null)
-        {
-            return new ValidationResult(ValidationResult.ResultType.Missing, ErrorMessages.NonOptionalParameterNotSupplied2);
         }
 
         return ValidationResult.ValidResult;

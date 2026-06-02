@@ -42,15 +42,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
-                foreach (Control_t item in e.NewItems!)
-                {
-                    if (_controls.ContainsKey(item.Id))
-                    {
-                        throw ThrowHelper.New<DuplicateKeyException>(this, ErrorMessages.AttemptToAddDuplicateKey, item.Id, "Controls");
-                    }
-
-                    _controls.Add(item.Id, item);
-                }
+                HandleAddAction(e);
                 break;
 
             // MSDN documentation says helpfully: "The content of the collection changed dramatically."
@@ -59,28 +51,55 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                 break;
 
             case NotifyCollectionChangedAction.Remove:
-                foreach (Control_t item in e.OldItems!)
-                {
-                    if (_controls.ContainsKey(item.Id))
-                    {
-                        _controls.Remove(item.Id);
-                    }
-                }
+                HandleRemoveAction(e);
                 break;
 
             case NotifyCollectionChangedAction.Replace:
-                for (int n = 0; n < e.OldItems!.Count; n++)
-                {
-                    string oldId = ((Control_t)e.OldItems[n]!).Id;
-                    Control_t newControl = (Control_t)e.NewItems![n]!;
-
-                    // Re-key under the replacement's OWN Id. Keying the new control under the old Id
-                    // (as before) left it unreachable by its real Id and returned it under a stale
-                    // key whenever the replacement carried a different Id.
-                    _controls.Remove(oldId);
-                    _controls[newControl.Id] = newControl;
-                }
+                HandleReplaceAction(e);
                 break;
+        }
+    }
+
+    private void HandleAddAction(NotifyCollectionChangedEventArgs e)
+    {
+        foreach (Control_t item in e.NewItems!)
+        {
+            if (_controls.ContainsKey(item.Id))
+            {
+                throw ThrowHelper.New<DuplicateKeyException>(this, ErrorMessages.AttemptToAddDuplicateKey, item.Id, "Controls");
+            }
+
+            _controls.Add(item.Id, item);
+        }
+    }
+
+    private void HandleRemoveAction(NotifyCollectionChangedEventArgs e)
+    {
+        foreach (Control_t item in e.OldItems!)
+        {
+            if (_controls.ContainsKey(item.Id))
+            {
+                _controls.Remove(item.Id);
+            }
+        }
+    }
+
+    private void HandleReplaceAction(NotifyCollectionChangedEventArgs e)
+    {
+        for (int n = 0; n < e.OldItems!.Count; n++)
+        {
+            string oldId = ((Control_t)e.OldItems[n]!).Id;
+            Control_t newControl = (Control_t)e.NewItems![n]!;
+
+            // Re-key under the replacement's OWN Id. Keying the new control under the old Id
+            // (as before) left it unreachable by its real Id and returned it under a stale
+            // key whenever the replacement carried a different Id.
+            _controls.Remove(oldId);
+            if (_controls.ContainsKey(newControl.Id))
+            {
+                throw ThrowHelper.New<DuplicateKeyException>(this, ErrorMessages.AttemptToAddDuplicateKey, newControl.Id, "Controls");
+            }
+            _controls[newControl.Id] = newControl;
         }
     }
 
@@ -243,9 +262,9 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     {
         foreach (StateRule_t stateRule in control.StateRules)
         {
-            Edit_t<Control_t> edit = stateRule.Edit;
+            Edit_t<Control_t>? edit = stateRule.Edit;
 
-            if (stateRule.Value != Atdl.NullValue || edit.Operator != Operator_t.Equal)
+            if (edit is not { } || stateRule.Value != Atdl.NullValue || edit.Operator != Operator_t.Equal)
             {
                 continue;
             }

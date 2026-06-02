@@ -275,17 +275,37 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
     public override string ToString(IParameter targetParameter)
     {
-        if (_value != null && HasEnumeratedState)
+        if (_value == null)
         {
-            EnumPairCollection enumPairs = targetParameter.EnumPairs;
-
-            string value = (bool)_value ? enumPairs.GetWireValueFromEnumId(CheckedEnumRef) : enumPairs.GetWireValueFromEnumId(UncheckedEnumRef);
-
-            // It is possible for '{NULL}' to be provided as one of the enum wire values, so we have to act accordingly
-            return value != Atdl.NullValue ? value : null!;
+            return null!;
         }
 
-        return _value != null ? _value.Value.ToString().ToLower() : null!;
+        if (HasEnumeratedState)
+        {
+            return GetEnumeratedStateString(targetParameter);
+        }
+
+        return GetBooleanValueString(targetParameter);
+    }
+
+    private string GetEnumeratedStateString(IParameter targetParameter)
+    {
+        EnumPairCollection enumPairs = targetParameter.EnumPairs;
+        string value = (bool)_value! ? enumPairs.GetWireValueFromEnumId(CheckedEnumRef) : enumPairs.GetWireValueFromEnumId(UncheckedEnumRef);
+        return value != Atdl.NullValue ? value : null!;
+    }
+
+    private string GetBooleanValueString(IParameter targetParameter)
+    {
+        if (targetParameter is FixPortal.FixAtdl.Model.Elements.Parameter_t<FixPortal.FixAtdl.Model.Types.Boolean_t> boolParam)
+        {
+            string trueValue = boolParam.Value.TrueWireValue ?? "Y";
+            string falseValue = boolParam.Value.FalseWireValue ?? "N";
+            string val = _value!.Value ? trueValue : falseValue;
+            return val != Atdl.NullValue ? val : null!;
+        }
+
+        return _value!.Value ? "Y" : "N";
     }
 
     /// <summary>

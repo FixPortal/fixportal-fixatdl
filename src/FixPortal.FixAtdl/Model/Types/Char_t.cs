@@ -78,9 +78,9 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string ConvertToWireValueFormat(char? value)
+    protected override string? ConvertToWireValueFormat(char? value)
     {
-        return value != null ? value.ToString()! : null!;
+        return value?.ToString();
     }
 
 

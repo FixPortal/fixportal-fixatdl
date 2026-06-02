@@ -58,9 +58,9 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string ConvertToWireValueFormat(uint? value)
+    protected override string? ConvertToWireValueFormat(uint? value)
     {
-        return value != null ? ((uint)value).ToString(CultureInfo.InvariantCulture) : null!;
+        return value != null ? ((uint)value).ToString(CultureInfo.InvariantCulture) : null;
     }
 
     /// <summary>

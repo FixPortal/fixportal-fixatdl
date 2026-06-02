@@ -352,15 +352,18 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             return false;
         }
 
+        object? normLhs = NormaliseValue(lhs);
+        object? normRhs = NormaliseValue(rhs);
+
         // Operands of different runtime types (e.g. a decimal LHS vs a non-numeric string RHS, after
         // NormaliseNumericString) cannot be ordered: IComparable.CompareTo would throw a raw
         // ArgumentException. Surface a clear domain error instead.
-        if (lhs.GetType() != rhs.GetType())
+        if (normLhs == null || normRhs == null || normLhs.GetType() != normRhs.GetType())
         {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
         }
 
-        int compareResult = lhs.CompareTo(rhs);
+        int compareResult = ((IComparable)normLhs).CompareTo(normRhs);
 
         bool finalResult = Operator switch
         {
@@ -376,6 +379,9 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
 
     private static bool AreEqual(object? lhs, object? rhs)
     {
+        lhs = NormaliseValue(lhs);
+        rhs = NormaliseValue(rhs);
+
         if (lhs == null)
         {
             return rhs == null || rhs as string == Atdl.NullValue;
@@ -397,7 +403,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         }
 
         return lhs is IComparable comparableLhs && rhs is IComparable comparableRhs
-            ? comparableLhs.CompareTo(comparableRhs) == 0
+            ? (comparableLhs.GetType() == comparableRhs.GetType() && comparableLhs.CompareTo(comparableRhs) == 0)
             : lhs.Equals(rhs);
     }
 
@@ -442,6 +448,44 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         }
 
         return decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal number) ? number : value;
+    }
+
+    private static bool IsNumericType(Type type)
+    {
+        return Type.GetTypeCode(type) switch
+        {
+            TypeCode.Byte or TypeCode.SByte or TypeCode.UInt16 or TypeCode.Int16 or
+            TypeCode.UInt32 or TypeCode.Int32 or TypeCode.UInt64 or TypeCode.Int64 or
+            TypeCode.Decimal or TypeCode.Double or TypeCode.Single => true,
+            _ => false
+        };
+    }
+
+    private static object? NormaliseValue(object? val)
+    {
+        if (val == null)
+        {
+            return null;
+        }
+
+        if (val is string str)
+        {
+            return decimal.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal dec) ? dec : str;
+        }
+
+        if (IsNumericType(val.GetType()))
+        {
+            try
+            {
+                return Convert.ToDecimal(val, CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return val;
+            }
+        }
+
+        return val;
     }
 
     private void CheckForUnsupportedComparisons(object lhs, object rhs)

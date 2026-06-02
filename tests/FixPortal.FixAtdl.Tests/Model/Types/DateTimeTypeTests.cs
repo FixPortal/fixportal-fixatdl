@@ -27,15 +27,17 @@ public class DateTimeTypeTests
     [Fact]
     public void UTCTimestamp_t_round_trips_millisecond_wire_value()
     {
-        // NOTE: The second format is accepted on input but output always uses format[0] (no ms).
-        // A millisecond input is accepted and stored, then serialised without ms precision
-        // unless the wire was originally ms-formatted.
-        // Actually: ConvertToWireValueFormat uses format[0] = "yyyyMMdd-HH:mm:ss" always,
-        // so ms precision is LOST on round-trip through WireValue getter.
-        // Pinning actual behaviour: ms input → no-ms output.
+        // MS-aware round-tripping: milliseconds are preserved when present.
         var p = new Parameter_t<UTCTimestamp_t>("Ts") { WireValue = "20260101-09:30:00.123" };
-        // NOTE: ms precision is lost on output — format[0] is "yyyyMMdd-HH:mm:ss" (no ms).
-        p.WireValue.Should().Be("20260101-09:30:00");
+        p.WireValue.Should().Be("20260101-09:30:00.123");
+    }
+
+    [Fact]
+    public void UTCTimeOnly_t_round_trips_millisecond_wire_value()
+    {
+        // MS-aware round-tripping: milliseconds are preserved when present.
+        var p = new Parameter_t<UTCTimeOnly_t>("T") { WireValue = "09:30:00.123" };
+        p.WireValue.Should().Be("09:30:00.123");
     }
 
     [Fact]
@@ -245,5 +247,31 @@ public class DateTimeTypeTests
         var p = new Parameter_t<LocalMktDate_t>("D");
         var act = () => p.WireValue = "baddate";
         act.Should().Throw<InvalidCastException>();
+    }
+
+    [Fact]
+    public void DateTimeTypeBase_SetBound_clears_alternative_slots()
+    {
+        var param = new Parameter_t<UTCTimestamp_t>("Ts");
+
+        // 1. Set time-only bound
+        param.Value.MaxValueText = "12:00:00";
+        param.Value.MaxValue.Should().BeNull();
+
+        // 2. Set datetime bound
+        param.Value.MaxValueText = "20260602-15:00:00";
+        param.Value.MaxValue.Should().NotBeNull();
+
+        // Check validation of 13:00:00 on that date (valid because 13:00:00 < 15:00:00, and 12:00:00 time-only is cleared)
+        var actValid = () => param.WireValue = "20260602-13:00:00";
+        actValid.Should().NotThrow();
+
+        // 3. Set time-only bound again, check that datetime bound is cleared
+        param.Value.MaxValueText = "12:00:00";
+        param.Value.MaxValue.Should().BeNull();
+
+        // Now 13:00:00 should fail because 13:00:00 > 12:00:00 (time-only bound)
+        var actInvalid = () => param.WireValue = "20260602-13:00:00";
+        actInvalid.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
     }
 }

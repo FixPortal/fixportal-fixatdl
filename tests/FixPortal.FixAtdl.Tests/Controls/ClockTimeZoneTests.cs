@@ -183,4 +183,27 @@ public class ClockTimeZoneTests
         clock.ToDateTime(null!, CultureInfo.InvariantCulture)
             .Should().Be(new DateTime(2026, 3, 29, 1, 30, 0, DateTimeKind.Utc));
     }
+
+    [Fact]
+    public void SetValue_with_unspecified_kind_throws_argument_exception()
+    {
+        var clock = new Clock_t("clk") { Clock = new FakeClock(Instant.FromUtc(2026, 1, 15, 12, 0, 0)) };
+        var act = () => clock.SetValue(new DateTime(2026, 1, 15, 12, 0, 0, DateTimeKind.Unspecified));
+        act.Should().Throw<ArgumentException>().WithMessage("DateTimeKind.Unspecified is not supported to avoid timezone ambiguity; Kind must be Utc or Local");
+    }
+
+    [Fact]
+    public void GetCurrentValue_with_unresolvable_localMktTz_throws()
+    {
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "Mars/Phobos",
+            Clock = new FakeClock(Instant.FromUtc(2026, 1, 15, 12, 0, 0))
+        };
+        // Set value first using a valid UTC DateTime
+        clock.SetValue(new DateTime(2026, 1, 15, 12, 0, 0, DateTimeKind.Utc));
+
+        var act = () => clock.GetCurrentValue();
+        act.Should().Throw<InvalidFieldValueException>();
+    }
 }
