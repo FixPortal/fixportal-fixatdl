@@ -63,9 +63,15 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
         if (TimeOnly.TryParseExact(text, _timeOnlyBoundFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out TimeOnly timeOfDay))
         {
             if (isMax)
-            { _maxTimeOfDay = timeOfDay; }
+            {
+                _maxTimeOfDay = timeOfDay;
+                MaxValue = null;
+            }
             else
-            { _minTimeOfDay = timeOfDay; }
+            {
+                _minTimeOfDay = timeOfDay;
+                MinValue = null;
+            }
         }
         else
         {
@@ -77,9 +83,15 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
             DateTime parsed = FixDateTime.Parse(text, CultureInfo.InvariantCulture);
             DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
             if (isMax)
-            { MaxValue = normalised; }
+            {
+                MaxValue = normalised;
+                _maxTimeOfDay = null;
+            }
             else
-            { MinValue = normalised; }
+            {
+                MinValue = normalised;
+                _minTimeOfDay = null;
+            }
         }
     }
 
@@ -174,11 +186,11 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string ConvertToWireValueFormat(DateTime? value)
+    protected override string? ConvertToWireValueFormat(DateTime? value)
     {
         string format = GetDateTimeFormatStrings()[0];
 
-        return value != null ? ((DateTime)value).ToString(format, CultureInfo.InvariantCulture) : null!;
+        return value != null ? ((DateTime)value).ToString(format, CultureInfo.InvariantCulture) : null;
     }
 
     /// <summary>

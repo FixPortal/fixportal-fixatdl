@@ -39,10 +39,7 @@ public static class Regions
         return Region.None;
     }
 
-    /// <summary>
-    /// Provides the set of ISO country codes that are in The Americas.
-    /// </summary>
-    public static readonly HashSet<IsoCountryCode> TheAmericasCountries =
+    private static readonly HashSet<IsoCountryCode> _theAmericasCountries =
     [
         IsoCountryCode.AI,
         IsoCountryCode.AG,
@@ -97,9 +94,11 @@ public static class Regions
     ];
 
     /// <summary>
-    /// Provides the set of ISO country codes that are in Europe, the Middle East and Africa.
+    /// Provides the set of ISO country codes that are in The Americas.
     /// </summary>
-    public static readonly HashSet<IsoCountryCode> EuropeMiddleEastAfricaCountries =
+    public static IReadOnlySet<IsoCountryCode> TheAmericasCountries => _theAmericasCountries;
+
+    private static readonly HashSet<IsoCountryCode> _europeMiddleEastAfricaCountries =
     [
         IsoCountryCode.AD,
         IsoCountryCode.AE,
@@ -237,9 +236,11 @@ public static class Regions
     ];
 
     /// <summary>
-    /// Provides the set of ISO country codes that are in the Asia Pacific and Japan region.
+    /// Provides the set of ISO country codes that are in Europe, the Middle East and Africa.
     /// </summary>
-    public static readonly HashSet<IsoCountryCode> AsiaPacificJapanCountries =
+    public static IReadOnlySet<IsoCountryCode> EuropeMiddleEastAfricaCountries => _europeMiddleEastAfricaCountries;
+
+    private static readonly HashSet<IsoCountryCode> _asiaPacificJapanCountries =
     [
         IsoCountryCode.AF,
         IsoCountryCode.AS,
@@ -301,5 +302,10 @@ public static class Regions
         IsoCountryCode.WF,
         IsoCountryCode.WS
     ];
+
+    /// <summary>
+    /// Provides the set of ISO country codes that are in the Asia Pacific and Japan region.
+    /// </summary>
+    public static IReadOnlySet<IsoCountryCode> AsiaPacificJapanCountries => _asiaPacificJapanCountries;
 }
 

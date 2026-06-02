@@ -55,9 +55,9 @@ public class Currency_t : EnumTypeBase<IsoCurrencyCode>
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string ConvertToWireValueFormat(IsoCurrencyCode? value)
+    protected override string? ConvertToWireValueFormat(IsoCurrencyCode? value)
     {
-        return value != null ? Enum.GetName(typeof(IsoCurrencyCode), value)! : null!;
+        return value != null ? Enum.GetName(typeof(IsoCurrencyCode), value) : null;
     }
 
     /// <summary>

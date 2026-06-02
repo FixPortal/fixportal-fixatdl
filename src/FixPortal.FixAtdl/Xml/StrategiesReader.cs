@@ -114,6 +114,11 @@ public class StrategiesReader
 
     private Strategies_t LoadStrategies(XDocument document)
     {
+        if (document.Descendants().Any(e => e.Name.LocalName == "RepeatingGroup"))
+        {
+            throw ThrowHelper.New<FixAtdlException>(this, "RepeatingGroup elements are not supported.");
+        }
+
         XElement? element = document.Element(AtdlNamespaces.core + "Strategies");
 
         if (element == null)

@@ -297,13 +297,12 @@ public class ParameterTypeFeatureTests
     }
 
     [Fact]
-    public void Boolean_t_IControlConvertible_ToString_returns_lower_bool()
+    public void Boolean_t_IControlConvertible_ToString_returns_wire_value()
     {
         var p = new Parameter_t<Boolean_t>("X") { WireValue = "Y" };
         var cc = p.Value;
-        // NOTE: Boolean_t.ToString(provider) returns "true"/"false" (lowercase),
-        // not the wire value "Y"/"N".
-        cc.ToString(null).Should().Be("true");
+        // NOTE: Boolean_t.ToString(provider) returns the wire value "Y"/"N".
+        cc.ToString(null).Should().Be("Y");
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -689,5 +688,83 @@ public class ParameterTypeFeatureTests
         p.Value.MaxValue = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         var act = () => p.WireValue = "20260102-00:00:00";
         act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Percentage_t_ConstValue_returns_correct_native_value_without_extra_division()
+    {
+        var p = new Parameter_t<Percentage_t>("X");
+        p.Value.ConstValue = 0.75m; // 75% in native units (fraction)
+        p.Value.MultiplyBy100 = true;
+
+        // GetNativeValue(applyWireValueFormat: false) should return the native fraction as-is (0.75)
+        p.Value.GetNativeValue(applyWireValueFormat: false).Should().Be(0.75m);
+
+        // GetNativeValue(applyWireValueFormat: true) should apply the wire format multiplier and return 75
+        p.Value.GetNativeValue(applyWireValueFormat: true).Should().Be(75m);
+
+        // And WireValue should be correct (75)
+        p.WireValue.Should().Be("75");
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(29)]
+    public void Float_t_Precision_out_of_range_throws_InvalidFieldValueException(int badPrecision)
+    {
+        var p = new Parameter_t<Float_t>("X");
+        var act = () => p.Value.Precision = badPrecision;
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Char_t_invalid_wire_value_throws_InvalidFieldValueException()
+    {
+        var p = new Parameter_t<Char_t>("C");
+        var act1 = () => p.WireValue = "";
+        act1.Should().Throw<InvalidFieldValueException>();
+
+        var act2 = () => p.WireValue = "AB";
+        act2.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Boolean_t_cannot_have_equal_wire_values()
+    {
+        var p = new Parameter_t<Boolean_t>("X");
+        
+        // Setting them to different values is fine
+        p.Value.TrueWireValue = "Y";
+        p.Value.FalseWireValue = "N";
+
+        // Setting them to the same value throws ArgumentException
+        var act1 = () => p.Value.TrueWireValue = "N";
+        act1.Should().Throw<ArgumentException>();
+
+        var act2 = () => p.Value.FalseWireValue = "Y";
+        act2.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void Boolean_t_inbound_null_wire_value_returns_null()
+    {
+        var p = new Parameter_t<Boolean_t>("X") { WireValue = "{NULL}" };
+        p.Value.ToBoolean().Should().BeNull();
+    }
+
+    [Fact]
+    public void ValidationResult_formatting_safety_on_zero_args_with_literal_braces()
+    {
+        // Zero args, string contains literal braces (e.g. from XML)
+        var result = new FixPortal.FixAtdl.Validation.ValidationResult(FixPortal.FixAtdl.Validation.ValidationResult.ResultType.Invalid, "This has literal braces {NULL} and Nullable{Int32}");
+        result.ErrorText.Should().Be("This has literal braces {NULL} and Nullable{Int32}");
+    }
+
+    [Fact]
+    public void RegionCountries_are_read_only()
+    {
+        FixPortal.FixAtdl.Model.Reference.Regions.TheAmericasCountries.Should().BeAssignableTo<System.Collections.Generic.IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
+        FixPortal.FixAtdl.Model.Reference.Regions.EuropeMiddleEastAfricaCountries.Should().BeAssignableTo<System.Collections.Generic.IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
+        FixPortal.FixAtdl.Model.Reference.Regions.AsiaPacificJapanCountries.Should().BeAssignableTo<System.Collections.Generic.IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
     }
 }

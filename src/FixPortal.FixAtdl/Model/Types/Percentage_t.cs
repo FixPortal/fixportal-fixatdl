@@ -87,11 +87,11 @@ public class Percentage_t : Float_t
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string ConvertToWireValueFormat(decimal? value)
+    protected override string? ConvertToWireValueFormat(decimal? value)
     {
         if (value == null)
         {
-            return null!;
+            return null;
         }
 
         decimal adjustedValue = MultiplyBy100 == true ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value;
@@ -132,18 +132,14 @@ public class Percentage_t : Float_t
     /// <returns>Native parameter value.</returns>
     public override object GetNativeValue(bool applyWireValueFormat)
     {
-        decimal? value = ConstValue switch
-        {
-            null => _value,
-            _ => MultiplyBy100 == true ? ConstValue / 100 : ConstValue,
-        };
+        decimal? value = ConstValue ?? _value;
 
         if (value != null && applyWireValueFormat)
         {
             decimal adjustedValue = MultiplyBy100 == true ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value;
 
             return Precision != null
-                ? Math.Round(adjustedValue, Precision.Value, MidpointRounding.AwayFromZero)
+                ? Round(adjustedValue, Precision.Value)!
                 : adjustedValue;
         }
 

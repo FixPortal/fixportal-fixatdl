@@ -128,7 +128,7 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
         {
             convertedValue = ConvertFromWireValueFormat(value);
         }
-        catch (Exception ex) when (ex is FormatException or OverflowException)
+        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException)
         {
             // Translate raw BCL conversion failures (Convert.ToInt32/ToDecimal/etc. in the numeric
             // subclasses) into a domain InvalidFieldValueException, matching the control-set path
@@ -153,7 +153,7 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
     /// represented by means of the generic Parameter_t type with the appropriate type parameter, for example,
     /// Parameter_t&lt;Amt_t&gt;.</param>
     /// <returns>The parameter's current wire value (all wire values in Atdl4net are strings).</returns>
-    public string GetWireValue(IParameter hostParameter)
+    public string? GetWireValue(IParameter hostParameter)
     {
         T? value = ConstValue ?? _value;
 
@@ -170,7 +170,7 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
                 hostParameter.Name, value, validity.ErrorText);
         }
 
-        string wireValue = ConvertToWireValueFormat(value);
+        string? wireValue = ConvertToWireValueFormat(value);
 
         return wireValue;
     }
@@ -225,7 +225,7 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected abstract string ConvertToWireValueFormat(T? value);
+    protected abstract string? ConvertToWireValueFormat(T? value);
 
     /// <summary>
     /// Converts the supplied value to the type parameter type (T?) for this class.

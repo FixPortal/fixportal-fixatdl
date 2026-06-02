@@ -50,7 +50,7 @@ public interface IParameterType
     /// <param name="hostParameter"><see cref="IParameter"/> that is hosting this type. Parameters in Atdl4net are
     /// represented by means of the generic Parameter_t type with the appropriate type parameter, for example, Parameter_t&lt;Amt_t&gt;.</param>
     /// <returns>The parameter's current wire value (all wire values in Atdl4net are strings).</returns>
-    string GetWireValue(IParameter hostParameter);
+    string? GetWireValue(IParameter hostParameter);
 
     /// <summary>
     /// Gets the value of this parameter type in its native (i.e., raw) form, such as int, char, string, etc. 

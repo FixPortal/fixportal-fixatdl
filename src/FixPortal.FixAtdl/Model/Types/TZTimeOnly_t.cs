@@ -89,11 +89,11 @@ public class TZTimeOnly_t : DateTimeTypeBase
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>The FIX wire representation, or null.</returns>
-    protected override string ConvertToWireValueFormat(DateTime? value)
+    protected override string? ConvertToWireValueFormat(DateTime? value)
     {
         if (value == null)
         {
-            return null!;
+            return null;
         }
 
         string format = value.Value.Ticks % TimeSpan.TicksPerSecond == 0

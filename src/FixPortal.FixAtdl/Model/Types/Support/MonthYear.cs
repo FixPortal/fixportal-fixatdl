@@ -239,7 +239,41 @@ public struct MonthYear : IComparable
         // (day-qualified vs week-qualified, or a suffix vs no suffix) compare deterministically
         // instead of throwing NotSupportedException when reached via the </>=/<= operators that
         // MonthYear_t.ValidateValue uses for Min/Max range checks.
-        return lhs.IntraMonthOrdinal().CompareTo(rhs.IntraMonthOrdinal());
+        int cmpOrdinal = lhs.IntraMonthOrdinal().CompareTo(rhs.IntraMonthOrdinal());
+        if (cmpOrdinal != 0)
+        {
+            return cmpOrdinal;
+        }
+
+        // Tie-break 1: Compare Day presence and value.
+        if (lhs.Day != rhs.Day)
+        {
+            if (lhs.Day == null)
+            {
+                return -1;
+            }
+            if (rhs.Day == null)
+            {
+                return 1;
+            }
+            return lhs.Day.Value.CompareTo(rhs.Day.Value);
+        }
+
+        // Tie-break 2: Compare Week presence and value.
+        if (lhs.Week != rhs.Week)
+        {
+            if (lhs.Week == null)
+            {
+                return -1;
+            }
+            if (rhs.Week == null)
+            {
+                return 1;
+            }
+            return lhs.Week.Value.CompareTo(rhs.Week.Value);
+        }
+
+        return 0;
     }
 
     /// <summary>

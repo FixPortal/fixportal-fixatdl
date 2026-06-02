@@ -41,12 +41,27 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <value>The minimum value.</value>
     public decimal? MinValue { get; set; }
 
+#pragma warning disable IDE0032
+    private int? _precision;
+
     /// <summary>
     /// Gets/sets the precision of this value, taken as the number of digits to the right of the decimal point in 
     /// which to round when populating the FIX message. Lack of this attribute indicates that the value entered by 
     /// the user should be taken as-is without rounding.
     /// </summary>
-    public int? Precision { get; set; }
+    public int? Precision
+    {
+        get => _precision;
+        set
+        {
+            if (value is < 0 or > 28)
+            {
+                throw ThrowHelper.New<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>(this, "Precision must be between 0 and 28.");
+            }
+            _precision = value;
+        }
+    }
+#pragma warning restore IDE0032
 
     #region AtdlValueType<T> Overrides
 
@@ -95,11 +110,11 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string ConvertToWireValueFormat(decimal? value)
+    protected override string? ConvertToWireValueFormat(decimal? value)
     {
         if (value == null)
         {
-            return null!;
+            return null;
         }
 
         if (Precision == null)

@@ -175,7 +175,7 @@ public class Parameter_t<T> : IParameter where T : IParameterType, new()
     /// <summary>
     /// Gets/sets the wire value of this parameter.
     /// </summary>
-    public string WireValue
+    public string? WireValue
     {
         get => _value.GetWireValue(this);
 

@@ -44,12 +44,26 @@ public abstract class UTCDateTimeTypeBase : DateTimeTypeBase
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string ConvertToWireValueFormat(DateTime? value)
+    protected override string? ConvertToWireValueFormat(DateTime? value)
     {
-        string format = GetDateTimeFormatStrings()[0];
+        if (value == null)
+        {
+            return null;
+        }
+
         DateTime? adjustedValue = GetAdjustedValue(value);
 
-        return adjustedValue != null ? ((DateTime)adjustedValue).ToString(format, CultureInfo.InvariantCulture) : null!;
+        if (adjustedValue == null)
+        {
+            return null;
+        }
+
+        string[] formats = GetDateTimeFormatStrings();
+        string format = (adjustedValue.Value.Ticks % TimeSpan.TicksPerSecond != 0 && formats.Length > 1)
+            ? formats[1]
+            : formats[0];
+
+        return adjustedValue.Value.ToString(format, CultureInfo.InvariantCulture);
     }
 
     #endregion

@@ -200,6 +200,11 @@ public struct Tenor : IComparable
 
     private static int Compare(Tenor lhs, Tenor rhs)
     {
+        if (lhs.TenorType == TenorTypeValue.Invalid || rhs.TenorType == TenorTypeValue.Invalid)
+        {
+            throw ThrowHelper.New<ArgumentException>(ExceptionContext, "Cannot compare invalid Tenor values.");
+        }
+
         // Same unit: compare offsets exactly (D5 vs D7).
         if (lhs.TenorType == rhs.TenorType)
         {
@@ -209,7 +214,13 @@ public struct Tenor : IComparable
         // Different units (e.g. D7 vs M1): order deterministically by approximate duration so that
         // Min/Max range validation in Tenor_t.ValidateValue cannot throw NotSupportedException on a
         // mixed-unit bound. Note equality (operator ==) remains exact (unit + offset).
-        return lhs.ApproximateDays().CompareTo(rhs.ApproximateDays());
+        int approxCompare = lhs.ApproximateDays().CompareTo(rhs.ApproximateDays());
+        if (approxCompare != 0)
+        {
+            return approxCompare;
+        }
+
+        return lhs.TenorType.CompareTo(rhs.TenorType);
     }
 
     /// <summary>

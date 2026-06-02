@@ -82,9 +82,9 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
     /// </summary>
     /// <param name="value">Value to convert, may be null.</param>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
-    protected override string ConvertToWireValueFormat(Tenor? value)
+    protected override string? ConvertToWireValueFormat(Tenor? value)
     {
-        return value != null ? value.ToString()! : null!;
+        return value?.ToString();
     }
 
     /// <summary>

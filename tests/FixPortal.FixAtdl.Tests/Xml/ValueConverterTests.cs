@@ -54,4 +54,18 @@ public class ValueConverterTests
 
         act.Should().Throw<InvalidFieldValueException>();
     }
+
+    [Theory]
+    [InlineData("1", true)]
+    [InlineData("0", false)]
+    [InlineData("true", true)]
+    [InlineData("false", false)]
+    [InlineData("True", true)]
+    [InlineData("False", false)]
+    public void ConvertTo_supports_boolean_values_including_xs_boolean_literals(string value, bool expected)
+    {
+        var result = ValueConverter.ConvertTo<bool>(value);
+
+        result.Should().Be(expected);
+    }
 }

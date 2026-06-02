@@ -65,6 +65,14 @@ public static class ValueConverter
                 return value.ToCharArray();
 
             case "System.Boolean":
+                if (value == "1")
+                {
+                    return true;
+                }
+                if (value == "0")
+                {
+                    return false;
+                }
                 try
                 {
                     return bool.Parse(value);

@@ -82,12 +82,11 @@ public class ValueTypeConversionTests
     [Fact]
     public void Char_t_requires_exactly_one_character()
     {
-        // NOTE: Char_t.ConvertFromWireValueFormat throws ArgumentException (not InvalidFieldValueException)
-        // because AtdlValueType.SetWireValue only catches FormatException/OverflowException for translation.
-        // ArgumentException from the Char/MonthYear/Tenor parsers propagates directly.
+        // NOTE: Char_t.ConvertFromWireValueFormat throws ArgumentException, which is caught and
+        // translated by AtdlValueType.SetWireValue to InvalidFieldValueException.
         var p = new Parameter_t<Char_t>("Side");
         var act = () => p.WireValue = "AB";
-        act.Should().Throw<ArgumentException>();
+        act.Should().Throw<InvalidFieldValueException>();
     }
 
     [Theory]
@@ -104,10 +103,9 @@ public class ValueTypeConversionTests
     [Fact]
     public void Char_t_rejects_empty_string()
     {
-        // NOTE: Char_t.ConvertFromWireValueFormat throws ArgumentException directly (see above note).
         var p = new Parameter_t<Char_t>("Side");
         var act = () => p.WireValue = "";
-        act.Should().Throw<ArgumentException>();
+        act.Should().Throw<InvalidFieldValueException>();
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -348,6 +346,14 @@ public class ValueTypeConversionTests
         act.Should().Throw<InvalidFieldValueException>();
     }
 
+    [Fact]
+    public void Exchange_t_rejects_SOH_delimiter()
+    {
+        var p = new Parameter_t<Exchange_t>("Exch");
+        var act = () => p.WireValue = "A" + FixPortal.FixAtdl.Fix.FixMessage.SOH + "BC";
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // MultipleCharValue_t / MultipleStringValue_t (both subclass String_t)
     // ──────────────────────────────────────────────────────────────────────────
@@ -432,12 +438,11 @@ public class ValueTypeConversionTests
     [InlineData("202613")]
     public void MonthYear_t_rejects_invalid_wire_values(string bad)
     {
-        // NOTE: MonthYear.Parse throws ArgumentException; AtdlValueType.SetWireValue only catches
-        // FormatException/OverflowException for translation to InvalidFieldValueException, so
-        // ArgumentException from MonthYear.Parse propagates directly. Pinning actual behaviour.
+        // NOTE: MonthYear.Parse throws ArgumentException, which is caught and translated
+        // by AtdlValueType.SetWireValue to InvalidFieldValueException.
         var p = new Parameter_t<MonthYear_t>("Expiry");
         var act = () => p.WireValue = bad;
-        act.Should().Throw<ArgumentException>();
+        act.Should().Throw<InvalidFieldValueException>();
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -460,11 +465,10 @@ public class ValueTypeConversionTests
     [InlineData("X5")]
     public void Tenor_t_rejects_invalid_wire_values(string bad)
     {
-        // NOTE: Tenor.Parse throws ArgumentException; AtdlValueType.SetWireValue only catches
-        // FormatException/OverflowException for translation to InvalidFieldValueException, so
-        // ArgumentException from Tenor.Parse propagates directly. Pinning actual behaviour.
+        // NOTE: Tenor.Parse throws ArgumentException, which is caught and translated
+        // by AtdlValueType.SetWireValue to InvalidFieldValueException.
         var p = new Parameter_t<Tenor_t>("Tenor");
         var act = () => p.WireValue = bad;
-        act.Should().Throw<ArgumentException>();
+        act.Should().Throw<InvalidFieldValueException>();
     }
 }

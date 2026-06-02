@@ -101,7 +101,7 @@ public interface IParameter : IValueProvider
     /// <summary>
     /// Gets/sets the wire value of this parameter.
     /// </summary>
-    string WireValue { get; set; }
+    string? WireValue { get; set; }
 
     /// <summary>
     /// Indicates whether this parameter has been set to a value other than null.
