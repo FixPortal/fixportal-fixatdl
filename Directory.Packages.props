@@ -21,5 +21,6 @@
        findings are warnings, not build-breaking. -->
   <ItemGroup Label="Analyzers">
     <GlobalPackageReference Include="SonarAnalyzer.CSharp" Version="10.27.0.140913" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
   </ItemGroup>
 </Project>

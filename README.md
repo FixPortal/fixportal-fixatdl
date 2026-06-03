@@ -75,5 +75,5 @@ MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.
 
 ## Status
 
-Pre-1.0; the public surface may evolve as the FPSIM ATDL Examiner exercises it.
+Production-ready 1.0.0 release. The public surface is locked and tracked via `PublicAPI.Shipped.txt` — any future public API change breaks the build.
 Issues and PRs welcome at https://github.com/FixPortal/FixAtdl.
