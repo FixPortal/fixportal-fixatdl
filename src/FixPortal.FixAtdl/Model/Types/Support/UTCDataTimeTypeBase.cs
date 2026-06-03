@@ -51,19 +51,14 @@ public abstract class UTCDateTimeTypeBase : DateTimeTypeBase
             return null;
         }
 
-        DateTime? adjustedValue = GetAdjustedValue(value);
-
-        if (adjustedValue == null)
-        {
-            return null;
-        }
+        DateTime adjustedValue = GetAdjustedValue(value)!.Value;
 
         string[] formats = GetDateTimeFormatStrings();
-        string format = (adjustedValue.Value.Ticks % TimeSpan.TicksPerSecond != 0 && formats.Length > 1)
+        string format = (adjustedValue.Ticks % TimeSpan.TicksPerSecond != 0 && formats.Length > 1)
             ? formats[1]
             : formats[0];
 
-        return adjustedValue.Value.ToString(format, CultureInfo.InvariantCulture);
+        return adjustedValue.ToString(format, CultureInfo.InvariantCulture);
     }
 
     #endregion
