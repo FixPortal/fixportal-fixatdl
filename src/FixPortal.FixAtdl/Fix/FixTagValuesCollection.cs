@@ -52,7 +52,7 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     /// <remarks>Returns a new instance on each access rather than a shared singleton: the indexer
     /// setter and Add mutate the backing message, so a shared Empty could bleed values across
     /// independent evaluations.</remarks>
-    public static FixTagValuesCollection Empty => new();
+    public static FixTagValuesCollection Empty => [];
 
     /// <summary>
     /// Gets or sets the value for the specified FIX field.

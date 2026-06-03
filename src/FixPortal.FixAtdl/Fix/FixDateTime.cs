@@ -28,8 +28,6 @@ public static class FixDateTime
     /// <returns>True if the supplied value could be converted; false otherwise.</returns>
     public static bool TryParse(string value, IFormatProvider provider, out DateTime result)
     {
-        result = DateTime.MinValue;
-
         // Try the exact FIX formats first (with AssumeUniversal so an offset-less value is treated as UTC
         // rather than host-local, plus AdjustToUniversal so the result is canonically Kind=Utc — independent
         // of the host offset — aligning with the UTC-family WireParseStyles (M1)). Only fall back to a loose

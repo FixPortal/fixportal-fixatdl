@@ -297,7 +297,7 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
 
     private string GetBooleanValueString(IParameter targetParameter)
     {
-        if (targetParameter is FixPortal.FixAtdl.Model.Elements.Parameter_t<FixPortal.FixAtdl.Model.Types.Boolean_t> boolParam)
+        if (targetParameter is Elements.Parameter_t<Types.Boolean_t> boolParam)
         {
             string trueValue = boolParam.Value.TrueWireValue ?? "Y";
             string falseValue = boolParam.Value.FalseWireValue ?? "N";

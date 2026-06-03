@@ -223,7 +223,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Int_t>("X") { WireValue = "1" };
         var cc = p.Value;
-        var act = () => cc.ToBoolean();
+        var act = cc.ToBoolean;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -232,7 +232,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Int_t>("X") { WireValue = "1" };
         var cc = p.Value;
-        var act = () => cc.ToDateTime();
+        var act = cc.ToDateTime;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -253,7 +253,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Float_t>("X") { WireValue = "1.0" };
         var cc = p.Value;
-        var act = () => cc.ToBoolean();
+        var act = cc.ToBoolean;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -262,7 +262,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Float_t>("X") { WireValue = "1.0" };
         var cc = p.Value;
-        var act = () => cc.ToDateTime();
+        var act = cc.ToDateTime;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -283,7 +283,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Boolean_t>("X") { WireValue = "Y" };
         var cc = p.Value;
-        var act = () => cc.ToDecimal();
+        var act = cc.ToDecimal;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -292,7 +292,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Boolean_t>("X") { WireValue = "Y" };
         var cc = p.Value;
-        var act = () => cc.ToDateTime();
+        var act = cc.ToDateTime;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -322,7 +322,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Char_t>("X") { WireValue = "A" };
         var cc = p.Value;
-        var act = () => cc.ToBoolean();
+        var act = cc.ToBoolean;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -331,7 +331,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Char_t>("X") { WireValue = "A" };
         var cc = p.Value;
-        var act = () => cc.ToDecimal();
+        var act = cc.ToDecimal;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -352,7 +352,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<String_t>("X") { WireValue = "hello" };
         var cc = p.Value;
-        var act = () => cc.ToBoolean();
+        var act = cc.ToBoolean;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -361,7 +361,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<String_t>("X") { WireValue = "hello" };
         var cc = p.Value;
-        var act = () => cc.ToDecimal();
+        var act = cc.ToDecimal;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -370,7 +370,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<String_t>("X") { WireValue = "hello" };
         var cc = p.Value;
-        var act = () => cc.ToDateTime();
+        var act = cc.ToDateTime;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -399,7 +399,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<SeqNum_t>("X") { WireValue = "1" };
         var cc = p.Value;
-        var act = () => cc.ToBoolean();
+        var act = cc.ToBoolean;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -408,7 +408,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<SeqNum_t>("X") { WireValue = "1" };
         var cc = p.Value;
-        var act = () => cc.ToDateTime();
+        var act = cc.ToDateTime;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -429,7 +429,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Country_t>("X") { WireValue = "US" };
         var cc = p.Value;
-        var act = () => cc.ToBoolean();
+        var act = cc.ToBoolean;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -438,7 +438,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Country_t>("X") { WireValue = "US" };
         var cc = p.Value;
-        var act = () => cc.ToDecimal();
+        var act = cc.ToDecimal;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -447,7 +447,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Country_t>("X") { WireValue = "US" };
         var cc = p.Value;
-        var act = () => cc.ToDateTime();
+        var act = cc.ToDateTime;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -468,7 +468,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<UTCTimestamp_t>("X") { WireValue = "20260101-09:30:00" };
         var cc = p.Value;
-        var act = () => cc.ToBoolean();
+        var act = cc.ToBoolean;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -477,7 +477,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<UTCTimestamp_t>("X") { WireValue = "20260101-09:30:00" };
         var cc = p.Value;
-        var act = () => cc.ToDecimal();
+        var act = cc.ToDecimal;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -498,7 +498,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<MonthYear_t>("X") { WireValue = "202601" };
         var cc = p.Value;
-        var act = () => cc.ToBoolean();
+        var act = cc.ToBoolean;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -507,7 +507,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<MonthYear_t>("X") { WireValue = "202601" };
         var cc = p.Value;
-        var act = () => cc.ToDecimal();
+        var act = cc.ToDecimal;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -516,7 +516,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<MonthYear_t>("X") { WireValue = "202601" };
         var cc = p.Value;
-        var act = () => cc.ToDateTime();
+        var act = cc.ToDateTime;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -537,7 +537,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Tenor_t>("X") { WireValue = "M3" };
         var cc = p.Value;
-        var act = () => cc.ToBoolean();
+        var act = cc.ToBoolean;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -546,7 +546,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Tenor_t>("X") { WireValue = "M3" };
         var cc = p.Value;
-        var act = () => cc.ToDecimal();
+        var act = cc.ToDecimal;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -567,7 +567,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Data_t>("X") { WireValue = "abc" };
         var cc = p.Value;
-        var act = () => cc.ToBoolean();
+        var act = cc.ToBoolean;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -576,7 +576,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Data_t>("X") { WireValue = "abc" };
         var cc = p.Value;
-        var act = () => cc.ToDecimal();
+        var act = cc.ToDecimal;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -585,7 +585,7 @@ public class ParameterTypeFeatureTests
     {
         var p = new Parameter_t<Data_t>("X") { WireValue = "abc" };
         var cc = p.Value;
-        var act = () => cc.ToDateTime();
+        var act = cc.ToDateTime;
         act.Should().Throw<InvalidCastException>();
     }
 
@@ -732,7 +732,7 @@ public class ParameterTypeFeatureTests
     public void Boolean_t_cannot_have_equal_wire_values()
     {
         var p = new Parameter_t<Boolean_t>("X");
-        
+
         // Setting them to different values is fine
         p.Value.TrueWireValue = "Y";
         p.Value.FalseWireValue = "N";
@@ -763,8 +763,8 @@ public class ParameterTypeFeatureTests
     [Fact]
     public void RegionCountries_are_read_only()
     {
-        FixPortal.FixAtdl.Model.Reference.Regions.TheAmericasCountries.Should().BeAssignableTo<System.Collections.Generic.IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
-        FixPortal.FixAtdl.Model.Reference.Regions.EuropeMiddleEastAfricaCountries.Should().BeAssignableTo<System.Collections.Generic.IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
-        FixPortal.FixAtdl.Model.Reference.Regions.AsiaPacificJapanCountries.Should().BeAssignableTo<System.Collections.Generic.IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
+        FixPortal.FixAtdl.Model.Reference.Regions.TheAmericasCountries.Should().BeAssignableTo<IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
+        FixPortal.FixAtdl.Model.Reference.Regions.EuropeMiddleEastAfricaCountries.Should().BeAssignableTo<IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
+        FixPortal.FixAtdl.Model.Reference.Regions.AsiaPacificJapanCountries.Should().BeAssignableTo<IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
     }
 }

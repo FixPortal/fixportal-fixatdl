@@ -110,7 +110,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override bool? ConvertFromWireValueFormat(string value)
     {
-        if (value == null || value == Atdl.NullValue)
+        if (value is null or Atdl.NullValue)
         {
             return null;
         }

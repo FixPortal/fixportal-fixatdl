@@ -173,7 +173,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         try
         {
-            var xAttributes = attributes as XAttribute[] ?? attributes.ToArray();
+            var xAttributes = attributes as XAttribute[] ?? [.. attributes];
             ProcessAttributes(newObject.GetType(), genericTypeDefinition.Attributes!, xAttributes, newObject);
             ProcessAttributes(newObject.GetType(), innerTypeAttributes, xAttributes, newObject);
         }
@@ -242,7 +242,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         try
         {
-            var xAttributes = attributes as XAttribute[] ?? attributes.ToArray();
+            var xAttributes = attributes as XAttribute[] ?? [.. attributes];
             ProcessAttributes(newObject.GetType(), multiTypeDefinition.Attributes!, xAttributes, newObject);
             ProcessAttributes(newObject.GetType(), typeAttributes, xAttributes, newObject);
         }
@@ -372,8 +372,8 @@ public class ElementFactory : INotifyClassDeserialized
             _log.LogDebug("ProcessAttributes called; Target type={TargetType}.", targetType.FullName);
         }
 
-        var xAttributes = attributes as XAttribute[] ?? attributes.ToArray();
-        
+        var xAttributes = attributes as XAttribute[] ?? [.. attributes];
+
         foreach (ElementAttribute attrDefn in attributeDefinitions)
         {
             object? value = attrDefn.Type.IsEnum && attrDefn.EnumValues != null

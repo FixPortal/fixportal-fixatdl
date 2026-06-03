@@ -60,7 +60,7 @@ public struct MonthYear : IComparable
     /// </summary>
     /// <param name="obj">Object to compare this instance with.</param>
     /// <returns>True if the supplied object is a MonthYear, and the day, month and year values of the two are the same; false otherwise.</returns>
-    public override bool Equals(object? obj)
+    public override readonly bool Equals(object? obj)
     {
         if (obj == null || GetType() != obj.GetType())
         {
@@ -200,7 +200,7 @@ public struct MonthYear : IComparable
     /// <item><description>Zero - this instance occurs in the same position in the sort order as obj.</description></item>
     /// <item><description>Greater than zero - this instance follows obj in the sort order.</description></item>
     /// </list></returns>
-    public int CompareTo(object? obj)
+    public readonly int CompareTo(object? obj)
     {
         // Null references are by definition less than the current instance.
         if (obj == null)

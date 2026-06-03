@@ -4,7 +4,7 @@
     <RootNamespace>FixPortal.FixAtdl</RootNamespace>
     <AssemblyName>FixPortal.FixAtdl</AssemblyName>
     <PackageId>FixPortal.FixAtdl</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>FixPortal contributors</Authors>
     <Description>Modernised .NET 10 fork of Atdl4net — parser, model, validator and FIX-tag emitter for FIXatdl v1.1 strategy XML documents. Headless (no UI). Maintained by FixPortal.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

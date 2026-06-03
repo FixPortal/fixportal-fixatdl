@@ -56,7 +56,7 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
         {
             if (value is < 0 or > 28)
             {
-                throw ThrowHelper.New<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>(this, "Precision must be between 0 and 28.");
+                throw ThrowHelper.New<Diagnostics.Exceptions.InvalidFieldValueException>(this, "Precision must be between 0 and 28.");
             }
             _precision = value;
         }

@@ -306,7 +306,14 @@ dotnet_diagnostic.CA1031.severity = none
 # --- Agent-friendly safety diagnostics (IDE-visible, kept non-blocking) ---
 dotnet_diagnostic.CS8602.severity = suggestion
 dotnet_diagnostic.CS8604.severity = suggestion
-dotnet_diagnostic.CA1062.severity = suggestion
+# CA1062 — "validate arguments of public methods". Suppressed by design: this is a
+#   parser/model library whose public surface is reached almost entirely through the
+#   nullable-annotated model graph, and the few genuine entry points (StrategiesReader,
+#   value/control converters) already fail fast via ThrowHelper with FIXatdl-specific
+#   exceptions. Blanket ArgumentNullException guards on every externally-visible member
+#   would be ~85 sites of dead ceremony that change wire/error semantics for no real
+#   safety gain; null-arg contracts are the caller's responsibility here.
+dotnet_diagnostic.CA1062.severity = none
 dotnet_diagnostic.CA2007.severity = suggestion
 dotnet_diagnostic.IDE0058.severity = suggestion
 dotnet_diagnostic.IDE0059.severity = suggestion
@@ -331,10 +338,15 @@ dotnet_diagnostic.CA1707.severity = none
 # Test method names commonly use Method_Should_DoX style.
 [*Tests.cs]
 dotnet_diagnostic.CA1707.severity = none
+# ConfigureAwait is wrong throughout test files (see xUnit1030 note below).
+dotnet_diagnostic.CA2007.severity = none
 
 [**/test/**.cs]
 dotnet_diagnostic.CA1707.severity = none
 
 [**/tests/**.cs]
 dotnet_diagnostic.CA1707.severity = none
+# CA2007 (ConfigureAwait) is actively wrong in xUnit test methods — it trips xUnit1030
+# (ConfigureAwait(false) can bypass the runner's parallelism limits). Never suggest it here.
+dotnet_diagnostic.CA2007.severity = none
 

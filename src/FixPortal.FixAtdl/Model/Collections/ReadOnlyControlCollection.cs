@@ -322,7 +322,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
 
         // The query is lazy; Count() + First() would enumerate it twice. Materialise once
         // (Take(2) is enough to distinguish "exactly one companion").
-        List<RadioButton_t> companions = radioButtons.Take(2).ToList();
+        List<RadioButton_t> companions = [.. radioButtons.Take(2)];
 
         if (companions.Count == 1)
         {
