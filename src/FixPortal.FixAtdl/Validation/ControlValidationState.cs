@@ -124,7 +124,7 @@ public class ControlValidationState
 
             if (parameterIsInvalid)
             {
-                sb.Append(ParameterValidationResult!.ErrorText);
+                sb.Append(ParameterValidationResult.ErrorText);
 
                 if (count > 0)
                 {

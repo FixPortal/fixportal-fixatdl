@@ -183,7 +183,7 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
     /// <returns>Native parameter value.</returns>
     public virtual object GetNativeValue(bool applyWireValueFormat)
     {
-        return ConstValue != null ? ConstValue : _value!;
+        return ConstValue ?? _value!;
     }
 
     /// <summary>

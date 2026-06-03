@@ -30,6 +30,6 @@ public class Label_t : TextControlBase
     protected override void LoadDefaultFromInitValue()
     {
         // InitValue takes precedence over Label
-        SetValue(InitValue != null ? InitValue : Label);
+        SetValue(InitValue ?? Label);
     }
 }

@@ -358,12 +358,12 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
         object? normRhs = NormaliseValue(rhs);
 
         // Operands of non-comparable or mismatched runtime types cannot be ordered
-        if (normLhs is not IComparable || normRhs is not IComparable || normLhs.GetType() != normRhs.GetType())
+        if (normLhs is not IComparable comparable || normRhs is not IComparable || comparable.GetType() != normRhs.GetType())
         {
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.UnsupportedComparisonOperation, lhs, rhs);
         }
 
-        int compareResult = ((IComparable)normLhs).CompareTo(normRhs);
+        int compareResult = comparable.CompareTo(normRhs);
 
         bool finalResult = Operator switch
         {

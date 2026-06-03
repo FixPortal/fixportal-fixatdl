@@ -73,7 +73,7 @@ public class EnumPairCollection : KeyedCollection<string, EnumPair_t>
     public bool TryParseWireValue(string wireValue, out string? enumId)
     {
         enumId = null;
-        string testValue = wireValue != null ? wireValue : Atdl.NullValue;
+        string testValue = wireValue ?? Atdl.NullValue;
 
         foreach (EnumPair_t enumPair in this)
         {

@@ -75,5 +75,5 @@ MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.
 
 ## Status
 
-Production-ready 1.0.0 release. The public surface is locked and tracked via `PublicAPI.Shipped.txt` — any future public API change breaks the build.
+Production-ready 1.0.1 release. The public surface is locked and tracked via `PublicAPI.Shipped.txt` — any future public API change breaks the build.
 Issues and PRs welcome at https://github.com/FixPortal/FixAtdl.
