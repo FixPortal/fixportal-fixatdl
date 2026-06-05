@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   pack-and-release:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
@@ -38,7 +38,7 @@ jobs:
           path: artifacts/*.nupkg
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: artifacts/*.nupkg
-          generate_release_notes: true
+        run: gh release create "$RELEASE_TAG" artifacts/*.nupkg --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
