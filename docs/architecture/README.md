@@ -5,7 +5,7 @@ A navigable map of the library, derived from two whole-repo graph passes:
 - **graphify** (`graphify-out/`) — agent-facing dependency graph: degree-based god
   nodes, betweenness bridges, community detection. Open `graphify-out/graph.html`
   or read `graphify-out/GRAPH_REPORT.md`.
-- **understand-anything** (`src/.understand-anything/knowledge-graph.json`) —
+- **understand-anything** (`.understand-anything/knowledge-graph.json`) —
   human-facing knowledge graph: 382 nodes, 536 edges, 9 layers, a 13-step guided
   tour. Explore it with `/understand-dashboard` (interactive) or
   `/understand-explain <file>`.
