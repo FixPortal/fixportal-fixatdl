@@ -450,3 +450,7 @@ TestResults/
 
 # Local package distribution
 _pkgout/
+
+# Architecture knowledge graphs (rebuildable: `graphify --update` / `/understand`)
+graphify-out/
+**/.understand-anything/
