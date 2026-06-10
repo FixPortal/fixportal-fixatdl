@@ -54,7 +54,7 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
 
             if (MinValue != null && value < MinValue)
             {
-                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueNotMet, value, MinValue);
             }
         }
         else if (isRequired)

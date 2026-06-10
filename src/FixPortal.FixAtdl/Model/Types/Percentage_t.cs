@@ -53,7 +53,7 @@ public class Percentage_t : Float_t
 
             if (MinValue != null && (decimal)value < MinValue)
             {
-                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded,
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueNotMet,
                     RemoveTrailingZeroes(value * 100)!, RemoveTrailingZeroes(MinValue.Value * 100)!);
             }
         }

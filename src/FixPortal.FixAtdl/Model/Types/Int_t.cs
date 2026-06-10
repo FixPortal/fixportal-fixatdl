@@ -56,7 +56,7 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
 
             if (MinValue != null && (int)value < MinValue)
             {
-                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueNotMet, value, MinValue);
             }
         }
         else if (isRequired)

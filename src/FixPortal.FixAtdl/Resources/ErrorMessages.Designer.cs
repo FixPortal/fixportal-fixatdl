@@ -367,18 +367,18 @@ namespace FixPortal.FixAtdl.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The value supplied for this field, &apos;{0}&apos;, is shorter than the minimum length allowed ({1})..
         /// </summary>
-        internal static string MinLengthExceeded {
+        internal static string MinLengthNotMet {
             get {
-                return ResourceManager.GetString("MinLengthExceeded", resourceCulture);
+                return ResourceManager.GetString("MinLengthNotMet", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The value supplied for this field, {0}, is less than the minimum value allowed ({1})..
         /// </summary>
-        internal static string MinValueExceeded {
+        internal static string MinValueNotMet {
             get {
-                return ResourceManager.GetString("MinValueExceeded", resourceCulture);
+                return ResourceManager.GetString("MinValueNotMet", resourceCulture);
             }
         }
         

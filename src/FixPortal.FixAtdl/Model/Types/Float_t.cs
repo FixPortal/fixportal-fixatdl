@@ -82,7 +82,7 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
 
             if (MinValue != null && (decimal)value < MinValue)
             {
-                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueNotMet, value, MinValue);
             }
         }
         else if (isRequired)

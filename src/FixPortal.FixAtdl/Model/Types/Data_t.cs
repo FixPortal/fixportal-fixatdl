@@ -55,7 +55,7 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
 
             if (MinLength != null && value.Length < MinLength)
             {
-                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinLengthExceeded, value, MinLength);
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinLengthNotMet, value, MinLength);
             }
         }
         else if (isRequired)

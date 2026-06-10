@@ -136,7 +136,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
 
         if (MinValue != null && value < MinValue)
         {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, MinValue);
+            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueNotMet, value, MinValue);
         }
 
         TimeOnly valueTimeOfDay = TimeOnly.FromDateTime(value);
@@ -148,7 +148,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
 
         if (_minTimeOfDay != null && valueTimeOfDay < _minTimeOfDay)
         {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value, _minTimeOfDay);
+            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueNotMet, value, _minTimeOfDay);
         }
 
         return null;
