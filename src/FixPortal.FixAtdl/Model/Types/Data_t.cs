@@ -97,7 +97,7 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     {
         string? result = value.ToString(hostParameter);
 
-        return result != null ? result.ToCharArray() : null;
+        return result?.ToCharArray();
     }
 
     /// <summary>
