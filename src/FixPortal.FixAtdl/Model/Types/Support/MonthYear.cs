@@ -62,12 +62,12 @@ public struct MonthYear : IComparable
     /// <returns>True if the supplied object is a MonthYear, and the day, month and year values of the two are the same; false otherwise.</returns>
     public override readonly bool Equals(object? obj)
     {
-        if (obj == null || GetType() != obj.GetType())
+        if (obj is not MonthYear rhs)
         {
             return false;
         }
 
-        return (MonthYear)obj == this;
+        return rhs == this;
     }
 
     /// <summary>
@@ -210,7 +210,7 @@ public struct MonthYear : IComparable
 
         if (obj is not MonthYear rhs)
         {
-            throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName!, GetType().FullName!);
+            throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName!, typeof(MonthYear).FullName!);
         }
 
         if (rhs == this)

@@ -133,7 +133,7 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
     {
         Tenor? value = ConstValue ?? _value;
 
-        return value != null ? ((Tenor)value).ToString() : null;
+        return value?.ToString();
     }
 
     /// <summary>

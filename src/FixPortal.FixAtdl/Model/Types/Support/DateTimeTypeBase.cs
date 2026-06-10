@@ -190,7 +190,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     {
         string format = GetDateTimeFormatStrings()[0];
 
-        return value != null ? ((DateTime)value).ToString(format, CultureInfo.InvariantCulture) : null;
+        return value?.ToString(format, CultureInfo.InvariantCulture);
     }
 
     /// <summary>
