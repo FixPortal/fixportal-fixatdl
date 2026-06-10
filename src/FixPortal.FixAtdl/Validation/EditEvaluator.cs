@@ -153,9 +153,11 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
         {
             ((IResolvable<Strategy_t, T>)Edit).Resolve(strategy, sourceCollection);
         }
-        else if (EditRef != null)
+        else
         {
-            ((IResolvable<Strategy_t, T>)EditRef).Resolve(strategy, sourceCollection);
+            // Edit and EditRef are mutually exclusive (enforced by the setters); a direct cast
+            // of null is legal and ?. then skips, so an unset EditRef is a no-op as before.
+            ((IResolvable<Strategy_t, T>)EditRef)?.Resolve(strategy, sourceCollection);
         }
     }
 
