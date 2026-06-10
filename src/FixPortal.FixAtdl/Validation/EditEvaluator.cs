@@ -28,14 +28,14 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
     {
         get
         {
-            if (EditRef != null)
-            {
-                return EditRef.Sources;
-            }
-
             if (Edit != null)
             {
                 return Edit.Sources;
+            }
+
+            if (EditRef != null)
+            {
+                return EditRef.Sources;
             }
 
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.NeitherEditNorEditRefSetOnObject, GetType().Name);
@@ -149,13 +149,13 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
     /// <param name="sourceCollection">The value source collection used to resolve field references.</param>
     void IResolvable<Strategy_t, T>.Resolve(Strategy_t strategy, ISimpleDictionary<T> sourceCollection)
     {
-        if (EditRef != null)
-        {
-            ((IResolvable<Strategy_t, T>)EditRef).Resolve(strategy, sourceCollection);
-        }
-        else if (Edit != null)
+        if (Edit != null)
         {
             ((IResolvable<Strategy_t, T>)Edit).Resolve(strategy, sourceCollection);
+        }
+        else if (EditRef != null)
+        {
+            ((IResolvable<Strategy_t, T>)EditRef).Resolve(strategy, sourceCollection);
         }
     }
 

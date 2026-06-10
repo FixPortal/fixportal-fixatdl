@@ -58,7 +58,7 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
 
             if (MinValue != null && value < MinValue)
             {
-                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueExceeded, value.ToString()!, MinValue);
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueNotMet, value.ToString()!, MinValue);
             }
         }
         else if (isRequired)

@@ -191,10 +191,10 @@
   <data name="MaxValueExceeded" xml:space="preserve">
     <value>The value supplied for this field, {0}, is greater than the maximum value allowed ({1}).</value>
   </data>
-  <data name="MinLengthExceeded" xml:space="preserve">
+  <data name="MinLengthNotMet" xml:space="preserve">
     <value>The value supplied for this field, '{0}', is shorter than the minimum length allowed ({1}).</value>
   </data>
-  <data name="MinValueExceeded" xml:space="preserve">
+  <data name="MinValueNotMet" xml:space="preserve">
     <value>The value supplied for this field, {0}, is less than the minimum value allowed ({1}).</value>
   </data>
   <data name="MissingLogicalOperatorOnSetOfEdits" xml:space="preserve">
