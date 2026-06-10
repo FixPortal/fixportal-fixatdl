@@ -185,7 +185,7 @@ public struct Tenor : IComparable
 
         if (obj is not Tenor rhs)
         {
-            throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName!, GetType().FullName!);
+            throw ThrowHelper.New<ArgumentException>(this, InternalErrors.UnexpectedArgumentType, obj.GetType().FullName!, typeof(Tenor).FullName!);
         }
 
         if (rhs == this)

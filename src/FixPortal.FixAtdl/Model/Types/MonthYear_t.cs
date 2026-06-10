@@ -139,7 +139,7 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     {
         MonthYear? value = ConstValue ?? _value;
 
-        return value != null ? ((MonthYear)value).ToString() : null;
+        return value?.ToString();
     }
 
     /// <summary>

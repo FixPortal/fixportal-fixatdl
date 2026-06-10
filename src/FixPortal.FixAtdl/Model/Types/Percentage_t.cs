@@ -121,7 +121,7 @@ public class Percentage_t : Float_t
     {
         decimal? convertedValue = value.ToDecimal(hostParameter, CultureInfo.InvariantCulture);
 
-        return convertedValue != null ? convertedValue / 100 : null;
+        return convertedValue / 100;
     }
 
     /// <summary>
@@ -178,7 +178,7 @@ public class Percentage_t : Float_t
     {
         decimal? value = ToDecimal();
 
-        return value != null ? ((decimal)value).ToString(provider) : null;
+        return value?.ToString(provider);
     }
 
     #endregion

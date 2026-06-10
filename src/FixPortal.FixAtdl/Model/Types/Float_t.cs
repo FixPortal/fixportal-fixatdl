@@ -202,7 +202,7 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     {
         decimal? value = ConstValue ?? _value;
 
-        return value != null ? ((decimal)value).ToString(provider) : null;
+        return value?.ToString(provider);
     }
 
     /// <summary>

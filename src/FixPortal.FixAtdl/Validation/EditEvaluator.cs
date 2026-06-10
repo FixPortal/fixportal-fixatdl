@@ -151,11 +151,11 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
     {
         if (EditRef != null)
         {
-            (EditRef as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);
+            ((IResolvable<Strategy_t, T>)EditRef).Resolve(strategy, sourceCollection);
         }
         else if (Edit != null)
         {
-            (Edit as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);
+            ((IResolvable<Strategy_t, T>)Edit).Resolve(strategy, sourceCollection);
         }
     }
 
