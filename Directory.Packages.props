@@ -16,11 +16,12 @@
     <PackageVersion Include="NodaTime.Testing" Version="3.3.2" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
   </ItemGroup>
-  <!-- Analyzer applied to every project (CPM GlobalPackageReference = implicit
-       PrivateAssets=all). Cognitive-complexity (S3776) gate tuned in .editorconfig;
-       findings are warnings, not build-breaking. -->
+  <!-- House style/analyzer rules applied to every project (CPM GlobalPackageReference =
+       implicit PrivateAssets=all). The package carries the global AnalyzerConfig (all rule
+       severities), sets EnforceCodeStyleInBuild, and bundles SonarAnalyzer.CSharp — do not
+       reference SonarAnalyzer.CSharp separately. -->
   <ItemGroup Label="Analyzers">
-    <GlobalPackageReference Include="SonarAnalyzer.CSharp" Version="10.27.0.140913" />
+    <GlobalPackageReference Include="FixPortal.CodeStyle" Version="0.1.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
   </ItemGroup>
 </Project>

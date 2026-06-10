@@ -14,61 +14,61 @@ namespace FixPortal.FixAtdl.Fix;
 public static class FixDateTimeFormat
 {
     /// <summary>Date and time (no milliseconds).</summary>
-    public readonly static string FixDateTime = "yyyyMMdd-HH:mm:ss";
+    public static readonly string FixDateTime = "yyyyMMdd-HH:mm:ss";
 
     /// <summary>Date and time (with milliseconds).</summary>
-    public readonly static string FixDateTimeMs = "yyyyMMdd-HH:mm:ss.fff";
+    public static readonly string FixDateTimeMs = "yyyyMMdd-HH:mm:ss.fff";
 
     /// <summary>Time only (no milliseconds).</summary>
-    public readonly static string FixTimeOnly = "HH:mm:ss";
+    public static readonly string FixTimeOnly = "HH:mm:ss";
 
     /// <summary>Time only (with milliseconds).</summary>
-    public readonly static string FixTimeOnlyMs = "HH:mm:ss.fff";
+    public static readonly string FixTimeOnlyMs = "HH:mm:ss.fff";
 
     /// <summary>Date only.</summary>
-    public readonly static string FixDateOnly = "yyyyMMdd";
+    public static readonly string FixDateOnly = "yyyyMMdd";
 
     /// <summary>Date and time with appended time zone information.</summary>
-    public readonly static string FixDateTimeWithTz = "yyyyMMdd-HH:mm:ssK";
+    public static readonly string FixDateTimeWithTz = "yyyyMMdd-HH:mm:ssK";
 
     /// <summary>Date and time with appended time zone information.</summary>
-    public readonly static string FixTimeOnlyWithTz = "HH:mm:ssK";
+    public static readonly string FixTimeOnlyWithTz = "HH:mm:ssK";
 
     /// <summary>Time only with an optional-seconds UTC designator.</summary>
-    public readonly static string FixTimeOnlyMinutesWithUtcDesignator = "HH:mm'Z'";
+    public static readonly string FixTimeOnlyMinutesWithUtcDesignator = "HH:mm'Z'";
 
     /// <summary>Time only with an optional-seconds bare-hour timezone offset.</summary>
-    public readonly static string FixTimeOnlyMinutesWithHourOffset = "HH:mmzz";
+    public static readonly string FixTimeOnlyMinutesWithHourOffset = "HH:mmzz";
 
     /// <summary>Time only with an optional-seconds timezone offset including minutes.</summary>
-    public readonly static string FixTimeOnlyMinutesWithMinuteOffset = "HH:mmK";
+    public static readonly string FixTimeOnlyMinutesWithMinuteOffset = "HH:mmK";
 
     /// <summary>Time only with fractional seconds and an appended bare-hour timezone offset.</summary>
-    public readonly static string FixTimeOnlyFractionalWithHourOffset = "HH:mm:ss.FFFFFFFzz";
+    public static readonly string FixTimeOnlyFractionalWithHourOffset = "HH:mm:ss.FFFFFFFzz";
 
     /// <summary>Time only with fractional seconds and an appended timezone offset including minutes.</summary>
-    public readonly static string FixTimeOnlyFractionalWithMinuteOffset = "HH:mm:ss.FFFFFFFK";
+    public static readonly string FixTimeOnlyFractionalWithMinuteOffset = "HH:mm:ss.FFFFFFFK";
 
     /// <summary>Time only with whole seconds and an appended bare-hour timezone offset.</summary>
-    public readonly static string FixTimeOnlyWithHourOffset = "HH:mm:sszz";
+    public static readonly string FixTimeOnlyWithHourOffset = "HH:mm:sszz";
 
     /// <summary>Date and time with optional seconds and a UTC designator.</summary>
-    public readonly static string FixDateTimeMinutesWithUtcDesignator = "yyyyMMdd-HH:mm'Z'";
+    public static readonly string FixDateTimeMinutesWithUtcDesignator = "yyyyMMdd-HH:mm'Z'";
 
     /// <summary>Date and time with optional seconds and a bare-hour timezone offset.</summary>
-    public readonly static string FixDateTimeMinutesWithHourOffset = "yyyyMMdd-HH:mmzz";
+    public static readonly string FixDateTimeMinutesWithHourOffset = "yyyyMMdd-HH:mmzz";
 
     /// <summary>Date and time with optional seconds and a timezone offset including minutes.</summary>
-    public readonly static string FixDateTimeMinutesWithMinuteOffset = "yyyyMMdd-HH:mmK";
+    public static readonly string FixDateTimeMinutesWithMinuteOffset = "yyyyMMdd-HH:mmK";
 
     /// <summary>Date and time with fractional seconds and a bare-hour timezone offset.</summary>
-    public readonly static string FixDateTimeFractionalWithHourOffset = "yyyyMMdd-HH:mm:ss.FFFFFFFzz";
+    public static readonly string FixDateTimeFractionalWithHourOffset = "yyyyMMdd-HH:mm:ss.FFFFFFFzz";
 
     /// <summary>Date and time with fractional seconds and a timezone offset including minutes.</summary>
-    public readonly static string FixDateTimeFractionalWithMinuteOffset = "yyyyMMdd-HH:mm:ss.FFFFFFFK";
+    public static readonly string FixDateTimeFractionalWithMinuteOffset = "yyyyMMdd-HH:mm:ss.FFFFFFFK";
 
     /// <summary>Date and time with whole seconds and an appended bare-hour timezone offset.</summary>
-    public readonly static string FixDateTimeWithHourOffset = "yyyyMMdd-HH:mm:sszz";
+    public static readonly string FixDateTimeWithHourOffset = "yyyyMMdd-HH:mm:sszz";
 
     /// <summary>
     /// Gets an array containing all the FIX date/time formats.
