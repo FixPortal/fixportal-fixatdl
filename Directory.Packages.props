@@ -21,7 +21,7 @@
        severities), sets EnforceCodeStyleInBuild, and bundles SonarAnalyzer.CSharp — do not
        reference SonarAnalyzer.CSharp separately. -->
   <ItemGroup Label="Analyzers">
-    <GlobalPackageReference Include="FixPortal.CodeStyle" Version="0.1.0" />
+    <GlobalPackageReference Include="FixPortal.CodeStyle" Version="0.1.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
   </ItemGroup>
 </Project>
