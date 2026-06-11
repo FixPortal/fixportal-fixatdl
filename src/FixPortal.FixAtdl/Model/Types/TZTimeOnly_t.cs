@@ -59,6 +59,10 @@ public class TZTimeOnly_t : DateTimeTypeBase
     protected override DateTimeStyles WireParseStyles =>
         DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
 
+    private string? _originalWireValue;
+    private TimeSpan? _parsedOffset;
+    private DateTime? _parsedUtcValue;
+
     /// <summary>
     /// Gets the human-readable type name for use in error messages shown to the user.
     /// </summary>
@@ -79,12 +83,30 @@ public class TZTimeOnly_t : DateTimeTypeBase
 
         if (parsed == null)
         {
+            _originalWireValue = null;
+            _parsedOffset = null;
+            _parsedUtcValue = null;
             return null;
         }
 
         DateTime result = parsed.Value;
-        return new DateTime(1, 1, 1, result.Hour, result.Minute, result.Second, result.Millisecond, result.Kind)
+        DateTime anchored = new DateTime(1, 1, 1, result.Hour, result.Minute, result.Second, result.Millisecond, result.Kind)
             .AddTicks(result.Ticks % TimeSpan.TicksPerMillisecond);
+
+        if (DateTimeOffset.TryParseExact(value, _formatStrings, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset dto))
+        {
+            _originalWireValue = value;
+            _parsedOffset = dto.Offset;
+            _parsedUtcValue = anchored;
+        }
+        else
+        {
+            _originalWireValue = null;
+            _parsedOffset = null;
+            _parsedUtcValue = null;
+        }
+
+        return anchored;
     }
 
     /// <summary>
@@ -106,10 +128,25 @@ public class TZTimeOnly_t : DateTimeTypeBase
             _ => DateTime.SpecifyKind(value.Value, DateTimeKind.Utc),
         };
 
-        string format = adjustedValue.Ticks % TimeSpan.TicksPerSecond == 0
-            ? FixDateTimeFormat.FixTimeOnlyWithTz
-            : FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset;
+        if (_originalWireValue != null && _parsedUtcValue != null && adjustedValue.Equals(_parsedUtcValue.Value))
+        {
+            return _originalWireValue;
+        }
 
-        return adjustedValue.ToString(format, CultureInfo.InvariantCulture);
+        if (_parsedOffset != null)
+        {
+            DateTimeOffset dto = new DateTimeOffset(adjustedValue, TimeSpan.Zero).ToOffset(_parsedOffset.Value);
+            string format = dto.Ticks % TimeSpan.TicksPerSecond == 0
+                ? FixDateTimeFormat.FixTimeOnlyWithTz
+                : FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset;
+            return dto.ToString(format, CultureInfo.InvariantCulture);
+        }
+        else
+        {
+            string format = adjustedValue.Ticks % TimeSpan.TicksPerSecond == 0
+                ? FixDateTimeFormat.FixTimeOnlyWithTz
+                : FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset;
+            return adjustedValue.ToString(format, CultureInfo.InvariantCulture);
+        }
     }
 }

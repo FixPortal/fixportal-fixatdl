@@ -11,7 +11,6 @@ namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 /// The exception that is thrown when deserializing a FIXatdl file or stream, indicating that a property has been supplied for a given object,
 /// but that object does not support that property.
 /// </summary>
-[Serializable]
 public class InvalidPropertyOnObjectException : FixAtdlException
 {
     /// <summary>

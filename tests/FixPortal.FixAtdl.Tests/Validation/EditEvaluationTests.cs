@@ -1,5 +1,6 @@
 using System.Text;
 using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
@@ -284,5 +285,21 @@ public class EditEvaluationTests
         ((IResolvable<Strategy_t, IParameter>)strategyEdit).Resolve(twap, twap.Parameters);
 
         strategyEdit.Sources.Should().Contain("Participation");
+    }
+
+    [Fact]
+    public async Task StrategyEditCollection_EvaluateAll_returns_false_when_edit_fails()
+    {
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var twap = LoadTwap(xml);
+        twap.Parameters["Participation"].WireValue = "30";
+
+        var edit = MakeEdit(twap, "Participation", Operator_t.Equal, "50");
+        var strategyEdit = new StrategyEdit_t { Edit = edit, ErrorMessage = "Participation must be 50" };
+        ((IResolvable<Strategy_t, IParameter>)strategyEdit).Resolve(twap, twap.Parameters);
+
+        var col = new StrategyEditCollection { strategyEdit };
+        col.EvaluateAll(FixFieldValueProvider.Empty, shortCircuit: false).Should().BeFalse();
+        col.EvaluateAll(FixFieldValueProvider.Empty, shortCircuit: true).Should().BeFalse();
     }
 }

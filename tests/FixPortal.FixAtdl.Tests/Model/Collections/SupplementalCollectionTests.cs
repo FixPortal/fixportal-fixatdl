@@ -6,6 +6,7 @@ using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Model.Collections;
@@ -156,6 +157,54 @@ public class SupplementalCollectionTests
         // EvaluateAll code path runs to completion without throwing on resolved edits.
         var act = () => twap.StrategyEdits.EvaluateAll(FixFieldValueProvider.Empty, shortCircuit: false);
         act.Should().NotThrow();
+    }
+
+    [Fact]
+    public void StrategyEditCollection_EvaluateAll_returns_false_when_edit_fails()
+    {
+        var twap = LoadTwap();
+        twap.Parameters["Participation"].WireValue = "30";
+
+        var edit = new Edit_t<IParameter>
+        {
+            Field = "Participation",
+            Operator = Operator_t.Equal,
+            Value = "50" // will evaluate to false
+        };
+        ((IResolvable<Strategy_t, IParameter>)edit).Resolve(twap, twap.Parameters);
+
+        var strategyEdit = new StrategyEdit_t { Edit = edit, ErrorMessage = "err" };
+        var col = new StrategyEditCollection { strategyEdit };
+
+        col.EvaluateAll(FixFieldValueProvider.Empty, shortCircuit: false).Should().BeFalse();
+        col.EvaluateAll(FixFieldValueProvider.Empty, shortCircuit: true).Should().BeFalse();
+    }
+
+    [Fact]
+    public void StrategyEditCollection_EvaluateAll_shortCircuit_true_breaks_early()
+    {
+        var twap = LoadTwap();
+        twap.Parameters["Participation"].WireValue = "30";
+
+        var edit1 = new Edit_t<IParameter>
+        {
+            Field = "Participation",
+            Operator = Operator_t.Equal,
+            Value = "50" // will be false
+        };
+        ((IResolvable<Strategy_t, IParameter>)edit1).Resolve(twap, twap.Parameters);
+
+        var strategyEdit1 = new StrategyEdit_t { Edit = edit1, ErrorMessage = "Failed" };
+        var strategyEdit2 = new StrategyEdit_t { Edit = new Edit_t<IParameter>(), ErrorMessage = "Throws" };
+
+        var collection = new StrategyEditCollection { strategyEdit1, strategyEdit2 };
+
+        // With shortCircuit: true, it should return false and not throw.
+        collection.EvaluateAll(FixFieldValueProvider.Empty, shortCircuit: true).Should().BeFalse();
+
+        // With shortCircuit: false, it should evaluate all and throw.
+        var act = () => collection.EvaluateAll(FixFieldValueProvider.Empty, shortCircuit: false);
+        act.Should().Throw<InvalidOperationException>();
     }
 
     // -----------------------------------------------------------------------

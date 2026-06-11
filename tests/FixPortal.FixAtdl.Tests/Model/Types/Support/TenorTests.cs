@@ -63,12 +63,12 @@ public class TenorTests
     }
 
     [Fact]
-    public void Cross_unit_comparison_uses_approximate_days()
+    public void Cross_unit_comparison_throws_ArgumentException()
     {
-        // D7 (~7 days) < M1 (~30 days)
         var days = Tenor.Parse("D7");
         var months = Tenor.Parse("M1");
-        (days < months).Should().BeTrue();
+        Action act1 = () => { _ = days < months; };
+        act1.Should().Throw<ArgumentException>();
     }
 
     [Fact]
@@ -120,10 +120,10 @@ public class TenorTests
     [Theory]
     [InlineData("D0")]
     [InlineData("M-3")]
-    public void Parse_accepts_non_positive_offsets_by_design(string wire)
+    public void Parse_rejects_non_positive_offsets(string wire)
     {
         var act = () => Tenor.Parse(wire);
-        act.Should().NotThrow();
+        act.Should().Throw<ArgumentException>();
     }
 
     [Fact]
@@ -139,14 +139,13 @@ public class TenorTests
     }
 
     [Fact]
-    public void Cross_unit_comparison_tiebreaker_prevents_spurious_equality()
+    public void Cross_unit_comparison_throws_on_ordering_checks()
     {
-        // D30 (~30 days) and M1 (~30 days) have same approximate days but different units
         var d30 = Tenor.Parse("D30");
         var m1 = Tenor.Parse("M1");
 
         (d30 == m1).Should().BeFalse();
-        (d30 < m1).Should().BeTrue();
-        (m1 > d30).Should().BeTrue();
+        Action act1 = () => { _ = d30 < m1; };
+        act1.Should().Throw<ArgumentException>();
     }
 }

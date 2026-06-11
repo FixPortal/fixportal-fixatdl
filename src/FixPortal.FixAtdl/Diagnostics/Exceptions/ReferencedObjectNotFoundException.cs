@@ -11,7 +11,6 @@ namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 /// The exception that is thrown when a reference from one object to another cannot be resolved; for example, if a 
 /// control has a parameterRef value but there is no corresponding parameter with that name.
 /// </summary>
-[Serializable]
 public class ReferencedObjectNotFoundException : FixAtdlException
 {
     /// <summary>

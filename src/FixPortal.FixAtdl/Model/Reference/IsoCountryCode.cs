@@ -8,7 +8,7 @@
 namespace FixPortal.FixAtdl.Model.Reference;
 
 /// <summary>
-/// Enumeration of all the ISO 3166-1 alpha-2 country codes.
+/// Enumeration of ISO 3166-1 alpha-2 country codes.
 /// </summary>
 /// <remarks>Upper case codes are used throughout to avoid clashes with C# language keywords.</remarks>
 public enum IsoCountryCode

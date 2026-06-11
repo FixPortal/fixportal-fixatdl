@@ -151,8 +151,8 @@ public class EditValueConverterTests
     public void Converts_datetime_string()
     {
         // FIX UTCTimestamp format: YYYYMMDD-HH:MM:SS
-        IComparable result = EditValueConverter.ConvertToComparableType(DateTime.MinValue, "20240101-09:30:00");
-        result.Should().BeAssignableTo<DateTime>();
+        IComparable result = EditValueConverter.ConvertToComparableType(new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc), "20240101-09:30:00");
+        result.Should().Be(new DateTime(2024, 1, 1, 9, 30, 0, DateTimeKind.Utc));
     }
 
     // ── Enum codes ───────────────────────────────────────────────────────────
@@ -161,21 +161,21 @@ public class EditValueConverterTests
     public void Converts_iso_country_code()
     {
         IComparable result = EditValueConverter.ConvertToComparableType(default(IsoCountryCode), "US");
-        result.Should().BeAssignableTo<IsoCountryCode>();
+        result.Should().Be(IsoCountryCode.US);
     }
 
     [Fact]
     public void Converts_iso_currency_code()
     {
         IComparable result = EditValueConverter.ConvertToComparableType(default(IsoCurrencyCode), "USD");
-        result.Should().BeAssignableTo<IsoCurrencyCode>();
+        result.Should().Be(IsoCurrencyCode.USD);
     }
 
     [Fact]
     public void Converts_iso_language_code()
     {
         IComparable result = EditValueConverter.ConvertToComparableType(default(IsoLanguageCode), "en");
-        result.Should().BeAssignableTo<IsoLanguageCode>();
+        result.Should().Be(IsoLanguageCode.EN);
     }
 
     // ── MonthYear / Tenor ────────────────────────────────────────────────────
@@ -184,7 +184,7 @@ public class EditValueConverterTests
     public void Converts_month_year()
     {
         IComparable result = EditValueConverter.ConvertToComparableType(default(MonthYear), "202401");
-        result.Should().BeAssignableTo<MonthYear>();
+        result.Should().Be(MonthYear.Parse("202401"));
     }
 
     [Fact]

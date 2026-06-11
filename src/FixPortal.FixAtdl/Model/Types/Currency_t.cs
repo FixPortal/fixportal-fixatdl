@@ -47,7 +47,16 @@ public class Currency_t : EnumTypeBase<IsoCurrencyCode>
     /// <returns>Value converted from a string.</returns>
     protected override IsoCurrencyCode? ConvertFromWireValueFormat(string value)
     {
-        return value.ParseAsEnum<IsoCurrencyCode>();
+        if (value == "None")
+        {
+            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(this, Resources.ErrorMessages.InvalidValueEnumParseFailure, value, nameof(IsoCurrencyCode));
+        }
+        IsoCurrencyCode parsed = value.ParseAsEnum<IsoCurrencyCode>();
+        if (parsed == IsoCurrencyCode.None)
+        {
+            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(this, Resources.ErrorMessages.InvalidValueEnumParseFailure, value, nameof(IsoCurrencyCode));
+        }
+        return parsed;
     }
 
     /// <summary>
@@ -57,7 +66,7 @@ public class Currency_t : EnumTypeBase<IsoCurrencyCode>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
     protected override string? ConvertToWireValueFormat(IsoCurrencyCode? value)
     {
-        return value != null ? Enum.GetName(typeof(IsoCurrencyCode), value) : null;
+        return value != null && value != IsoCurrencyCode.None ? Enum.GetName(typeof(IsoCurrencyCode), value) : null;
     }
 
     /// <summary>

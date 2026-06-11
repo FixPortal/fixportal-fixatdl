@@ -10,7 +10,6 @@ namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 /// <summary>
 /// The exception that is thrown when a FIX message cannot be parsed.
 /// </summary>
-[Serializable]
 public class FixParseException : FixAtdlException
 {
     /// <summary>
