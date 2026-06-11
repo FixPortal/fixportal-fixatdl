@@ -151,7 +151,7 @@ public class Clock_t : InitializableControl<InitValueClock?>
 
         DateTime? dateTime = value.ToDateTime();
 
-        _value = dateTime == null ? null : ToInstant(dateTime.Value);
+        _value = dateTime == null ? null : ToInstant(dateTime.Value, parameter);
     }
 
     /// <summary>
@@ -339,10 +339,44 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// NodaTime <see cref="Instant"/>. These values are UTC by convention; a Local value is converted and an
     /// Unspecified value throws an exception to prevent timezone shift bugs.
     /// </summary>
-    private static Instant ToInstant(DateTime dateTime) => dateTime.Kind switch
+    private Instant ToInstant(DateTime dateTime, IParameter? parameter = null)
     {
-        DateTimeKind.Utc => Instant.FromDateTimeUtc(dateTime),
-        DateTimeKind.Local => Instant.FromDateTimeUtc(dateTime.ToUniversalTime()),
-        _ => throw ThrowHelper.New<ArgumentException>(null, "DateTimeKind.Unspecified is not supported to avoid timezone ambiguity; Kind must be Utc or Local")
-    };
+        if (dateTime.Year == 1)
+        {
+            // It is time-only. Anchor it to the current day in the market zone (or UTC if zone not set).
+            Instant nowInstant = Clock.GetCurrentInstant();
+            DateTimeZone zone = !string.IsNullOrEmpty(LocalMktTz)
+                ? (TimeZoneProvider.GetZoneOrNull(LocalMktTz) ?? DateTimeZone.Utc)
+                : DateTimeZone.Utc;
+            LocalDate marketToday = nowInstant.InZone(zone).Date;
+            LocalTime time = LocalTime.FromTicksSinceMidnight(dateTime.TimeOfDay.Ticks);
+            LocalDateTime localDt = marketToday.At(time);
+            return zone.ResolveLocal(localDt, Resolvers.LenientResolver).ToInstant();
+        }
+
+        if (dateTime.Kind == DateTimeKind.Utc)
+        {
+            return Instant.FromDateTimeUtc(dateTime);
+        }
+
+        if (dateTime.Kind == DateTimeKind.Local)
+        {
+            return Instant.FromDateTimeUtc(dateTime.ToUniversalTime());
+        }
+
+        // dateTime.Kind == DateTimeKind.Unspecified
+        if (!string.IsNullOrEmpty(LocalMktTz))
+        {
+            DateTimeZone? zone = TimeZoneProvider.GetZoneOrNull(LocalMktTz);
+            if (zone != null)
+            {
+                LocalDateTime localDt = LocalDateTime.FromDateTime(dateTime);
+                return zone.ResolveLocal(localDt, Resolvers.LenientResolver).ToInstant();
+            }
+        }
+
+        string paramInfo = parameter != null ? $" bound to parameter '{parameter.Name}'" : string.Empty;
+        throw ThrowHelper.New<ArgumentException>(this,
+            $"DateTimeKind.Unspecified is not supported to avoid timezone ambiguity; Kind must be Utc or Local. Control '{Id}'{paramInfo} has no localMktTz set.");
+    }
 }

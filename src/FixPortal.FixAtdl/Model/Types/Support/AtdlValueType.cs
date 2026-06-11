@@ -128,7 +128,7 @@ public abstract class AtdlValueType<T> : IParameterType where T : struct
         {
             convertedValue = ConvertFromWireValueFormat(value);
         }
-        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException)
+        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException or InvalidCastException)
         {
             // Translate raw BCL conversion failures (Convert.ToInt32/ToDecimal/etc. in the numeric
             // subclasses) into a domain InvalidFieldValueException, matching the control-set path

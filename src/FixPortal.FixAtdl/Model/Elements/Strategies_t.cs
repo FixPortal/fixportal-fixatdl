@@ -87,6 +87,23 @@ public class Strategies_t : IEnumerable<Strategy_t>
     {
         foreach (Strategy_t strategy in this)
         {
+            foreach (var parameter in strategy.Parameters)
+            {
+                if (parameter.Type == "Boolean_t")
+                {
+                    var valueProp = parameter.GetType().GetProperty("Value");
+                    if (valueProp?.GetValue(parameter) is FixPortal.FixAtdl.Model.Types.Boolean_t booleanTypeObj)
+                    {
+                        string trueVal = booleanTypeObj.TrueWireValue ?? "Y";
+                        string falseVal = booleanTypeObj.FalseWireValue ?? "N";
+                        if (trueVal == falseVal)
+                        {
+                            throw new System.ArgumentException("trueWireValue and falseWireValue cannot be equal.");
+                        }
+                    }
+                }
+            }
+
             strategy.Controls.ResolveAll();
 
             strategy.StrategyEdits.ResolveAll(strategy);

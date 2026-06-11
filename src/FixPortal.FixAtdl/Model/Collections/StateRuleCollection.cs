@@ -33,9 +33,21 @@ public class StateRuleCollection : Collection<StateRule_t>
     /// <param name="item">The state rule to add.</param>
     public new void Add(StateRule_t item)
     {
-        (item as IParentable<Control_t>).Parent = _owner;
-
         base.Add(item);
+    }
+
+    /// <inheritdoc />
+    protected override void InsertItem(int index, StateRule_t item)
+    {
+        ((IParentable<Control_t>)item).Parent = _owner;
+        base.InsertItem(index, item);
+    }
+
+    /// <inheritdoc />
+    protected override void SetItem(int index, StateRule_t item)
+    {
+        ((IParentable<Control_t>)item).Parent = _owner;
+        base.SetItem(index, item);
     }
 
     /// <summary>

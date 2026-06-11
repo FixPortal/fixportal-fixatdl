@@ -36,12 +36,12 @@ public class UTCDateOnly_t : DateTimeTypeBase
     }
 
     /// <summary>
-    /// Parse the date as UTC (Kind=Utc) without shifting, so a UTCDateOnly value carries the same
+    /// Parse the date as UTC (Kind=Utc) so a UTCDateOnly value carries the same
     /// Kind as the sibling UTCTimeOnly/UTCTimestamp types and a date+time recombination is coherent.
-    /// AssumeUniversal (no AdjustToUniversal) sets Kind=Utc for a date-only value with no offset.
+    /// AssumeUniversal | AdjustToUniversal sets Kind=Utc for a date-only value.
     /// </summary>
     protected override DateTimeStyles WireParseStyles =>
-        DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal;
+        DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
 
     /// <summary>
     /// Gets the human-readable type name for use in error messages shown to the user.

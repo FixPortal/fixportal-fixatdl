@@ -47,7 +47,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
 
             // MSDN documentation says helpfully: "The content of the collection changed dramatically."
             case NotifyCollectionChangedAction.Reset:
-                _controls.Clear();
+                RebuildControlsIndex();
                 break;
 
             case NotifyCollectionChangedAction.Remove:
@@ -57,6 +57,27 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             case NotifyCollectionChangedAction.Replace:
                 HandleReplaceAction(e);
                 break;
+        }
+    }
+
+    private void RebuildControlsIndex()
+    {
+        _controls.Clear();
+        if (Owner?.StrategyLayout?.StrategyPanel != null)
+        {
+            AddControlsFromPanel(Owner.StrategyLayout.StrategyPanel);
+        }
+    }
+
+    private void AddControlsFromPanel(StrategyPanel_t panel)
+    {
+        foreach (Control_t control in panel.Controls)
+        {
+            _controls[control.Id] = control;
+        }
+        foreach (StrategyPanel_t childPanel in panel.StrategyPanels)
+        {
+            AddControlsFromPanel(childPanel);
         }
     }
 
@@ -91,14 +112,12 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             string oldId = ((Control_t)e.OldItems[n]!).Id;
             Control_t newControl = (Control_t)e.NewItems![n]!;
 
-            // Re-key under the replacement's OWN Id. Keying the new control under the old Id
-            // (as before) left it unreachable by its real Id and returned it under a stale
-            // key whenever the replacement carried a different Id.
-            _controls.Remove(oldId);
-            if (_controls.ContainsKey(newControl.Id))
+            if (newControl.Id != oldId && _controls.ContainsKey(newControl.Id))
             {
                 throw ThrowHelper.New<DuplicateKeyException>(this, ErrorMessages.AttemptToAddDuplicateKey, newControl.Id, "Controls");
             }
+
+            _controls.Remove(oldId);
             _controls[newControl.Id] = newControl;
         }
     }

@@ -191,6 +191,6 @@ public class Percentage_t : Float_t
         }
 
         // We use this slightly ugly manipulation to remove the trailing zeroes that multiplication by 100 produces
-        return decimal.Parse(((decimal)value).ToString("G29", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
+        return decimal.Parse(((decimal)value).ToString("G29", CultureInfo.InvariantCulture), NumberStyles.Float, CultureInfo.InvariantCulture);
     }
 }

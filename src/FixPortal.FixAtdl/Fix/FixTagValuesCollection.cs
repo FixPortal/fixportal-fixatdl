@@ -94,7 +94,7 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     {
         // Honour the Try-pattern: an unknown/extension/symbolic field name returns false rather than
         // throwing out of ParseAsEnum.
-        if (!Enum.TryParse(fixField, true, out FixField field) || !Enum.IsDefined(field))
+        if (!Enum.TryParse(fixField, true, out FixField field))
         {
             value = null!;
             return false;

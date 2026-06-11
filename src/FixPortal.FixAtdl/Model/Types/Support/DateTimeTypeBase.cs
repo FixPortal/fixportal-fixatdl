@@ -38,7 +38,10 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     private TimeOnly? _maxTimeOfDay;
     private TimeOnly? _minTimeOfDay;
 
-    private static readonly string[] _timeOnlyBoundFormats = ["HH:mm:ss.fff", "HH:mm:ss"];
+    /// <summary>
+    /// Indicates whether this type represents a time-only value.
+    /// </summary>
+    internal virtual bool IsTimeOnlyType => false;
 
     /// <summary>Deserialization-only round-trip of the raw <c>maxValue</c> attribute text; parsed with
     /// time-only awareness on set (C2). The getter returns the last raw text set (or null). Not intended
@@ -60,8 +63,12 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
 
     private void SetBound(string text, bool isMax)
     {
-        if (TimeOnly.TryParseExact(text, _timeOnlyBoundFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out TimeOnly timeOfDay))
+        bool isTimeOnly = IsTimeOnlyType || IsDateLess(text);
+        if (isTimeOnly)
         {
+            DateTime parsed = FixDateTime.Parse(text, CultureInfo.InvariantCulture);
+            DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
+            TimeOnly timeOfDay = TimeOnly.FromDateTime(normalised);
             if (isMax)
             {
                 _maxTimeOfDay = timeOfDay;
@@ -93,6 +100,22 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
                 _minTimeOfDay = null;
             }
         }
+    }
+
+    private static bool IsDateLess(string text)
+    {
+        if (text.Length < 8)
+        {
+            return true;
+        }
+        for (int i = 0; i < 8; i++)
+        {
+            if (!char.IsDigit(text[i]))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     #region AtdlReferenceType<string> Overrides
@@ -129,14 +152,24 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
 
     private ValidationResult? CheckBounds(DateTime value)
     {
-        if (MaxValue != null && value > MaxValue)
+        DateTime normalisedVal = NormaliseToUtc(value);
+
+        if (MaxValue != null)
         {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, MaxValue);
+            DateTime normalisedMax = NormaliseToUtc(MaxValue.Value);
+            if (normalisedVal > normalisedMax)
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MaxValueExceeded, value, MaxValue);
+            }
         }
 
-        if (MinValue != null && value < MinValue)
+        if (MinValue != null)
         {
-            return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueNotMet, value, MinValue);
+            DateTime normalisedMin = NormaliseToUtc(MinValue.Value);
+            if (normalisedVal < normalisedMin)
+            {
+                return new ValidationResult(ValidationResult.ResultType.Invalid, ErrorMessages.MinValueNotMet, value, MinValue);
+            }
         }
 
         TimeOnly valueTimeOfDay = TimeOnly.FromDateTime(value);
@@ -152,6 +185,19 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
         }
 
         return null;
+    }
+
+    private static DateTime NormaliseToUtc(DateTime dt)
+    {
+        if (dt.Kind == DateTimeKind.Local)
+        {
+            return dt.ToUniversalTime();
+        }
+        if (dt.Kind == DateTimeKind.Unspecified)
+        {
+            return DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+        }
+        return dt;
     }
 
     /// <summary>

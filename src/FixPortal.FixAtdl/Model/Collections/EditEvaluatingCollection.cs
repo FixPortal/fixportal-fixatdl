@@ -37,23 +37,30 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
     /// <summary>
     /// Gets the set of sources for the data to be evaluated as part of this collection of Edits.
     /// </summary>
-    public HashSet<string> Sources { get; } = [];
+    public HashSet<string> Sources
+    {
+        get
+        {
+            HashSet<string> sources = [];
+            foreach (IEdit<T> item in Items)
+            {
+                foreach (string source in item.Sources)
+                {
+                    sources.Add(source);
+                }
+            }
+            return sources;
+        }
+    }
 
     /// <summary>
-    /// Inserts an item, recording its evaluation sources. Implemented as an override of the
-    /// Collection&lt;T&gt; virtual hook (rather than a <c>new Add</c>) so the source-tracking side
-    /// effect cannot be bypassed by base-typed access or a collection initializer.
+    /// Inserts an item into the collection.
     /// </summary>
-    /// <param name="index">The insertion index.</param>
-    /// <param name="item">The item.</param>
+    /// <param name="index">The zero-based index at which item should be inserted.</param>
+    /// <param name="item">The object to insert.</param>
     protected override void InsertItem(int index, IEdit<T> item)
     {
         base.InsertItem(index, item);
-
-        foreach (string source in item.Sources)
-        {
-            Sources.Add(source);
-        }
     }
 
     /// <summary>

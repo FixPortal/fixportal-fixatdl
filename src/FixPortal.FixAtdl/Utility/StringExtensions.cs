@@ -37,7 +37,7 @@ public static class StringExtensions
         {
             result = Enum.Parse<T>(value, true);
         }
-        catch (ArgumentException ex)
+        catch (Exception ex) when (ex is ArgumentException or OverflowException)
         {
             throw ThrowHelper.New<ArgumentException>(ExceptionContext, ex, ErrorMessages.InvalidValueEnumParseFailure, value, typeof(T).Name);
         }

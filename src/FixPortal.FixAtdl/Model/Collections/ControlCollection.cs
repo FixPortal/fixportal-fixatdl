@@ -39,6 +39,11 @@ public class ControlCollection : ObservableCollection<Control_t>
     /// <param name="item">The item.</param>
     protected override void InsertItem(int index, Control_t item)
     {
+        if (_owner.OwningStrategy != null && _owner.OwningStrategy.Controls.Contains(item.Id))
+        {
+            throw Diagnostics.ThrowHelper.New<Diagnostics.Exceptions.DuplicateKeyException>(this, Resources.ErrorMessages.AttemptToAddDuplicateKey, item.Id, "Controls");
+        }
+
         ((IParentable<StrategyPanel_t>)item).Parent = _owner;
 
         base.InsertItem(index, item);
@@ -49,6 +54,15 @@ public class ControlCollection : ObservableCollection<Control_t>
     /// <inheritdoc />
     protected override void SetItem(int index, Control_t item)
     {
+        if (_owner.OwningStrategy != null)
+        {
+            Control_t oldItem = Items[index];
+            if (item.Id != oldItem.Id && _owner.OwningStrategy.Controls.Contains(item.Id))
+            {
+                throw Diagnostics.ThrowHelper.New<Diagnostics.Exceptions.DuplicateKeyException>(this, Resources.ErrorMessages.AttemptToAddDuplicateKey, item.Id, "Controls");
+            }
+        }
+
         ((IParentable<StrategyPanel_t>)item).Parent = _owner;
 
         base.SetItem(index, item);

@@ -37,6 +37,15 @@ public sealed class InitValueClock
     [
         LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss.fff"),
         LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss"),
+        LocalTimePattern.CreateWithInvariantCulture("HH:mm"),
+    ];
+
+    private static readonly OffsetTimePattern[] OffsetTimePatterns =
+    [
+        OffsetTimePattern.GeneralIso,
+        OffsetTimePattern.CreateWithInvariantCulture("HH:mm:ss.fffo<g>"),
+        OffsetTimePattern.CreateWithInvariantCulture("HH:mm:sso<g>"),
+        OffsetTimePattern.CreateWithInvariantCulture("HH:mmo<g>"),
     ];
 
     private static readonly LocalDateTimePattern[] DateTimePatterns =
@@ -62,6 +71,13 @@ public sealed class InitValueClock
         if (timeMatch is not null)
         {
             TimeOfDay = timeMatch.Value;
+            return;
+        }
+
+        ParseResult<OffsetTime>? offsetTimeMatch = OffsetTimePatterns.Select(pattern => pattern.Parse(raw)).FirstOrDefault(result => result.Success);
+        if (offsetTimeMatch is not null)
+        {
+            TimeOfDay = offsetTimeMatch.Value.TimeOfDay;
             return;
         }
 

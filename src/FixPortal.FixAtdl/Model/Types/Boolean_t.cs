@@ -24,32 +24,10 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     private const string DefaultTrueValue = "Y";
     private const string DefaultFalseValue = "N";
 
-#pragma warning disable IDE0032
-    private string? _falseWireValue;
-    private string? _trueWireValue;
-#pragma warning restore IDE0032
-
-    /// <summary>Gets or sets the false wire value (for use with Boolean type parameters).<br/>
-    /// <b>This attribute is targeted for deprecation.</b><br/>
-    /// Defines the value with which to populate the FIX message when the boolean parameter is False. Overrides the 
-    /// standard FIX boolean value of “N”. I.e. if this attribute is not provided then the order-sending application 
-    /// must use “N”.<br/>
-    /// If it is desired that the FIX message is not to be populated with this tag when the value of the parameter is 
-    /// false, then falseWireValue should be defined as “{NULL}”.</summary>
-    public string? FalseWireValue
-    {
-        get => _falseWireValue;
-        set
-        {
-            string effectiveTrue = _trueWireValue ?? DefaultTrueValue;
-            string effectiveValue = value ?? DefaultFalseValue;
-            if (effectiveValue == effectiveTrue)
-            {
-                throw new ArgumentException("trueWireValue and falseWireValue cannot be equal.");
-            }
-            _falseWireValue = value;
-        }
-    }
+    /// <summary>
+    /// Gets or sets the false wire-value.
+    /// </summary>
+    public string? FalseWireValue { get; set; }
 
     /// <summary>
     /// Applicable only when xsi:type is Boolean_t.
@@ -68,20 +46,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// If it is desired that the FIX message is not to be populated with this tag when the value of the parameter 
     /// is true, then trueWireValue should be defined as “{NULL}”.
     /// </summary>
-    public string? TrueWireValue
-    {
-        get => _trueWireValue;
-        set
-        {
-            string effectiveFalse = _falseWireValue ?? DefaultFalseValue;
-            string effectiveValue = value ?? DefaultTrueValue;
-            if (effectiveValue == effectiveFalse)
-            {
-                throw new ArgumentException("trueWireValue and falseWireValue cannot be equal.");
-            }
-            _trueWireValue = value;
-        }
-    }
+    public string? TrueWireValue { get; set; }
 
     #region AtdlValueType<T> Overrides
 

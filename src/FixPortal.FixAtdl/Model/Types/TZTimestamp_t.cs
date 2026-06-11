@@ -77,10 +77,17 @@ public class TZTimestamp_t : DateTimeTypeBase
             return null;
         }
 
-        string format = value.Value.Ticks % TimeSpan.TicksPerSecond == 0
+        DateTime adjustedValue = value.Value.Kind switch
+        {
+            DateTimeKind.Utc => value.Value,
+            DateTimeKind.Local => value.Value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value.Value, DateTimeKind.Utc),
+        };
+
+        string format = adjustedValue.Ticks % TimeSpan.TicksPerSecond == 0
             ? FixDateTimeFormat.FixDateTimeWithTz
             : FixDateTimeFormat.FixDateTimeFractionalWithMinuteOffset;
 
-        return value.Value.ToString(format, CultureInfo.InvariantCulture);
+        return adjustedValue.ToString(format, CultureInfo.InvariantCulture);
     }
 }

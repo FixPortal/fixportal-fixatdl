@@ -731,17 +731,25 @@ public class ParameterTypeFeatureTests
     [Fact]
     public void Boolean_t_cannot_have_equal_wire_values()
     {
-        var p = new Parameter_t<Boolean_t>("X");
+        var strategies = new Strategies_t();
+        var strategy = new Strategy_t { Name = "Test" };
+        var p = new Parameter_t<Boolean_t>("X") { Type = "Boolean_t" };
+        strategy.Parameters.Add(p);
+        strategies.Strategies.Add(strategy);
 
         // Setting them to different values is fine
         p.Value.TrueWireValue = "Y";
         p.Value.FalseWireValue = "N";
+        strategies.ResolveAll();
 
-        // Setting them to the same value throws ArgumentException
-        var act1 = () => p.Value.TrueWireValue = "N";
+        // Setting them to the same value throws ArgumentException during ResolveAll
+        p.Value.TrueWireValue = "N";
+        var act1 = () => strategies.ResolveAll();
         act1.Should().Throw<ArgumentException>();
 
-        var act2 = () => p.Value.FalseWireValue = "Y";
+        p.Value.TrueWireValue = "Y";
+        p.Value.FalseWireValue = "Y";
+        var act2 = () => strategies.ResolveAll();
         act2.Should().Throw<ArgumentException>();
     }
 

@@ -189,7 +189,7 @@ public class ClockTimeZoneTests
     {
         var clock = new Clock_t("clk") { Clock = new FakeClock(Instant.FromUtc(2026, 1, 15, 12, 0, 0)) };
         var act = () => clock.SetValue(new DateTime(2026, 1, 15, 12, 0, 0, DateTimeKind.Unspecified));
-        act.Should().Throw<ArgumentException>().WithMessage("DateTimeKind.Unspecified is not supported to avoid timezone ambiguity; Kind must be Utc or Local");
+        act.Should().Throw<ArgumentException>().WithMessage("DateTimeKind.Unspecified is not supported to avoid timezone ambiguity; Kind must be Utc or Local*");
     }
 
     [Fact]

@@ -128,7 +128,7 @@ public abstract class AtdlReferenceType<T> : IParameterType where T : class
         {
             convertedValue = ConvertFromWireValueFormat(value);
         }
-        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException)
+        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException or InvalidCastException)
         {
             // Translate raw BCL conversion failures into a domain InvalidFieldValueException at the
             // wire boundary, matching the control-set path rather than leaking a raw exception.

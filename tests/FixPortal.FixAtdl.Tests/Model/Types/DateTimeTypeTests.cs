@@ -45,7 +45,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<UTCTimestamp_t>("Ts");
         var act = () => p.WireValue = "notadate";
-        act.Should().Throw<InvalidCastException>();
+        act.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<UTCTimeOnly_t>("T");
         var act = () => p.WireValue = "notatime";
-        act.Should().Throw<InvalidCastException>();
+        act.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<UTCDateOnly_t>("D");
         var act = () => p.WireValue = "2026-01-01";
-        act.Should().Throw<InvalidCastException>();
+        act.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -170,7 +170,7 @@ public class DateTimeTypeTests
         // Only a completely unparseable string triggers rejection.
         var p = new Parameter_t<TZTimeOnly_t>("T");
         var act = () => p.WireValue = "notatime";
-        act.Should().Throw<InvalidCastException>();
+        act.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -225,7 +225,7 @@ public class DateTimeTypeTests
         // Only a completely unparseable string triggers rejection.
         var p = new Parameter_t<TZTimestamp_t>("Ts");
         var act = () => p.WireValue = "notadatetime";
-        act.Should().Throw<InvalidCastException>();
+        act.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -246,7 +246,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<LocalMktDate_t>("D");
         var act = () => p.WireValue = "baddate";
-        act.Should().Throw<InvalidCastException>();
+        act.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
     }
 
     [Fact]
@@ -273,5 +273,33 @@ public class DateTimeTypeTests
         // Now 13:00:00 should fail because 13:00:00 > 12:00:00 (time-only bound)
         var actInvalid = () => param.WireValue = "20260602-13:00:00";
         actInvalid.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void DateTimeTypeBase_SetBound_handles_offset_bearing_and_minute_only_bounds()
+    {
+        var param = new Parameter_t<UTCTimeOnly_t>("T");
+
+        // 1. Set offset-bearing bound "12:00:00+01:00" -> which is 11:00:00 UTC.
+        param.Value.MaxValueText = "12:00:00+01:00";
+        
+        // 10:30:00 UTC should succeed (10:30:00 < 11:00:00)
+        var act1 = () => param.WireValue = "10:30:00";
+        act1.Should().NotThrow();
+
+        // 11:30:00 UTC should throw (11:30:00 > 11:00:00)
+        var act2 = () => param.WireValue = "11:30:00";
+        act2.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
+
+        // 2. Set minute-only bound "12:30"
+        param.Value.MaxValueText = "12:30";
+
+        // 12:00:00 UTC should succeed
+        var act3 = () => param.WireValue = "12:00:00";
+        act3.Should().NotThrow();
+
+        // 13:00:00 UTC should throw
+        var act4 = () => param.WireValue = "13:00:00";
+        act4.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
     }
 }

@@ -69,4 +69,39 @@ public class StrategiesParserRejectionTests
         var act = () => Load(xml);
         act.Should().Throw<InvalidFieldValueException>();
     }
+
+    [Fact]
+    public void Parse_deeply_nested_xml_throws_FixAtdlException()
+    {
+        // Construct a deeply nested XML document
+        var sb = new StringBuilder();
+        sb.AppendLine("""
+            <?xml version="1.0" encoding="utf-8"?>
+            <Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+                        xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        strategyIdentifierTag="958">
+                <Strategy name="TestRecursion" version="1" wireValue="TestRecursion" uiRep="TestRecursion" providerID="DEMO" lclMktTz="Europe/London">
+                    <lay:StrategyLayout>
+            """);
+
+        const int depth = 130;
+        for (int i = 0; i < depth; i++)
+        {
+            sb.AppendLine("        <lay:StrategyPanel title=\"P\">");
+        }
+        for (int i = 0; i < depth; i++)
+        {
+            sb.AppendLine("        </lay:StrategyPanel>");
+        }
+
+        sb.AppendLine("""
+                    </lay:StrategyLayout>
+                </Strategy>
+            </Strategies>
+            """);
+
+        var act = () => Load(sb.ToString());
+        act.Should().Throw<FixAtdlException>().WithMessage("*exceeded maximum depth limit*");
+    }
 }
