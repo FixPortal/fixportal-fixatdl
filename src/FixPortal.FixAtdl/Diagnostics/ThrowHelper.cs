@@ -260,6 +260,17 @@ public static class ThrowHelper
                     return exception;
                 }
 
+            case "ArgumentException":
+                {
+                    ConstructorInfo classConstructor = classType.GetConstructor([typeof(string), typeof(string)])
+                        ?? throw new InternalErrorException($"Exception type '{classType.FullName}' has no (string, string) constructor required by ThrowHelper. Message: {message}");
+                    T exception = (T)classConstructor.Invoke([message, paramName]);
+                    exception.Source = source?.ToString();
+                    info?.PopulateExceptionData(exception.Data);
+
+                    return exception;
+                }
+
             default:
                 {
                     ConstructorInfo classConstructor = classType.GetConstructor([typeof(string)])

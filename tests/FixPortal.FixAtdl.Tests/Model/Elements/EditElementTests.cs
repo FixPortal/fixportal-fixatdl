@@ -252,7 +252,7 @@ public class EditElementTests
     }
 
     [Fact]
-    public async Task EditRef_t_evaluate_with_false_result_reflects_in_CurrentState()
+    public async Task Edit_t_evaluate_with_false_result_reflects_in_CurrentState()
     {
         var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
@@ -275,5 +275,39 @@ public class EditElementTests
         editRef.Evaluate();
 
         editRef.CurrentState.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Edit_t_Resolve_with_operator_but_no_field_throws_InconsistentStrategyException()
+    {
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var twap = LoadTwap(xml);
+
+        var edit = new Edit_t<IParameter>
+        {
+            Operator = Operator_t.Equal,
+            Value = "100"
+        };
+
+        var act = () => ((IResolvable<Strategy_t, IParameter>)edit).Resolve(twap, twap.Parameters);
+        act.Should().Throw<InconsistentStrategyException>().WithMessage("*missing the 'field' attribute*");
+    }
+
+    [Fact]
+    public async Task Edit_t_Resolve_with_operator_and_logic_operator_throws_InconsistentStrategyException()
+    {
+        var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
+        var twap = LoadTwap(xml);
+
+        var edit = new Edit_t<IParameter>
+        {
+            Field = "Participation",
+            Operator = Operator_t.Equal,
+            Value = "100",
+            LogicOperator = LogicOperator_t.And
+        };
+
+        var act = () => ((IResolvable<Strategy_t, IParameter>)edit).Resolve(twap, twap.Parameters);
+        act.Should().Throw<InconsistentStrategyException>().WithMessage("*both comparison operator and child edits/logicOperator*");
     }
 }

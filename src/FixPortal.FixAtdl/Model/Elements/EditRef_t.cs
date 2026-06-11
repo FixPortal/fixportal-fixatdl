@@ -119,7 +119,7 @@ public class EditRef_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class
     public EditEvaluatingCollection<T> Edits => ReferencedEdit.Edits;
 
     /// <inheritdoc />
-    public HashSet<string> Sources => ReferencedEdit.Sources;
+    public HashSet<string> Sources => _referencedEdit != null ? _referencedEdit.Sources : [];
 
     #endregion
 

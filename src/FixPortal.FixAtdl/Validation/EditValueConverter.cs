@@ -60,7 +60,7 @@ public static class EditValueConverter
                 "System.Int32" => Convert.ToInt32(value, CultureInfo.InvariantCulture),
                 "System.UInt32" => Convert.ToUInt32(value, CultureInfo.InvariantCulture),
                 "System.Char" => Convert.ToChar(value),
-                "System.DateTime" => FixDateTime.Parse(value, CultureInfo.InvariantCulture),
+                "System.DateTime" => ConvertToDateTime(typeInstanceToMatch, value),
                 "System.String" => value,
                 "FixPortal.FixAtdl.Model.Reference.IsoCountryCode" => value.ParseAsEnum<IsoCountryCode>(),
                 "FixPortal.FixAtdl.Model.Reference.IsoCurrencyCode" => value.ParseAsEnum<IsoCurrencyCode>(),
@@ -96,5 +96,47 @@ public static class EditValueConverter
                 ? result
                 : throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.DataConversionError1, value, "System.Boolean"),
         };
+    }
+
+    private static DateTime ConvertToDateTime(object typeInstanceToMatch, string value)
+    {
+        DateTime lhsDt = (DateTime)typeInstanceToMatch;
+        DateTime parsed = FixDateTime.Parse(value, CultureInfo.InvariantCulture);
+        // Normalise to UTC matching the canonical Kind=Utc contract
+        DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
+
+        if (lhsDt.Year == 1)
+        {
+            // LHS is time-only (anchored to 0001-01-01). Anchor RHS to 0001-01-01 too so
+            // the comparison compares times of day.
+            normalised = new DateTime(1, 1, 1, normalised.Hour, normalised.Minute, normalised.Second, normalised.Millisecond, normalised.Kind)
+                .AddTicks(normalised.Ticks % TimeSpan.TicksPerMillisecond);
+        }
+        else if (IsDateLess(value))
+        {
+            // LHS is datetime, but RHS is time-only.
+            // If RHS is date-less, it represents a time-of-day comparison on the same date as LHS.
+            // So we copy LHS's date component to RHS.
+            normalised = new DateTime(lhsDt.Year, lhsDt.Month, lhsDt.Day, normalised.Hour, normalised.Minute, normalised.Second, normalised.Millisecond, normalised.Kind)
+                .AddTicks(normalised.Ticks % TimeSpan.TicksPerMillisecond);
+        }
+
+        return normalised;
+    }
+
+    private static bool IsDateLess(string text)
+    {
+        if (text.Length < 8)
+        {
+            return true;
+        }
+        for (int i = 0; i < 8; i++)
+        {
+            if (!char.IsDigit(text[i]))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

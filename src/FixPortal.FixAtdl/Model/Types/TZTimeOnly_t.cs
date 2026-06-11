@@ -35,6 +35,9 @@ public class TZTimeOnly_t : DateTimeTypeBase
         FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset
     ];
 
+    /// <inheritdoc />
+    internal override bool IsTimeOnlyType => true;
+
     /// <summary>
     /// Gets the DateTime format strings to use when converting this date/time to a FIX string and vice versa.
     /// </summary>
@@ -96,10 +99,17 @@ public class TZTimeOnly_t : DateTimeTypeBase
             return null;
         }
 
-        string format = value.Value.Ticks % TimeSpan.TicksPerSecond == 0
+        DateTime adjustedValue = value.Value.Kind switch
+        {
+            DateTimeKind.Utc => value.Value,
+            DateTimeKind.Local => value.Value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value.Value, DateTimeKind.Utc),
+        };
+
+        string format = adjustedValue.Ticks % TimeSpan.TicksPerSecond == 0
             ? FixDateTimeFormat.FixTimeOnlyWithTz
             : FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset;
 
-        return value.Value.ToString(format, CultureInfo.InvariantCulture);
+        return adjustedValue.ToString(format, CultureInfo.InvariantCulture);
     }
 }

@@ -33,6 +33,7 @@ public class ElementFactory : INotifyClassDeserialized
     // DeserializeElement call so reuse of a factory cannot leak cached objects across parses.
     // Not thread-safe: a factory instance must be used by one thread / one parse at a time.
     private readonly Dictionary<string, object> _elementValueCache = [];
+    private int _currentDepth;
 
     /// <summary>
     /// Initializes a new <see cref="ElementFactory"/>.
@@ -69,12 +70,15 @@ public class ElementFactory : INotifyClassDeserialized
         // Start each pass with an empty NamedPredecessor cache so a reused factory cannot carry
         // cached objects across parses.
         _elementValueCache.Clear();
+        _currentDepth = 0;
 
         return CreateObject(_elementDefinition, element, null);
     }
 
     private object CreateObject(ElementDefinition definition, XElement sourceElement, object? parentObject)
     {
+        using var guard = new DepthGuard(this, sourceElement);
+
         if (_log.IsEnabled(LogLevel.Debug))
         {
             _log.LogDebug("CreateObject(ElementDefinition, XElement) called; ElementName='{ElementName}.'", definition.ElementName);
@@ -125,6 +129,8 @@ public class ElementFactory : INotifyClassDeserialized
     /// </ul></exception>
     private object CreateObject(GenericTypeElementDefinition genericTypeDefinition, XElement sourceElement, object? parentObject)
     {
+        using var guard = new DepthGuard(this, sourceElement);
+
         if (_log.IsEnabled(LogLevel.Debug))
         {
             _log.LogDebug("CreateObject(GenericTypeElementDefinition, XElement) called; ElementName='{ElementName}'.", genericTypeDefinition.ElementName);
@@ -194,6 +200,8 @@ public class ElementFactory : INotifyClassDeserialized
 
     private object CreateObject(MultiTypeElementDefinition multiTypeDefinition, XElement sourceElement, object? parentObject)
     {
+        using var guard = new DepthGuard(this, sourceElement);
+
         if (_log.IsEnabled(LogLevel.Debug))
         {
             _log.LogDebug("CreateObject(MultiTypeElementDefinition, XElement) called; ElementName='{ElementName}'.", multiTypeDefinition.ElementName);
@@ -608,7 +616,7 @@ public class ElementFactory : INotifyClassDeserialized
                 }
                 return result;
             }
-            catch (ArgumentException ex)
+            catch (Exception ex) when (ex is ArgumentException or OverflowException)
             {
                 throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ex, ErrorMessages.InvalidValueEnumParseFailure, attribute.Value, type.Name);
             }
@@ -691,4 +699,25 @@ public class ElementFactory : INotifyClassDeserialized
     public event EventHandler<ClassDeserializedEventArgs>? ClassDeserialized;
 
     #endregion
+
+    private struct DepthGuard : IDisposable
+    {
+        private readonly ElementFactory _factory;
+
+        public DepthGuard(ElementFactory factory, XElement sourceElement)
+        {
+            _factory = factory;
+            _factory._currentDepth++;
+            if (_factory._currentDepth > 128)
+            {
+                throw ThrowHelper.New<FixAtdlException>(_factory, new ExceptionInfo(sourceElement),
+                    "XML parsing exceeded maximum depth limit of 128. The document may contain too many nested levels.");
+            }
+        }
+
+        public void Dispose()
+        {
+            _factory._currentDepth--;
+        }
+    }
 }

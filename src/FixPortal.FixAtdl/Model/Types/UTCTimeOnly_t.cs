@@ -23,6 +23,9 @@ public class UTCTimeOnly_t : UTCDateTimeTypeBase
 {
     private static readonly string[] _formatStrings = [FixDateTimeFormat.FixTimeOnly, FixDateTimeFormat.FixTimeOnlyMs];
 
+    /// <inheritdoc />
+    internal override bool IsTimeOnlyType => true;
+
     /// <summary>
     /// Gets the DateTime format strings to use when converting this date/time to a FIX string and vice versa.
     /// </summary>

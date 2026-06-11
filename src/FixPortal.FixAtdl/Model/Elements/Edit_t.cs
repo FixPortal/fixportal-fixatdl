@@ -537,31 +537,49 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     /// </summary>
     void IResolvable<Strategy_t, T>.Resolve(Strategy_t strategy, ISimpleDictionary<T> sourceCollection)
     {
-        // 'value' and 'field2' are mutually exclusive right-hand-side forms; both being present is a
-        // malformed edit. Reject it here (fail fast at resolve) rather than silently letting 'value'
-        // win in GetRhsValue. Both default to null! and are non-null once the attribute is present (an
-        // explicit empty-string value="" also counts as "set" — conservative fail-fast).
+        ValidateInvariants();
+
+        (Edits as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);
+
+        if (!string.IsNullOrEmpty(Field) && !Field.StartsWith("FIX_", StringComparison.Ordinal))
+        {
+            _fieldSource = ResolveField(Field, nameof(Field), sourceCollection);
+        }
+
+        if (!string.IsNullOrEmpty(Field2) && !Field2.StartsWith("FIX_", StringComparison.Ordinal))
+        {
+            _field2Source = ResolveField(Field2, nameof(Field2), sourceCollection);
+        }
+    }
+
+    private void ValidateInvariants()
+    {
         if (Value != null && Field2 != null)
         {
             throw ThrowHelper.New<InconsistentStrategyException>(this, ErrorMessages.EditValueAndField2BothSet,
                 string.IsNullOrEmpty(Id) ? "(unnamed)" : Id);
         }
 
-        (Edits as IResolvable<Strategy_t, T>).Resolve(strategy, sourceCollection);
-
-        if (!string.IsNullOrEmpty(Field) && !Field.StartsWith("FIX_", StringComparison.Ordinal))
+        if (Operator != null && string.IsNullOrEmpty(Field))
         {
-            _fieldSource = sourceCollection.Contains(Field)
-                ? sourceCollection[Field]
-                : throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefFieldControlNotFound, Field, "Field");
+            throw ThrowHelper.New<InconsistentStrategyException>(this,
+                "An Edit (Id '{0}') has an operator specified but is missing the 'field' attribute.",
+                string.IsNullOrEmpty(Id) ? "(unnamed)" : Id);
         }
 
-        if (!string.IsNullOrEmpty(Field2) && !Field2.StartsWith("FIX_", StringComparison.Ordinal))
+        if (Operator != null && (LogicOperator != null || Edits.Count > 0))
         {
-            _field2Source = sourceCollection.Contains(Field2)
-                ? sourceCollection[Field2]
-                : throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefFieldControlNotFound, Field2, "Field2");
+            throw ThrowHelper.New<InconsistentStrategyException>(this,
+                "An Edit (Id '{0}') has both comparison operator and child edits/logicOperator configured.",
+                string.IsNullOrEmpty(Id) ? "(unnamed)" : Id);
         }
+    }
+
+    private T ResolveField(string fieldName, string propertyName, ISimpleDictionary<T> sourceCollection)
+    {
+        return sourceCollection.Contains(fieldName)
+            ? sourceCollection[fieldName]
+            : throw ThrowHelper.New<ReferencedObjectNotFoundException>(this, ErrorMessages.EditRefFieldControlNotFound, fieldName, propertyName);
     }
 
     #endregion IResolvable<Strategy_t> Members

@@ -1,1 +1,3 @@
 #nullable enable
+override FixPortal.FixAtdl.Model.Collections.StateRuleCollection.InsertItem(int index, FixPortal.FixAtdl.Model.Elements.StateRule_t! item) -> void
+override FixPortal.FixAtdl.Model.Collections.StateRuleCollection.SetItem(int index, FixPortal.FixAtdl.Model.Elements.StateRule_t! item) -> void

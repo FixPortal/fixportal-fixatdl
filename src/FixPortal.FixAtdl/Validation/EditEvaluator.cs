@@ -149,15 +149,18 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T> where T : cl
     /// <param name="sourceCollection">The value source collection used to resolve field references.</param>
     void IResolvable<Strategy_t, T>.Resolve(Strategy_t strategy, ISimpleDictionary<T> sourceCollection)
     {
+        if (Edit == null && EditRef == null)
+        {
+            throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.NeitherEditNorEditRefSetOnObject, GetType().Name);
+        }
+
         if (Edit != null)
         {
             ((IResolvable<Strategy_t, T>)Edit).Resolve(strategy, sourceCollection);
         }
         else
         {
-            // Edit and EditRef are mutually exclusive (enforced by the setters); a direct cast
-            // of null is legal and ?. then skips, so an unset EditRef is a no-op as before.
-            ((IResolvable<Strategy_t, T>)EditRef)?.Resolve(strategy, sourceCollection);
+            ((IResolvable<Strategy_t, T>)EditRef)!.Resolve(strategy, sourceCollection);
         }
     }
 
