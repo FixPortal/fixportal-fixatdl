@@ -47,7 +47,16 @@ public class Country_t : EnumTypeBase<IsoCountryCode>
     /// <returns>Value converted from a string.</returns>
     protected override IsoCountryCode? ConvertFromWireValueFormat(string value)
     {
-        return value.ParseAsEnum<IsoCountryCode>();
+        if (value == "None")
+        {
+            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(this, Resources.ErrorMessages.InvalidValueEnumParseFailure, value, nameof(IsoCountryCode));
+        }
+        IsoCountryCode parsed = value.ParseAsEnum<IsoCountryCode>();
+        if (parsed == IsoCountryCode.None)
+        {
+            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(this, Resources.ErrorMessages.InvalidValueEnumParseFailure, value, nameof(IsoCountryCode));
+        }
+        return parsed;
     }
 
     /// <summary>
@@ -57,7 +66,7 @@ public class Country_t : EnumTypeBase<IsoCountryCode>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
     protected override string? ConvertToWireValueFormat(IsoCountryCode? value)
     {
-        return value != null ? Enum.GetName(typeof(IsoCountryCode), value) : null;
+        return value != null && value != IsoCountryCode.None ? Enum.GetName(typeof(IsoCountryCode), value) : null;
     }
 
     /// <summary>

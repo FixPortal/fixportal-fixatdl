@@ -10,7 +10,6 @@ namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 /// <summary>
 /// The exception that is thrown when attempting to set a field to an invalid value.
 /// </summary>
-[Serializable]
 public class InvalidFieldValueException : FixAtdlException
 {
     /// <summary>

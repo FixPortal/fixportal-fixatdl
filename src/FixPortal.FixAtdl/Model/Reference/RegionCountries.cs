@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Collections.Frozen;
 using FixPortal.FixAtdl.Model.Enumerations;
 
 namespace FixPortal.FixAtdl.Model.Reference;
@@ -39,8 +40,8 @@ public static class Regions
         return Region.None;
     }
 
-    private static readonly HashSet<IsoCountryCode> _theAmericasCountries =
-    [
+    private static readonly FrozenSet<IsoCountryCode> _theAmericasCountries = new[]
+    {
         IsoCountryCode.AI,
         IsoCountryCode.AG,
         IsoCountryCode.AR,
@@ -91,15 +92,15 @@ public static class Regions
         IsoCountryCode.VG,
         IsoCountryCode.VI,
         IsoCountryCode.VE,
-    ];
+    }.ToFrozenSet();
 
     /// <summary>
     /// Provides the set of ISO country codes that are in The Americas.
     /// </summary>
     public static IReadOnlySet<IsoCountryCode> TheAmericasCountries => _theAmericasCountries;
 
-    private static readonly HashSet<IsoCountryCode> _europeMiddleEastAfricaCountries =
-    [
+    private static readonly FrozenSet<IsoCountryCode> _europeMiddleEastAfricaCountries = new[]
+    {
         IsoCountryCode.AD,
         IsoCountryCode.AE,
         IsoCountryCode.AL,
@@ -233,15 +234,15 @@ public static class Regions
         IsoCountryCode.ZA,
         IsoCountryCode.ZM,
         IsoCountryCode.ZW
-    ];
+    }.ToFrozenSet();
 
     /// <summary>
     /// Provides the set of ISO country codes that are in Europe, the Middle East and Africa.
     /// </summary>
     public static IReadOnlySet<IsoCountryCode> EuropeMiddleEastAfricaCountries => _europeMiddleEastAfricaCountries;
 
-    private static readonly HashSet<IsoCountryCode> _asiaPacificJapanCountries =
-    [
+    private static readonly FrozenSet<IsoCountryCode> _asiaPacificJapanCountries = new[]
+    {
         IsoCountryCode.AF,
         IsoCountryCode.AS,
         IsoCountryCode.AU,
@@ -301,7 +302,7 @@ public static class Regions
         IsoCountryCode.VU,
         IsoCountryCode.WF,
         IsoCountryCode.WS
-    ];
+    }.ToFrozenSet();
 
     /// <summary>
     /// Provides the set of ISO country codes that are in the Asia Pacific and Japan region.

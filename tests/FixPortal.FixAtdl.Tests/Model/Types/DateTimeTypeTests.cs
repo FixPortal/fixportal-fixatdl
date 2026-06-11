@@ -131,10 +131,9 @@ public class DateTimeTypeTests
     [Fact]
     public void TZTimeOnly_t_normalises_offset_to_UTC_Z()
     {
-        // NOTE: "02:39:00-05:00" (ET) is normalised to UTC on parse: 07:39:00Z.
-        // The original offset "-05:00" is NOT preserved — only the UTC instant is.
+        // NOTE: Now we preserve and round-trip the original offset representation.
         var p = new Parameter_t<TZTimeOnly_t>("T") { WireValue = "02:39:00-05:00" };
-        p.WireValue.Should().Be("07:39:00Z");
+        p.WireValue.Should().Be("02:39:00-05:00");
     }
 
     [Fact]
@@ -142,7 +141,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<TZTimeOnly_t>("T") { WireValue = "15:39+08" };
 
-        p.WireValue.Should().Be("07:39:00Z");
+        p.WireValue.Should().Be("15:39+08");
         ((DateTime?)p.GetCurrentValue()).Value.Date.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
     }
 
@@ -151,7 +150,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<TZTimeOnly_t>("T") { WireValue = "13:09:00.123456+05:30" };
 
-        p.WireValue.Should().Be("07:39:00.123456Z");
+        p.WireValue.Should().Be("13:09:00.123456+05:30");
     }
 
     [Fact]
@@ -159,7 +158,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<TZTimeOnly_t>("T") { WireValue = "02:39:00-05" };
 
-        p.WireValue.Should().Be("07:39:00Z");
+        p.WireValue.Should().Be("02:39:00-05");
     }
 
     [Fact]
@@ -188,9 +187,9 @@ public class DateTimeTypeTests
     [Fact]
     public void TZTimestamp_t_normalises_offset_to_UTC_Z()
     {
-        // NOTE: "20060901-02:39:00-05:00" normalised: 02:39 + 5h = 07:39 UTC on same date.
+        // NOTE: Now we preserve and round-trip the original offset representation.
         var p = new Parameter_t<TZTimestamp_t>("Ts") { WireValue = "20060901-02:39:00-05:00" };
-        p.WireValue.Should().Be("20060901-07:39:00Z");
+        p.WireValue.Should().Be("20060901-02:39:00-05:00");
     }
 
     [Fact]
@@ -198,7 +197,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<TZTimestamp_t>("Ts") { WireValue = "20060901-15:39+08" };
 
-        p.WireValue.Should().Be("20060901-07:39:00Z");
+        p.WireValue.Should().Be("20060901-15:39+08");
     }
 
     [Fact]
@@ -206,7 +205,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<TZTimestamp_t>("Ts") { WireValue = "20060901-13:09:00.123456+05:30" };
 
-        p.WireValue.Should().Be("20060901-07:39:00.123456Z");
+        p.WireValue.Should().Be("20060901-13:09:00.123456+05:30");
     }
 
     [Fact]
@@ -214,7 +213,7 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<TZTimestamp_t>("Ts") { WireValue = "20060901-02:39:00-05" };
 
-        p.WireValue.Should().Be("20060901-07:39:00Z");
+        p.WireValue.Should().Be("20060901-02:39:00-05");
     }
 
     [Fact]

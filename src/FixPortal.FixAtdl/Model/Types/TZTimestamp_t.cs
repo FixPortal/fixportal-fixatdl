@@ -65,6 +65,41 @@ public class TZTimestamp_t : DateTimeTypeBase
         return HumanReadableTypeNames.TimestampType;
     }
 
+    private string? _originalWireValue;
+    private TimeSpan? _parsedOffset;
+    private DateTime? _parsedUtcValue;
+
+    /// <summary>
+    /// Converts the supplied wire value to a DateTime? and captures the timezone offset.
+    /// </summary>
+    protected override DateTime? ConvertFromWireValueFormat(string value)
+    {
+        DateTime? parsed = base.ConvertFromWireValueFormat(value);
+
+        if (parsed == null)
+        {
+            _originalWireValue = null;
+            _parsedOffset = null;
+            _parsedUtcValue = null;
+            return null;
+        }
+
+        if (DateTimeOffset.TryParseExact(value, _formatStrings, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset dto))
+        {
+            _originalWireValue = value;
+            _parsedOffset = dto.Offset;
+            _parsedUtcValue = parsed;
+        }
+        else
+        {
+            _originalWireValue = null;
+            _parsedOffset = null;
+            _parsedUtcValue = null;
+        }
+
+        return parsed;
+    }
+
     /// <summary>
     /// Converts the supplied value to a string, preserving fractional seconds when present.
     /// </summary>
@@ -84,10 +119,25 @@ public class TZTimestamp_t : DateTimeTypeBase
             _ => DateTime.SpecifyKind(value.Value, DateTimeKind.Utc),
         };
 
-        string format = adjustedValue.Ticks % TimeSpan.TicksPerSecond == 0
-            ? FixDateTimeFormat.FixDateTimeWithTz
-            : FixDateTimeFormat.FixDateTimeFractionalWithMinuteOffset;
+        if (_originalWireValue != null && _parsedUtcValue != null && adjustedValue.Equals(_parsedUtcValue.Value))
+        {
+            return _originalWireValue;
+        }
 
-        return adjustedValue.ToString(format, CultureInfo.InvariantCulture);
+        if (_parsedOffset != null)
+        {
+            DateTimeOffset dto = new DateTimeOffset(adjustedValue, TimeSpan.Zero).ToOffset(_parsedOffset.Value);
+            string format = dto.Ticks % TimeSpan.TicksPerSecond == 0
+                ? FixDateTimeFormat.FixDateTimeWithTz
+                : FixDateTimeFormat.FixDateTimeFractionalWithMinuteOffset;
+            return dto.ToString(format, CultureInfo.InvariantCulture);
+        }
+        else
+        {
+            string format = adjustedValue.Ticks % TimeSpan.TicksPerSecond == 0
+                ? FixDateTimeFormat.FixDateTimeWithTz
+                : FixDateTimeFormat.FixDateTimeFractionalWithMinuteOffset;
+            return adjustedValue.ToString(format, CultureInfo.InvariantCulture);
+        }
     }
 }

@@ -70,10 +70,7 @@ public static class FixDateTimeFormat
     /// <summary>Date and time with whole seconds and an appended bare-hour timezone offset.</summary>
     public static readonly string FixDateTimeWithHourOffset = "yyyyMMdd-HH:mm:sszz";
 
-    /// <summary>
-    /// Gets an array containing all the FIX date/time formats.
-    /// </summary>
-    public static string[] AllFormats { get; } = [
+    internal static readonly string[] FormatsArray = [
         FixDateTime,
         FixDateTimeMs,
         FixTimeOnly,
@@ -94,4 +91,9 @@ public static class FixDateTimeFormat
         FixDateTimeFractionalWithHourOffset,
         FixDateTimeFractionalWithMinuteOffset
     ];
+
+    /// <summary>
+    /// Gets all the FIX date/time formats.
+    /// </summary>
+    public static System.Collections.Generic.IReadOnlyList<string> AllFormats => FormatsArray;
 }

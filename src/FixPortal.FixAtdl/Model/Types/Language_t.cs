@@ -47,7 +47,16 @@ public class Language_t : EnumTypeBase<IsoLanguageCode>
     /// <returns>Value converted from a string.</returns>
     protected override IsoLanguageCode? ConvertFromWireValueFormat(string value)
     {
-        return value.ParseAsEnum<IsoLanguageCode>();
+        if (value == "None")
+        {
+            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(this, Resources.ErrorMessages.InvalidValueEnumParseFailure, value, nameof(IsoLanguageCode));
+        }
+        IsoLanguageCode parsed = value.ParseAsEnum<IsoLanguageCode>();
+        if (parsed == IsoLanguageCode.None)
+        {
+            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(this, Resources.ErrorMessages.InvalidValueEnumParseFailure, value, nameof(IsoLanguageCode));
+        }
+        return parsed;
     }
 
     /// <summary>
@@ -57,7 +66,7 @@ public class Language_t : EnumTypeBase<IsoLanguageCode>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
     protected override string? ConvertToWireValueFormat(IsoLanguageCode? value)
     {
-        return value != null ? Enum.GetName(typeof(IsoLanguageCode), value) : null;
+        return value != null && value != IsoLanguageCode.None ? Enum.GetName(typeof(IsoLanguageCode), value) : null;
     }
 
     /// <summary>

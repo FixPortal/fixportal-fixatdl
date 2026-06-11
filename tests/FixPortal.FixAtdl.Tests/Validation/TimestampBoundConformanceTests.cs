@@ -47,4 +47,12 @@ public class TimestampBoundConformanceTests
         var act = () => p.WireValue = "20260601-13:00:00";
         act.Should().Throw<InvalidFieldValueException>();
     }
+
+    [Fact]
+    public void Time_only_max_bound_rejects_value_after_time_of_day()
+    {
+        var p = Param(minText: null, maxText: "16:00:00");
+        var act = () => p.WireValue = "20260101-17:00:00";
+        act.Should().Throw<InvalidFieldValueException>();
+    }
 }

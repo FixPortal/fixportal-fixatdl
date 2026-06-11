@@ -8,11 +8,14 @@
 namespace FixPortal.FixAtdl.Model.Reference;
 
 /// <summary>
-/// Enumeration of all the ISO 4217 currency codes.
+/// Enumeration of ISO 4217 currency codes.
 /// </summary>
 /// <remarks>Upper case codes are used throughout to avoid clashes with C# language keywords.</remarks>
 public enum IsoCurrencyCode
 {
+    /// <summary>No currency code selected.</summary>
+    None,
+
     /// <summary>Dirhams (United Arab Emirates)</summary>
     AED,
 
@@ -524,6 +527,27 @@ public enum IsoCurrencyCode
     ZMK,
 
     /// <summary>Zimbabwe Dollars (Zimbabwe)</summary>
-    ZWD
+    ZWD,
+
+    /// <summary>New Kwacha (Zambia)</summary>
+    ZMW,
+
+    /// <summary>Belarusian Ruble (Belarus)</summary>
+    BYN,
+
+    /// <summary>Bolívar Soberano (Venezuela)</summary>
+    VES,
+
+    /// <summary>Ouguiya (Mauritania)</summary>
+    MRU,
+
+    /// <summary>Dobra (São Tomé and Príncipe)</summary>
+    STN,
+
+    /// <summary>Leone (Sierra Leone)</summary>
+    SLE,
+
+    /// <summary>South Sudanese Pound (South Sudan)</summary>
+    SSP
 }
 

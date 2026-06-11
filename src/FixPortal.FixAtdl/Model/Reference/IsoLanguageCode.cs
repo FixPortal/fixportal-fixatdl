@@ -8,11 +8,14 @@
 namespace FixPortal.FixAtdl.Model.Reference;
 
 /// <summary>
-/// Enumeration of all the ISO 639-1 language codes.
-///</summary>
+/// Enumeration of ISO 639-1 language codes.
+/// </summary>
 /// <remarks>Upper case codes are used throughout to avoid clashes with C# language keywords.</remarks>
 public enum IsoLanguageCode
 {
+    /// <summary>No language code selected.</summary>
+    None,
+
     /// <summary>Afar</summary>
     AA,
     /// <summary>Abkhazian</summary>

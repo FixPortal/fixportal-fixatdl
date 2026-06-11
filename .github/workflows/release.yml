@@ -27,13 +27,19 @@ jobs:
         run: dotnet restore FixPortal.FixAtdl.sln
 
       - name: Build (Release)
-        run: dotnet build FixPortal.FixAtdl.sln -c Release --no-restore
+        run: |
+          VERSION=${{ github.ref_name }}
+          VERSION=${VERSION#v}
+          dotnet build FixPortal.FixAtdl.sln -c Release --no-restore /p:Version=$VERSION
 
       - name: Test (Release)
         run: dotnet test FixPortal.FixAtdl.sln -c Release --no-build
 
       - name: Pack
-        run: dotnet pack src/FixPortal.FixAtdl/FixPortal.FixAtdl.csproj -c Release --no-build -o artifacts
+        run: |
+          VERSION=${{ github.ref_name }}
+          VERSION=${VERSION#v}
+          dotnet pack src/FixPortal.FixAtdl/FixPortal.FixAtdl.csproj -c Release --no-build -o artifacts /p:Version=$VERSION
 
       - name: Upload nupkg artefact
         uses: actions/upload-artifact@v7
@@ -44,7 +50,7 @@ jobs:
       # github.token suffices here: packages:write lets it publish to this repo's own
       # namespace (the cross-repo 403 trap only applies to *consumers* restoring it).
       - name: Push to GitHub Packages
-        run: dotnet nuget push artifacts/*.nupkg --source https://nuget.pkg.github.com/FixPortal/index.json --api-key ${{ github.token }} --skip-duplicate
+        run: dotnet nuget push artifacts/*.nupkg --source https://nuget.pkg.github.com/FixPortal/index.json --api-key ${{ github.token }}
 
       - name: Create GitHub Release
         run: gh release create "$RELEASE_TAG" artifacts/*.nupkg --generate-notes

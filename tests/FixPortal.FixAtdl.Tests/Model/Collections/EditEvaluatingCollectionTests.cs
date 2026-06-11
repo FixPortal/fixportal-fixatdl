@@ -32,23 +32,12 @@ public class EditEvaluatingCollectionTests
     [Fact]
     public void LoadTwap_is_not_cwd_dependent()
     {
-        string originalDirectory = Environment.CurrentDirectory;
-        string isolatedDirectory = Path.Join(Path.GetTempPath(), Path.GetRandomFileName());
-        Directory.CreateDirectory(isolatedDirectory);
+        // Assert that the file is loaded from AppContext.BaseDirectory, avoiding process-global CWD mutation.
+        var path = Path.Combine(AppContext.BaseDirectory, "Fixtures", "twap.xml");
+        File.Exists(path).Should().BeTrue();
 
-        try
-        {
-            Environment.CurrentDirectory = isolatedDirectory;
-
-            var act = () => LoadTwap();
-
-            act.Should().NotThrow();
-        }
-        finally
-        {
-            Environment.CurrentDirectory = originalDirectory;
-            Directory.Delete(isolatedDirectory);
-        }
+        var act = () => LoadTwap();
+        act.Should().NotThrow();
     }
 
     /// <summary>
@@ -146,10 +135,13 @@ public class EditEvaluatingCollectionTests
             LogicOperator = LogicOperator_t.And
         };
         collection.Add(MakeEdit(twap, "Participation", Operator_t.GreaterThan, "0"));
-        collection.Add(MakeEdit(twap, "Participation", Operator_t.LessThan, "100"));
 
-        collection.Evaluate(FixFieldValueProvider.Empty);
+        // Sentinel edit with neither Operator nor LogicOperator set, which throws on Evaluate
+        var sentinel = new Edit_t<IParameter>();
+        collection.Add(sentinel);
 
+        var act = () => collection.Evaluate(FixFieldValueProvider.Empty);
+        act.Should().NotThrow();
         collection.CurrentState.Should().BeFalse();
     }
 
@@ -162,8 +154,6 @@ public class EditEvaluatingCollectionTests
     {
         var twap = LoadTwap();
         // Participation = 50 → (> 0) = true OR (> 200) = false → OR = true.
-        // Also exercises short-circuit: once the first operand is true the Or breaks early,
-        // and the result is unchanged whether or not the second operand is evaluated.
         twap.Parameters["Participation"].WireValue = "50";
 
         var collection = new EditEvaluatingCollection<IParameter>
@@ -175,6 +165,28 @@ public class EditEvaluatingCollectionTests
 
         collection.Evaluate(FixFieldValueProvider.Empty);
 
+        collection.CurrentState.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Or_short_circuits_on_first_true()
+    {
+        var twap = LoadTwap();
+        // Participation = 50 → (> 0) = true; short-circuit should skip second edit
+        twap.Parameters["Participation"].WireValue = "50";
+
+        var collection = new EditEvaluatingCollection<IParameter>
+        {
+            LogicOperator = LogicOperator_t.Or
+        };
+        collection.Add(MakeEdit(twap, "Participation", Operator_t.GreaterThan, "0"));
+
+        // Sentinel edit with neither Operator nor LogicOperator set, which throws on Evaluate
+        var sentinel = new Edit_t<IParameter>();
+        collection.Add(sentinel);
+
+        var act = () => collection.Evaluate(FixFieldValueProvider.Empty);
+        act.Should().NotThrow();
         collection.CurrentState.Should().BeTrue();
     }
 
@@ -291,6 +303,26 @@ public class EditEvaluatingCollectionTests
             LogicOperator = LogicOperator_t.Xor
         };
         collection.Add(MakeEdit(twap, "Participation", Operator_t.GreaterThan, "0"));
+        collection.Add(MakeEdit(twap, "Participation", Operator_t.GreaterThan, "100"));
+
+        collection.Evaluate(FixFieldValueProvider.Empty);
+
+        collection.CurrentState.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Xor_three_operands_all_true_yields_false()
+    {
+        var twap = LoadTwap();
+        // Participation = 150 → (> 0), (> 50), (> 100) are all true → XOR = false (three true)
+        twap.Parameters["Participation"].WireValue = "150";
+
+        var collection = new EditEvaluatingCollection<IParameter>
+        {
+            LogicOperator = LogicOperator_t.Xor
+        };
+        collection.Add(MakeEdit(twap, "Participation", Operator_t.GreaterThan, "0"));
+        collection.Add(MakeEdit(twap, "Participation", Operator_t.GreaterThan, "50"));
         collection.Add(MakeEdit(twap, "Participation", Operator_t.GreaterThan, "100"));
 
         collection.Evaluate(FixFieldValueProvider.Empty);

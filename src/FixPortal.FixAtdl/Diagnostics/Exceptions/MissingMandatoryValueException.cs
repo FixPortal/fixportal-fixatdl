@@ -11,7 +11,6 @@ namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 /// The exception that is thrown when a value is not supplied but is required, either by the FIXatdl schema, or by setting the
 /// 'use' attribute to 'required'.
 /// </summary>
-[Serializable]
 public class MissingMandatoryValueException : FixAtdlException
 {
     /// <summary>

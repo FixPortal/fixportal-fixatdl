@@ -18,9 +18,16 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     env:
       # Restoring the private FixPortal.CodeStyle package needs read:packages.
-      GITHUB_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || github.token }}
+      GITHUB_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
     steps:
       - uses: actions/checkout@v6
+
+      - name: Check GITHUB_PACKAGES_TOKEN
+        run: |
+          if [ -z "$GITHUB_PACKAGES_TOKEN" ]; then
+            echo "::error::GH_PACKAGES_TOKEN secret is not set. This token is required to restore the private FixPortal.CodeStyle package."
+            exit 1
+          fi
 
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v5
@@ -36,11 +43,11 @@ jobs:
       - name: Test
         run: dotnet test FixPortal.FixAtdl.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
 
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool --ignore-failed-sources
+      - name: Restore local tools
+        run: dotnet tool restore
 
       - name: Generate coverage summary
-        run: reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:TextSummary
+        run: dotnet reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:TextSummary
 
       - name: Check coverage floor
         shell: pwsh

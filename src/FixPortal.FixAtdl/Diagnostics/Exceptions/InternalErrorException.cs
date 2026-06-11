@@ -8,7 +8,6 @@
 namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 
 /// <summary>Represents an internal error, i.e., one that should not occur during normal operation of Atdl4net which may indicate a bug.</summary>
-[Serializable]
 public class InternalErrorException : Exception
 {
     /// <summary>

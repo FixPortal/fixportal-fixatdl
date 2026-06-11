@@ -10,7 +10,6 @@ namespace FixPortal.FixAtdl.Diagnostics.Exceptions;
 /// <summary>
 /// The exception that is thrown when trying to process a strategy that is internally inconsistent, such as having ListItems but no EnumPairs.
 /// </summary>
-[Serializable]
 public class InconsistentStrategyException : FixAtdlException
 {
     /// <summary>

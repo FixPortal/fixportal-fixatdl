@@ -150,7 +150,14 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     /// <returns>The FIX message with SOH delimiters replaced for display.</returns>
     public override string ToString()
     {
-        return ToFix().Replace("\x01", " | ");
+        try
+        {
+            return ToFix().Replace("\x01", " | ");
+        }
+        catch (Exception ex)
+        {
+            return $"[Invalid FIX Message: {ex.Message}]";
+        }
     }
 
     /// <summary>

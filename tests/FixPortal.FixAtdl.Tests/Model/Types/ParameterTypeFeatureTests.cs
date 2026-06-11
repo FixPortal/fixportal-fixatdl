@@ -771,8 +771,12 @@ public class ParameterTypeFeatureTests
     [Fact]
     public void RegionCountries_are_read_only()
     {
-        FixPortal.FixAtdl.Model.Reference.Regions.TheAmericasCountries.Should().BeAssignableTo<IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
-        FixPortal.FixAtdl.Model.Reference.Regions.EuropeMiddleEastAfricaCountries.Should().BeAssignableTo<IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
-        FixPortal.FixAtdl.Model.Reference.Regions.AsiaPacificJapanCountries.Should().BeAssignableTo<IReadOnlySet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
+        FixPortal.FixAtdl.Model.Reference.Regions.TheAmericasCountries.Should().BeAssignableTo<System.Collections.Frozen.FrozenSet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
+        FixPortal.FixAtdl.Model.Reference.Regions.EuropeMiddleEastAfricaCountries.Should().BeAssignableTo<System.Collections.Frozen.FrozenSet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
+        FixPortal.FixAtdl.Model.Reference.Regions.AsiaPacificJapanCountries.Should().BeAssignableTo<System.Collections.Frozen.FrozenSet<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>>();
+
+        var americasColl = (System.Collections.Generic.ICollection<FixPortal.FixAtdl.Model.Reference.IsoCountryCode>)FixPortal.FixAtdl.Model.Reference.Regions.TheAmericasCountries;
+        Action addAct = () => americasColl.Add(FixPortal.FixAtdl.Model.Reference.IsoCountryCode.US);
+        addAct.Should().Throw<NotSupportedException>();
     }
 }
