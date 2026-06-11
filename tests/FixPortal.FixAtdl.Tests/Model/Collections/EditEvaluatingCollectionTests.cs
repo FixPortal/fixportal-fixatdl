@@ -33,7 +33,7 @@ public class EditEvaluatingCollectionTests
     public void LoadTwap_is_not_cwd_dependent()
     {
         // Assert that the file is loaded from AppContext.BaseDirectory, avoiding process-global CWD mutation.
-        var path = Path.Combine(AppContext.BaseDirectory, "Fixtures", "twap.xml");
+        var path = Path.Join(AppContext.BaseDirectory, "Fixtures", "twap.xml");
         File.Exists(path).Should().BeTrue();
 
         var act = () => LoadTwap();

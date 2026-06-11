@@ -154,7 +154,7 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
         {
             return ToFix().Replace("\x01", " | ");
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex)
         {
             return $"[Invalid FIX Message: {ex.Message}]";
         }
