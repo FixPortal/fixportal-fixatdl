@@ -9,23 +9,13 @@ permissions:
   contents: read
 
 jobs:
-  stryker-fixatdl-pilot:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+  stryker:
+    runs-on: ubuntu-latest
     continue-on-error: true
-    env:
-      # Restoring the private FixPortal.CodeStyle package needs read:packages.
-      GITHUB_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Check GITHUB_PACKAGES_TOKEN
-        run: |
-          if [ -z "$GITHUB_PACKAGES_TOKEN" ]; then
-            echo "::error::GH_PACKAGES_TOKEN secret is not set. This token is required to restore the private FixPortal.CodeStyle package."
-            exit 1
-          fi
 
       - uses: actions/setup-dotnet@v5
         with:
@@ -33,11 +23,13 @@ jobs:
 
       - name: Restore solution
         run: dotnet restore FixPortal.FixAtdl.sln
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_PACKAGES_TOKEN }}
 
       - name: Restore local tools
         run: dotnet tool restore
 
-      - name: Run Stryker pilot
+      - name: Run Stryker
         run: dotnet stryker --config-file stryker-config.json
 
       - name: Summarize mutation report
@@ -49,7 +41,7 @@ jobs:
           $report = Join-Path $latest.FullName 'reports/mutation-report.json'
           $jsonSummary = Join-Path $latest.FullName 'reports/mutation-summary.json'
           $mdSummary = Join-Path $latest.FullName 'reports/mutation-summary.md'
-          ./scripts/summarize-stryker.ps1 -ReportPath $report -JsonOutputPath $jsonSummary -MarkdownOutputPath $mdSummary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          .\scripts\summarize-stryker.ps1 -ReportPath $report -JsonOutputPath $jsonSummary -MarkdownOutputPath $mdSummary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
 
       - name: Upload mutation summary
         if: always()

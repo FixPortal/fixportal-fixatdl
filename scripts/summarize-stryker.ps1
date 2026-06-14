@@ -23,7 +23,6 @@ $rows = foreach ($file in $files) {
     foreach ($mutant in $mutants) {
         [void]$allStatuses.Add([string]$mutant.status)
     }
-
     [pscustomobject]@{
         file     = [System.IO.Path]::GetFileName($file.Name)
         killed   = @($mutants | Where-Object status -eq 'Killed').Count
@@ -37,7 +36,7 @@ $killed = @($rows | Measure-Object -Property killed -Sum).Sum
 $survived = @($rows | Measure-Object -Property survived -Sum).Sum
 $ignored = @($rows | Measure-Object -Property ignored -Sum).Sum
 $total = @($rows | Measure-Object -Property total -Sum).Sum
-$tested = $killed + $survived
+$tested = $total - $ignored
 $score = if ($tested -eq 0) { 0 } else { [math]::Round(($killed / $tested) * 100, 1) }
 $hotspots = @(
     $rows |
@@ -65,22 +64,22 @@ $summary = [ordered]@{
 }
 
 $markdown = @(
-    '### Stryker mutation summary',
-    '',
-    '| Metric | Value |',
-    '| --- | ---: |',
-    "| Killed | $killed |",
-    "| Survived | $survived |",
-    "| Ignored | $ignored |",
-    "| Tested mutants | $tested |",
-    "| Score (killed/tested) | $score% |",
+    '### Stryker mutation summary'
+    ''
+    "| Metric | Value |"
+    "| --- | ---: |"
+    "| Killed | $killed |"
+    "| Survived | $survived |"
+    "| Ignored | $ignored |"
+    "| Tested mutants | $tested |"
+    "| Score (killed/tested) | $score% |"
     ''
 )
 
 $extraStatuses = @($statusTotals.GetEnumerator() | Where-Object { $_.Key -notin @('Killed', 'Survived', 'Ignored') -and $_.Value -gt 0 })
 if ($extraStatuses.Count -gt 0) {
-    $markdown += '| Additional status | Count |'
-    $markdown += '| --- | ---: |'
+    $markdown += "| Additional status | Count |"
+    $markdown += "| --- | ---: |"
     foreach ($entry in $extraStatuses) {
         $markdown += "| $($entry.Key) | $($entry.Value) |"
     }
@@ -88,14 +87,14 @@ if ($extraStatuses.Count -gt 0) {
 }
 
 if ($hotspots.Count -gt 0) {
-    $markdown += '| File | Killed | Survived | Ignored |'
-    $markdown += '| --- | ---: | ---: | ---: |'
+    $markdown += "| File | Killed | Survived | Ignored |"
+    $markdown += "| --- | ---: | ---: | ---: |"
     foreach ($hotspot in $hotspots) {
         $markdown += "| $($hotspot.file) | $($hotspot.killed) | $($hotspot.survived) | $($hotspot.ignored) |"
     }
 }
 else {
-    $markdown += 'No surviving mutants.'
+    $markdown += "No surviving mutants."
 }
 
 $markdownText = ($markdown -join [Environment]::NewLine) + [Environment]::NewLine
@@ -105,7 +104,6 @@ if ($JsonOutputPath) {
     if ($directory) {
         [System.IO.Directory]::CreateDirectory($directory) | Out-Null
     }
-
     $summary | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $JsonOutputPath
 }
 
@@ -114,7 +112,6 @@ if ($MarkdownOutputPath) {
     if ($directory) {
         [System.IO.Directory]::CreateDirectory($directory) | Out-Null
     }
-
     $markdownText | Set-Content -LiteralPath $MarkdownOutputPath
 }
 
