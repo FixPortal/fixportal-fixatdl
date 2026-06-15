@@ -22,9 +22,9 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore solution
-        run: dotnet restore FixPortal.FixAtdl.sln
+        run: dotnet restore FixPortal.FixAtdl.slnx
         env:
-          GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_PACKAGES_TOKEN }}
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore local tools
         run: dotnet tool restore

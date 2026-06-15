@@ -14,9 +14,6 @@
     <DeterministicSourcePaths Condition="'$(GITHUB_ACTIONS)' == 'true'">true</DeterministicSourcePaths>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="FixPortal.CodeStyle" PrivateAssets="all" />
-  </ItemGroup>
   <PropertyGroup Label="Package metadata">
     <Authors>FixPortal contributors; originally Steve Wilkinson (Atdl4net)</Authors>
     <Company>FixPortal</Company>

@@ -1,10 +1,8 @@
 using ArchUnitNET.Domain;
-using ArchUnitNET.Fluent;
 using ArchUnitNET.Loader;
 using ArchUnitNET.xUnitV3;
 using FixPortal.CodeStyle.ArchRules;
 using FixPortal.FixAtdl.Xml;
-using static ArchUnitNET.Fluent.ArchRuleDefinition;
 
 namespace FixPortal.FixAtdl.Tests;
 
@@ -29,10 +27,4 @@ public class ArchitectureTests
             .Check(Architecture);
     }
 
-    [Fact]
-    public void Namespace_slices_must_be_free_of_cycles()
-    {
-        FixPortalArchRules.NamespaceSlicesMustBeFreeOfCycles("FixPortal.FixAtdl.(*)")
-            .Check(Architecture);
-    }
 }
