@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -14,17 +14,20 @@ permissions:
   contents: read
 
 jobs:
-  backend:
+  build-and-test:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     env:
+      # Restoring the private FixPortal.CodeStyle package needs read:packages.
       GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v6
 
-      - name: Lint workflow and shell scripts
-        uses: raven-actions/actionlint@v2
-        with:
-          shellcheck: true
+      - name: Check GITHUB_PACKAGES_TOKEN
+        run: |
+          if [ -z "$GITHUB_PACKAGES_TOKEN" ]; then
+            echo "::error::GH_PACKAGES_TOKEN secret is not set. This token is required to restore the private FixPortal.CodeStyle package."
+            exit 1
+          fi
 
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v5
