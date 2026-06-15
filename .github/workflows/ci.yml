@@ -41,15 +41,15 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore FixPortal.FixAtdl.sln
+        run: dotnet restore FixPortal.FixAtdl.slnx
         env:
-          GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_PACKAGES_TOKEN }}
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
-        run: dotnet build FixPortal.FixAtdl.sln --configuration Release --no-restore
+        run: dotnet build FixPortal.FixAtdl.slnx --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test FixPortal.FixAtdl.sln --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
+        run: dotnet test FixPortal.FixAtdl.slnx --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
 
       - name: Upload test results
         if: always()

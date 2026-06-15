@@ -24,21 +24,23 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore FixPortal.FixAtdl.sln
+        run: dotnet restore FixPortal.FixAtdl.slnx
 
       - name: Build (Release)
+        env:
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          VERSION=${{ github.ref_name }}
-          VERSION=${VERSION#v}
-          dotnet build FixPortal.FixAtdl.sln -c Release --no-restore /p:Version=$VERSION
+          VERSION=${REF_NAME#v}
+          dotnet build FixPortal.FixAtdl.slnx -c Release --no-restore /p:Version=$VERSION
 
       - name: Test (Release)
-        run: dotnet test FixPortal.FixAtdl.sln -c Release --no-build
+        run: dotnet test FixPortal.FixAtdl.slnx -c Release --no-build
 
       - name: Pack
+        env:
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          VERSION=${{ github.ref_name }}
-          VERSION=${VERSION#v}
+          VERSION=${REF_NAME#v}
           dotnet pack src/FixPortal.FixAtdl/FixPortal.FixAtdl.csproj -c Release --no-build -o artifacts /p:Version=$VERSION
 
       - name: Upload nupkg artefact

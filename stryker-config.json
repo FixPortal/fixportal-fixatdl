@@ -1,6 +1,6 @@
 {
   "stryker-config": {
-    "solution": "FixPortal.FixAtdl.sln",
+    "solution": "FixPortal.FixAtdl.slnx",
     "project": "src/FixPortal.FixAtdl/FixPortal.FixAtdl.csproj",
     "test-projects": [
       "tests/FixPortal.FixAtdl.Tests/FixPortal.FixAtdl.Tests.csproj"
