@@ -29,6 +29,11 @@ jobs:
             exit 1
           fi
 
+      - name: Lint workflow and shell scripts
+        uses: raven-actions/actionlint@v2
+        with:
+          shellcheck: true
+
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v5
         with:
