@@ -23,10 +23,13 @@ concurrency:
 
 permissions:
   contents: read
+  packages: read
 
 jobs:
   backend:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || github.token }}
     steps:
       - uses: actions/checkout@v6
 
@@ -42,8 +45,6 @@ jobs:
 
       - name: Restore
         run: dotnet restore FixPortal.FixAtdl.slnx
-        env:
-          GITHUB_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || github.token }}
 
       - name: Build
         run: dotnet build FixPortal.FixAtdl.slnx --configuration Release --no-restore
