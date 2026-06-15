@@ -43,7 +43,7 @@ jobs:
       - name: Restore
         run: dotnet restore FixPortal.FixAtdl.slnx
         env:
-          GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || github.token }}
 
       - name: Build
         run: dotnet build FixPortal.FixAtdl.slnx --configuration Release --no-restore
