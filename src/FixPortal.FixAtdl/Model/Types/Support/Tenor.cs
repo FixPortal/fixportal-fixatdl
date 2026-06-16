@@ -226,8 +226,21 @@ public struct Tenor : IComparable
             return lhs.Offset.CompareTo(rhs.Offset);
         }
 
-        // Different units (e.g. D7 vs M1): reject mixed-unit comparisons.
-        throw new ArgumentException("Cannot compare tenors with different units.");
+        // Different units (e.g. D7 vs M1): compare by approximate calendar-day magnitude so
+        // the IComparable contract stays total — CompareTo must return an int for any two
+        // valid tenors, not throw. This keeps MinValue/MaxValue validation returning a
+        // ValidationResult for mixed-unit bounds instead of crashing. Same-unit comparisons
+        // above remain exact; only cross-unit ordering is approximate.
+        return ApproximateDays(lhs).CompareTo(ApproximateDays(rhs));
     }
 
+    // Nominal calendar-day magnitude for cross-unit ordering only (W=7, M=30, Y=365 days).
+    private static long ApproximateDays(Tenor tenor) => tenor.TenorType switch
+    {
+        TenorTypeValue.Day => tenor.Offset,
+        TenorTypeValue.Week => tenor.Offset * 7L,
+        TenorTypeValue.Month => tenor.Offset * 30L,
+        TenorTypeValue.Year => tenor.Offset * 365L,
+        _ => 0L,
+    };
 }

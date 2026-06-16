@@ -60,7 +60,6 @@ public class TZTimeOnly_t : DateTimeTypeBase
         DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
 
     private string? _originalWireValue;
-    private TimeSpan? _parsedOffset;
     private DateTime? _parsedUtcValue;
 
     /// <summary>
@@ -84,7 +83,6 @@ public class TZTimeOnly_t : DateTimeTypeBase
         if (parsed == null)
         {
             _originalWireValue = null;
-            _parsedOffset = null;
             _parsedUtcValue = null;
             return null;
         }
@@ -93,16 +91,14 @@ public class TZTimeOnly_t : DateTimeTypeBase
         DateTime anchored = new DateTime(1, 1, 1, result.Hour, result.Minute, result.Second, result.Millisecond, result.Kind)
             .AddTicks(result.Ticks % TimeSpan.TicksPerMillisecond);
 
-        if (DateTimeOffset.TryParseExact(value, _formatStrings, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset dto))
+        if (DateTimeOffset.TryParseExact(value, _formatStrings, CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
         {
             _originalWireValue = value;
-            _parsedOffset = dto.Offset;
             _parsedUtcValue = anchored;
         }
         else
         {
             _originalWireValue = null;
-            _parsedOffset = null;
             _parsedUtcValue = null;
         }
 
@@ -128,25 +124,19 @@ public class TZTimeOnly_t : DateTimeTypeBase
             _ => DateTime.SpecifyKind(value.Value, DateTimeKind.Utc),
         };
 
+        // Round-trip the exact original wire string only when the instant is unchanged from
+        // what was parsed. For any other instant emit canonical UTC ('Z'): the parsed offset
+        // belongs to the parsed instant alone and must not be re-applied to a value set
+        // programmatically (control/SetWireValue) after the parse, which previously emitted
+        // the wrong offset.
         if (_originalWireValue != null && _parsedUtcValue != null && adjustedValue.Equals(_parsedUtcValue.Value))
         {
             return _originalWireValue;
         }
 
-        if (_parsedOffset != null)
-        {
-            DateTimeOffset dto = new DateTimeOffset(adjustedValue, TimeSpan.Zero).ToOffset(_parsedOffset.Value);
-            string format = dto.Ticks % TimeSpan.TicksPerSecond == 0
-                ? FixDateTimeFormat.FixTimeOnlyWithTz
-                : FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset;
-            return dto.ToString(format, CultureInfo.InvariantCulture);
-        }
-        else
-        {
-            string format = adjustedValue.Ticks % TimeSpan.TicksPerSecond == 0
-                ? FixDateTimeFormat.FixTimeOnlyWithTz
-                : FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset;
-            return adjustedValue.ToString(format, CultureInfo.InvariantCulture);
-        }
+        string format = adjustedValue.Ticks % TimeSpan.TicksPerSecond == 0
+            ? FixDateTimeFormat.FixTimeOnlyWithTz
+            : FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset;
+        return adjustedValue.ToString(format, CultureInfo.InvariantCulture);
     }
 }

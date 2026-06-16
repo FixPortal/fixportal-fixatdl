@@ -235,11 +235,6 @@ public struct MonthYear : IComparable
             return lhs.Month.CompareTo(rhs.Month);
         }
 
-        if (lhs.Day != null && rhs.Week != null || lhs.Week != null && rhs.Day != null)
-        {
-            throw new ArgumentException("Cannot compare day-specified MonthYear with week-specified MonthYear.");
-        }
-
         // Same year and month: order by approximate intra-month position so that mixed suffixes
         // (day-qualified vs week-qualified, or a suffix vs no suffix) compare deterministically
         // instead of throwing NotSupportedException when reached via the </>=/<= operators that

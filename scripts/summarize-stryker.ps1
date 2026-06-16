@@ -36,8 +36,11 @@ $killed = @($rows | Measure-Object -Property killed -Sum).Sum
 $survived = @($rows | Measure-Object -Property survived -Sum).Sum
 $ignored = @($rows | Measure-Object -Property ignored -Sum).Sum
 $total = @($rows | Measure-Object -Property total -Sum).Sum
-$tested = $total - $ignored
-$score = if ($tested -eq 0) { 0 } else { [math]::Round(($killed / $tested) * 100, 1) }
+# Non-ignored mutants form the score denominator. This is broader than killed+survived
+# (it also includes NoCoverage/Timeout/error statuses), so the heading below says
+# "killed / non-ignored" rather than implying a killed/(killed+survived) ratio.
+$nonIgnored = $total - $ignored
+$score = if ($nonIgnored -eq 0) { 0 } else { [math]::Round(($killed / $nonIgnored) * 100, 1) }
 $hotspots = @(
     $rows |
         Where-Object survived -gt 0 |
@@ -57,7 +60,7 @@ $summary = [ordered]@{
     killed       = $killed
     survived     = $survived
     ignored      = $ignored
-    tested       = $tested
+    nonIgnored   = $nonIgnored
     score        = $score
     statusTotals = $statusTotals
     hotspots     = $hotspots
@@ -71,8 +74,8 @@ $markdown = @(
     "| Killed | $killed |"
     "| Survived | $survived |"
     "| Ignored | $ignored |"
-    "| Tested mutants | $tested |"
-    "| Score (killed/tested) | $score% |"
+    "| Non-ignored mutants | $nonIgnored |"
+    "| Score (killed/non-ignored) | $score% |"
     ''
 )
 

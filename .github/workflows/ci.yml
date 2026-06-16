@@ -23,13 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Check GITHUB_PACKAGES_TOKEN
-        run: |
-          if [ -z "$GITHUB_PACKAGES_TOKEN" ]; then
-            echo "::error::GH_PACKAGES_TOKEN secret is not set. This token is required to restore the private FixPortal.CodeStyle package."
-            exit 1
-          fi
-
       - name: Lint workflow and shell scripts
         uses: raven-actions/actionlint@v2
         with:
