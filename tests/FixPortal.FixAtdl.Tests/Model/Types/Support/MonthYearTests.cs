@@ -97,18 +97,21 @@ public class MonthYearTests
     }
 
     [Fact]
-    public void Mixed_suffix_comparison_throws_argument_exception()
+    public void Mixed_suffix_comparison_is_total_and_does_not_throw()
     {
-        // 20260107 (Day=7) vs 202601w1 (Week=1 -> ordinal 7)
+        // 20260107 (Day=7) vs 202601w1 (Week=1 -> approx ordinal 7)
         var day7 = MonthYear.Parse("20260107");
         var week1 = MonthYear.Parse("202601w1");
 
+        // Exact equality stays suffix-sensitive...
         (day7 == week1).Should().BeFalse();
 
+        // ...but ordering is total (consumed by MonthYear_t.ValidateValue Min/Max checks) and
+        // must not throw on mixed suffixes; a day-qualified value sorts after a week-qualified
+        // one at the same intra-month ordinal via the deterministic tie-break.
         Action act1 = () => { _ = day7 > week1; };
-        act1.Should().Throw<ArgumentException>();
-
-        Action act2 = () => { _ = week1 < day7; };
-        act2.Should().Throw<ArgumentException>();
+        act1.Should().NotThrow();
+        (day7 > week1).Should().BeTrue();
+        (week1 < day7).Should().BeTrue();
     }
 }

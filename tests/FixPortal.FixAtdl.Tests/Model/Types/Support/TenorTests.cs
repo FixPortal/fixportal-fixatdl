@@ -63,12 +63,17 @@ public class TenorTests
     }
 
     [Fact]
-    public void Cross_unit_comparison_throws_ArgumentException()
+    public void Cross_unit_comparison_orders_by_approximate_magnitude()
     {
+        // CompareTo must be total (it is consumed by Tenor_t.ValidateValue's </> Min/Max
+        // checks), so cross-unit operands order by approximate calendar-day magnitude rather
+        // than throwing: D7 (~7 days) < M1 (~30 days).
         var days = Tenor.Parse("D7");
         var months = Tenor.Parse("M1");
         Action act1 = () => { _ = days < months; };
-        act1.Should().Throw<ArgumentException>();
+        act1.Should().NotThrow();
+        (days < months).Should().BeTrue();
+        (months > days).Should().BeTrue();
     }
 
     [Fact]
@@ -139,13 +144,16 @@ public class TenorTests
     }
 
     [Fact]
-    public void Cross_unit_comparison_throws_on_ordering_checks()
+    public void Cross_unit_ordering_does_not_throw_and_uses_approximate_magnitude()
     {
-        var d30 = Tenor.Parse("D30");
-        var m1 = Tenor.Parse("M1");
+        var d40 = Tenor.Parse("D40"); // ~40 days
+        var m1 = Tenor.Parse("M1");   // ~30 days
 
-        (d30 == m1).Should().BeFalse();
-        Action act1 = () => { _ = d30 < m1; };
-        act1.Should().Throw<ArgumentException>();
+        // Exact equality is still unit-sensitive (different unit/offset => not equal)...
+        (d40 == m1).Should().BeFalse();
+        // ...but ordering is total and compares by approximate calendar-day magnitude.
+        Action act1 = () => { _ = d40 < m1; };
+        act1.Should().NotThrow();
+        (d40 > m1).Should().BeTrue();
     }
 }
