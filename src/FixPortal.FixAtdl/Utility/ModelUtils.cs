@@ -16,27 +16,7 @@ namespace FixPortal.FixAtdl.Utility;
 /// </summary>
 public static class ModelUtils
 {
-    private static readonly Type[] _types = BuildModelTypes();
     private static readonly Dictionary<string, MethodInfo> _methodInfoCache = [];
-
-    private static Type[] BuildModelTypes()
-    {
-        Type[] allTypes;
-
-        try
-        {
-            allTypes = Assembly.GetExecutingAssembly().GetTypes();
-        }
-        catch (ReflectionTypeLoadException ex)
-        {
-            // One unloadable type would otherwise bubble a TypeInitializationException out of the type
-            // initializer and brick every consumer of ModelUtils for the process lifetime.
-            allTypes = [.. ex.Types.Where(t => t != null).Cast<Type>()];
-        }
-
-        // Materialise once so GetTypeFromName does not re-run the LINQ predicate on every call.
-        return [.. allTypes.Where(t => t.IsClass && t.Namespace == "FixPortal.FixAtdl.Model.Types" && !t.IsAbstract)];
-    }
 
     /// <summary>
     /// Invokes a matching <c>Visit</c> overload on the supplied visitor for the target object.
@@ -88,14 +68,4 @@ public static class ModelUtils
         return true;
     }
 
-    // GetTypeFromName lives here by design: ModelUtils owns the _types cache it reads.
-    /// <summary>
-    /// Gets a FIXatdl model type by its CLR type name.
-    /// </summary>
-    /// <param name="typeName">The CLR type name to look up.</param>
-    /// <returns>The matching type, or <see langword="null"/> if no type matches.</returns>
-    public static Type? GetTypeFromName(string typeName)
-    {
-        return _types.FirstOrDefault(t => t.Name == typeName);
-    }
 }
