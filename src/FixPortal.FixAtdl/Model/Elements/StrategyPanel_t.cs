@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Collections.ObjectModel;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
@@ -86,7 +87,7 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
     /// <summary>
     /// Gets the child panels contained within this panel.
     /// </summary>
-    public StrategyPanelCollection StrategyPanels { get; }
+    public Collection<StrategyPanel_t> StrategyPanels { get; }
 
     /// <summary>
     /// Gets the controls contained within this panel.

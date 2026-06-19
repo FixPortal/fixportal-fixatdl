@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Collections.ObjectModel;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls;
@@ -532,7 +533,7 @@ public static class SchemaDefinitions
         StrategyPanelAttributes,
         [
             new ChildElementDefinition(new RecursiveTypeElementDefinition(), "StrategyPanels",
-                typeof(StrategyPanelCollection), StandardContainerMethod.Add),
+                typeof(Collection<StrategyPanel_t>), StandardContainerMethod.Add),
             new ChildElementDefinition(Control_t, "Controls",
                 typeof(ControlCollection), StandardContainerMethod.Add)
         ]);

@@ -74,9 +74,6 @@ const FixPortal.FixAtdl.Model.Types.Support.AtdlTypeName.UTCTimeOnly_t = "UTCTim
 const FixPortal.FixAtdl.Model.Types.Support.AtdlTypeName.UTCTimestamp_t = "UTCTimestamp_t" -> string!
 FixPortal.FixAtdl.Configuration.FixAtdlOptions
 FixPortal.FixAtdl.Configuration.FixAtdlOptions.FixAtdlOptions() -> void
-FixPortal.FixAtdl.Diagnostics.ExceptionInfo
-FixPortal.FixAtdl.Diagnostics.ExceptionInfo.ExceptionInfo(System.Xml.Linq.XObject! obj) -> void
-FixPortal.FixAtdl.Diagnostics.ExceptionInfo.PopulateExceptionData(System.Collections.IDictionary! data) -> void
 FixPortal.FixAtdl.Diagnostics.Exceptions.DuplicateKeyException
 FixPortal.FixAtdl.Diagnostics.Exceptions.DuplicateKeyException.DuplicateKeyException(string! message) -> void
 FixPortal.FixAtdl.Diagnostics.Exceptions.DuplicateKeyException.DuplicateKeyException(string! message, System.Exception! innerException) -> void
@@ -1671,8 +1668,6 @@ FixPortal.FixAtdl.Model.Collections.StrategyEditCollection
 FixPortal.FixAtdl.Model.Collections.StrategyEditCollection.EvaluateAll(FixPortal.FixAtdl.Fix.FixFieldValueProvider! additionalValues, bool shortCircuit) -> bool
 FixPortal.FixAtdl.Model.Collections.StrategyEditCollection.ResolveAll(FixPortal.FixAtdl.Model.Elements.Strategy_t! owningStrategy) -> void
 FixPortal.FixAtdl.Model.Collections.StrategyEditCollection.StrategyEditCollection() -> void
-FixPortal.FixAtdl.Model.Collections.StrategyPanelCollection
-FixPortal.FixAtdl.Model.Collections.StrategyPanelCollection.StrategyPanelCollection() -> void
 FixPortal.FixAtdl.Model.Controls.CheckBoxList_t
 FixPortal.FixAtdl.Model.Controls.CheckBoxList_t.CheckBoxList_t(string! id) -> void
 FixPortal.FixAtdl.Model.Controls.CheckBoxList_t.Orientation.get -> FixPortal.FixAtdl.Model.Enumerations.Orientation_t?
@@ -1998,7 +1993,6 @@ FixPortal.FixAtdl.Model.Elements.StrategyPanel_t.Dispose() -> void
 FixPortal.FixAtdl.Model.Elements.StrategyPanel_t.Orientation.get -> FixPortal.FixAtdl.Model.Enumerations.Orientation_t?
 FixPortal.FixAtdl.Model.Elements.StrategyPanel_t.Orientation.set -> void
 FixPortal.FixAtdl.Model.Elements.StrategyPanel_t.OwningStrategy.get -> FixPortal.FixAtdl.Model.Elements.Strategy_t!
-FixPortal.FixAtdl.Model.Elements.StrategyPanel_t.StrategyPanels.get -> FixPortal.FixAtdl.Model.Collections.StrategyPanelCollection!
 FixPortal.FixAtdl.Model.Elements.StrategyPanel_t.StrategyPanel_t(FixPortal.FixAtdl.Model.Elements.Strategy_t! owner) -> void
 FixPortal.FixAtdl.Model.Elements.StrategyPanel_t.StrategyPanel_t(FixPortal.FixAtdl.Model.Elements.Strategy_t! owningStrategy, FixPortal.FixAtdl.Model.Elements.Support.IStrategyPanel? parent) -> void
 FixPortal.FixAtdl.Model.Elements.StrategyPanel_t.Title.get -> string!
@@ -2960,7 +2954,6 @@ FixPortal.FixAtdl.Utility.IParentable<T>.Parent.set -> void
 FixPortal.FixAtdl.Utility.IResolvable<THost, TValueSource>
 FixPortal.FixAtdl.Utility.IResolvable<THost, TValueSource>.Resolve(THost host, FixPortal.FixAtdl.Model.Collections.ISimpleDictionary<TValueSource>! sourceCollection) -> void
 FixPortal.FixAtdl.Utility.ModelUtils
-FixPortal.FixAtdl.Utility.ProcessExtensions
 FixPortal.FixAtdl.Utility.StringExtensions
 FixPortal.FixAtdl.Validation.ControlValidationState
 FixPortal.FixAtdl.Validation.ControlValidationState.Add(FixPortal.FixAtdl.Model.Elements.StrategyEdit_t! strategyEdit) -> void
@@ -3308,16 +3301,11 @@ override FixPortal.FixAtdl.Model.Types.UTCTimestamp_t.GetDateTimeFormatStrings()
 override FixPortal.FixAtdl.Model.Types.UTCTimestamp_t.GetHumanReadableTypeName() -> string!
 readonly FixPortal.FixAtdl.Model.Controls.Support.ListControlBase._listItems -> FixPortal.FixAtdl.Model.Collections.ListItemCollection!
 static FixPortal.FixAtdl.Configuration.FixAtdlOptions.Default.get -> FixPortal.FixAtdl.Configuration.FixAtdlOptions!
-static FixPortal.FixAtdl.Diagnostics.ThrowHelper.New<T>(object? source, FixPortal.FixAtdl.Diagnostics.ExceptionInfo? info, string! format, params object?[]! args) -> T!
-static FixPortal.FixAtdl.Diagnostics.ThrowHelper.New<T>(object? source, FixPortal.FixAtdl.Diagnostics.ExceptionInfo? info, string! message) -> T!
 static FixPortal.FixAtdl.Diagnostics.ThrowHelper.New<T>(object? source, string! format, params object?[]! args) -> T!
 static FixPortal.FixAtdl.Diagnostics.ThrowHelper.New<T>(object? source, string! message) -> T!
-static FixPortal.FixAtdl.Diagnostics.ThrowHelper.New<T>(object? source, System.Exception! innerException, FixPortal.FixAtdl.Diagnostics.ExceptionInfo? info, string! format, params object?[]! args) -> T!
-static FixPortal.FixAtdl.Diagnostics.ThrowHelper.New<T>(object? source, System.Exception! innerException, FixPortal.FixAtdl.Diagnostics.ExceptionInfo? info, string! message) -> T!
 static FixPortal.FixAtdl.Diagnostics.ThrowHelper.New<T>(object? source, System.Exception! innerException, string! format, params object?[]! args) -> T!
 static FixPortal.FixAtdl.Diagnostics.ThrowHelper.New<T>(object? source, System.Exception! innerException, string! message) -> T!
 static FixPortal.FixAtdl.Diagnostics.ThrowHelper.NewWithParamName<T>(object? source, string! paramName, string! message) -> T!
-static FixPortal.FixAtdl.Diagnostics.ThrowHelper.Rethrow(object? source, System.Exception! ex, FixPortal.FixAtdl.Diagnostics.ExceptionInfo? info, string! format, object! arg) -> System.Exception!
 static FixPortal.FixAtdl.Diagnostics.ThrowHelper.Rethrow(object? source, System.Exception! ex, string! format, object! arg) -> System.Exception!
 static FixPortal.FixAtdl.Diagnostics.ThrowHelper.Rethrow(object? source, System.Exception! ex, string! format, params object![]! args) -> System.Exception!
 static FixPortal.FixAtdl.Fix.FixDateTime.Parse(string! value, System.IFormatProvider! provider) -> System.DateTime
@@ -3352,9 +3340,7 @@ static FixPortal.FixAtdl.Model.Types.Support.Tenor.operator ==(FixPortal.FixAtdl
 static FixPortal.FixAtdl.Model.Types.Support.Tenor.operator >(FixPortal.FixAtdl.Model.Types.Support.Tenor lhs, FixPortal.FixAtdl.Model.Types.Support.Tenor rhs) -> bool
 static FixPortal.FixAtdl.Model.Types.Support.Tenor.operator >=(FixPortal.FixAtdl.Model.Types.Support.Tenor lhs, FixPortal.FixAtdl.Model.Types.Support.Tenor rhs) -> bool
 static FixPortal.FixAtdl.Model.Types.Support.Tenor.Parse(string! value) -> FixPortal.FixAtdl.Model.Types.Support.Tenor
-static FixPortal.FixAtdl.Utility.ModelUtils.GetTypeFromName(string! typeName) -> System.Type?
 static FixPortal.FixAtdl.Utility.ModelUtils.VisitHelper(System.Type! visitorType, object! visitor, object! target) -> bool
-static FixPortal.FixAtdl.Utility.ProcessExtensions.IsVSDesigner(this System.Diagnostics.Process! process) -> bool
 static FixPortal.FixAtdl.Utility.StringExtensions.ParseAsEnum<T>(this string! value) -> T
 static FixPortal.FixAtdl.Validation.EditValueConverter.ConvertToComparableType(object! typeInstanceToMatch, string! value) -> System.IComparable!
 static FixPortal.FixAtdl.Validation.ValidationResult.ValidResult.get -> FixPortal.FixAtdl.Validation.ValidationResult!

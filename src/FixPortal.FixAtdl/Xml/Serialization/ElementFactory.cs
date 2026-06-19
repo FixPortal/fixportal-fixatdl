@@ -8,7 +8,6 @@
 using System.Globalization;
 using System.Reflection;
 using System.Xml.Linq;
-using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Resources;
 using Microsoft.Extensions.Logging;
@@ -102,7 +101,7 @@ public class ElementFactory : INotifyClassDeserialized
         }
         catch (FixAtdlException ex)
         {
-            throw ThrowHelper.Rethrow(this, ex, new ExceptionInfo(sourceElement), ErrorMessages.GeneralElementProcessingError, string.Empty);
+            throw ThrowHelper.Rethrow(this, ex, sourceElement, ErrorMessages.GeneralElementProcessingError, string.Empty);
         }
 
         ProcessChildren(definition, sourceElement, newObject);
@@ -144,7 +143,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         if (string.IsNullOrEmpty(innerTypeName))
         {
-            throw ThrowHelper.New<MissingMandatoryValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.MissingMandatoryAttribute,
+            throw ThrowHelper.New<MissingMandatoryValueException>(this, sourceElement, ErrorMessages.MissingMandatoryAttribute,
                 genericTypeDefinition.AttributeForInnerType.LocalName, genericTypeDefinition.ElementName!.LocalName);
         }
 
@@ -160,7 +159,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         if (innerType == null)
         {
-            throw ThrowHelper.New<InvalidFieldValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.UnrecognisedTypeError, innerTypeName,
+            throw ThrowHelper.New<InvalidFieldValueException>(this, sourceElement, ErrorMessages.UnrecognisedTypeError, innerTypeName,
                 genericTypeDefinition.AttributeForInnerType.LocalName, genericTypeDefinition.ElementName!.LocalName);
         }
 
@@ -169,7 +168,7 @@ public class ElementFactory : INotifyClassDeserialized
         // trigger its constructor / type-initializer side effects before rejection.
         if (!genericTypeDefinition.InnerTypeToAttributesMap.TryGetValue(innerType, out ElementAttribute[]? innerTypeAttributes))
         {
-            throw ThrowHelper.New<InvalidFieldValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.UnrecognisedTypeError, innerTypeName,
+            throw ThrowHelper.New<InvalidFieldValueException>(this, sourceElement, ErrorMessages.UnrecognisedTypeError, innerTypeName,
                 genericTypeDefinition.AttributeForInnerType.LocalName, genericTypeDefinition.ElementName!.LocalName);
         }
 
@@ -185,7 +184,7 @@ public class ElementFactory : INotifyClassDeserialized
         }
         catch (FixAtdlException ex)
         {
-            throw ThrowHelper.Rethrow(this, ex, new ExceptionInfo(sourceElement), ErrorMessages.GeneralElementProcessingError, string.Empty);
+            throw ThrowHelper.Rethrow(this, ex, sourceElement, ErrorMessages.GeneralElementProcessingError, string.Empty);
         }
 
         ProcessChildren(genericTypeDefinition, sourceElement, newObject);
@@ -215,7 +214,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         if (string.IsNullOrEmpty(typeName))
         {
-            throw ThrowHelper.New<MissingMandatoryValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.MissingMandatoryAttribute,
+            throw ThrowHelper.New<MissingMandatoryValueException>(this, sourceElement, ErrorMessages.MissingMandatoryAttribute,
                 multiTypeDefinition.AttributeForType.LocalName, multiTypeDefinition.ElementName!.LocalName);
         }
 
@@ -231,7 +230,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         if (targetType == null)
         {
-            throw ThrowHelper.New<InvalidFieldValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.UnrecognisedTypeError, typeName,
+            throw ThrowHelper.New<InvalidFieldValueException>(this, sourceElement, ErrorMessages.UnrecognisedTypeError, typeName,
                 multiTypeDefinition.AttributeForType.LocalName, multiTypeDefinition.ElementName!.LocalName);
         }
 
@@ -240,7 +239,7 @@ public class ElementFactory : INotifyClassDeserialized
         // constructor / type-initializer side effects before being rejected.
         if (!multiTypeDefinition.TypeToAttributesMap.TryGetValue(targetType, out ElementAttribute[]? typeAttributes))
         {
-            throw ThrowHelper.New<InvalidFieldValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.UnrecognisedTypeError, typeName,
+            throw ThrowHelper.New<InvalidFieldValueException>(this, sourceElement, ErrorMessages.UnrecognisedTypeError, typeName,
                 multiTypeDefinition.AttributeForType.LocalName, multiTypeDefinition.ElementName!.LocalName);
         }
 
@@ -256,7 +255,7 @@ public class ElementFactory : INotifyClassDeserialized
         }
         catch (FixAtdlException ex)
         {
-            throw ThrowHelper.Rethrow(this, ex, new ExceptionInfo(sourceElement), ErrorMessages.GeneralElementProcessingError, string.Empty);
+            throw ThrowHelper.Rethrow(this, ex, sourceElement, ErrorMessages.GeneralElementProcessingError, string.Empty);
         }
 
         ProcessChildren(multiTypeDefinition, sourceElement, newObject);
@@ -342,7 +341,7 @@ public class ElementFactory : INotifyClassDeserialized
                                 // passed positionally into the ctor (NRE / half-initialised object with no
                                 // schema context). Surface a located error instead — typically triggered by
                                 // malformed or out-of-order XML.
-                                throw ThrowHelper.New<FixAtdlException>(this, new ExceptionInfo(sourceElement),
+                                throw ThrowHelper.New<FixAtdlException>(this, sourceElement,
                                     $"The named predecessor '{elementDefinition.ConstructorParameters[n].Source}' required by element '{elementDefinition.ElementName}' was not found; the source XML may be malformed or its elements out of order.");
                             }
                         }
@@ -369,7 +368,7 @@ public class ElementFactory : INotifyClassDeserialized
             return value;
         }
 
-        throw ThrowHelper.New<MissingMandatoryValueException>(this, new ExceptionInfo(sourceElement), ErrorMessages.MissingMandatoryAttribute,
+        throw ThrowHelper.New<MissingMandatoryValueException>(this, sourceElement, ErrorMessages.MissingMandatoryAttribute,
             constructorParameter.Source, elementDefinition.ElementName!.LocalName);
     }
 
@@ -523,12 +522,12 @@ public class ElementFactory : INotifyClassDeserialized
         }
         catch (FixAtdlException ex)
         {
-            throw ThrowHelper.Rethrow(this, ex, new ExceptionInfo(childElement), ErrorMessages.GeneralElementProcessingError,
+            throw ThrowHelper.Rethrow(this, ex, childElement, ErrorMessages.GeneralElementProcessingError,
                 definition.ElementName!.LocalName);
         }
         catch (ArgumentException ex)
         {
-            throw ThrowHelper.New<FixAtdlException>(this, ex, new ExceptionInfo(childElement), ErrorMessages.GeneralElementProcessingError,
+            throw ThrowHelper.New<FixAtdlException>(this, ex, childElement, ErrorMessages.GeneralElementProcessingError,
                 definition.ElementName!.LocalName, ex.Message);
         }
     }
@@ -710,7 +709,7 @@ public class ElementFactory : INotifyClassDeserialized
             _factory._currentDepth++;
             if (_factory._currentDepth > 128)
             {
-                throw ThrowHelper.New<FixAtdlException>(_factory, new ExceptionInfo(sourceElement),
+                throw ThrowHelper.New<FixAtdlException>(_factory, sourceElement,
                     "XML parsing exceeded maximum depth limit of 128. The document may contain too many nested levels.");
             }
         }
