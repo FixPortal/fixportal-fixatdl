@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   pack-and-release:
+    name: Publish Package (GitHub NuGet)
     runs-on: blacksmith-4vcpu-ubuntu-2404
     env:
       # Restoring the private FixPortal.CodeStyle package needs read:packages.
