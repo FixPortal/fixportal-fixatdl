@@ -8,7 +8,7 @@
 
 **Tech Stack:** .NET 10, C# latest, NodaTime 3.x, xUnit v3, AwesomeAssertions (`using AwesomeAssertions;`, `.Should()`, never `Assert.*`), NSubstitute, NodaTime.Testing `FakeClock`.
 
-**Branch / worktree:** `reviewer-findings-batch7` in `D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes` (already created from `origin/main` @ `edb36be`).
+**Branch / worktree:** `reviewer-findings-batch7` in `D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes` (already created from `origin/main` @ `edb36be`).
 
 **Standing constraints:**
 - IDE0045/IDE0017/IDE0047 are enforced as **errors** — no implicit-else ternary violations, use object initializers, no redundant parens in patterns. The implementer must keep the build clean.

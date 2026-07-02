@@ -36,8 +36,8 @@ The longer-term ≥80%/≥70% target is deferred to a future coverage pass after
 After writing tests, regenerate the report (same tooling as Phase 0) and read the per-class numbers, aggregating to the namespace:
 
 ```
-dotnet test D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln --collect:"XPlat Code Coverage" --results-directory D:\FixPortal\fixportal-fixatdl\coverage\raw
-dotnet reportgenerator -reports:D:\FixPortal\fixportal-fixatdl\coverage\raw\**\coverage.cobertura.xml -targetdir:D:\FixPortal\fixportal-fixatdl\coverage\report -reporttypes:"TextSummary;JsonSummary"
+dotnet test D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln --collect:"XPlat Code Coverage" --results-directory D:\fix-portal\fixportal-fixatdl\coverage\raw
+dotnet reportgenerator -reports:D:\fix-portal\fixportal-fixatdl\coverage\raw\**\coverage.cobertura.xml -targetdir:D:\fix-portal\fixportal-fixatdl\coverage\report -reporttypes:"TextSummary;JsonSummary"
 ```
 
 Read `coverage/report/Summary.txt` (per-class %) and sum covered/coverable lines across the namespace's classes to confirm the floor. (`coverage/` is git-ignored — never commit it.)
@@ -159,7 +159,7 @@ public class ValueTypeConversionTests
 
 - [ ] **Step 2: Run it, confirm pass**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~ValueTypeConversionTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~ValueTypeConversionTests"`
 Expected: all green. If `GetCurrentValue()` returns a differently-typed box than expected for any type, adjust the assertion to the actual native type (characterization — pin what it really does) and note it; do not change source.
 
 - [ ] **Step 3: Write the support-struct tests**
