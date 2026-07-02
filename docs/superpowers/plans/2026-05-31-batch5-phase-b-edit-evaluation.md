@@ -9,7 +9,7 @@
 **Tech Stack:** .NET 10, xUnit v3, AwesomeAssertions (`using AwesomeAssertions;` — NOT FluentAssertions), NSubstitute. The test project already wires these via `Directory.Packages.props`. ImplicitUsings is enabled (`System.Linq` etc. are global). IDE0045 (prefer conditional expression) is enforced as an **error** — avoid `if/else` assignment chains where a conditional expression is idiomatic.
 
 **Branch / worktree:** All work happens in the batch-5 review worktree
-`D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes` on branch
+`D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes` on branch
 `reviewer-findings-batch6` (already created from `origin/main` @ `265a308`).
 
 **Design reference:** `docs/superpowers/specs/2026-05-31-batch5-conformance-fixes-design.md` §2.

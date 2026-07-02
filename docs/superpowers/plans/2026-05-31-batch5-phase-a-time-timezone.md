@@ -10,7 +10,7 @@
 
 **Scope note (read before starting):** The design doc (`docs/superpowers/specs/2026-05-31-batch5-conformance-fixes-design.md`) lists C2 under "Time & timezone". C2 has two halves. The **Clock `initValue` time-only** half is resolved *for free* here — C1 parses `initValue` with NodaTime `LocalTimePattern`, so no spurious date is ever injected. The **`UTCTimestamp_t` time-only bound** half (`maxValue="23:59:59"`) is a type/validation-layer change requiring a bound-representation decision; it is deferred to **Phase C** (parse-fidelity) and is explicitly **out of scope here**. This plan delivers **C1 + M1** as a coherent, independently shippable unit.
 
-**Branch / worktree:** All work on `reviewer-findings-batch5` in the review worktree `D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes`. Per house rules, commit `git add <paths>` and `git commit` as **separate** tool calls.
+**Branch / worktree:** All work on `reviewer-findings-batch5` in the review worktree `D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes`. Per house rules, commit `git add <paths>` and `git commit` as **separate** tool calls.
 
 ---
 
@@ -91,7 +91,7 @@ In `tests/FixPortal.FixAtdl.Tests/FixPortal.FixAtdl.Tests.csproj`, replace the `
 
 - [ ] **Step 4: Restore + confirm the solution still builds**
 
-Run: `dotnet build D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\FixPortal.FixAtdl.sln`
+Run: `dotnet build D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\FixPortal.FixAtdl.sln`
 Expected: **FAILS to compile** — `ClockTimeProviderTests.cs` still uses `Microsoft.Extensions.Time.Testing` / `Clock_t.TimeProvider`, both now gone. This confirms the package removal took effect. (It is fixed in Task 4; do not commit yet.)
 
 > If you prefer a green checkpoint here, temporarily comment out `ClockTimeProviderTests.cs`'s body — but it is cleaner to leave the solution red until Task 4 and commit Tasks 1+3+4 together. **This plan commits Task 1's project files together with Task 4's Clock rewrite** because the type-signature change makes them inseparable for a compiling build. Tasks 2 and 5 commit independently.
@@ -175,7 +175,7 @@ public class InitValueClockTests
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~InitValueClockTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~InitValueClockTests"`
 Expected: FAIL — `InitValueClock` does not exist (compile error).
 
 - [ ] **Step 3: Implement `InitValueClock`**
@@ -278,7 +278,7 @@ public sealed class InitValueClock
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~InitValueClockTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~InitValueClockTests"`
 Expected: PASS (all theory cases).
 
 - [ ] **Step 5: Commit**
@@ -338,7 +338,7 @@ public class UtcTimestampWireParseTests
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~UtcTimestampWireParseTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~UtcTimestampWireParseTests"`
 Expected: FAIL — `native.Kind` is `Local` (current `AssumeUniversal` without `AdjustToUniversal`).
 
 - [ ] **Step 3: Retire the hardcoded override; route through `WireParseStyles`**
@@ -399,12 +399,12 @@ Keep `using System.Globalization;` (DateTimeStyles) and `using FixPortal.FixAtdl
 
 - [ ] **Step 5: Run to verify it passes**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~UtcTimestampWireParseTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~UtcTimestampWireParseTests"`
 Expected: PASS — `Kind` is `Utc`.
 
 - [ ] **Step 6: Confirm no regression in the UTC/TZ type suite + clean build**
 
-Run: `dotnet build D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\src\FixPortal.FixAtdl\FixPortal.FixAtdl.csproj`
+Run: `dotnet build D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\src\FixPortal.FixAtdl\FixPortal.FixAtdl.csproj`
 Expected: build succeeds, **no new warnings** (the removed usings would otherwise warn).
 
 - [ ] **Step 7: Commit**
@@ -716,7 +716,7 @@ Add any usings the file does not already have at its top: `using NodaTime;` and 
 
 - [ ] **Step 4: Run the new + updated tests to verify they fail**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~ClockTimeZoneTests|FullyQualifiedName~ClockTimeProviderTests|FullyQualifiedName~ClockControlTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~ClockTimeZoneTests|FullyQualifiedName~ClockTimeProviderTests|FullyQualifiedName~ClockControlTests"`
 Expected: FAIL to compile — `Clock_t.InitValue` is still `DateTime?`, `Clock_t.Clock` does not exist.
 
 - [ ] **Step 5: Rewrite `Clock_t`**
@@ -1070,10 +1070,10 @@ In `src/FixPortal.FixAtdl/Xml/SchemaDefinitions.cs`, the `ClockAttributes` array
 
 - [ ] **Step 7: Build, then run the full test suite**
 
-Run: `dotnet build D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\FixPortal.FixAtdl.sln`
+Run: `dotnet build D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\FixPortal.FixAtdl.sln`
 Expected: builds with **no new warnings**.
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests`
 Expected: PASS — the new `ClockTimeZoneTests`, the rewritten `ClockTimeProviderTests`, the updated `ClockControlTests`, and every pre-existing test green.
 
 - [ ] **Step 8: Commit (this includes Task 1's project edits)**
@@ -1140,7 +1140,7 @@ public class ClockDeserializationTests
 
 - [ ] **Step 3: Run to verify it fails, then passes**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~ClockDeserializationTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\.claude\worktrees\reviewer-passes\tests\FixPortal.FixAtdl.Tests --filter "FullyQualifiedName~ClockDeserializationTests"`
 Expected before wiring the loader: compile error / FAIL. After implementing `DeserializeBerlinClockControl` against the real loader: PASS. The production code needs no further change — Task 4 already did the work; this only proves the parse path.
 
 - [ ] **Step 4: Commit**

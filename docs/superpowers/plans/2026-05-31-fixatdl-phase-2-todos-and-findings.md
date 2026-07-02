@@ -8,7 +8,7 @@
 
 **Tech Stack:** .NET 10; xUnit v3 + AwesomeAssertions (`.Should()`) + NSubstitute (test project global usings: `AwesomeAssertions`, `NSubstitute`, `Xunit`); `dotnet build` 0-warning bar; `dotnet test`; CI coverage floor (65%) in `build-and-test.yml`.
 
-**Branch:** Normal feature branch `phase-2-todos-and-findings` in the **primary checkout** (`D:\FixPortal\fixportal-fixatdl`), branched from `origin/main`. This is *not* a reviewer-findings pass, so the review-worktree workflow does **not** apply (that is reserved for Phase 3's adversarial review on `reviewer-findings-batch5`). PR-only to `main`, rebase-merge.
+**Branch:** Normal feature branch `phase-2-todos-and-findings` in the **primary checkout** (`D:\fix-portal\fixportal-fixatdl`), branched from `origin/main`. This is *not* a reviewer-findings pass, so the review-worktree workflow does **not** apply (that is reserved for Phase 3's adversarial review on `reviewer-findings-batch5`). PR-only to `main`, rebase-merge.
 
 ---
 
@@ -93,7 +93,7 @@ Add to `EditValueConverterTests.cs`, in the `// ── Null prototype ──` re
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~EditValueConverterTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~EditValueConverterTests"`
 Expected: the three numeric `[InlineData]` cases FAIL (they return `0`/`0u` instead of throwing); the MonthYear case FAILS with `NullReferenceException` rather than `InvalidFieldValueException`.
 
 - [ ] **Step 3: Add the null-`value` guard**
@@ -129,12 +129,12 @@ to:
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~EditValueConverterTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~EditValueConverterTests"`
 Expected: all `EditValueConverterTests` PASS (including the pre-existing `Null_prototype_returns_value_unchanged`, which is unaffected — the prototype-null branch returns before the new value-null guard).
 
 - [ ] **Step 5: Build clean and commit**
 
-Run: `dotnet build D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln -c Release`
+Run: `dotnet build D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln -c Release`
 Expected: 0 errors, 0 new warnings.
 
 ```
@@ -201,7 +201,7 @@ public class ThrowHelperTests
 
 - [ ] **Step 3: Run the test to verify it fails**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~ThrowHelperTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~ThrowHelperTests"`
 Expected: FAIL — either it doesn't compile (no `paramName` parameter yet) or, once a stub overload exists, `New_argument_exception_threads_supplied_param_name` fails because `ParamName` is `"Value"`.
 
 - [ ] **Step 4: Thread `paramName` through `CreateException` and one `New<T>` overload**
@@ -250,9 +250,9 @@ Run: `Grep` for `New<ArgumentNullException>` and `New<ArgumentOutOfRangeExceptio
 
 - [ ] **Step 6: Run the test to verify it passes; build clean**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~ThrowHelperTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~ThrowHelperTests"`
 Expected: both tests PASS.
-Run: `dotnet build D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln -c Release`
+Run: `dotnet build D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln -c Release`
 Expected: 0 errors, 0 new warnings.
 
 - [ ] **Step 7: Commit**
@@ -316,7 +316,7 @@ Add to `TypeCoverageGapTests.cs` (match its existing `using`s / namespace; `TagN
 
 - [ ] **Step 3: Run the tests to verify they pass (they pin current behaviour, so green immediately)**
 
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~TenorTests|FullyQualifiedName~TypeCoverageGapTests"`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln --filter "FullyQualifiedName~TenorTests|FullyQualifiedName~TypeCoverageGapTests"`
 Expected: PASS. If either FAILS, current behaviour differs from the finding's description — **stop and report**; the disposition (close) would need revisiting.
 
 - [ ] **Step 4: Commit**
@@ -421,9 +421,9 @@ with:
 
 - [ ] **Step 5: Build clean and run the full suite (no behaviour changed, but prove it)**
 
-Run: `dotnet build D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln -c Release`
+Run: `dotnet build D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln -c Release`
 Expected: 0 errors, 0 new warnings (deleting `IBindable.cs` must not orphan any reference — the grep proved none exist).
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln`
 Expected: all tests PASS (unchanged count from main + the tests added in Tasks 1-3).
 
 - [ ] **Step 6: Commit**
@@ -471,7 +471,7 @@ with (substitute the real issue number from Step 1):
 
 - [ ] **Step 3: Build clean and commit**
 
-Run: `dotnet build D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln -c Release`
+Run: `dotnet build D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln -c Release`
 Expected: 0 errors, 0 new warnings.
 
 ```
@@ -547,9 +547,9 @@ Expected: the only matches are the rationale comments added in Tasks 5/6 that no
 
 - [ ] **Step 3: Full green build + test + coverage floor**
 
-Run: `dotnet build D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln -c Release`
+Run: `dotnet build D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln -c Release`
 Expected: 0 errors, 0 warnings (no new warnings vs the main baseline).
-Run: `dotnet test D:\FixPortal\fixportal-fixatdl\FixPortal.FixAtdl.sln --collect:"XPlat Code Coverage" --results-directory D:\FixPortal\fixportal-fixatdl\coverage\phase2`
+Run: `dotnet test D:\fix-portal\fixportal-fixatdl\FixPortal.FixAtdl.sln --collect:"XPlat Code Coverage" --results-directory D:\fix-portal\fixportal-fixatdl\coverage\phase2`
 Expected: all tests PASS; coverage ≥ the 65% CI floor (it will be ≥ Phase 1's 69%, since Tasks 1-3 add tests and the source deltas are tiny).
 
 - [ ] **Step 4: Commit the disposition doc**
