@@ -454,3 +454,6 @@ _pkgout/
 # Architecture knowledge graphs (rebuildable: `graphify --update` / `/understand`)
 graphify-out/
 **/.understand-anything/
+
+# Semgrep local scan cache (semgrep-guardian MCP / local runs)
+.semgrep/
