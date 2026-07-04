@@ -72,11 +72,16 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// <returns>true if the supplied value could set this control; false otherwise.</returns>
     protected override bool LoadDefaultFromFixValue(string value)
     {
-        bool parsed = FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result);
+        // On a failed parse, leave _value untouched and return false (matching NumericControlBase /
+        // ListControlBase): "could not load" must not also clobber existing state to null (D-CLOCK-CLOBBER).
+        if (!FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result))
+        {
+            return false;
+        }
 
-        _value = parsed ? ToInstant(result) : null;
+        _value = ToInstant(result);
 
-        return parsed;
+        return true;
     }
 
     /// <summary>

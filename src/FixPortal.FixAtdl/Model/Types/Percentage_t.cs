@@ -76,7 +76,13 @@ public class Percentage_t : Float_t
     {
         decimal? decimalValue = base.ConvertFromWireValueFormat(value);
 
-        return MultiplyBy100 == true ? (decimal)decimalValue! / 100 : (decimal)decimalValue!;
+        // base now returns null for a '{NULL}' clear (C4); propagate it rather than dereferencing null through /100.
+        if (decimalValue == null)
+        {
+            return null;
+        }
+
+        return MultiplyBy100 == true ? decimalValue.Value / 100 : decimalValue.Value;
     }
 
     /// <summary>

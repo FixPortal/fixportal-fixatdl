@@ -71,18 +71,22 @@ public abstract class ListControlBase : InitializableControl<string>
             return false;
         }
 
-        _value = new EnumState(ListItems.EnumIds);
+        EnumState candidate = new(ListItems.EnumIds);
 
         try
         {
-            _value.LoadInitValue(value, IsNonEnumValueAllowed);
+            candidate.LoadInitValue(value, IsNonEnumValueAllowed);
         }
         catch (Exception ex) when (ex is ArgumentException or FixAtdlException)
         {
             // Honour the bool contract: an invalid EnumID falls back to "not initialised" rather than
-            // aborting initialisation by throwing (as BinaryControlBase already does).
+            // aborting initialisation by throwing (as BinaryControlBase already does). Build into a local
+            // first so a failed load leaves _value untouched instead of overwriting it with a half-built
+            // EnumState (D-F12).
             return false;
         }
+
+        _value = candidate;
 
         return true;
     }

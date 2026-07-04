@@ -225,6 +225,15 @@ public class EnumState
                 {
                     _enumStates[n] = value;
 
+                    // A list selection and a free-text (non-enum) value are mutually exclusive on an
+                    // EditableDropDownList_t. The NonEnumValue setter clears all bits when text is set; mirror
+                    // it here so selecting an enum clears any stale free text — otherwise ToWireValue returns
+                    // the stale NonEnumValue unconditionally and the selection is silently dropped (B-N1).
+                    if (value)
+                    {
+                        _nonEnumValue = null;
+                    }
+
                     return;
                 }
             }

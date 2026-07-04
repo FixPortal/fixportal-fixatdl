@@ -632,6 +632,20 @@ public class EnumStateTests
     }
 
     [Fact]
+    public void EnumState_indexer_selection_clears_stale_non_enum_value()
+    {
+        // B-N1: free text then a list selection via the indexer must drop the stale text — otherwise
+        // ToWireValue returns the NonEnumValue unconditionally and the selection is silently lost.
+        var state = new EnumState(["A", "B"])
+        {
+            NonEnumValue = "custom"
+        };
+        state["A"] = true;
+        state["A"].Should().BeTrue();
+        state.NonEnumValue.Should().BeNull();
+    }
+
+    [Fact]
     public void EnumState_equals_same_state()
     {
         var a = new EnumState(["X", "Y"])

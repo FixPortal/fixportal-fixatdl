@@ -89,6 +89,8 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
     /// </summary>
     public Collection<StrategyPanel_t> StrategyPanels { get; }
 
+    private ControlCollection? _controls;
+
     /// <summary>
     /// Gets the controls contained within this panel.
     /// </summary>
@@ -97,18 +99,18 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
         get
         {
             // Lazy initialisation as we can't use 'this' pointer in constructor.
-            if (field == null)
+            if (_controls == null)
             {
-                field = new ControlCollection(this);
+                _controls = new ControlCollection(this);
 
                 // Provide a mechanism for the Controls collection of the Strategy_t (as opposed to the StrategyPanel_t) to be
                 // notified as controls are added to and removed from this StrategyPanel_t.
-                field.CollectionChanged += OwningStrategy.Controls.SourceCollectionChanged;
+                _controls.CollectionChanged += OwningStrategy.Controls.SourceCollectionChanged;
             }
 
-            return field;
+            return _controls;
         }
-    } = null!;
+    }
 
     #region IDisposable Members
 
@@ -125,9 +127,12 @@ public class StrategyPanel_t : IParentable<StrategyPanel_t>, IDisposable, IStrat
 
         if (disposing)
         {
-            if (OwningStrategy != null)
+            // Only unsubscribe if the Controls collection was actually constructed. Touching the lazy Controls
+            // property here would otherwise allocate a collection and subscribe just to immediately unsubscribe,
+            // for every panel disposed without its controls ever being accessed (E-GAP2).
+            if (_controls != null && OwningStrategy != null)
             {
-                Controls.CollectionChanged -= OwningStrategy.Controls.SourceCollectionChanged;
+                _controls.CollectionChanged -= OwningStrategy.Controls.SourceCollectionChanged;
             }
 
             // Recurse over child panels so their Controls -> OwningStrategy subscriptions are released
