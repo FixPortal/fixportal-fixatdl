@@ -7,6 +7,7 @@
 
 using System.Collections;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Collections;
@@ -121,20 +122,14 @@ public class EnumState
             return false;
         }
 
-        // Cross-check that both operands denote the same set of EnumIDs before comparing bit
-        // states (mirrors the identity check in UpdateFrom). Without this, two EnumStates for
-        // unrelated parameters that happen to share a bit pattern would compare equal.
-        if (_enumIds.Length != state._enumIds.Length)
+        // Cross-check that both operands denote the same EnumIDs in the same order before
+        // comparing bit states (mirrors the identity check in UpdateFrom). The bit comparison
+        // below is positional, so order must match too, not just set membership — otherwise two
+        // EnumStates holding the same EnumIDs in a different order could pass this check while
+        // BitArraysEqual compares unrelated bit positions against each other.
+        if (!_enumIds.SequenceEqual(state._enumIds))
         {
             return false;
-        }
-
-        for (int n = 0; n < _enumIds.Length; n++)
-        {
-            if (Array.IndexOf(state._enumIds, _enumIds[n]) < 0)
-            {
-                return false;
-            }
         }
 
         // Compare the bit states element-wise. The previous _enumStates.Equals(state) compared a
