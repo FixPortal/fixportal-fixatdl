@@ -101,8 +101,9 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override decimal? ConvertFromWireValueFormat(string value)
     {
-        // A '{NULL}' sentinel (or empty) means "clear this field" — return null rather than throwing, matching
-        // Boolean_t/String_t/Data_t (C4, {NULL}-handling theme).
+        // A '{NULL}' sentinel means "clear this field" — return null rather than throwing, matching
+        // Boolean_t/String_t/Data_t (C4, {NULL}-handling theme). An empty string is not a clear (empty
+        // FIX fields are invalid) and still falls through to throw.
         if (value is null or Atdl.NullValue)
         {
             return null;
