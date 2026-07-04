@@ -6,8 +6,11 @@
 #endregion
 
 using System.Collections;
+using System.Globalization;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Types;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Elements;
 
@@ -87,17 +90,19 @@ public class Strategies_t : IEnumerable<Strategy_t>
     {
         foreach (Strategy_t strategy in this)
         {
-            foreach (var parameter in strategy.Parameters.Where(p => p.Type == "Boolean_t"))
+            // Match the boolean parameters by concrete type rather than the string literal "Boolean_t" +
+            // reflected "Value" property: the typed pattern is compile-time checked (no silent no-op if a
+            // name drifts) and yields Boolean_t directly (E-G3).
+            foreach (Parameter_t<Boolean_t> booleanParameter in strategy.Parameters.OfType<Parameter_t<Boolean_t>>())
             {
-                var valueProp = parameter.GetType().GetProperty("Value");
-                if (valueProp?.GetValue(parameter) is FixPortal.FixAtdl.Model.Types.Boolean_t booleanTypeObj)
+                Boolean_t booleanType = booleanParameter.Value;
+                string trueVal = booleanType.TrueWireValue ?? "Y";
+                string falseVal = booleanType.FalseWireValue ?? "N";
+                if (trueVal == falseVal)
                 {
-                    string trueVal = booleanTypeObj.TrueWireValue ?? "Y";
-                    string falseVal = booleanTypeObj.FalseWireValue ?? "N";
-                    if (trueVal == falseVal)
-                    {
-                        throw new System.ArgumentException("trueWireValue and falseWireValue cannot be equal.");
-                    }
+                    throw ThrowHelper.New<ArgumentException>(this, string.Format(CultureInfo.InvariantCulture,
+                        "Parameter '{0}': trueWireValue and falseWireValue cannot be equal (both resolve to '{1}').",
+                        booleanParameter.Name, trueVal));
                 }
             }
 

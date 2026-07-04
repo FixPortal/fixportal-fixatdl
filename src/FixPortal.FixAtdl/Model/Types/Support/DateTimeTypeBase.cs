@@ -228,8 +228,14 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     /// <returns>Value converted from a string if the conversion succeeded; otherwise an exception is thrown.</returns>
     protected override DateTime? ConvertFromWireValueFormat(string value)
     {
-        string[] formats = GetDateTimeFormatStrings();
+        // A '{NULL}' sentinel (or empty) means "clear this field" — return null rather than throwing, matching
+        // Boolean_t/String_t/Data_t (C4, {NULL}-handling theme).
+        if (value is null or Atdl.NullValue)
+        {
+            return null;
+        }
 
+        string[] formats = GetDateTimeFormatStrings();
 
         if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, WireParseStyles, out DateTime result))
         {

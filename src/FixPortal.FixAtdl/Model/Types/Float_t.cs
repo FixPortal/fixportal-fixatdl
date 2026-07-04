@@ -101,6 +101,13 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override decimal? ConvertFromWireValueFormat(string value)
     {
+        // A '{NULL}' sentinel (or empty) means "clear this field" — return null rather than throwing, matching
+        // Boolean_t/String_t/Data_t (C4, {NULL}-handling theme).
+        if (value is null or Atdl.NullValue)
+        {
+            return null;
+        }
+
         return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
     }
 

@@ -471,4 +471,42 @@ public class ValueTypeConversionTests
         var act = () => p.WireValue = bad;
         act.Should().Throw<InvalidFieldValueException>();
     }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // {NULL} sentinel clears numeric/date types (C4). The "{NULL}" wire value is the
+    // FIXatdl "clear this field" instruction; Boolean_t/String_t/Data_t already honour it,
+    // so Int_t/Float_t/Percentage_t and the date types must clear too, not throw.
+    // ──────────────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Int_t_treats_NULL_sentinel_as_clear()
+    {
+        var p = new Parameter_t<Int_t>("Qty") { WireValue = "100" };
+        p.WireValue = "{NULL}";
+        p.WireValue.Should().BeNull();
+    }
+
+    [Fact]
+    public void Float_t_treats_NULL_sentinel_as_clear()
+    {
+        var p = new Parameter_t<Float_t>("Px") { WireValue = "123.45" };
+        p.WireValue = "{NULL}";
+        p.WireValue.Should().BeNull();
+    }
+
+    [Fact]
+    public void Percentage_t_treats_NULL_sentinel_as_clear()
+    {
+        var p = new Parameter_t<Percentage_t>("Pct") { WireValue = "0.75" };
+        p.WireValue = "{NULL}";
+        p.WireValue.Should().BeNull();
+    }
+
+    [Fact]
+    public void UTCTimestamp_t_treats_NULL_sentinel_as_clear()
+    {
+        var p = new Parameter_t<UTCTimestamp_t>("Ts") { WireValue = "20260101-09:30:00" };
+        p.WireValue = "{NULL}";
+        p.WireValue.Should().BeNull();
+    }
 }

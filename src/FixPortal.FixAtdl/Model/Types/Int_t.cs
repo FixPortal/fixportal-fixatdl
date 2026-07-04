@@ -75,7 +75,14 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override int? ConvertFromWireValueFormat(string value)
     {
-        // 'value' is non-nullable (an empty FIX field is invalid); the dead null branch is removed.
+        // A '{NULL}' sentinel (or empty) means "clear this field" — return null rather than throwing, matching
+        // Boolean_t/String_t/Data_t. Without this a schema-legal {NULL} clear reaches Convert.ToInt32 and
+        // throws FormatException, surfaced as InvalidFieldValueException (C4, {NULL}-handling theme).
+        if (value is null or Atdl.NullValue)
+        {
+            return null;
+        }
+
         // Convert.ToInt32 FormatException/OverflowException are translated at the SetWireValue boundary.
         return Convert.ToInt32(value, CultureInfo.InvariantCulture);
     }

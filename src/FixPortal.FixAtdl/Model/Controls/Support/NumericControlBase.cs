@@ -45,6 +45,14 @@ public class NumericControlBase : InitializableControl<decimal?>
     /// <returns>true if it was possible to set the value of this control using the supplied value; false otherwise.</returns>
     protected override bool LoadDefaultFromFixValue(string value)
     {
+        // Convert.ToDecimal(null) returns 0m (not an exception), which would load a spurious 0 and report
+        // success; guard null/empty explicitly so an absent value is "not initialised", matching
+        // ListControlBase (D-NUM-ZERO).
+        if (string.IsNullOrEmpty(value))
+        {
+            return false;
+        }
+
         try
         {
             _value = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
