@@ -45,8 +45,6 @@ public class StrategiesReader
         XmlResolver = null,
     };
 
-    private int _strategyLoadedCount;
-
     /// <summary>
     /// Occurs when a strategy has been deserialized. This is a pre-resolution progress signal: it is
     /// raised as each strategy is deserialized, before cross-reference resolution (ResolveAll), which
@@ -128,7 +126,14 @@ public class StrategiesReader
 
         ElementFactory factory = new(SchemaDefinitions.Strategies_t, typeof(Strategy_t), _loggerFactory);
 
-        _strategyLoadedCount = 0;
+        // Counter is local to this call (not instance state), so concurrent Load calls on the same
+        // StrategiesReader instance cannot corrupt each other's StrategyLoadedEventArgs.Index.
+        int strategyLoadedCount = 0;
+
+        // Index is a running count of strategies as they deserialize. Total is reported as 0 ("unknown")
+        // because the full count is not known until deserialization completes (this fires mid-parse).
+        void OnStrategyDeserialized(object? sender, ClassDeserializedEventArgs args) =>
+            NotifyStrategyLoaded(strategyLoadedCount++, 0, (args.ExtraInfo as Strategy_t)!.Name);
 
         factory.ClassDeserialized += OnStrategyDeserialized;
 
@@ -147,13 +152,6 @@ public class StrategiesReader
         strategies.ResolveAll();
 
         return strategies;
-    }
-
-    private void OnStrategyDeserialized(object? sender, ClassDeserializedEventArgs args)
-    {
-        // Index is a running count of strategies as they deserialize. Total is reported as 0 ("unknown")
-        // because the full count is not known until deserialization completes (this fires mid-parse).
-        NotifyStrategyLoaded(_strategyLoadedCount++, 0, (args.ExtraInfo as Strategy_t)!.Name);
     }
 
     private void NotifyStrategyLoaded(int index, int total, string strategyName)

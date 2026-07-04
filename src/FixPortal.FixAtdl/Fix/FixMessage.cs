@@ -115,6 +115,15 @@ public class FixMessage : Dictionary<FixField, string>
                     ((int)item.Key).ToString(CultureInfo.InvariantCulture));
             }
 
+            // A null value would emit "tag=" + SOH, which this class's own parse constructor then rejects
+            // (separatorIndex == length - 1). A value containing SOH would split one field into two on the
+            // wire. Guard both at this single serialization chokepoint, mirroring the tag guard above.
+            if (item.Value == null || item.Value.Contains(SOH))
+            {
+                throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.InvalidFixValueForSerialization,
+                    ((uint)item.Key).ToString(CultureInfo.InvariantCulture));
+            }
+
             sb.AppendFormat(CultureInfo.InvariantCulture, "{0}{1}{2}{3}", ((uint)item.Key).ToString(CultureInfo.InvariantCulture), Separator, item.Value, SOH);
         }
 

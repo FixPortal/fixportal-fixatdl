@@ -49,6 +49,15 @@ public static class EditValueConverter
             throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
         }
 
+        // Data_t (char[]) has no meaningful comparison target. Without this check the switch below
+        // falls to its default arm and raises InvalidCastException — a raw data-conversion error —
+        // instead of the InvalidOperationException/"unsupported comparison" error that
+        // Edit_t.CheckForUnsupportedComparisons raises for the same scenario elsewhere.
+        if (typeInstanceToMatch is char[] lhsChars)
+        {
+            throw ThrowHelper.New<InvalidOperationException>(ExceptionContext, ErrorMessages.UnsupportedComparisonOperation, value, new string(lhsChars));
+        }
+
         string? type = typeInstanceToMatch.GetType().FullName;
 
         try

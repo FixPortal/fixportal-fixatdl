@@ -75,6 +75,15 @@ public class EditEvaluatingCollection<T> : Collection<IEdit<T>>, IResolvable<Str
             throw ThrowHelper.New<InvalidOperationException>(this, ErrorMessages.MissingLogicalOperatorOnSetOfEdits);
         }
 
+        // A LogicOperator with no operands is schema-invalid: without this guard, an empty
+        // collection silently falls through to the initial `newState` value below (false for
+        // NOT/OR/XOR, true for AND) rather than surfacing the invalid input.
+        if (Items.Count == 0)
+        {
+            throw ThrowHelper.New<InvalidOperationException>(this,
+                "LogicOperator '{0}' is set but the Edits collection is empty; this is schema-invalid input.", LogicOperator);
+        }
+
         bool newState = LogicOperator == LogicOperator_t.And;
         int xorCount = 0;
 

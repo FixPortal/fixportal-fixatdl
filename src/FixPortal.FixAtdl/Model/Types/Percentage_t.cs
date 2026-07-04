@@ -101,7 +101,7 @@ public class Percentage_t : Float_t
             return adjustedValue.ToString(CultureInfo.InvariantCulture);
         }
 
-        int effectivePrecision = MultiplyBy100 == true ? Precision.Value : Precision.Value + 2;
+        int effectivePrecision = Math.Min(28, MultiplyBy100 == true ? Precision.Value : Precision.Value + 2);
         return Round(adjustedValue, effectivePrecision)!.Value.ToString(CultureInfo.InvariantCulture);
     }
 
@@ -141,7 +141,7 @@ public class Percentage_t : Float_t
 
             if (Precision != null)
             {
-                int effectivePrecision = MultiplyBy100 == true ? Precision.Value : Precision.Value + 2;
+                int effectivePrecision = Math.Min(28, MultiplyBy100 == true ? Precision.Value : Precision.Value + 2);
                 return Round(adjustedValue, effectivePrecision)!;
             }
             return adjustedValue;

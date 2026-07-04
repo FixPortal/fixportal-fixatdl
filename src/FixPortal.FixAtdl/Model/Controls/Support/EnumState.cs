@@ -121,6 +121,22 @@ public class EnumState
             return false;
         }
 
+        // Cross-check that both operands denote the same set of EnumIDs before comparing bit
+        // states (mirrors the identity check in UpdateFrom). Without this, two EnumStates for
+        // unrelated parameters that happen to share a bit pattern would compare equal.
+        if (_enumIds.Length != state._enumIds.Length)
+        {
+            return false;
+        }
+
+        for (int n = 0; n < _enumIds.Length; n++)
+        {
+            if (Array.IndexOf(state._enumIds, _enumIds[n]) < 0)
+            {
+                return false;
+            }
+        }
+
         // Compare the bit states element-wise. The previous _enumStates.Equals(state) compared a
         // BitArray to an EnumState by reference, so it was ALWAYS false for two distinct instances,
         // breaking equality / HashSet / Dictionary / dirty-checking semantics.
@@ -374,18 +390,18 @@ public class EnumState
     /// <param name="enumPairs">The EnumPairs for this parameter, to provide the mapping from EnumID values.</param>
     /// <returns>A space-separated string containing zero or more EnumPair WireValues.  If no EnumIDs are enabled,
     /// then null is returned.</returns>
-    public string ToWireValue(EnumPairCollection enumPairs)
+    public string? ToWireValue(EnumPairCollection enumPairs)
     {
         if (enumPairs.Count != _enumStates.Count)
         {
             throw ThrowHelper.New<InvalidOperationException>(ExceptionContext, ErrorMessages.InconsistentEnumPairsListItemsError);
         }
 
-        // Override the values in the states collection if a non-enum value is supplied.  This is used to handle 
+        // Override the values in the states collection if a non-enum value is supplied.  This is used to handle
         // the unique case of the EditableDropDownList_t control.
         if (NonEnumValue != null)
         {
-            return NonEnumValue.Length > 0 ? NonEnumValue : null!;
+            return NonEnumValue.Length > 0 ? NonEnumValue : null;
         }
 
         bool hasAtLeastOneValue = false;
@@ -409,7 +425,7 @@ public class EnumState
             AppendWireValue(sb, value, ref hasAtLeastOneValue);
         }
 
-        return hasAtLeastOneValue ? sb.ToString() : null!;
+        return hasAtLeastOneValue ? sb.ToString() : null;
     }
 
     private static void AppendWireValue(StringBuilder sb, string value, ref bool hasAtLeastOneValue)

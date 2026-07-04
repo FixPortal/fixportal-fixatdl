@@ -53,6 +53,62 @@ public class EditRefCollection<T> : KeyedCollection<string, EditRef_t<T>> where 
     }
 
     /// <summary>
+    /// Removes an item, also unregistering it from the associated evaluating collection.
+    /// </summary>
+    /// <param name="index">The index of the item to remove.</param>
+    protected override void RemoveItem(int index)
+    {
+        EditRef_t<T> item = Items[index];
+
+        base.RemoveItem(index);
+
+        _evaluatingCollection?.Remove(item);
+    }
+
+    /// <summary>
+    /// Replaces an item, keeping the associated evaluating collection in sync.
+    /// </summary>
+    /// <param name="index">The index of the item to replace.</param>
+    /// <param name="item">The replacement item.</param>
+    protected override void SetItem(int index, EditRef_t<T> item)
+    {
+        EditRef_t<T> oldItem = Items[index];
+
+        base.SetItem(index, item);
+
+        if (_evaluatingCollection != null)
+        {
+            int mirroredIndex = _evaluatingCollection.IndexOf(oldItem);
+
+            if (mirroredIndex >= 0)
+            {
+                _evaluatingCollection[mirroredIndex] = item;
+            }
+            else
+            {
+                _evaluatingCollection.Add(item);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Clears the collection, also removing the mirrored entries from the associated evaluating
+    /// collection (which may hold other, non-mirrored edits and so cannot simply be cleared wholesale).
+    /// </summary>
+    protected override void ClearItems()
+    {
+        if (_evaluatingCollection != null)
+        {
+            foreach (EditRef_t<T> item in Items)
+            {
+                _evaluatingCollection.Remove(item);
+            }
+        }
+
+        base.ClearItems();
+    }
+
+    /// <summary>
     /// Determines whether an EditRef with the specified ID is in the collection.
     /// </summary>
     /// <param name="id">The id.</param>

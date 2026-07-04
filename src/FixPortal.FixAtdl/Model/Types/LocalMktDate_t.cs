@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Globalization;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
@@ -31,6 +32,14 @@ public class LocalMktDate_t : DateTimeTypeBase
     {
         return _formatStrings;
     }
+
+    /// <summary>
+    /// Parse the date as UTC (Kind=Utc), matching the sibling UTCDateOnly_t/UTCTimestamp_t/UTCTimeOnly_t/
+    /// TZTimestamp_t types so a parsed value is never Kind=Unspecified. AssumeUniversal | AdjustToUniversal
+    /// sets Kind=Utc for a date-only value.
+    /// </summary>
+    protected override DateTimeStyles WireParseStyles =>
+        DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
 
     /// <summary>
     /// Gets the human-readable type name for use in error messages shown to the user.

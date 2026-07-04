@@ -226,7 +226,7 @@ public class NumericControlBase : InitializableControl<decimal?>
     /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
     public override string ToString(IParameter targetParameter)
     {
-        return _value?.ToString(CultureInfo.InvariantCulture) ?? "";
+        return _value?.ToString(CultureInfo.InvariantCulture)!;
     }
 
     /// <summary>
