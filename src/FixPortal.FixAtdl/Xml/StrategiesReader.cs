@@ -9,11 +9,13 @@ using System.Xml;
 using System.Xml.Linq;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Xml.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using NodaTime;
 
 namespace FixPortal.FixAtdl.Xml;
 
@@ -25,16 +27,21 @@ public class StrategiesReader
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<StrategiesReader> _log;
+    private readonly IClock _clock;
 
     /// <summary>
     /// Initializes a new <see cref="StrategiesReader"/>.
     /// </summary>
     /// <param name="loggerFactory">Optional logger factory. When null, no logging is produced
     /// (<see cref="NullLoggerFactory"/>). Supply one to trace loading and deserialization.</param>
-    public StrategiesReader(ILoggerFactory? loggerFactory = null)
+    /// <param name="clock">Optional clock wired into every <see cref="Clock_t"/> control as it is
+    /// loaded, so a time-only initValue anchors to a controllable "now". When null, the system clock
+    /// is used (unchanged behaviour). Supply a NodaTime FakeClock in tests for deterministic dates.</param>
+    public StrategiesReader(ILoggerFactory? loggerFactory = null, IClock? clock = null)
     {
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         _log = _loggerFactory.CreateLogger<StrategiesReader>();
+        _clock = clock ?? SystemClock.Instance;
     }
 
     // Hardened reader settings shared by both Load overloads: prohibit DTD processing and use no
@@ -150,6 +157,17 @@ public class StrategiesReader
         }
 
         strategies.ResolveAll();
+
+        // Wire the injected clock into every Clock_t. Clock_t reads its clock lazily (at LoadInitValue
+        // and value-set time, not during parse), so assigning here — after parse, before the host loads
+        // defaults — lands the injected "now" without the caller walking the control graph by hand.
+        foreach (Strategy_t strategy in strategies)
+        {
+            foreach (Clock_t clock in strategy.Controls.OfType<Clock_t>())
+            {
+                clock.Clock = _clock;
+            }
+        }
 
         return strategies;
     }
