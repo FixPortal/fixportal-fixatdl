@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -387,6 +388,16 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
             return rhs == null || rhs as string == Atdl.NullValue;
         }
 
+        // RHS "{NULL}" is the FIXatdl sentinel for "field is not set" — never a real value to
+        // numerically/enum-convert against. For a non-null LHS this always means "the field IS
+        // set", so EQ-to-null is false (NE is true, via the caller's negation). An EnumState LHS
+        // uses its own "no selection" check rather than Matches("{NULL}"), which would throw
+        // since "{NULL}" is not a valid EnumID.
+        if (rhs as string == Atdl.NullValue)
+        {
+            return lhs is EnumState lhsEnumStateForNullCheck && !lhsEnumStateForNullCheck.HasSelection;
+        }
+
         if (lhs is EnumState lhsEnumState)
         {
             return rhs switch
@@ -421,6 +432,14 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T> where T : class, I
     {
         if (Value != null)
         {
+            // "{NULL}" is a sentinel, not a real value of lhs's type — routing it through numeric/
+            // enum conversion would throw or silently coerce it. Short-circuit so it flows into
+            // AreEqual as the literal sentinel string.
+            if (Value == Atdl.NullValue)
+            {
+                return Value;
+            }
+
             return EditValueConverter.ConvertToComparableType(lhs, Value);
         }
 

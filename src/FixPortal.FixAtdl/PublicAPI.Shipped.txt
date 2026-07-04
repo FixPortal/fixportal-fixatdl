@@ -3241,6 +3241,7 @@ override FixPortal.FixAtdl.Model.Types.Language_t.GetHumanReadableTypeName() -> 
 override FixPortal.FixAtdl.Model.Types.Language_t.ValidateValue(FixPortal.FixAtdl.Model.Reference.IsoLanguageCode? value, bool isRequired) -> FixPortal.FixAtdl.Validation.ValidationResult!
 override FixPortal.FixAtdl.Model.Types.LocalMktDate_t.GetDateTimeFormatStrings() -> string![]!
 override FixPortal.FixAtdl.Model.Types.LocalMktDate_t.GetHumanReadableTypeName() -> string!
+override FixPortal.FixAtdl.Model.Types.LocalMktDate_t.WireParseStyles.get -> System.Globalization.DateTimeStyles
 override FixPortal.FixAtdl.Model.Types.MonthYear_t.ConvertFromWireValueFormat(string! value) -> FixPortal.FixAtdl.Model.Types.Support.MonthYear?
 override FixPortal.FixAtdl.Model.Types.MonthYear_t.ConvertToNativeType(FixPortal.FixAtdl.Model.Elements.Support.IParameter! hostParameter, FixPortal.FixAtdl.Model.Controls.Support.IParameterConvertible! value) -> FixPortal.FixAtdl.Model.Types.Support.MonthYear?
 override FixPortal.FixAtdl.Model.Types.MonthYear_t.ConvertToWireValueFormat(FixPortal.FixAtdl.Model.Types.Support.MonthYear? value) -> string?

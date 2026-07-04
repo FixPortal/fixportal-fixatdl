@@ -73,7 +73,12 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     {
         foreach (Control_t control in panel.Controls)
         {
-            _controls[control.Id] = control;
+            if (_controls.ContainsKey(control.Id))
+            {
+                throw ThrowHelper.New<DuplicateKeyException>(this, ErrorMessages.AttemptToAddDuplicateKey, control.Id, "Controls");
+            }
+
+            _controls.Add(control.Id, control);
         }
         foreach (StrategyPanel_t childPanel in panel.StrategyPanels)
         {
@@ -232,7 +237,18 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             // We only want to update the control value if the parameter has a value
             if (parameterValue != null)
             {
-                control.SetValueFromParameter(parameter);
+                try
+                {
+                    control.SetValueFromParameter(parameter);
+                }
+                catch (Exception ex) when (ex is ArgumentException or FormatException or InvalidCastException or OverflowException)
+                {
+                    // Defense in depth: a value/type-conversion failure while pushing a parameter value into
+                    // its bound control (e.g. an unresolvable date/time Kind) must not propagate as a raw,
+                    // uncaught exception (D-F8) - wrap it with control/parameter context instead.
+                    throw ThrowHelper.Rethrow(this, ex, ErrorMessages.UnsuccessfulSetParameterOperation,
+                        control.ParameterRef!, control.Id, ex.Message);
+                }
 
                 UpdateRelatedHelperControls(control);
             }

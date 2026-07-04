@@ -16,7 +16,7 @@ namespace FixPortal.FixAtdl.Utility;
 /// </summary>
 public static class ModelUtils
 {
-    private static readonly Dictionary<string, MethodInfo> _methodInfoCache = [];
+    private static readonly Dictionary<string, MethodInfo?> _methodInfoCache = [];
 
     /// <summary>
     /// Invokes a matching <c>Visit</c> overload on the supplied visitor for the target object.
@@ -44,13 +44,14 @@ public static class ModelUtils
 
                 methodInfo = visitor.GetType().GetMethod("Visit", types);
 
-                if (methodInfo == null)
-                {
-                    return false;
-                }
-
-                // Indexer rather than Add: idempotent if the same key is computed twice.
+                // Cache the miss too (as null), so a permanently-absent Visit overload is only
+                // reflected-over once instead of re-scanning under the lock on every call.
                 _methodInfoCache[searchString] = methodInfo;
+            }
+
+            if (methodInfo == null)
+            {
+                return false;
             }
         }
 

@@ -148,7 +148,7 @@ public abstract class ListControlBase : InitializableControl<string>
     /// </summary>
     public override void Reset()
     {
-        _value.ClearAll();
+        _value?.ClearAll();
     }
 
     /// <summary>
@@ -244,7 +244,7 @@ public abstract class ListControlBase : InitializableControl<string>
 
         try
         {
-            return _value.ToWireValue(targetParameter.EnumPairs);
+            return _value.ToWireValue(targetParameter.EnumPairs)!;
         }
         catch (InvalidOperationException ex)
         {

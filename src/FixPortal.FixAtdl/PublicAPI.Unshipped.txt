@@ -1,4 +1,9 @@
 #nullable enable
+*REMOVED*FixPortal.FixAtdl.Model.Controls.Support.EnumState.ToWireValue(FixPortal.FixAtdl.Model.Collections.EnumPairCollection! enumPairs) -> string!
+FixPortal.FixAtdl.Model.Controls.Support.EnumState.ToWireValue(FixPortal.FixAtdl.Model.Collections.EnumPairCollection! enumPairs) -> string?
+override FixPortal.FixAtdl.Model.Collections.EditRefCollection<T>.ClearItems() -> void
+override FixPortal.FixAtdl.Model.Collections.EditRefCollection<T>.RemoveItem(int index) -> void
+override FixPortal.FixAtdl.Model.Collections.EditRefCollection<T>.SetItem(int index, FixPortal.FixAtdl.Model.Elements.EditRef_t<T!>! item) -> void
 override FixPortal.FixAtdl.Model.Collections.StateRuleCollection.InsertItem(int index, FixPortal.FixAtdl.Model.Elements.StateRule_t! item) -> void
 override FixPortal.FixAtdl.Model.Collections.StateRuleCollection.SetItem(int index, FixPortal.FixAtdl.Model.Elements.StateRule_t! item) -> void
 override FixPortal.FixAtdl.Model.Types.TZTimestamp_t.ConvertFromWireValueFormat(string! value) -> System.DateTime?

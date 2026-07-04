@@ -92,9 +92,17 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     /// <returns><see langword="true"/> if the field was present; otherwise, <see langword="false"/>.</returns>
     public bool TryGetValue(string fixField, out string value)
     {
-        // Honour the Try-pattern: an unknown/extension/symbolic field name returns false rather than
-        // throwing out of ParseAsEnum.
-        if (!Enum.TryParse(fixField, true, out FixField field))
+        // Honour the Try-pattern: an unknown/extension/symbolic field name, or a numeric string that
+        // is not a defined FixField member (e.g. "99999"), returns false rather than throwing out of
+        // ParseAsEnum. Uses the same strict acceptance rule as the indexer (ParseAsEnum<FixField>())
+        // rather than a raw Enum.TryParse, which would accept any undefined numeric value.
+        FixField field;
+
+        try
+        {
+            field = fixField.ParseAsEnum<FixField>();
+        }
+        catch (ArgumentException)
         {
             value = null!;
             return false;

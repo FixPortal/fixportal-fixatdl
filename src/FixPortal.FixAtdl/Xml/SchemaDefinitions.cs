@@ -427,7 +427,7 @@ public static class SchemaDefinitions
 
     private static readonly ElementAttribute[] HiddenFieldAttributes =
     [
-        new("initValue", "InitValue", typeof(object), Required.Optional)
+        new("initValue", "InitValue", typeof(string), Required.Optional)
     ];
 
     private static readonly ElementAttribute[] LabelAttributes =

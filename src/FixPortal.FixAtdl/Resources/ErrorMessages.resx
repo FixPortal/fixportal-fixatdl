@@ -317,4 +317,7 @@
   <data name="InvalidFixTagForSerialization" xml:space="preserve">
     <value>Unable to serialize FIX message: the tag '{0}' is not a positive integer.</value>
   </data>
+  <data name="InvalidFixValueForSerialization" xml:space="preserve">
+    <value>Unable to serialize FIX message: the value for tag '{0}' is null or contains the SOH field delimiter.</value>
+  </data>
 </root>

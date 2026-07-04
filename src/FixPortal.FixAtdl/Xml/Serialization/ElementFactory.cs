@@ -71,7 +71,15 @@ public class ElementFactory : INotifyClassDeserialized
         _elementValueCache.Clear();
         _currentDepth = 0;
 
-        return CreateObject(_elementDefinition, element, null);
+        // Mirror ProcessMatchingChild's runtime-type dispatch (:503-508) so a polymorphic root
+        // definition (MultiTypeElementDefinition / GenericTypeElementDefinition) is routed to its
+        // matching CreateObject overload instead of always binding to the plain ElementDefinition one.
+        return _elementDefinition switch
+        {
+            GenericTypeElementDefinition genericDefinition => CreateObject(genericDefinition, element, null),
+            MultiTypeElementDefinition multiDefinition => CreateObject(multiDefinition, element, null),
+            _ => CreateObject(_elementDefinition, element, null)
+        };
     }
 
     private object CreateObject(ElementDefinition definition, XElement sourceElement, object? parentObject)
@@ -97,7 +105,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         try
         {
-            ProcessAttributes(definition.TargetType!, definition.Attributes!, attributes, newObject);
+            ProcessAttributes(definition.TargetType!, definition.Attributes!, attributes, newObject, sourceElement);
         }
         catch (FixAtdlException ex)
         {
@@ -153,6 +161,15 @@ public class ElementFactory : INotifyClassDeserialized
             innerTypeName = innerTypeName[(innerTypeName.IndexOf(':') + 1)..];
         }
 
+        // SECURITY: reject assembly-qualified type names before probing Type.GetType, which would
+        // otherwise load (and run the type/module initializer of) an arbitrary assembly before the
+        // allow-list check below can reject it.
+        if (innerTypeName.Contains(','))
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(this, sourceElement, ErrorMessages.UnrecognisedTypeError, innerTypeName,
+                genericTypeDefinition.AttributeForInnerType.LocalName, genericTypeDefinition.ElementName!.LocalName);
+        }
+
         Type? innerType = string.IsNullOrEmpty(genericTypeDefinition.InnerTypeNamespace)
             ? Type.GetType(innerTypeName)
             : Type.GetType(string.Format(CultureInfo.InvariantCulture, "{0}.{1}", genericTypeDefinition.InnerTypeNamespace, innerTypeName));
@@ -179,8 +196,8 @@ public class ElementFactory : INotifyClassDeserialized
         try
         {
             var xAttributes = attributes as XAttribute[] ?? [.. attributes];
-            ProcessAttributes(newObject.GetType(), genericTypeDefinition.Attributes!, xAttributes, newObject);
-            ProcessAttributes(newObject.GetType(), innerTypeAttributes, xAttributes, newObject);
+            ProcessAttributes(newObject.GetType(), genericTypeDefinition.Attributes!, xAttributes, newObject, sourceElement);
+            ProcessAttributes(newObject.GetType(), innerTypeAttributes, xAttributes, newObject, sourceElement);
         }
         catch (FixAtdlException ex)
         {
@@ -224,6 +241,15 @@ public class ElementFactory : INotifyClassDeserialized
             typeName = typeName[(typeName.IndexOf(':') + 1)..];
         }
 
+        // SECURITY: reject assembly-qualified type names before probing Type.GetType, which would
+        // otherwise load (and run the type/module initializer of) an arbitrary assembly before the
+        // allow-list check below can reject it.
+        if (typeName.Contains(','))
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(this, sourceElement, ErrorMessages.UnrecognisedTypeError, typeName,
+                multiTypeDefinition.AttributeForType.LocalName, multiTypeDefinition.ElementName!.LocalName);
+        }
+
         Type? targetType = string.IsNullOrEmpty(multiTypeDefinition.TypeNamespace)
             ? Type.GetType(typeName)
             : Type.GetType(string.Format(CultureInfo.InvariantCulture, "{0}.{1}", multiTypeDefinition.TypeNamespace, typeName));
@@ -250,8 +276,8 @@ public class ElementFactory : INotifyClassDeserialized
         try
         {
             var xAttributes = attributes as XAttribute[] ?? [.. attributes];
-            ProcessAttributes(newObject.GetType(), multiTypeDefinition.Attributes!, xAttributes, newObject);
-            ProcessAttributes(newObject.GetType(), typeAttributes, xAttributes, newObject);
+            ProcessAttributes(newObject.GetType(), multiTypeDefinition.Attributes!, xAttributes, newObject, sourceElement);
+            ProcessAttributes(newObject.GetType(), typeAttributes, xAttributes, newObject, sourceElement);
         }
         catch (FixAtdlException ex)
         {
@@ -372,7 +398,7 @@ public class ElementFactory : INotifyClassDeserialized
             constructorParameter.Source, elementDefinition.ElementName!.LocalName);
     }
 
-    private void ProcessAttributes(Type targetType, ElementAttribute[] attributeDefinitions, IEnumerable<XAttribute> attributes, object target)
+    private void ProcessAttributes(Type targetType, ElementAttribute[] attributeDefinitions, IEnumerable<XAttribute> attributes, object target, XElement sourceElement)
     {
         if (_log.IsEnabled(LogLevel.Debug))
         {
@@ -389,7 +415,7 @@ public class ElementFactory : INotifyClassDeserialized
 
             if (attrDefn.Required == Required.Mandatory && value == null)
             {
-                throw ThrowHelper.New<MissingMandatoryValueException>(this, ErrorMessages.MissingMandatoryAttribute,
+                throw ThrowHelper.New<MissingMandatoryValueException>(this, sourceElement, ErrorMessages.MissingMandatoryAttribute,
                     attrDefn.XmlName.LocalName, targetType.Name);
             }
 
@@ -426,7 +452,7 @@ public class ElementFactory : INotifyClassDeserialized
             throw ThrowHelper.New<InternalErrorException>(this, InternalErrors.PropertyNotFoundOnObjectInternal, names[0], targetType.FullName!);
         }
 
-        object innerObject = outerProperty.GetValue(target, null)!;
+        object? innerObject = outerProperty.GetValue(target, null);
 
         if (innerObject == null)
         {

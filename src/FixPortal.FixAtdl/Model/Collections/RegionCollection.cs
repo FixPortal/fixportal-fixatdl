@@ -34,7 +34,7 @@ public class RegionCollection : KeyedCollection<Region, Region_t>
     /// <remarks>If no region information is provided, the strategy is assumed applicable to all regions. If the
     /// collection contains only excluded regions, then all regions <em>except</em> those excluded are applicable
     /// (per the FIXatdl inclusion/exclusion semantics); if it contains any included region, that union forms the
-    /// base set (Include takes precedence over Exclude) from which any excluded regions are then removed.</remarks>
+    /// base set. Excludes are always subtracted last, so a region present in both lists ends up excluded.</remarks>
     public Region GetApplicableRegions()
     {
         if (Count == 0)

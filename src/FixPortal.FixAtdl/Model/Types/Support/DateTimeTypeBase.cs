@@ -49,7 +49,17 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     public string? MaxValueText
     {
         get;
-        set { field = value; SetBound(value!, isMax: true); }
+        set
+        {
+            field = value;
+            if (value == null)
+            {
+                MaxValue = null;
+                _maxTimeOfDay = null;
+                return;
+            }
+            SetBound(value, isMax: true);
+        }
     }
 
     /// <summary>Deserialization-only round-trip of the raw <c>minValue</c> attribute text; parsed with
@@ -58,7 +68,17 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     public string? MinValueText
     {
         get;
-        set { field = value; SetBound(value!, isMax: false); }
+        set
+        {
+            field = value;
+            if (value == null)
+            {
+                MinValue = null;
+                _minTimeOfDay = null;
+                return;
+            }
+            SetBound(value, isMax: false);
+        }
     }
 
     private void SetBound(string text, bool isMax)
@@ -172,7 +192,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
             }
         }
 
-        TimeOnly valueTimeOfDay = TimeOnly.FromDateTime(value);
+        TimeOnly valueTimeOfDay = TimeOnly.FromDateTime(NormaliseToUtc(value));
 
         if (_maxTimeOfDay != null && valueTimeOfDay > _maxTimeOfDay)
         {

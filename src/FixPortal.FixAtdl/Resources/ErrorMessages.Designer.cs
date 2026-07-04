@@ -654,6 +654,15 @@ namespace FixPortal.FixAtdl.Resources {
                 return ResourceManager.GetString("InvalidFixTagForSerialization", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to serialize FIX message: the value for tag &apos;{0}&apos; is null or contains the SOH field delimiter..
+        /// </summary>
+        internal static string InvalidFixValueForSerialization {
+            get {
+                return ResourceManager.GetString("InvalidFixValueForSerialization", resourceCulture);
+            }
+        }
     }
 }
 

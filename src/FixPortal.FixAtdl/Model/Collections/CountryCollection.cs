@@ -23,7 +23,7 @@ namespace FixPortal.FixAtdl.Model.Collections;
 /// UnionWith or a collection initializer, all of which skipped the region check.</remarks>
 public class CountryCollection : IEnumerable<Country_t>
 {
-    private readonly Region _region;
+    private readonly Region_t _owner;
     private readonly HashSet<Country_t> _countries = [];
 
     /// <summary>
@@ -32,7 +32,7 @@ public class CountryCollection : IEnumerable<Country_t>
     /// <param name="region">The region.</param>
     public CountryCollection(Region_t region)
     {
-        _region = region.Name;
+        _owner = region;
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class CountryCollection : IEnumerable<Country_t>
         if (!IsCountryInRegion(item))
         {
             throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.InvalidAttemptToAddCountryToRegion,
-                Enum.GetName(item.CountryCode), Enum.GetName(_region));
+                Enum.GetName(item.CountryCode), Enum.GetName(_owner.Name));
         }
 
         // Surface the add/duplicate result rather than silently swallowing it.
@@ -74,19 +74,20 @@ public class CountryCollection : IEnumerable<Country_t>
     // the previous single-value switch fell through to "reject everything" for any composite region.
     private bool IsCountryInRegion(Country_t item)
     {
+        Region region = _owner.Name;
         bool countryOkay = false;
 
-        if (_region.HasFlag(Region.AsiaPacificJapan))
+        if (region.HasFlag(Region.AsiaPacificJapan))
         {
             countryOkay |= Regions.AsiaPacificJapanCountries.Contains(item.CountryCode);
         }
 
-        if (_region.HasFlag(Region.EuropeMiddleEastAfrica))
+        if (region.HasFlag(Region.EuropeMiddleEastAfrica))
         {
             countryOkay |= Regions.EuropeMiddleEastAfricaCountries.Contains(item.CountryCode);
         }
 
-        if (_region.HasFlag(Region.TheAmericas))
+        if (region.HasFlag(Region.TheAmericas))
         {
             countryOkay |= Regions.TheAmericasCountries.Contains(item.CountryCode);
         }
