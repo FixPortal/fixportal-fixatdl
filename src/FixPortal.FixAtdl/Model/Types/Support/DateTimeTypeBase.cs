@@ -228,8 +228,9 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     /// <returns>Value converted from a string if the conversion succeeded; otherwise an exception is thrown.</returns>
     protected override DateTime? ConvertFromWireValueFormat(string value)
     {
-        // A '{NULL}' sentinel (or empty) means "clear this field" — return null rather than throwing, matching
-        // Boolean_t/String_t/Data_t (C4, {NULL}-handling theme).
+        // A '{NULL}' sentinel means "clear this field" — return null rather than throwing, matching
+        // Boolean_t/String_t/Data_t (C4, {NULL}-handling theme). An empty string is not a clear (empty
+        // FIX fields are invalid) and still falls through to throw.
         if (value is null or Atdl.NullValue)
         {
             return null;
