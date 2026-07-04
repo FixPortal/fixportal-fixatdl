@@ -15,7 +15,6 @@
     <PackageTags>FIX;FIXatdl;algorithmic-trading;trading;finance</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="NodaTime" />
   </ItemGroup>
