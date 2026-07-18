@@ -167,12 +167,8 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// May also contain the FIXatdl '{NULL}' value as a string.</param>
     public override void SetValue(object newValue)
     {
-        bool isString = newValue is string;
-
-        if (isString)
+        if (newValue is string value)
         {
-            string? value = newValue as string;
-
             if (value == Atdl.NullValue)
             {
                 _value = null;
