@@ -281,7 +281,7 @@ public class DateTimeTypeTests
 
         // 1. Set offset-bearing bound "12:00:00+01:00" -> which is 11:00:00 UTC.
         param.Value.MaxValueText = "12:00:00+01:00";
-        
+
         // 10:30:00 UTC should succeed (10:30:00 < 11:00:00)
         var act1 = () => param.WireValue = "10:30:00";
         act1.Should().NotThrow();

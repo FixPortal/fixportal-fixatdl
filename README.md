@@ -48,6 +48,17 @@ foreach (var tag in twap.Parameters.GetOutputValues())
 - Nullable reference types enabled throughout.
 - New xUnit v3 test suite (AwesomeAssertions + NSubstitute).
 
+## Development
+
+Open `FixPortal.FixAtdl.slnx` in Visual Studio, then build the solution and run
+the tests from Test Explorer. The equivalent command-line checks are:
+
+```powershell
+dotnet restore FixPortal.FixAtdl.slnx
+dotnet build FixPortal.FixAtdl.slnx --configuration Release --no-restore
+dotnet test FixPortal.FixAtdl.slnx --configuration Release --no-build
+```
+
 Files modified from upstream carry a `// FP Enhancement: <date> — <reason>` banner.
 
 ## Mutation testing
