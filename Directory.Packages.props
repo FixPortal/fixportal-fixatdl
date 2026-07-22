@@ -15,7 +15,7 @@
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="NodaTime.Testing" Version="3.3.2" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
-    <PackageVersion Include="FixPortal.CodeStyle.ArchRules" Version="0.1.7" />
+    <PackageVersion Include="FixPortal.CodeStyle.ArchRules" Version="0.1.10" />
     <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.3" />
   </ItemGroup>
   <!-- House style/analyzer rules applied to every project (CPM GlobalPackageReference =
@@ -23,6 +23,6 @@
        severities), sets EnforceCodeStyleInBuild, and bundles SonarAnalyzer.CSharp — do not
        reference SonarAnalyzer.CSharp separately. -->
   <ItemGroup Label="Analyzers">
-    <GlobalPackageReference Include="FixPortal.CodeStyle" Version="0.1.7" />
+    <GlobalPackageReference Include="FixPortal.CodeStyle" Version="0.1.10" />
   </ItemGroup>
 </Project>
