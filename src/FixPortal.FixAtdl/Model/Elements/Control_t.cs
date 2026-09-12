@@ -43,7 +43,9 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     public bool? DisableForTemplate { get; set; }
 
     /// <summary>Unique identifier of this control. No two controls of the same strategy can have the same ID.</summary>
-    public string Id { get; set; }
+    /// <remarks>Init-only: the strategy index keys controls by Id at insertion time, so a post-insertion
+    /// rename would desynchronise every lookup (#R24).</remarks>
+    public string Id { get; init; }
 
     /// <summary>Zero-based index for this control within a StrategyPanel_t.  For example, if a StrategyPanel_t has three controls,
     /// the first would have index of 0, the second 1 and the third 2.</summary>
