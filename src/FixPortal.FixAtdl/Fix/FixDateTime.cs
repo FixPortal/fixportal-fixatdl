@@ -6,6 +6,7 @@
 #endregion
 
 using System.Globalization;
+using System.Text.RegularExpressions;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Resources;
 
@@ -14,9 +15,15 @@ namespace FixPortal.FixAtdl.Fix;
 /// <summary>
 /// Static class that provides utility methods for dealing with FIX format dates and times.
 /// </summary>
-public static class FixDateTime
+public static partial class FixDateTime
 {
     private static readonly string ExceptionContext = "FixPortal.FixAtdl.Fix.FixDateTime";
+
+    // Matches a literal "60" seconds field (a declared UTC leap second, FIX-legal per the UTCTimestamp_t
+    // spec) preceded by "MM:" and not followed by a further digit, so it only ever matches the SS token in
+    // every FixDateTimeFormat variant that carries seconds (never minutes, hours, or a malformed "600").
+    [GeneratedRegex(@"(?<=:\d{2}:)60(?!\d)")]
+    private static partial Regex LeapSecondPattern();
 
     /// <summary>
     /// Attempts to convert the supplied string to a <see cref="DateTime"/> using either the specified
@@ -40,8 +47,25 @@ public static class FixDateTime
         const DateTimeStyles styles =
             DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
 
-        return DateTime.TryParseExact(value, FixDateTimeFormat.FormatsArray, provider, styles, out result)
-            || DateTime.TryParse(value, provider, styles, out result);
+        // A literal ":60" seconds field is a declared UTC leap second - legal per the UTCTimestamp_t spec,
+        // but unrepresentable directly since DateTime has no 60th second. Normalise to ":59" for parsing,
+        // then roll forward by one second: DateTime.AddSeconds cascades minute/hour/day/month/year rollover
+        // on its own, matching the spec's own worked example (19981231-23:59:60 -> 19990101-00:00:00).
+        Match leapSecondMatch = LeapSecondPattern().Match(value);
+        string parseValue = leapSecondMatch.Success
+            ? string.Concat(value.AsSpan(0, leapSecondMatch.Index), "59", value.AsSpan(leapSecondMatch.Index + 2))
+            : value;
+
+        bool parsed =
+            DateTime.TryParseExact(parseValue, FixDateTimeFormat.FormatsArray, provider, styles, out result)
+            || DateTime.TryParse(parseValue, provider, styles, out result);
+
+        if (parsed && leapSecondMatch.Success)
+        {
+            result = result.AddSeconds(1);
+        }
+
+        return parsed;
     }
 
     /// <summary>
