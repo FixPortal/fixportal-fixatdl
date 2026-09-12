@@ -786,7 +786,12 @@ public static class FixFieldTypes
         { FixField.FIX_NoInstrumentParties, true }, // NUMINGROUP
         { FixField.FIX_NoInstrumentPartySubIDs, true }, // NUMINGROUP
         { FixField.FIX_NoLegAllocs, true }, // NUMINGROUP
-        { FixField.FIX_NoLegSecurityAltID, false }, // STRING
+        // Override: FIX50SP2.xml itself mistypes this one repeating-group counter as STRING
+        // (verified against the raw spec file, line 8125) - every sibling No*SecurityAltID counter
+        // (NoSecurityAltID, NoDerivativeSecurityAltID, NoUnderlyingSecurityAltID,
+        // NoUnderlyingLegSecurityAltID) is NUMINGROUP, and FIX convention requires every NoXXX
+        // repeating-group counter to be numeric. Gitar review finding on PR #117.
+        { FixField.FIX_NoLegSecurityAltID, true }, // NUMINGROUP (spec has STRING - see note above)
         { FixField.FIX_NoLegStipulations, true }, // NUMINGROUP
         { FixField.FIX_NoLegs, true }, // NUMINGROUP
         { FixField.FIX_NoLinesOfText, true }, // NUMINGROUP
