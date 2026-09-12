@@ -30,10 +30,12 @@ public static class StrategyParametersGrpEmitter
         ArgumentNullException.ThrowIfNull(strategy);
 
         // Pre-collect in parameter declaration order so the 957 count is known before emission.
+        // An empty WireValue is filtered alongside a missing one: emitting "960=" would produce a
+        // field the parser rejects (Low 6).
         var filled = new List<IParameter>(strategy.Parameters.Count);
         foreach (var parameter in strategy.Parameters)
         {
-            if (parameter.IsSet && parameter.WireValue is not null)
+            if (parameter.IsSet && !string.IsNullOrEmpty(parameter.WireValue))
             {
                 filled.Add(parameter);
             }

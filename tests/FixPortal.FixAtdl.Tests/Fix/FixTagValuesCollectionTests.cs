@@ -202,4 +202,29 @@ public class FixTagValuesCollectionTests
         var pairs = col.ToList();
         pairs.Should().HaveCount(2);
     }
+
+    // User-defined tags by bare number (Low 7) --------------------------------
+
+    [Fact]
+    public void TryGetValue_resolves_a_bare_numeric_user_defined_tag()
+    {
+        // Low 7: initFixField/Edit field references can address tags outside the FIX_ enum.
+        FixTagValuesCollection col = [];
+        col.Add(5000, "X");
+
+        col.TryGetValue("5000", out var value).Should().BeTrue();
+        value.Should().Be("X");
+    }
+
+    [Theory]
+    [InlineData("0")] // not a positive tag
+    [InlineData("-1")] // sign is outside the tag alphabet
+    [InlineData("5000x")] // not numeric, not a FIX_ member
+    public void TryGetValue_still_returns_false_for_unresolvable_field_names(string fixField)
+    {
+        FixTagValuesCollection col = [];
+        col.Add(5000, "X");
+
+        col.TryGetValue(fixField, out _).Should().BeFalse();
+    }
 }

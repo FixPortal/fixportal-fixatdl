@@ -6,6 +6,7 @@
 #endregion
 
 using System.Collections;
+using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Utility;
@@ -90,17 +91,10 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     /// <returns><see langword="true"/> if the field was present; otherwise, <see langword="false"/>.</returns>
     public bool TryGetValue(string fixField, out string value)
     {
-        // Honour the Try-pattern: an unknown/extension/symbolic field name, or a numeric string that
-        // is not a defined FixField member (e.g. "99999"), returns false rather than throwing out of
-        // ParseAsEnum. Uses the same strict acceptance rule as the indexer (ParseAsEnum<FixField>())
-        // rather than a raw Enum.TryParse, which would accept any undefined numeric value.
-        FixField field;
-
-        try
-        {
-            field = fixField.ParseAsEnum<FixField>();
-        }
-        catch (ArgumentException)
+        // Honour the Try-pattern: an unknown/extension/symbolic field name returns false rather than
+        // throwing out of ParseAsEnum. A bare numeric tag ("5000") resolves to a user-defined field,
+        // so initFixField and Edit_t field references can address tags outside the FIX_ enum (Low 7).
+        if (!TryResolveField(fixField, out FixField field))
         {
             value = null!;
             return false;
@@ -124,6 +118,28 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
         bool result = _message.TryGetValue(field, out string? v);
         value = v!;
         return result;
+    }
+
+    // A field name resolves either as a defined FixField member ("FIX_MsgType") or as a bare positive
+    // numeric tag ("5000") for user-defined fields, matching the wire grammar and the numeric indexer.
+    private static bool TryResolveField(string fixField, out FixField field)
+    {
+        try
+        {
+            field = fixField.ParseAsEnum<FixField>();
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            if (int.TryParse(fixField, NumberStyles.None, CultureInfo.InvariantCulture, out int tag) && tag > 0)
+            {
+                field = (FixField)tag;
+                return true;
+            }
+
+            field = default;
+            return false;
+        }
     }
 
     /// <summary>
