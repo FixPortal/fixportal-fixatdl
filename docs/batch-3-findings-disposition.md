@@ -1,5 +1,10 @@
 # Batch-3 Findings & TODO Disposition (Phase 2)
 
+> **Historical record — a point-in-time disposition, closed in 2026-06.** Kept
+> because the rationale behind each closed finding is still load-bearing (some
+> are pinned by characterization tests). It describes the code as it stood then,
+> not as it stands now.
+
 > Resolves the Phase 2 acceptance gate of the 1.0 roadmap: every in-`src/` TODO and every deferred
 > batch-3 adversarial-review finding is fixed, closed with rationale, or recorded as deferred work.
 > Audit source: the batch-3 adversarial audit at
