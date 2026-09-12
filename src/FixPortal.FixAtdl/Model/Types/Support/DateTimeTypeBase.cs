@@ -391,7 +391,7 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
         throw ThrowHelper.New<InvalidCastException>(
             this,
             ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
+            ConstValue ?? _value,
             "Boolean"
         );
     }
@@ -417,7 +417,7 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
         throw ThrowHelper.New<InvalidCastException>(
             this,
             ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
+            ConstValue ?? _value,
             "Decimal"
         );
     }
@@ -443,7 +443,7 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
         throw ThrowHelper.New<InvalidCastException>(
             this,
             ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
+            ConstValue ?? _value,
             "Enumerated Type"
         );
     }

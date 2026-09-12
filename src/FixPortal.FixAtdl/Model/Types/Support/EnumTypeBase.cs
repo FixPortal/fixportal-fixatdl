@@ -29,7 +29,7 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible
         throw ThrowHelper.New<InvalidCastException>(
             this,
             ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
+            ConstValue ?? _value,
             "Boolean"
         );
     }
@@ -55,7 +55,7 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible
         throw ThrowHelper.New<InvalidCastException>(
             this,
             ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
+            ConstValue ?? _value,
             "Decimal"
         );
     }
@@ -69,7 +69,7 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible
         throw ThrowHelper.New<InvalidCastException>(
             this,
             ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
+            ConstValue ?? _value,
             "DateTime"
         );
     }
@@ -91,7 +91,7 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible
             return state;
         }
 
-        string? wireValue = ToString(null);
+        string? wireValue = ConvertToWireValueFormat(val);
         if (wireValue != null && enumPairs.TryParseWireValue(wireValue, out string? enumId))
         {
             state[enumId!] = true;
