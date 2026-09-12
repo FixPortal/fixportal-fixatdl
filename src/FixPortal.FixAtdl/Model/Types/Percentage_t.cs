@@ -10,6 +10,7 @@ using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Validation;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Types;
 
@@ -125,7 +126,24 @@ public class Percentage_t : Float_t
         }
 
         int effectivePrecision = Math.Min(28, MultiplyBy100 == true ? Precision.Value : Precision.Value + 2);
-        return Round(adjustedValue, effectivePrecision)!.Value.ToString(CultureInfo.InvariantCulture);
+        decimal rounded = Round(adjustedValue, effectivePrecision)!.Value;
+
+        // As Float_t: re-validate the rounded output (mapped back to native units) before emission,
+        // since rounding after validation can push the value outside the validated bounds (R11).
+        decimal roundedNative = MultiplyBy100 == true ? rounded / 100 : rounded;
+        ValidationResult validity = ValidateValue(roundedNative, isRequired: false);
+        if (!validity.IsValid)
+        {
+            throw ThrowHelper.New<Diagnostics.Exceptions.InvalidFieldValueException>(
+                this,
+                "Rounded value {0} at precision {1} falls outside the validated bounds ({2}).",
+                rounded,
+                Precision.Value,
+                validity.ErrorText
+            );
+        }
+
+        return rounded.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>

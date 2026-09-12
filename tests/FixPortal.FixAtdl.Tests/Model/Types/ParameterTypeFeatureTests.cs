@@ -197,6 +197,50 @@ public class ParameterTypeFeatureTests
         p.WireValue.Should().Be(expected);
     }
 
+    [Fact]
+    public void Float_t_rejects_emission_when_precision_rounding_exceeds_a_validated_bound()
+    {
+        // R11: validation compares the raw stored value while rounding to Precision happens only on
+        // emission, so the wire value can land outside the validated bounds (0.16 validates against
+        // MaxValue 0.16, then rounds to 0.2). The rounded output is re-validated and refused.
+        var p = new Parameter_t<Float_t>("X");
+        p.Value.MaxValue = 0.16m;
+        p.Value.Precision = 1;
+        p.WireValue = "0.16";
+
+        var act = () => p.WireValue;
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Float_t_emits_rounded_value_when_rounding_stays_within_bounds()
+    {
+        // Companion to the R11 guard: a rounding that lands exactly on the bound must still emit.
+        var p = new Parameter_t<Float_t>("X");
+        p.Value.MaxValue = 0.2m;
+        p.Value.Precision = 1;
+        p.WireValue = "0.16";
+
+        p.WireValue.Should().Be("0.2");
+    }
+
+    [Fact]
+    public void Percentage_t_rejects_emission_when_precision_rounding_exceeds_a_validated_bound()
+    {
+        // R11 on the Percentage_t override: MaxValue 15.95% (0.1595 native); wire "15.95" with
+        // multiplyBy100 stores 0.1595 (valid) but rounds to 16 (0.16 native) on emission.
+        var p = new Parameter_t<Percentage_t>("Pct");
+        p.Value.MaxValue = 0.1595m;
+        p.Value.MultiplyBy100 = true;
+        p.Value.Precision = 1;
+        p.WireValue = "15.95";
+
+        var act = () => p.WireValue;
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // IControlConvertible — Int_t
     // ──────────────────────────────────────────────────────────────────────────
