@@ -416,31 +416,25 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// <summary>
     /// Converts an inbound BCL <see cref="DateTime"/> (from a FIX wire value or a UI/StateRule set) to a
     /// NodaTime <see cref="Instant"/>. These values are UTC by convention; a Local value is converted and an
-    /// Unspecified value throws an exception to prevent timezone shift bugs.
+    /// Unspecified value throws an exception to prevent timezone shift bugs. A time-only value (anchored to
+    /// 0001-01-01 by UTCTimeOnly_t / TZTimeOnly_t) is re-anchored to today's UTC date, keeping its UTC
+    /// wall-clock time — the market zone must not be applied to a value that is already a UTC time-of-day.
     /// </summary>
     private Instant ToInstant(DateTime dateTime, IParameter? parameter = null)
     {
-        if (dateTime.Year == 1)
+        if (dateTime.Kind is DateTimeKind.Utc or DateTimeKind.Local)
         {
-            // It is time-only. Anchor it to the current day in the market zone (or UTC if zone not set).
-            Instant nowInstant = Clock.GetCurrentInstant();
-            DateTimeZone zone = !string.IsNullOrEmpty(LocalMktTz)
-                ? (TimeZoneProvider.GetZoneOrNull(LocalMktTz) ?? DateTimeZone.Utc)
-                : DateTimeZone.Utc;
-            LocalDate marketToday = nowInstant.InZone(zone).Date;
-            LocalTime time = LocalTime.FromTicksSinceMidnight(dateTime.TimeOfDay.Ticks);
-            LocalDateTime localDt = marketToday.At(time);
-            return zone.ResolveLocal(localDt, Resolvers.LenientResolver).ToInstant();
-        }
+            if (dateTime.Year == 1)
+            {
+                // Time-only: re-anchor to today's UTC date, keeping the UTC time-of-day (R01).
+                LocalDate utcToday = Clock.GetCurrentInstant().InUtc().Date;
+                LocalTime time = LocalTime.FromTicksSinceMidnight(dateTime.TimeOfDay.Ticks);
+                return utcToday.At(time).InUtc().ToInstant();
+            }
 
-        if (dateTime.Kind == DateTimeKind.Utc)
-        {
-            return Instant.FromDateTimeUtc(dateTime);
-        }
-
-        if (dateTime.Kind == DateTimeKind.Local)
-        {
-            return Instant.FromDateTimeUtc(dateTime.ToUniversalTime());
+            return dateTime.Kind == DateTimeKind.Utc
+                ? Instant.FromDateTimeUtc(dateTime)
+                : Instant.FromDateTimeUtc(dateTime.ToUniversalTime());
         }
 
         // dateTime.Kind == DateTimeKind.Unspecified

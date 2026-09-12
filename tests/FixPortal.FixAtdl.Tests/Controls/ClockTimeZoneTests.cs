@@ -2,6 +2,8 @@ using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Controls;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Types;
 using NodaTime;
 using NodaTime.Testing;
 
@@ -308,5 +310,46 @@ public class ClockTimeZoneTests
 
         Func<object?> act = clock.GetCurrentValue;
         act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Theory]
+    [InlineData(2026, 7, 15)] // EDT (UTC-4)
+    [InlineData(2026, 1, 15)] // EST (UTC-5)
+    public void SetValueFromParameter_utc_time_only_stays_utc_regardless_of_market_zone(int year, int month, int day)
+    {
+        // R01: a UTCTimeOnly_t parameter holds a Year-1 Kind=Utc value. The clock must keep the UTC
+        // time-of-day, not re-read it as market-local wall clock (which re-emitted 17:30Z/18:30Z here).
+        var parameter = new Parameter_t<UTCTimeOnly_t>("P") { WireValue = "13:30:00" };
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "America/New_York",
+            Clock = new FakeClock(Instant.FromUtc(year, month, day, 12, 0, 0)),
+        };
+
+        clock.SetValueFromParameter(parameter);
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(year, month, day, 13, 30, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void SetValueFromParameter_tz_time_only_stays_utc_regardless_of_market_zone()
+    {
+        // TZTimeOnly_t anchors the same Year-1 Kind=Utc value after normalising the offset to UTC.
+        var parameter = new Parameter_t<TZTimeOnly_t>("P") { WireValue = "13:30:00Z" };
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "America/New_York",
+            Clock = new FakeClock(Instant.FromUtc(2026, 7, 15, 12, 0, 0)),
+        };
+
+        clock.SetValueFromParameter(parameter);
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 7, 15, 13, 30, 0, DateTimeKind.Utc));
     }
 }

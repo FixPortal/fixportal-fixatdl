@@ -303,6 +303,129 @@ public class ExpressionAndParameterConformanceTests
     }
 
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Non_string_parameter_compares_against_FIX_field_by_native_type(bool reverse)
+    {
+        // R02: a Char_t parameter ('1') against FIX_Side (tag 54, non-numeric CHAR) previously
+        // evaluated EQ false in both directions because only string parameters kept the FIX text.
+        var strategy = Load();
+        var side = new Parameter_t<Char_t>("Side") { FixTag = 54, WireValue = "1" };
+        strategy.Parameters.Add(side);
+        var initial = Substitute.For<IInitialFixValueProvider>();
+        initial.InputFixValues.Returns(new FixTagValuesCollection { { 54, "1" } });
+        var edit = ParameterEdit(
+            strategy,
+            reverse ? "FIX_Side" : "Side",
+            Operator_t.Equal,
+            field2: reverse ? "Side" : "FIX_Side"
+        );
+
+        edit.Evaluate(new FixFieldValueProvider(initial, strategy.Parameters));
+
+        edit.CurrentState.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Non_string_parameter_inequality_against_FIX_field_evaluates_instead_of_throwing()
+    {
+        // R02: GT/LT/GE/LE on a non-string parameter against a FIX field previously threw
+        // InvalidOperationException from the type-match guard.
+        var strategy = Load();
+        var side = new Parameter_t<Char_t>("Side") { FixTag = 54, WireValue = "2" };
+        strategy.Parameters.Add(side);
+        var initial = Substitute.For<IInitialFixValueProvider>();
+        initial.InputFixValues.Returns(new FixTagValuesCollection { { 54, "1" } });
+        var edit = ParameterEdit(strategy, "Side", Operator_t.GreaterThan, field2: "FIX_Side");
+
+        edit.Evaluate(new FixFieldValueProvider(initial, strategy.Parameters));
+
+        edit.CurrentState.Should().BeTrue("'2' > '1' ordinal as chars");
+    }
+
+    [Theory]
+    [InlineData(Operator_t.Equal, false)]
+    [InlineData(Operator_t.NotEqual, true)]
+    [InlineData(Operator_t.GreaterThan, false)]
+    [InlineData(Operator_t.LessThan, true)]
+    public void Numeric_text_in_text_control_against_non_numeric_literal_evaluates_as_strings(
+        Operator_t op,
+        bool expected
+    )
+    {
+        // R03: typing digits into a text control carrying a rule against a non-numeric literal
+        // previously threw InvalidFieldValueException out of evaluation; now both sides compare
+        // as strings ("123" vs "NONE", ordinally: "1" < "N").
+        var strategy = Load();
+        strategy.Controls["TextControl"].SetValue("123");
+        var edit = new Edit_t<Control_t>
+        {
+            Field = "TextControl",
+            Operator = op,
+            Value = "NONE",
+        };
+        ((IResolvable<Strategy_t, Control_t>)edit).Resolve(strategy, strategy.Controls);
+
+        edit.Evaluate();
+
+        edit.CurrentState.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Numeric_text_in_text_control_against_numeric_literal_keeps_decimal_comparison()
+    {
+        // R03 companion: the decimal path is retained when BOTH sides parse ("123" < "124").
+        var strategy = Load();
+        strategy.Controls["TextControl"].SetValue("123");
+        var edit = new Edit_t<Control_t>
+        {
+            Field = "TextControl",
+            Operator = Operator_t.LessThan,
+            Value = "124",
+        };
+        ((IResolvable<Strategy_t, Control_t>)edit).Resolve(strategy, strategy.Controls);
+
+        edit.Evaluate();
+
+        edit.CurrentState.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Parser_loaded_state_rule_with_numeric_text_and_non_numeric_literal_does_not_throw()
+    {
+        // R03 parser-level regression: RunStateRules has no catch, so the throw escaped into the host.
+        var xml = FixtureFiles
+            .ReadAllText("Fixtures/Conformance/expressions.xml")
+            .Replace(
+                "<lay:Control ID=\"TextControl\" xsi:type=\"lay:TextField_t\" parameterRef=\"Text\"/>",
+                """
+                <lay:Control ID="TextControl" xsi:type="lay:TextField_t" parameterRef="Text">
+                  <flow:StateRule xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow" enabled="false">
+                    <val:Edit xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" field="TextControl" operator="EQ" value="NONE"/>
+                  </flow:StateRule>
+                </lay:Control>
+                """,
+                StringComparison.Ordinal
+            );
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+        var strategy = new StrategiesReader().Load(stream).Strategies[0];
+
+        strategy.Controls["TextControl"].SetValue("123");
+        var act = () => strategy.Controls.RunStateRules();
+
+        act.Should().NotThrow();
+        strategy.Controls["TextControl"].StateRules[0].CurrentState.Should().BeFalse("\"123\" does not equal \"NONE\"");
+
+        strategy.Controls["TextControl"].SetValue("NONE");
+        strategy.Controls.RunStateRules();
+        strategy
+            .Controls["TextControl"]
+            .StateRules[0]
+            .CurrentState.Should()
+            .BeTrue("the rule fires once the text matches");
+    }
+
+    [Theory]
     [InlineData("EQ")]
     [InlineData("NE")]
     [InlineData("LT")]

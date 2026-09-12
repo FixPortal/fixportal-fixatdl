@@ -294,6 +294,16 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
     {
         if (Operator != null)
         {
+            // ValidateInvariants rejects an operator without 'field' at Resolve; guard here too so that
+            // evaluating an unresolved edit raises a domain error instead of an NRE from Field.StartsWith.
+            if (Field == null)
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    this,
+                    "Edit attempted to evaluate an operator comparison but the 'field' attribute was not set."
+                );
+            }
+
             object lhs = GetLhsValue(additionalValues);
 
             CurrentState = Operator switch
@@ -379,7 +389,11 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
             );
         }
 
-        int compareResult = comparable.CompareTo(normRhs);
+        // FIX wire values are opaque byte sequences: order strings ordinally, never by host culture (R18).
+        int compareResult =
+            comparable is string lhsText && normRhs is string rhsText
+                ? string.CompareOrdinal(lhsText, rhsText)
+                : comparable.CompareTo(normRhs);
 
         bool finalResult = Operator switch
         {
@@ -428,6 +442,12 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
             return rhsEnumState.Matches(lhsEnumId);
         }
 
+        // FIX wire values compare ordinally: string.CompareTo(string) would use the host's culture (R18).
+        if (lhs is string lhsString && rhs is string rhsString)
+        {
+            return string.Equals(lhsString, rhsString, StringComparison.Ordinal);
+        }
+
         return lhs is IComparable comparableLhs && rhs is IComparable comparableRhs
             ? (comparableLhs.GetType() == comparableRhs.GetType() && comparableLhs.CompareTo(comparableRhs) == 0)
             : lhs.Equals(rhs);
@@ -437,7 +457,12 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
     {
         if (Field.StartsWith("FIX_", StringComparison.Ordinal))
         {
-            return GetFixFieldValue(additionalValues, Field, _field2Source is IParameter && Field2Value is string);
+            // When the opposite operand is a parameter, convert the FIX field's string to the
+            // parameter's native type — the same conversion the literal path applies — rather than
+            // facing the parameter with a raw string it can never equal (R02).
+            return _field2Source is IParameter
+                ? ConvertFixFieldForParameter(additionalValues, Field, Field2Value)
+                : GetFixFieldValue(additionalValues, Field);
         }
 
         // A Boolean parameter can retain true/false while its declared wire mapping suppresses the tag.
@@ -453,7 +478,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
 
         // Parameters already supply their declared native type. In particular, String_t "01"
         // must not become the number 1. Text controls retain their numeric-entry conversion.
-        return GetComparisonValue(_fieldSource, FieldValue);
+        return GetComparisonValue(_fieldSource, FieldValue, Value);
     }
 
     private object GetRhsValue(FixFieldValueProvider additionalValues, object lhs)
@@ -470,16 +495,24 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
 
             // StrategyEdit literals use the parameter's wire representation, including the
             // Boolean_t trueWireValue/falseWireValue overrides. StateRules still compare bools.
-            return _fieldSource is Parameter_t<Boolean_t> booleanParameter
-                ? booleanParameter.Value.ParseWireValue(Value)!
-                : EditValueConverter.ConvertToComparableType(lhs, Value);
+            if (_fieldSource is Parameter_t<Boolean_t> booleanParameter)
+            {
+                return booleanParameter.Value.ParseWireValue(Value)!;
+            }
+
+            // A string LHS (text control) compares against the literal as text: GetComparisonValue
+            // keeps both sides strings unless BOTH parse as decimal, so a numeric entry facing a
+            // non-numeric literal evaluates instead of throwing (R03).
+            return lhs is string ? Value : EditValueConverter.ConvertToComparableType(lhs, Value);
         }
 
         if (Field2 != null)
         {
             if (Field2.StartsWith("FIX_", StringComparison.Ordinal))
             {
-                return GetFixFieldValue(additionalValues, Field2, _fieldSource is IParameter && lhs is string);
+                return _fieldSource is IParameter
+                    ? ConvertFixFieldForParameter(additionalValues, Field2, lhs)
+                    : GetFixFieldValue(additionalValues, Field2);
             }
 
             return GetComparisonValue(_field2Source, Field2Value);
@@ -488,11 +521,40 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         return null!;
     }
 
-    private static object GetComparisonValue(T source, object value)
+    // R02: a FIX_ operand facing an IParameter must be converted to the parameter's native type, exactly
+    // as the literal path is via ConvertToComparableType. Previously only string parameters ever matched
+    // the raw FIX string, so char/bool/date-time/MonthYear/Tenor/ISO-enum parameters silently mis-compared
+    // (EQ always false, NE always true, inequalities throwing on the type mismatch). A missing FIX field
+    // stays null so EX/NX and null comparisons keep their meaning.
+    private static object ConvertFixFieldForParameter(
+        FixFieldValueProvider additionalValues,
+        string fixField,
+        object parameterValue
+    )
+    {
+        return !additionalValues.TryGetValue(fixField, out string? fixString) || fixString == null
+            ? null!
+            : EditValueConverter.ConvertToComparableType(parameterValue, fixString);
+    }
+
+    private static object GetComparisonValue(T source, object value, string? literal = null)
     {
         if (source is BinaryControlBase { HasEnumeratedState: true } binary && value is bool selected)
         {
             return selected ? binary.CheckedEnumRef : binary.UncheckedEnumRef;
+        }
+
+        // R03: a text control's comparison type is data-dependent. Take the decimal path only when BOTH
+        // sides of a literal comparison parse as decimal; facing a non-numeric literal, keep the text as
+        // a string so the comparison evaluates (ordinally) instead of throwing from ConvertToComparableType.
+        if (
+            literal != null
+            && value is string text
+            && decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out _)
+            && !decimal.TryParse(literal, NumberStyles.Number, CultureInfo.InvariantCulture, out _)
+        )
+        {
+            return text;
         }
 
         return isPartOfStrategyEdit ? value : NormaliseNumericString(value);
@@ -593,24 +655,25 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         }
     }
 
-    private static object GetFixFieldValue(
-        FixFieldValueProvider additionalValues,
-        string fixField,
-        bool preserveText = false
-    )
+    private static object GetFixFieldValue(FixFieldValueProvider additionalValues, string fixField)
     {
         bool gotValue = additionalValues.TryGetValue(fixField, out var value);
 
         object? result = gotValue switch
         {
             false => null,
-            _ when preserveText => value,
             _ => IsNumericFixField(fixField)
             // A String/Char FIX field (e.g. a zero-padded ClOrdID, or a symbol that happens to
             // look numeric) must never be silently decimal-parsed - that loses leading zeros and
             // compares it as a number instead of text. Only convert when the field's actual FIX
-            // data type is numeric.
-            && decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal number)
+            // data type is numeric. NumberStyles is stated explicitly so thousands separators are
+            // rejected rather than silently swallowed (R21).
+            && decimal.TryParse(
+                value,
+                NumberStyles.Float | NumberStyles.AllowLeadingSign,
+                CultureInfo.InvariantCulture,
+                out decimal number
+            )
                 ? number
                 : value,
         };
@@ -624,7 +687,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
     // is unreachable in practice: TryGetValue (called by GetFixFieldValue just before this) already
     // requires fixField to parse as a FixField for gotValue to be true, so this method is never
     // invoked with a name ParseAsEnum would reject. Kept only as defensive robustness against a
-    // future caller that bypasses that invariant.
+    // future caller that bypasses that invariant; it returns the same safe non-numeric default.
     private static bool IsNumericFixField(string fixField)
     {
         try
@@ -633,7 +696,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         }
         catch (ArgumentException)
         {
-            return true;
+            return false;
         }
     }
 
@@ -663,6 +726,17 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
     private void ValidateInvariants()
     {
         string editId = string.IsNullOrEmpty(Id) ? "(unnamed)" : Id;
+
+        // Fail at load, not at first evaluation: an Edit with neither operator nor logicOperator
+        // can never evaluate (R17).
+        if (Operator == null && LogicOperator == null)
+        {
+            throw ThrowHelper.New<InconsistentStrategyException>(
+                this,
+                "An Edit (Id '{0}') has neither 'operator' nor 'logicOperator' specified.",
+                editId
+            );
+        }
 
         if (Value != null && Field2 != null)
         {
