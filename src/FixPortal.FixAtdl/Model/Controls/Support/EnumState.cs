@@ -40,14 +40,17 @@ public class EnumState
     public EnumState(string[] enumIds)
     {
         // Guard up front: Count, the indexer and ToString all dereference _enumIds unconditionally,
-        // so a null array would surface as an opaque NRE far from here.
-        _enumIds =
-            enumIds
-            ?? throw ThrowHelper.NewWithParamName<ArgumentNullException>(
-                typeof(EnumState),
-                nameof(enumIds),
-                "A valid array of EnumIDs must be supplied."
-            );
+        // so a null array would surface as an opaque NRE far from here. The array is cloned so later
+        // mutation of the caller's array cannot desynchronise the _enumStates bit positions.
+        _enumIds = (string[])
+            (
+                enumIds
+                ?? throw ThrowHelper.NewWithParamName<ArgumentNullException>(
+                    typeof(EnumState),
+                    nameof(enumIds),
+                    "A valid array of EnumIDs must be supplied."
+                )
+            ).Clone();
         _enumStates = new BitArray(_enumIds.Length);
         _nonEnumValue = null;
     }
@@ -66,7 +69,8 @@ public class EnumState
             );
         }
 
-        _enumIds = sourceState._enumIds;
+        // Clone rather than share the source's array, so the copy is fully independent of the original.
+        _enumIds = (string[])sourceState._enumIds.Clone();
         _enumStates = new BitArray(sourceState._enumStates);
         _nonEnumValue = sourceState._nonEnumValue;
         IsExplicitNull = sourceState.IsExplicitNull;

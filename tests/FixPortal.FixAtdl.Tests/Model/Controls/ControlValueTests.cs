@@ -282,6 +282,32 @@ public class NumericControlTests
     }
 
     [Fact]
+    public void SingleSpinner_decimal_max_value_is_a_value_not_a_sentinel()
+    {
+        // decimal.MaxValue was a magic "invalid" sentinel: a spinner genuinely holding it reported
+        // null (do-not-send). It is now returned verbatim like any other value.
+        var control = new SingleSpinner_t("ss");
+        control.LoadInitValue(FixFieldValueProvider.Empty);
+
+        control.SetValue(decimal.MaxValue);
+
+        control.GetCurrentValue().Should().Be(decimal.MaxValue);
+    }
+
+    [Fact]
+    public void SingleSpinner_fix_load_of_decimal_max_value_keeps_it_as_a_value()
+    {
+        // The wire literal for decimal.MaxValue loads as a normal large value rather than "no value".
+        var control = new SingleSpinner_t("ss") { InitPolicy = InitPolicy_t.UseFixField, InitFixField = "9500" };
+        var initial = Substitute.For<IInitialFixValueProvider>();
+        initial.InputFixValues.Returns(new FixTagValuesCollection { { 9500, "79228162514264337593543950335" } });
+
+        control.LoadInitValue(new FixFieldValueProvider(initial, null));
+
+        control.GetCurrentValue().Should().Be(decimal.MaxValue);
+    }
+
+    [Fact]
     public void SingleSpinner_has_no_enumerated_state()
     {
         var control = new SingleSpinner_t("ss");
@@ -545,6 +571,20 @@ public class EnumStateTests
     {
         var act = () => new EnumState((string[])null!);
         act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void EnumState_ctor_clones_the_supplied_array()
+    {
+        // The caller's array must not alias internal state: mutating it after construction would
+        // otherwise desynchronise the bit positions from the EnumIDs.
+        string[] ids = ["A", "B"];
+        var state = new EnumState(ids);
+
+        ids[0] = "ZZZ";
+
+        state.IsValidEnumId("A").Should().BeTrue();
+        state.IsValidEnumId("ZZZ").Should().BeFalse();
     }
 
     [Fact]

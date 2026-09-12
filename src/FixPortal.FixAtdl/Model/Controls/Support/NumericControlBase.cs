@@ -17,11 +17,8 @@ namespace FixPortal.FixAtdl.Model.Controls.Support;
 /// <summary>
 /// Represents control elements within FIXatdl that can optionally contain numeric values.
 /// </summary>
-/// <remarks>Note that decimal.MaxValue is used to represent an invalid value.</remarks>
 public class NumericControlBase : InitializableControl<decimal?>
 {
-    private const decimal InvalidValue = decimal.MaxValue;
-
     /// <summary>
     /// The state value for this control.
     /// </summary>
@@ -82,7 +79,7 @@ public class NumericControlBase : InitializableControl<decimal?>
     /// <returns>Either a valid decimal value or null (meaning do not send this value over FIX).</returns>
     public override object GetCurrentValue()
     {
-        return (_value != InvalidValue ? _value : null)!;
+        return _value!;
     }
 
     /// <summary>
