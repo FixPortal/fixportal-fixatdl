@@ -113,15 +113,17 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override decimal? ConvertFromWireValueFormat(string value)
     {
-        // A '{NULL}' sentinel means "clear this field" — return null rather than throwing, matching
-        // Boolean_t/String_t/Data_t (C4, {NULL}-handling theme). An empty string is not a clear (empty
+        // AtdlValueType.SetWireValue maps the '{NULL}' sentinel to null before this method runs; a
+        // direct C# null means the same "clear this field". An empty string is not a clear (empty
         // FIX fields are invalid) and still falls through to throw.
-        if (value is null or Atdl.NullValue)
+        if (value is null)
         {
             return null;
         }
 
-        return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+        // Explicit styles: the FIX float alphabet is '-', '0'-'9' and '.', so a thousands-separated
+        // spelling ("1,000.5") must fail rather than parse as 1000.5 (R21).
+        return decimal.Parse(value, NumberStyles.Float | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
     }
 
     /// <summary>

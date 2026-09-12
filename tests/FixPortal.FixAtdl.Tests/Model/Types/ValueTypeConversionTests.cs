@@ -131,6 +131,17 @@ public class ValueTypeConversionTests
         act.Should().Throw<InvalidFieldValueException>();
     }
 
+    [Theory]
+    [InlineData("1,5")]
+    [InlineData("1,000.5")]
+    public void Float_t_rejects_thousands_separated_wire_values(string wire)
+    {
+        // The FIX float alphabet has no thousands separators; "1,5" must fail, not parse as 15 (R21).
+        var p = new Parameter_t<Float_t>("Px");
+        var act = () => p.WireValue = wire;
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Amt_t (inherits Float_t with no overrides)
     // ──────────────────────────────────────────────────────────────────────────

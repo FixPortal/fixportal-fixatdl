@@ -127,7 +127,9 @@ public struct Tenor : IComparable
 
             try
             {
-                result.Offset = Convert.ToInt32(number, CultureInfo.InvariantCulture);
+                // Digits only: a tenor offset carries no sign or whitespace, so "D+1" must fail
+                // rather than parse as D1 (R21).
+                result.Offset = int.Parse(number, NumberStyles.None, CultureInfo.InvariantCulture);
 
                 if (result.Offset <= 0)
                 {

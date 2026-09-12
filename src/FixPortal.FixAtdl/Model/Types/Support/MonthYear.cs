@@ -175,7 +175,9 @@ public struct MonthYear : IComparable
     {
         try
         {
-            ushort numValue = Convert.ToUInt16(value, CultureInfo.InvariantCulture);
+            // Digits only: a MonthYear component carries no sign or whitespace, so "2026+1"
+            // must fail rather than parse as 202601 (R21).
+            ushort numValue = ushort.Parse(value, NumberStyles.None, CultureInfo.InvariantCulture);
 
             if (numValue >= lowerBound && numValue <= upperBound)
             {
