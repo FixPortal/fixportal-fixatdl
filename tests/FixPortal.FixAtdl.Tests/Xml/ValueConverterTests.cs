@@ -68,4 +68,15 @@ public class ValueConverterTests
 
         result.Should().Be(expected);
     }
+
+    [Theory]
+    [InlineData("1,5")]
+    [InlineData("1,000.5")]
+    public void ConvertTo_rejects_thousands_separated_decimal_values(string value)
+    {
+        // The FIX numeric alphabet has no thousands separators; "1,5" must fail, not parse as 15 (R21).
+        var act = () => ValueConverter.ConvertTo<decimal>(value);
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
 }

@@ -328,4 +328,58 @@ public class FixMessageTests
 
         provider.TryGetValue("FIX_MsgType", "Flag", out _).Should().BeFalse();
     }
+
+    // FixMessage tag alphabet (R21) --------------------------------------------
+
+    [Theory]
+    [InlineData("+35")]
+    [InlineData(" 35")]
+    public void String_constructor_throws_FixParseException_for_signed_or_whitespace_padded_tag(string tagText)
+    {
+        // Digits only: a FIX tag carries no sign or whitespace (R21).
+        var act = () => new FixMessage($"{tagText}{Sep}D{Soh}");
+
+        act.Should().Throw<FixParseException>();
+    }
+
+    // FixFieldValueProvider percentage scaling: numeric alphabet + full precision (R21, R28, Low 3) -------
+
+    [Theory]
+    [InlineData("1,234.5")] // thousands separator is outside the FIX numeric alphabet (R21)
+    [InlineData("79228162514264337593543950335")] // decimal.MaxValue: the x100 scale-up overflows (Low 3)
+    public void FixFieldValueProvider_reports_failure_for_unscalable_percentage_wire_values(string wireValue)
+    {
+        FixTagValuesCollection fixValues = [];
+        fixValues.Add(35, wireValue);
+
+        var initialProvider = Substitute.For<IInitialFixValueProvider>();
+        initialProvider.InputFixValues.Returns(fixValues);
+
+        ParameterCollection parameters = [new Parameter_t<Percentage_t>("Pct")];
+
+        var provider = new FixFieldValueProvider(initialProvider, parameters);
+
+        provider.TryGetValue("FIX_MsgType", "Pct", out _).Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData("0.12345678", "12.345678")] // full precision: no four-decimal-place cap (R28)
+    [InlineData("0.5", "50")] // trailing zeros from the x100 multiplication are stripped
+    [InlineData("0.75", "75")]
+    public void FixFieldValueProvider_scales_percentage_wire_values_at_full_precision(string wireValue, string expected)
+    {
+        // The parameter's own Precision governs rounding on the way back out, not this lookup (R28).
+        FixTagValuesCollection fixValues = [];
+        fixValues.Add(35, wireValue);
+
+        var initialProvider = Substitute.For<IInitialFixValueProvider>();
+        initialProvider.InputFixValues.Returns(fixValues);
+
+        ParameterCollection parameters = [new Parameter_t<Percentage_t>("Pct")];
+
+        var provider = new FixFieldValueProvider(initialProvider, parameters);
+
+        provider.TryGetValue("FIX_MsgType", "Pct", out var value).Should().BeTrue();
+        value.Should().Be(expected);
+    }
 }

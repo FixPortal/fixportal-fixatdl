@@ -130,14 +130,37 @@ public class FixFieldValueProvider
             return true;
         }
 
-        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal decimalValue))
+        // Explicit styles: the FIX numeric alphabet has no thousands separators, so "1,234.5" must
+        // fail rather than scale to 123450 (R21).
+        if (
+            !decimal.TryParse(
+                value,
+                NumberStyles.Float | NumberStyles.AllowLeadingSign,
+                CultureInfo.InvariantCulture,
+                out decimal decimalValue
+            )
+        )
         {
-            value = (decimalValue * 100).ToString("0.####", CultureInfo.InvariantCulture);
-            return true;
+            value = null!;
+            return false;
         }
 
-        value = null!;
-        return false;
+        try
+        {
+            // Full decimal precision here; the parameter's own Precision governs rounding on the
+            // way back out (Percentage_t.ConvertToWireValueFormat), not this display conversion
+            // (R28). 28 '#' keeps every representable decimal place while still stripping the
+            // trailing zeros a plain ToString would keep from the multiplication (0.5 -> "50",
+            // not "50.0"); decimal.Normalize would risk scientific notation, so it is not used.
+            value = (decimalValue * 100).ToString("0.############################", CultureInfo.InvariantCulture);
+            return true;
+        }
+        catch (OverflowException)
+        {
+            // A Try-style method must not throw: an unrepresentable scale-up is a failed lookup.
+            value = null!;
+            return false;
+        }
     }
 
     // Translates a raw FIX boolean value into the standard Y/N spelling the binary controls accept,

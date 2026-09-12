@@ -96,7 +96,18 @@ public static class ValueConverter
                 return ParseOrThrow(value, targetType, v => Convert.ToInt32(v, CultureInfo.InvariantCulture));
 
             case "System.Decimal":
-                return ParseOrThrow(value, targetType, v => Convert.ToDecimal(v, CultureInfo.InvariantCulture));
+                // Explicit styles: the FIX numeric alphabet has no thousands separators, so
+                // "1,5" (a comma-decimal spelling) must fail rather than parse as 15 (R21).
+                return ParseOrThrow(
+                    value,
+                    targetType,
+                    v =>
+                        decimal.Parse(
+                            v,
+                            NumberStyles.Float | NumberStyles.AllowLeadingSign,
+                            CultureInfo.InvariantCulture
+                        )
+                );
 
             case "System.DateTime":
                 if (!FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result))

@@ -159,4 +159,16 @@ public class TenorTests
         act1.Should().NotThrow();
         (d40 > m1).Should().BeTrue();
     }
+
+    [Theory]
+    [InlineData("D+1")]
+    [InlineData("D 1")]
+    public void Parse_rejects_signs_and_whitespace_in_the_offset(string wire)
+    {
+        // Digits only: a tenor offset carries no sign or whitespace (R21); "+1"/" 1" were
+        // previously accepted as offset 1 via the permissive Convert.ToInt32 default styles. The
+        // rejection surfaces as a BCL FormatException wrapped in the domain ArgumentException.
+        var act = () => Tenor.Parse(wire);
+        act.Should().Throw<ArgumentException>().WithInnerException<FormatException>();
+    }
 }

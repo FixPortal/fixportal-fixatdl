@@ -73,7 +73,9 @@ public class FixMessage : Dictionary<FixField, string>
                 tagText = nameValuePair[..separatorIndex];
                 valueText = nameValuePair[(separatorIndex + 1)..];
 
-                int tag = Convert.ToInt32(tagText, CultureInfo.InvariantCulture);
+                // Digits only: a FIX tag carries no sign or whitespace, so "+35" and " 35" are
+                // rejected here just as the guard below rejects non-positive tags (R21).
+                int tag = int.Parse(tagText, NumberStyles.None, CultureInfo.InvariantCulture);
 
                 // FIX tags are positive. Reject non-positive tags here so a negative tag cannot be
                 // admitted and then corrupted by the (uint) cast in ToFix (e.g. -1 -> 4294967295).

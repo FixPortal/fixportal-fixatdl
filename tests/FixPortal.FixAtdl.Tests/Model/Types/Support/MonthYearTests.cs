@@ -117,4 +117,16 @@ public class MonthYearTests
         (day7 > week1).Should().BeTrue();
         (week1 < day7).Should().BeTrue();
     }
+
+    [Theory]
+    [InlineData("2026+1")]
+    [InlineData("20261 ")]
+    public void Parse_rejects_signs_and_whitespace_in_components(string wire)
+    {
+        // Digits only: a MonthYear component carries no sign or whitespace (R21); "+1"/"1 " were
+        // previously accepted as month 1 via the permissive Convert.ToUInt16 default styles. The
+        // rejection surfaces as a BCL FormatException wrapped in the domain ArgumentException.
+        var act = () => MonthYear.Parse(wire);
+        act.Should().Throw<ArgumentException>().WithInnerException<FormatException>();
+    }
 }
