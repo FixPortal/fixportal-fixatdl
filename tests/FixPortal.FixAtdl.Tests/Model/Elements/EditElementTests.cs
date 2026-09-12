@@ -111,18 +111,18 @@ public class EditElementTests
     // ── Edit_t<T> missing-operators throws ───────────────────────────────────
 
     [Fact]
-    public async Task Edit_t_Evaluate_with_neither_operator_nor_logic_operator_throws_InvalidOperationException()
+    public async Task Edit_t_Resolve_with_neither_operator_nor_logic_operator_throws_InconsistentStrategyException()
     {
         var xml = await FixtureFiles.ReadAllTextAsync("Fixtures/twap.xml", TestContext.Current.CancellationToken);
         var twap = LoadTwap(xml);
 
-        // Edit with no Operator and no LogicOperator
+        // Edit with no Operator and no LogicOperator: R17 fails fast at Resolve rather than
+        // leaving the failure to the first Evaluate.
         var edit = new Edit_t<IParameter> { Field = "Participation" };
-        ((IResolvable<Strategy_t, IParameter>)edit).Resolve(twap, twap.Parameters);
 
-        var act = () => edit.Evaluate();
+        var act = () => ((IResolvable<Strategy_t, IParameter>)edit).Resolve(twap, twap.Parameters);
 
-        act.Should().Throw<InvalidOperationException>();
+        act.Should().Throw<InconsistentStrategyException>();
     }
 
     // ── Edit_t<T> Sources property ───────────────────────────────────────────
