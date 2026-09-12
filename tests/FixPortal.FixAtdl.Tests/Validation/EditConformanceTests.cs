@@ -201,4 +201,33 @@ public class EditConformanceTests
 
         edit.CurrentState.Should().BeTrue();
     }
+
+    // ── Low 22 — numeric operands outside decimal range ─────────────────────
+
+    [Theory]
+    [InlineData(Operator_t.Equal, true)]
+    [InlineData(Operator_t.GreaterThanOrEqual, true)]
+    [InlineData(Operator_t.LessThan, false)]
+    public void Same_typed_numeric_operands_beyond_decimal_range_compare_natively(Operator_t op, bool expected)
+    {
+        // A host-registered double-backed CustomParameterType can hold a value outside decimal's
+        // range (here 1e300). Same-typed operands must compare natively via IComparable instead of
+        // aborting the whole evaluation with an InvalidOperationException from decimal normalisation.
+        var strategy = new Strategy_t();
+        var parameter = Substitute.For<IParameter>();
+        parameter.Name.Returns("P");
+        parameter.GetCurrentValue().Returns(1e300d);
+        strategy.Parameters.Add(parameter);
+
+        var edit = new Edit_t<IParameter>
+        {
+            Field = "P",
+            Operator = op,
+            Field2 = "P",
+        };
+        ((IResolvable<Strategy_t, IParameter>)edit).Resolve(strategy, strategy.Parameters);
+        edit.Evaluate();
+
+        edit.CurrentState.Should().Be(expected);
+    }
 }

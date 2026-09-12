@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Diagnostics.CodeAnalysis;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Enumerations;
@@ -99,8 +100,10 @@ public interface IParameter : IValueProvider
     ValidationResult SetValueFromControl(Control_t control);
 
     /// <summary>
-    /// Gets/sets the wire value of this parameter.
+    /// Gets/sets the wire value of this parameter. The getter may return null (no value); the setter
+    /// rejects null (assigning null is equivalent to writing an empty FIX field, which is invalid).
     /// </summary>
+    [DisallowNull]
     string? WireValue { get; set; }
 
     /// <summary>

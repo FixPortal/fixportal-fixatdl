@@ -371,8 +371,8 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
 
         CheckForUnsupportedComparisons(lhs, rhs);
 
-        object? normLhs = NormaliseValue(lhs);
-        object? normRhs = NormaliseValue(rhs);
+        object? normLhs = NormaliseValue(lhs, rhs);
+        object? normRhs = NormaliseValue(rhs, lhs);
 
         // Operands of non-comparable or mismatched runtime types cannot be ordered
         if (
@@ -409,8 +409,8 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
 
     private static bool AreEqual(object? lhs, object? rhs)
     {
-        lhs = NormaliseValue(lhs);
-        rhs = NormaliseValue(rhs);
+        lhs = NormaliseValue(lhs, rhs);
+        rhs = NormaliseValue(rhs, lhs);
 
         if (lhs == null)
         {
@@ -594,7 +594,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         };
     }
 
-    private static object? NormaliseValue(object? val)
+    private static object? NormaliseValue(object? val, object? other)
     {
         if (val == null)
         {
@@ -613,6 +613,15 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
 
         if (IsNumericType(val.GetType()))
         {
+            // Operands already sharing one numeric runtime type compare natively via IComparable;
+            // decimal normalisation exists to give cross-type comparisons a common type. A
+            // host-registered double-backed CustomParameterType can hold a value outside decimal's
+            // range, where Convert.ToDecimal overflows and would abort the whole evaluation.
+            if (other != null && other.GetType() == val.GetType())
+            {
+                return val;
+            }
+
             try
             {
                 return Convert.ToDecimal(val, CultureInfo.InvariantCulture);
