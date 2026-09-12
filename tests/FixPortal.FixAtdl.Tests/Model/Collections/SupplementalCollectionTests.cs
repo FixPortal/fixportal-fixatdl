@@ -7,6 +7,7 @@ using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Utility;
+using FixPortal.FixAtdl.Validation;
 using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Model.Collections;
@@ -339,5 +340,68 @@ public class SupplementalCollectionTests
 
         var act = () => panel.Controls.Add(new TextField_t("c_Two"));
         act.Should().Throw<DuplicateKeyException>();
+    }
+
+    // -----------------------------------------------------------------------
+    // ControlCollection — Move/Remove bookkeeping (Low 25, Low 27)
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public void Move_refreshes_layout_indexes()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var first = new TextField_t("c_First");
+        var second = new TextField_t("c_Second");
+        panel.Controls.Add(first);
+        panel.Controls.Add(second);
+
+        panel.Controls.Move(0, 1);
+
+        first.Index.Should().Be(1);
+        second.Index.Should().Be(0);
+    }
+
+    [Fact]
+    public void Remove_detaches_the_control_from_its_panel()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var control = new TextField_t("c_One");
+        panel.Controls.Add(control);
+
+        panel.Controls.Remove(control);
+
+        control.OwningStrategyPanel.Should().BeNull();
+    }
+
+    // -----------------------------------------------------------------------
+    // ReadOnlyControlCollection — shared-parameter update dedup (Low 26)
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public void TryUpdateParameterValues_reports_a_shared_radio_parameter_once()
+    {
+        // Ungrouped radio members share one parameter and resolve to a single value source
+        // (GetParameterValueSource): a failing update must be reported once, not once per member.
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        panel.Controls.Add(new RadioButton_t("r_A") { ParameterRef = "P" });
+        panel.Controls.Add(new RadioButton_t("r_B") { ParameterRef = "P" });
+        var parameter = Substitute.For<IParameter>();
+        parameter.Name.Returns("P");
+        parameter
+            .SetValueFromControl(Arg.Any<Control_t>())
+            .Returns(new ValidationResult(ValidationResult.ResultType.Invalid, "bad"));
+        strategy.Parameters.Add(parameter);
+
+        bool result = strategy.Controls.TryUpdateParameterValues(
+            strategy.Parameters,
+            shortCircuit: false,
+            out IList<ValidationResult>? results
+        );
+
+        result.Should().BeFalse();
+        results.Should().HaveCount(1);
     }
 }

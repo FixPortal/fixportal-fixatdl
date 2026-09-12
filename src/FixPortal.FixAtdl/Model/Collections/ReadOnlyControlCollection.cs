@@ -217,38 +217,49 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     {
         bool isValid = true;
         validationResults = null;
+        var handledParameters = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (Control_t control in this)
         {
             string parameter = control.ParameterRef;
 
-            if (parameter != null)
+            if (parameter == null)
             {
-                if (!parameters.Contains(parameter))
-                {
-                    throw ThrowHelper.New<ReferencedObjectNotFoundException>(
-                        this,
-                        ErrorMessages.UnresolvedParameterRefError,
-                        parameter
-                    );
-                }
-
-                ValidationResult result = parameters[parameter].SetValueFromControl(GetParameterValueSource(control));
-
-                if (!result.IsValid)
-                {
-                    validationResults ??= [];
-
-                    validationResults.Add(result);
-
-                    if (shortCircuit)
-                    {
-                        return false;
-                    }
-
-                    isValid = false;
-                }
+                continue;
             }
+
+            if (!parameters.Contains(parameter))
+            {
+                throw ThrowHelper.New<ReferencedObjectNotFoundException>(
+                    this,
+                    ErrorMessages.UnresolvedParameterRefError,
+                    parameter
+                );
+            }
+
+            // Radio-group members share one parameter and resolve to a single value source
+            // (GetParameterValueSource): update and report that parameter once, not once per member.
+            if (!handledParameters.Add(parameter))
+            {
+                continue;
+            }
+
+            ValidationResult result = parameters[parameter].SetValueFromControl(GetParameterValueSource(control));
+
+            if (result.IsValid)
+            {
+                continue;
+            }
+
+            validationResults ??= [];
+            validationResults.Add(result);
+
+            if (shortCircuit)
+            {
+                return false;
+            }
+
+            isValid = false;
         }
 
         return isValid;
