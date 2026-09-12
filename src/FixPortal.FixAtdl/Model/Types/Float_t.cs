@@ -144,7 +144,25 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
             return ((decimal)value).ToString(CultureInfo.InvariantCulture);
         }
 
-        return Round(value, Precision.Value)!.Value.ToString(CultureInfo.InvariantCulture);
+        decimal rounded = Round(value, Precision.Value)!.Value;
+
+        // Rounding is applied only here, on emission, after the stored value was validated - so it
+        // can push the wire value outside the validated bounds (MaxValue 0.16, Precision 1: "0.16"
+        // validates, then rounds to "0.2"). Re-validate the rounded output and refuse to emit out
+        // of bounds (R11).
+        ValidationResult validity = ValidateValue(rounded, isRequired: false);
+        if (!validity.IsValid)
+        {
+            throw ThrowHelper.New<Diagnostics.Exceptions.InvalidFieldValueException>(
+                this,
+                "Rounded value {0} at precision {1} falls outside the validated bounds ({2}).",
+                rounded,
+                Precision.Value,
+                validity.ErrorText
+            );
+        }
+
+        return rounded.ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>
