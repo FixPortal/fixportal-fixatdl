@@ -134,6 +134,28 @@ public class TimestampBoundConformanceTests
         }
     }
 
+    [Theory]
+    [InlineData("20260101-21:00:00", true)] // 21:00Z == the bound's own UTC anchor (bare-hour "-00" offset).
+    [InlineData("20260101-21:00:01", false)]
+    public void Bare_hour_offset_max_bound_is_also_recognised_as_offset_anchored(string wire, bool valid)
+    {
+        // "-05" (FixTimeOnlyWithHourOffset's "zz" format) is a bare 2-digit hour offset with no minutes -
+        // distinct from the 4-digit "+05:30"/"Z" forms covered above, and the specific gap Gitar flagged.
+        var p = Param(minText: null, maxText: "16:00:00-05");
+        p.Value.LocalMktTz = "America/New_York";
+
+        var act = () => p.WireValue = wire;
+
+        if (valid)
+        {
+            act.Should().NotThrow();
+        }
+        else
+        {
+            act.Should().Throw<InvalidFieldValueException>();
+        }
+    }
+
     [Fact]
     public void Min_and_max_bounds_may_independently_carry_or_omit_an_offset()
     {
