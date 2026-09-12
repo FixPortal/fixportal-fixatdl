@@ -80,7 +80,10 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T>
         get;
         set
         {
-            if (Edit != null)
+            // Guard on value too: assigning null to an already-clear property must be a no-op, not a
+            // false "both set" error (#R25). Null stays representable here (the default is already a
+            // suppressed null); the non-nullable declaration is the compatibility surface.
+            if (value != null && Edit != null)
             {
                 throw ThrowHelper.New<InvalidOperationException>(
                     this,
@@ -89,7 +92,7 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T>
                 );
             }
 
-            field = value;
+            field = value!;
         }
     } = null!;
 
@@ -101,7 +104,8 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T>
         get;
         set
         {
-            if (EditRef != null)
+            // Mirror of the EditRef guard: assigning null to an already-clear property is a no-op (#R25).
+            if (value != null && EditRef != null)
             {
                 throw ThrowHelper.New<InvalidOperationException>(
                     this,
@@ -110,7 +114,7 @@ public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T>
                 );
             }
 
-            field = value;
+            field = value!;
         }
     } = null!;
 

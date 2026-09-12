@@ -1,4 +1,5 @@
 using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Model.Reference;
 
@@ -158,6 +159,49 @@ public class ElementPropertyTests
     {
         var se = new StrategyEdit_t { ErrorMessage = "Qty must be positive" };
         se.ErrorMessage.Should().Be("Qty must be positive");
+    }
+
+    // ── EditEvaluator Edit/EditRef mutual exclusion (R25) ────────────────────
+
+    [Fact]
+    public void Edit_setter_accepts_null_when_EditRef_is_already_clear()
+    {
+        // R25: a redundant null assignment must be a no-op, not a false "both set" error.
+        var se = new StrategyEdit_t();
+
+        var act = () => se.Edit = null!;
+
+        act.Should().NotThrow();
+    }
+
+    [Fact]
+    public void EditRef_setter_accepts_null_when_Edit_is_already_clear()
+    {
+        var se = new StrategyEdit_t();
+
+        var act = () => se.EditRef = null!;
+
+        act.Should().NotThrow();
+    }
+
+    [Fact]
+    public void Edit_setter_still_throws_when_EditRef_is_set()
+    {
+        var se = new StrategyEdit_t { EditRef = new EditRef_t<IParameter>("e1") };
+
+        var act = () => se.Edit = new Edit_t<IParameter>();
+
+        act.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void EditRef_setter_still_throws_when_Edit_is_set()
+    {
+        var se = new StrategyEdit_t { Edit = new Edit_t<IParameter>() };
+
+        var act = () => se.EditRef = new EditRef_t<IParameter>("e1");
+
+        act.Should().Throw<InvalidOperationException>();
     }
 
     // ── Country_t ────────────────────────────────────────────────────────────
