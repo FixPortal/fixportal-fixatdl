@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            strategyIdentifierTag="5001">
+  <Strategy name="Conformance" version="1" wireValue="CONF" uiRep="Conformance" providerID="FIXPORTAL">
+    <Parameter name="Text" xsi:type="String_t" fixTag="9001"/>
+    <Parameter name="OtherText" xsi:type="String_t" fixTag="9002"/>
+    <Parameter name="Amount" xsi:type="Int_t" fixTag="9003" use="required" minValue="1" maxValue="9"/>
+    <Parameter name="OtherAmount" xsi:type="Float_t" fixTag="9004"/>
+    <Parameter name="Enabled" xsi:type="Boolean_t" fixTag="9005" trueWireValue="T" falseWireValue="F"/>
+    <Parameter name="Mode" xsi:type="Char_t" fixTag="9006">
+      <EnumPair enumID="e_Low" wireValue="L"/>
+      <EnumPair enumID="e_High" wireValue="H"/>
+    </Parameter>
+    <lay:StrategyLayout>
+      <lay:StrategyPanel>
+        <lay:Control ID="TextControl" xsi:type="lay:TextField_t" parameterRef="Text"/>
+        <lay:Control ID="AmountControl" xsi:type="lay:SingleSpinner_t" parameterRef="Amount"/>
+        <lay:Control ID="EnabledControl" xsi:type="lay:CheckBox_t" parameterRef="Enabled"/>
+        <lay:Control ID="ModeControl" xsi:type="lay:DropDownList_t" parameterRef="Mode">
+          <lay:ListItem enumID="e_Low" uiRep="Low"/>
+          <lay:ListItem enumID="e_High" uiRep="High"/>
+        </lay:Control>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+</Strategies>
