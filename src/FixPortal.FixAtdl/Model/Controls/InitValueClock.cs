@@ -81,8 +81,11 @@ public sealed class InitValueClock
             .FirstOrDefault(result => result.Success);
         if (offsetTimeMatch is not null)
         {
-            TimeOfDay = offsetTimeMatch.Value.TimeOfDay;
-            return;
+            throw ThrowHelper.New<InvalidFieldValueException>(
+                ExceptionContext,
+                "Offset-bearing Clock initValue '{0}' is unsupported; use local market wall time with localMktTz.",
+                raw
+            );
         }
 
         ParseResult<LocalDateTime>? dateTimeMatch = DateTimePatterns

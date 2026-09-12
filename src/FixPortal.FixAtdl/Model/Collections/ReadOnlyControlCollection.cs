@@ -218,7 +218,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                     );
                 }
 
-                ValidationResult result = parameters[parameter].SetValueFromControl(control);
+                ValidationResult result = parameters[parameter].SetValueFromControl(GetParameterValueSource(control));
 
                 if (!result.IsValid)
                 {
@@ -237,6 +237,30 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         }
 
         return isValid;
+    }
+
+    /// <summary>
+    /// Gets the control contributing this parameter's value. A selected radio button takes
+    /// precedence over unselected members of the same group that share its parameter.
+    /// Consumers validating individual controls should use this same source as bulk updates.
+    /// </summary>
+    /// <param name="control">Control whose parameter is being validated.</param>
+    /// <returns>The selected radio sibling, or the supplied control when none is selected.</returns>
+    public Control_t GetParameterValueSource(Control_t control)
+    {
+        if (control is not RadioButton_t radio || string.IsNullOrEmpty(radio.RadioGroup) || radio.ParameterRef == null)
+        {
+            return control;
+        }
+
+        // ponytail: linear scan per radio, index groups if layouts grow beyond ordinary forms.
+        return this.OfType<RadioButton_t>()
+                .FirstOrDefault(candidate =>
+                    candidate.RadioGroup == radio.RadioGroup
+                    && candidate.ParameterRef == radio.ParameterRef
+                    && candidate.GetCurrentValue() is true
+                )
+            ?? control;
     }
 
     /// <summary>

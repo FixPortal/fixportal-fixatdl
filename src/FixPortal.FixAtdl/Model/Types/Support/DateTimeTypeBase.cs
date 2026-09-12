@@ -228,7 +228,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
             }
         }
 
-        TimeOnly valueTimeOfDay = TimeOnly.FromDateTime(NormaliseToUtc(value));
+        TimeOnly valueTimeOfDay = GetTimeOfDayForBounds(normalisedVal);
 
         if (_maxTimeOfDay != null && valueTimeOfDay > _maxTimeOfDay)
         {
@@ -251,6 +251,11 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
         }
 
         return null;
+    }
+
+    internal virtual TimeOnly GetTimeOfDayForBounds(DateTime utcValue)
+    {
+        return TimeOnly.FromDateTime(utcValue);
     }
 
     private static DateTime NormaliseToUtc(DateTime dt)

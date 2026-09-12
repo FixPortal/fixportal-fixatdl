@@ -19,6 +19,12 @@ namespace FixPortal.FixAtdl.Model.Types;
 /// </summary>
 public class Percentage_t : Float_t
 {
+    /// <summary>Initializes the FIXatdl default minimum of zero.</summary>
+    public Percentage_t()
+    {
+        MinValue = 0;
+    }
+
     /// <summary>
     /// Applicable for xsi:type of Percentage_t. If true then percent values must be multiplied by 100 before being
     /// sent on the wire. For example, if multiplyBy100 were false then the percentage, 75%, would be sent as 0.75

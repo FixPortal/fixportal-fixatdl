@@ -4,6 +4,7 @@ using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Model.Types;
 using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Xml;
 
@@ -26,7 +27,12 @@ public class EditEvaluatingCollectionTests
         // used in integration tests where the TestContext is available.
         string xml = FixtureFiles.ReadAllText("Fixtures/twap.xml");
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
-        return new StrategiesReader().Load(stream).Strategies[0];
+        var strategy = new StrategiesReader().Load(stream).Strategies[0];
+        // These operator tests deliberately exercise negative operands; override FIXatdl's zero default.
+        ((Parameter_t<Percentage_t>)strategy.Parameters["Participation"])
+            .Value
+            .MinValue = -10;
+        return strategy;
     }
 
     [Fact]

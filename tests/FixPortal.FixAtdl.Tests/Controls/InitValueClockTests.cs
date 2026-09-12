@@ -7,6 +7,17 @@ namespace FixPortal.FixAtdl.Tests.Controls;
 public class InitValueClockTests
 {
     [Theory]
+    [InlineData("09:00:00Z")]
+    [InlineData("09:00:00+02:00")]
+    [InlineData("09:00:00-05:00")]
+    public void Offset_bearing_authored_init_values_are_explicitly_rejected(string value)
+    {
+        var act = () => new InitValueClock(value);
+
+        act.Should().Throw<InvalidFieldValueException>().WithMessage("*Offset-bearing*initValue*localMktTz*");
+    }
+
+    [Theory]
     [InlineData("08:00:00")]
     [InlineData("23:59:59")]
     [InlineData("08:00:00.250")]

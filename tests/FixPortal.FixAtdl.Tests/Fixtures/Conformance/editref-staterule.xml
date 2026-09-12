@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fixture for M-01: EditRef inside a StateRule.
+  Strategy-level <Edit> is referenced by <EditRef> inside a control's <StateRule>.
+  Before fix: BuildStateRuleDto throws AtdlParseException(UnresolvedEditRef) via
+  the singleton builder's null registries → 500.
+  After fix: ReferencedEdit path resolves the pre-linked Edit_t → 201.
+-->
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            strategyIdentifierTag="5001"
+            versionIdentifierTag="5002">
+
+  <Strategy name="EDITREF_TEST" version="1" wireValue="EDITREFTEST" uiRep="EditRefTest" providerID="SIMULATOR">
+    <val:Edit id="DurationIsZero" field="c_Duration" operator="EQ" value="0"/>
+    <Parameter name="Duration" xsi:type="Int_t" fixTag="7001" use="optional"/>
+
+    <lay:StrategyLayout>
+      <lay:StrategyPanel title="EditRef Test" orientation="VERTICAL" collapsible="false">
+        <lay:Control ID="c_Duration" xsi:type="lay:TextField_t" parameterRef="Duration" label="Duration">
+          <flow:StateRule enabled="false">
+            <val:EditRef id="DurationIsZero"/>
+          </flow:StateRule>
+        </lay:Control>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+
+</Strategies>
