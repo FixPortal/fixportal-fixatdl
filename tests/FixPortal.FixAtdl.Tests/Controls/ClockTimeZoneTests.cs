@@ -236,6 +236,29 @@ public class ClockTimeZoneTests
     }
 
     [Fact]
+    public void Offset_bearing_initValue_anchors_today_in_its_own_offset_not_utc()
+    {
+        // now = 2026-09-01 23:30Z; initValue = 01:00+05:30. UTC's calendar day (Sep 1) differs from the
+        // offset's own wall-clock day at this instant (Sep 2, since 23:30Z + 5:30 = 05:00 next day) - if
+        // "today" were wrongly anchored in UTC, this would resolve a day early (2026-08-31T19:30Z) instead
+        // of the correct 2026-09-01T19:30Z (01:00+05:30 on 2026-09-02's offset-local calendar day).
+        var clock = new Clock_t("clk")
+        {
+            InitValue = new InitValueClock("01:00:00+05:30"),
+            LocalMktTz = "Europe/Berlin",
+            InitValueMode = 0,
+            Clock = new FakeClock(Instant.FromUtc(2026, 9, 1, 23, 30, 0)),
+        };
+
+        clock.LoadInitValue(FixFieldValueProvider.Empty);
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 9, 1, 19, 30, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
     public void Offset_bearing_initValue_still_requires_localMktTz_attribute()
     {
         // localMktTz stays a required Clock_t attribute whenever initValue is supplied (spec table,
