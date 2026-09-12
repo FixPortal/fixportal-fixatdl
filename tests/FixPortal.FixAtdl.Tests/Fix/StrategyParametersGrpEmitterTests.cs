@@ -84,4 +84,28 @@ public class StrategyParametersGrpEmitterTests
             .Should()
             .ContainEquivalentOf((959, expectedCode.ToString(CultureInfo.InvariantCulture)));
     }
+
+    // R27: codes 25-29 read off the FIX 5.0 SP2 enumeration for tag 959 (QuickFIX/n data dictionary
+    // spec XML, FIX50SP2.xml field 959); FIX 5.0/SP1 stop at 24 and FIX 4.4 has no tag 959 at all.
+    [Theory]
+    [InlineData("Country_t", 25)]
+    [InlineData("Language_t", 26)]
+    [InlineData("TZTimeOnly_t", 27)]
+    [InlineData("TZTimestamp_t", 28)]
+    [InlineData("Tenor_t", 29)]
+    public void Resolves_codes_25_to_29_per_the_fix_5_0_sp2_enumeration(string typeName, int expectedCode)
+    {
+        FixStrategyParameterTypeCodes.Resolve(typeName).Should().Be(expectedCode);
+    }
+
+    [Theory]
+    // Neither identifier names a type in the FIXatdl model; their old dedicated arms (26, 29) were
+    // dead and collided with the SP2 codes for LANGUAGE and TENOR.
+    [InlineData("NumInMsg_t")]
+    [InlineData("XMLData_t")]
+    [InlineData("CustomThing_t")]
+    public void Unregistered_type_names_fall_back_to_string(string typeName)
+    {
+        FixStrategyParameterTypeCodes.Resolve(typeName).Should().Be(14);
+    }
 }

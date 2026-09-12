@@ -2,7 +2,9 @@ namespace FixPortal.FixAtdl.Fix;
 
 /// <summary>
 /// Maps a FIXatdl parameter type name (e.g. "Int_t") to its FIX StrategyParameterType (tag 959)
-/// code. Mirrors the FIX 4.4 StrategyParameterType field values exactly.
+/// code. Codes mirror the FIX 5.0 SP2 (FIX Latest) enumeration, read off the QuickFIX/n data
+/// dictionary spec XML (spec/fix/FIX50SP2.xml, field 959): the tag has no FIX 4.4 enumeration at
+/// all, and codes 25-29 (COUNTRY, LANGUAGE, TZTIMEONLY, TZTIMESTAMP, TENOR) exist only from SP2.
 /// </summary>
 public static class FixStrategyParameterTypeCodes
 {
@@ -37,11 +39,10 @@ public static class FixStrategyParameterTypeCodes
             "Data_t" => 23,
             "MultipleStringValue_t" => 24,
             "Country_t" => 25,
-            "NumInMsg_t" => 26,
+            "Language_t" => 26,
             "TZTimeOnly_t" => 27,
             "TZTimestamp_t" => 28,
-            "XMLData_t" => 29,
-            "Language_t" => 30,
+            "Tenor_t" => 29,
             _ => 14,
         };
 }

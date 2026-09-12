@@ -13,7 +13,8 @@ namespace FixPortal.FixAtdl.Fix;
 /// Tag reference:
 ///   957 NoStrategyParameters — count of filled parameter repetitions.
 ///   958 StrategyParameterName — parameter name string.
-///   959 StrategyParameterType — FIX 4.4 data type code (int).
+///   959 StrategyParameterType — FIX 5.0 SP2 data type code (int); the tag has no FIX 4.4
+///   enumeration.
 ///   960 StrategyParameterValue — the parameter's wire value.
 ///
 /// Parameters that are not set (<see cref="IParameter.IsSet"/> is false, or
