@@ -77,6 +77,14 @@ public class FixMessageTests
     }
 
     [Fact]
+    public void String_constructor_throws_FixParseException_for_a_doubled_soh()
+    {
+        // Low 5: an empty field between two SOH delimiters is rejected, not silently skipped.
+        var act = () => new FixMessage($"35=D{Soh}{Soh}10=123{Soh}");
+        act.Should().Throw<FixParseException>();
+    }
+
+    [Fact]
     public void String_constructor_throws_FixParseException_for_non_integer_tag()
     {
         var act = () => new FixMessage($"ABC{Sep}D{Soh}");

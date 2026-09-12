@@ -41,7 +41,11 @@ public class FixMessage : Dictionary<FixField, string>
             throw ThrowHelper.New<FixParseException>(this, ErrorMessages.UnableToParseFixMessageEmpty);
         }
 
-        string[] nameValuePairs = rawMessage.Split([SOH], StringSplitOptions.RemoveEmptyEntries);
+        // Split without RemoveEmptyEntries so a doubled SOH surfaces as an empty field and is rejected
+        // by the separator check below, rather than being silently skipped (Low 5). The single
+        // trailing SOH every FIX message carries is trimmed first.
+        string trimmedMessage = rawMessage.EndsWith(SOH) ? rawMessage[..^1] : rawMessage;
+        string[] nameValuePairs = trimmedMessage.Split(SOH);
 
         if (nameValuePairs.Length == 0)
         {

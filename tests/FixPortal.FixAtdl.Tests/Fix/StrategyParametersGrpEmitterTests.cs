@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Xml;
 
@@ -62,6 +63,20 @@ public class StrategyParametersGrpEmitterTests
             .Emit(strategy)
             .Should()
             .Equal((957, "1"), (958, "Text"), (959, "14"), (960, "hello"));
+    }
+
+    [Fact]
+    public void Omits_a_parameter_whose_wire_value_is_empty()
+    {
+        // Low 6: an empty WireValue is filtered alongside a missing one, so no "960=" is emitted.
+        var strategy = Load();
+        var parameter = Substitute.For<IParameter>();
+        parameter.Name.Returns("Empty");
+        parameter.IsSet.Returns(true);
+        parameter.WireValue.Returns("");
+        strategy.Parameters.Add(parameter);
+
+        StrategyParametersGrpEmitter.Emit(strategy).Should().BeEmpty();
     }
 
     [Theory]
