@@ -112,7 +112,9 @@ public class Tenor_t : AtdlValueType<Tenor>, IControlConvertible
     {
         string tenor = value.ToString(hostParameter);
 
-        return tenor != null ? Tenor.Parse(tenor) : null;
+        // A cleared text control yields ""; map empty to null (cleared) rather than throwing out
+        // of Tenor.Parse, matching Country_t/Currency_t/Language_t (R10).
+        return !string.IsNullOrEmpty(tenor) ? Tenor.Parse(tenor) : null;
     }
 
     /// <summary>

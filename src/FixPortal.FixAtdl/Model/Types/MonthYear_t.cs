@@ -118,7 +118,9 @@ public class MonthYear_t : AtdlValueType<MonthYear>, IControlConvertible
     {
         string monthYear = value.ToString(hostParameter);
 
-        return monthYear != null ? MonthYear.Parse(monthYear) : null;
+        // A cleared text control yields ""; map empty to null (cleared) rather than throwing out
+        // of MonthYear.Parse, matching Country_t/Currency_t/Language_t (R10).
+        return !string.IsNullOrEmpty(monthYear) ? MonthYear.Parse(monthYear) : null;
     }
 
     /// <summary>

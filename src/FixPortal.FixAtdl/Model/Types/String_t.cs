@@ -45,6 +45,13 @@ public class String_t : AtdlReferenceType<string>, IControlConvertible
     /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
     protected override ValidationResult ValidateValue(string? value, bool isRequired)
     {
+        // An empty string is not a value: normalise to null so a required parameter holding ""
+        // reports Missing instead of validating as "set" while emitting nothing on the wire (R06).
+        if (string.IsNullOrEmpty(value))
+        {
+            value = null;
+        }
+
         if (value != null)
         {
             // The type contract is "any character except the delimiter": a value carrying the FIX field
