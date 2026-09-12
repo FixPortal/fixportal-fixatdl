@@ -11,9 +11,13 @@ permissions:
 
 jobs:
   pack-and-release:
-    name: Publish Package (GitHub NuGet)
+    name: Publish Package (GitHub Packages + NuGet.org)
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
     env:
       # Restoring the private FixPortal.CodeStyle package needs read:packages.
       GITHUB_PACKAGES_TOKEN: ${{ github.token }}
@@ -86,6 +90,17 @@ jobs:
       # namespace (the cross-repo 403 trap only applies to *consumers* restoring it).
       - name: Push to GitHub Packages
         run: dotnet nuget push artifacts/*.nupkg --source https://nuget.pkg.github.com/FixPortal/index.json --api-key ${{ github.token }} --skip-duplicate
+
+      # NuGet.org exchanges this job's GitHub OIDC token for a one-hour, single-use
+      # API key. The trusted-publishing policy is scoped to this repository and workflow.
+      - name: NuGet.org login
+        uses: NuGet/login@ebc737b6fc418a6ca0073cf116ec8dc156d8b81e # v1
+        id: nuget-login
+        with:
+          user: chris-fixportal
+
+      - name: Push to NuGet.org
+        run: dotnet nuget push artifacts/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
 
       - name: Create GitHub Release
         run: gh release create "$RELEASE_TAG" artifacts/*.nupkg --generate-notes
