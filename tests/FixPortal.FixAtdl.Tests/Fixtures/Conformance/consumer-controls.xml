@@ -15,6 +15,16 @@
     <lay:StrategyLayout>
       <lay:StrategyPanel>
         <lay:Control ID="NumericSlider" xsi:type="lay:Slider_t" parameterRef="Number" initValue="12.5" increment="0.25"/>
+        <lay:Control ID="ListForward" xsi:type="lay:MultiSelectList_t" initValue="e_A e_B">
+          <lay:ListItem enumID="e_A" uiRep="A"/>
+          <lay:ListItem enumID="e_B" uiRep="B"/>
+          <lay:ListItem enumID="e_C" uiRep="C"/>
+        </lay:Control>
+        <lay:Control ID="ListReverse" xsi:type="lay:MultiSelectList_t" initValue="e_A e_B">
+          <lay:ListItem enumID="e_C" uiRep="C"/>
+          <lay:ListItem enumID="e_B" uiRep="B"/>
+          <lay:ListItem enumID="e_A" uiRep="A"/>
+        </lay:Control>
         <lay:Control ID="BinaryControl" xsi:type="lay:CheckBox_t" parameterRef="Binary" checkedEnumRef="e_A" uncheckedEnumRef="e_B"/>
         <lay:Control ID="ChoiceA" xsi:type="lay:RadioButton_t" parameterRef="Choice" radioGroup="Choice" checkedEnumRef="e_A" uncheckedEnumRef="e_Null"/>
         <lay:Control ID="ChoiceB" xsi:type="lay:RadioButton_t" parameterRef="Choice" radioGroup="Choice" checkedEnumRef="e_B" uncheckedEnumRef="e_Null"/>

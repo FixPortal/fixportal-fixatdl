@@ -66,7 +66,7 @@ public abstract class ListControlBase : InitializableControl<string>
     /// parameter is in fact an enumID.</remarks>
     protected override bool LoadDefaultFromFixValue(string value)
     {
-        if (string.IsNullOrEmpty(value))
+        if (value == null)
         {
             return false;
         }
@@ -102,6 +102,11 @@ public abstract class ListControlBase : InitializableControl<string>
         if (InitValue != null)
         {
             _value.LoadInitValue(InitValue, IsNonEnumValueAllowed);
+        }
+        else
+        {
+            // No authored value is absent, whereas an explicitly edited empty selection may invert to all values.
+            _value.ClearToNull();
         }
     }
 

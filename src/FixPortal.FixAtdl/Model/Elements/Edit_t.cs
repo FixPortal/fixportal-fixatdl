@@ -437,7 +437,18 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
     {
         if (Field.StartsWith("FIX_", StringComparison.Ordinal))
         {
-            return GetFixFieldValue(additionalValues, Field);
+            return GetFixFieldValue(additionalValues, Field, _field2Source is IParameter && Field2Value is string);
+        }
+
+        // A Boolean parameter can retain true/false while its declared wire mapping suppresses the tag.
+        // Only a literal wire NULL comparison observes suppression; field2 and EX retain native semantics.
+        if (
+            Value == Atdl.NullValue
+            && Operator is Operator_t.Equal or Operator_t.NotEqual
+            && _fieldSource is Parameter_t<Boolean_t> { WireValue: null }
+        )
+        {
+            return null!;
         }
 
         // Parameters already supply their declared native type. In particular, String_t "01"
@@ -468,7 +479,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         {
             if (Field2.StartsWith("FIX_", StringComparison.Ordinal))
             {
-                return GetFixFieldValue(additionalValues, Field2);
+                return GetFixFieldValue(additionalValues, Field2, _fieldSource is IParameter && lhs is string);
             }
 
             return GetComparisonValue(_field2Source, Field2Value);
@@ -582,7 +593,11 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         }
     }
 
-    private static object GetFixFieldValue(FixFieldValueProvider additionalValues, string fixField)
+    private static object GetFixFieldValue(
+        FixFieldValueProvider additionalValues,
+        string fixField,
+        bool preserveText = false
+    )
     {
         bool gotValue = additionalValues.TryGetValue(fixField, out var value);
 
@@ -591,6 +606,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         object? result = gotValue switch
         {
             false => null,
+            _ when preserveText => value,
             _ => decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal number)
                 ? number
                 : value,

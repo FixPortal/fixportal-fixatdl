@@ -7,6 +7,7 @@
 
 using System.Globalization;
 using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Types;
@@ -72,8 +73,9 @@ public class FixFieldValueProvider
             if (parameter.HasEnumPairs)
             {
                 string wireValue = result;
-
-                retrieved = parameter.EnumPairs.TryParseWireValue(wireValue, out result);
+                retrieved = parameter is Parameter_t<MultipleCharValue_t> or Parameter_t<MultipleStringValue_t>
+                    ? TryGetMultipleEnumIds(parameter, wireValue, out result)
+                    : parameter.EnumPairs.TryParseWireValue(wireValue, out result);
             }
             else if (parameter is Parameter_t<Percentage_t> t)
             {
@@ -126,5 +128,32 @@ public class FixFieldValueProvider
 
         value = null!;
         return false;
+    }
+
+    private static bool TryGetMultipleEnumIds(IParameter parameter, string wireValue, out string value)
+    {
+        value = null!;
+        if (string.IsNullOrEmpty(wireValue))
+        {
+            return false;
+        }
+        try
+        {
+            var state = EnumState.FromWireValue(parameter.EnumPairs, wireValue);
+            if (
+                parameter
+                is Parameter_t<MultipleCharValue_t> { Value.InvertOnWire: true }
+                    or Parameter_t<MultipleStringValue_t> { Value.InvertOnWire: true }
+            )
+            {
+                state.InvertSelection();
+            }
+            value = string.Join(" ", parameter.EnumPairs.EnumIds.Where(id => state[id]));
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
     }
 }
