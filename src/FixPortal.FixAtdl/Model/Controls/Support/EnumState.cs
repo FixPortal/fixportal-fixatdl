@@ -30,6 +30,7 @@ public class EnumState
     private readonly BitArray _enumStates;
     private readonly string[] _enumIds;
     private string? _nonEnumValue;
+    internal bool IsExplicitNull { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of <see cref="EnumState"/> with the supplied set of EnumID values.
@@ -68,6 +69,7 @@ public class EnumState
         _enumIds = sourceState._enumIds;
         _enumStates = new BitArray(sourceState._enumStates);
         _nonEnumValue = sourceState._nonEnumValue;
+        IsExplicitNull = sourceState.IsExplicitNull;
     }
 
     /// <summary>
@@ -122,6 +124,7 @@ public class EnumState
         }
 
         _nonEnumValue = source._nonEnumValue;
+        IsExplicitNull = source.IsExplicitNull;
     }
 
     /// <summary>
@@ -150,7 +153,9 @@ public class EnumState
         // Compare the bit states element-wise. The previous _enumStates.Equals(state) compared a
         // BitArray to an EnumState by reference, so it was ALWAYS false for two distinct instances,
         // breaking equality / HashSet / Dictionary / dirty-checking semantics.
-        return _nonEnumValue == state._nonEnumValue && BitArraysEqual(_enumStates, state._enumStates);
+        return IsExplicitNull == state.IsExplicitNull
+            && _nonEnumValue == state._nonEnumValue
+            && BitArraysEqual(_enumStates, state._enumStates);
     }
 
     private static bool BitArraysEqual(BitArray left, BitArray right)
@@ -195,7 +200,7 @@ public class EnumState
             // code mixed in _enumIds.GetHashCode() (a reference/identity hash), which made two equal
             // states with distinct _enumIds arrays hash differently, violating the Equals/GetHashCode
             // contract.
-            int hashCode = 17;
+            int hashCode = IsExplicitNull ? 19 : 17;
 
             foreach (int word in enumStates)
             {
@@ -238,6 +243,7 @@ public class EnumState
                 if (_enumIds[n] == enumId)
                 {
                     _enumStates[n] = value;
+                    IsExplicitNull = false;
 
                     // A list selection and a free-text (non-enum) value are mutually exclusive on an
                     // EditableDropDownList_t. The NonEnumValue setter clears all bits when text is set; mirror
@@ -299,6 +305,7 @@ public class EnumState
             _enumStates.SetAll(false);
 
             _nonEnumValue = value;
+            IsExplicitNull = false;
         }
     }
 
@@ -355,6 +362,21 @@ public class EnumState
         _enumStates.SetAll(false);
 
         _nonEnumValue = null;
+        IsExplicitNull = false;
+    }
+
+    internal void ClearToNull()
+    {
+        ClearAll();
+        IsExplicitNull = true;
+    }
+
+    internal void InvertSelection()
+    {
+        if (!IsExplicitNull && _nonEnumValue == null)
+        {
+            _enumStates.Not();
+        }
     }
 
     /// <summary>

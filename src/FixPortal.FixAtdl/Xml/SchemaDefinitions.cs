@@ -309,6 +309,7 @@ public static class SchemaDefinitions
     public static readonly ElementDefinition EditRef_t_Control_t = new(
         AtdlNamespaces.val + "EditRef",
         typeof(EditRef_t<Control_t>),
+        [new ConstructorParameter(typeof(string), SourceType.ElementAttribute, "id")],
         EditRefAttributes
     );
 
@@ -318,6 +319,7 @@ public static class SchemaDefinitions
     public static readonly ElementDefinition EditRef_t_IParameter_t = new(
         AtdlNamespaces.val + "EditRef",
         typeof(EditRef_t<IParameter>),
+        [new ConstructorParameter(typeof(string), SourceType.ElementAttribute, "id")],
         EditRefAttributes
     );
 
@@ -542,6 +544,7 @@ public static class SchemaDefinitions
     private static readonly ElementAttribute[] SliderAttributes =
     [
         new("initValue", "InitValue", typeof(string), Required.Optional),
+        new("increment", "Increment", typeof(decimal), Required.Optional),
     ];
 
     private static readonly ElementAttribute[] TextFieldAttributes =

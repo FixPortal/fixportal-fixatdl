@@ -1,0 +1,24 @@
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" strategyIdentifierTag="5001">
+  <Strategy name="Controls" version="1" wireValue="CTRL" uiRep="Controls" providerID="FIXPORTAL">
+    <Parameter name="Number" xsi:type="Float_t" fixTag="9001" minValue="0" maxValue="100"/>
+    <Parameter name="Binary" xsi:type="Char_t" fixTag="9002">
+      <EnumPair enumID="e_A" wireValue="A"/>
+      <EnumPair enumID="e_B" wireValue="B"/>
+    </Parameter>
+    <Parameter name="Choice" xsi:type="Char_t" fixTag="9003">
+      <EnumPair enumID="e_A" wireValue="A"/>
+      <EnumPair enumID="e_B" wireValue="B"/>
+      <EnumPair enumID="e_Null" wireValue="{NULL}"/>
+    </Parameter>
+    <lay:StrategyLayout>
+      <lay:StrategyPanel>
+        <lay:Control ID="NumericSlider" xsi:type="lay:Slider_t" parameterRef="Number" initValue="12.5" increment="0.25"/>
+        <lay:Control ID="BinaryControl" xsi:type="lay:CheckBox_t" parameterRef="Binary" checkedEnumRef="e_A" uncheckedEnumRef="e_B"/>
+        <lay:Control ID="ChoiceA" xsi:type="lay:RadioButton_t" parameterRef="Choice" radioGroup="Choice" checkedEnumRef="e_A" uncheckedEnumRef="e_Null"/>
+        <lay:Control ID="ChoiceB" xsi:type="lay:RadioButton_t" parameterRef="Choice" radioGroup="Choice" checkedEnumRef="e_B" uncheckedEnumRef="e_Null"/>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+</Strategies>

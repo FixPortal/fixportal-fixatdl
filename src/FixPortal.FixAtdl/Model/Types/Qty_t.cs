@@ -12,4 +12,11 @@ namespace FixPortal.FixAtdl.Model.Types;
 /// whole units) or a decimal value containing decimal places for non-share quantity asset classes (securities
 /// denominated in fractional units).'
 /// </summary>
-public class Qty_t : Float_t;
+public class Qty_t : Float_t
+{
+    /// <summary>Initializes the FIXatdl default minimum of zero.</summary>
+    public Qty_t()
+    {
+        MinValue = 0;
+    }
+}

@@ -8,7 +8,9 @@
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Types;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
 
@@ -134,7 +136,7 @@ public abstract class ListControlBase : InitializableControl<string>
 
         if (newValue == null || newValue as string == Atdl.NullValue)
         {
-            _value.ClearAll();
+            _value.ClearToNull();
         }
         else if (newValue is EnumState enumState)
         {
@@ -158,7 +160,7 @@ public abstract class ListControlBase : InitializableControl<string>
     /// </summary>
     public override void Reset()
     {
-        _value?.ClearAll();
+        _value?.ClearToNull();
     }
 
     /// <summary>
@@ -180,6 +182,10 @@ public abstract class ListControlBase : InitializableControl<string>
         IControlConvertible value = parameter.GetValueForControl();
 
         _value = value.ToEnumState(parameter.EnumPairs);
+        if (RequiresWireInversion(parameter))
+        {
+            _value.InvertSelection();
+        }
     }
 
     /// <summary>
@@ -265,7 +271,13 @@ public abstract class ListControlBase : InitializableControl<string>
 
         try
         {
-            return _value.ToWireValue(targetParameter.EnumPairs)!;
+            EnumState state = _value;
+            if (RequiresWireInversion(targetParameter))
+            {
+                state = _value.Copy();
+                state.InvertSelection();
+            }
+            return state.ToWireValue(targetParameter.EnumPairs)!;
         }
         catch (InvalidOperationException ex)
         {
@@ -278,6 +290,13 @@ public abstract class ListControlBase : InitializableControl<string>
                 ex.Message
             );
         }
+    }
+
+    private static bool RequiresWireInversion(IParameter parameter)
+    {
+        return parameter
+            is Parameter_t<MultipleCharValue_t> { Value.InvertOnWire: true }
+                or Parameter_t<MultipleStringValue_t> { Value.InvertOnWire: true };
     }
 
     /// <summary>

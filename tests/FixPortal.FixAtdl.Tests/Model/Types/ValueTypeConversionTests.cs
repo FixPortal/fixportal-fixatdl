@@ -212,7 +212,9 @@ public class ValueTypeConversionTests
     [InlineData("-0.25", -0.25)]
     public void PriceOffset_t_round_trips_offset(string wire, double expected)
     {
-        var p = new Parameter_t<PriceOffset_t>("Offset") { WireValue = wire };
+        var p = new Parameter_t<PriceOffset_t>("Offset");
+        p.Value.MinValue = -1;
+        p.WireValue = wire;
         p.GetCurrentValue().Should().Be((decimal)expected);
         p.WireValue.Should().Be(wire);
     }

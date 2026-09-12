@@ -5,9 +5,12 @@
 //
 #endregion
 
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
+using NodaTime;
 
 namespace FixPortal.FixAtdl.Model.Types;
 
@@ -33,6 +36,20 @@ public class UTCTimestamp_t : UTCDateTimeTypeBase
     /// Applicable when xsi:type is UTCTimestamp_t.</summary>
     /// <value>The local market timezone; null when not supplied in the ATDL.</value>
     public string? LocalMktTz { get; set; }
+
+    internal override TimeOnly GetTimeOfDayForBounds(DateTime utcValue)
+    {
+        if (string.IsNullOrEmpty(LocalMktTz))
+        {
+            return base.GetTimeOfDayForBounds(utcValue);
+        }
+
+        DateTimeZone zone =
+            DateTimeZoneProviders.Tzdb.GetZoneOrNull(LocalMktTz)
+            ?? throw ThrowHelper.New<InvalidFieldValueException>(this, "Unrecognised localMktTz '{0}'.", LocalMktTz);
+        // Use the order timestamp's date, so daily market bounds follow its DST offset.
+        return TimeOnly.FromDateTime(Instant.FromDateTimeUtc(utcValue).InZone(zone).ToDateTimeUnspecified());
+    }
 
     private static readonly string[] _formatStrings = [FixDateTimeFormat.FixDateTime, FixDateTimeFormat.FixDateTimeMs];
 

@@ -442,7 +442,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
 
         // Parameters already supply their declared native type. In particular, String_t "01"
         // must not become the number 1. Text controls retain their numeric-entry conversion.
-        return isPartOfStrategyEdit ? FieldValue : NormaliseNumericString(FieldValue);
+        return GetComparisonValue(_fieldSource, FieldValue);
     }
 
     private object GetRhsValue(FixFieldValueProvider additionalValues, object lhs)
@@ -471,10 +471,20 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
                 return GetFixFieldValue(additionalValues, Field2);
             }
 
-            return isPartOfStrategyEdit ? Field2Value : NormaliseNumericString(Field2Value);
+            return GetComparisonValue(_field2Source, Field2Value);
         }
 
         return null!;
+    }
+
+    private static object GetComparisonValue(T source, object value)
+    {
+        if (source is BinaryControlBase { HasEnumeratedState: true } binary && value is bool selected)
+        {
+            return selected ? binary.CheckedEnumRef : binary.UncheckedEnumRef;
+        }
+
+        return isPartOfStrategyEdit ? value : NormaliseNumericString(value);
     }
 
     // If the field value is a string that parses as a decimal, surface it as a decimal so that comparisons

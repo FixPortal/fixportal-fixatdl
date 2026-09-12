@@ -12,4 +12,11 @@ namespace FixPortal.FixAtdl.Model.Types;
 /// may be negative values. For example, prices for options strategies can be negative under certain market conditions.
 /// Refer to Volume 7: FIX Usage by Product for asset classes that support negative price values.'
 /// </summary>
-public class Price_t : Float_t;
+public class Price_t : Float_t
+{
+    /// <summary>Initializes the FIXatdl default minimum of zero.</summary>
+    public Price_t()
+    {
+        MinValue = 0;
+    }
+}
