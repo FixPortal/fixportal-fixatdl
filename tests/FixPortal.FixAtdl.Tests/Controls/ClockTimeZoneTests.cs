@@ -352,4 +352,89 @@ public class ClockTimeZoneTests
             .Should()
             .Be(new DateTime(2026, 7, 15, 13, 30, 0, DateTimeKind.Utc));
     }
+
+    [Fact]
+    public void SetValue_with_a_bare_time_of_day_resolves_in_localMktTz_like_initValue()
+    {
+        // R14: "08:00:00" via SetValue must resolve exactly as the same literal does as an initValue —
+        // the market's "today" in localMktTz (CEST, UTC+2 -> 06:00Z), not the host's today at 08:00Z.
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "Europe/Berlin",
+            Clock = new FakeClock(Instant.FromUtc(2026, 7, 15, 12, 0, 0)),
+        };
+
+        clock.SetValue("08:00:00");
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 7, 15, 6, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void SetValue_with_a_full_timestamp_keeps_the_utc_wire_interpretation()
+    {
+        // A full date-and-time keeps the UTC wire interpretation so the control round-trips its own
+        // serialized output. Same instant as the bare-time-of-day case above, reached via the other path.
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "Europe/Berlin",
+            Clock = new FakeClock(Instant.FromUtc(2026, 7, 15, 12, 0, 0)),
+        };
+
+        clock.SetValue("20260715-06:00:00");
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 7, 15, 6, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void SetValue_with_an_offset_bearing_time_of_day_resolves_via_its_offset()
+    {
+        // The explicit offset pins the value to UTC without consulting localMktTz: 08:00 at -05:00 is 13:00Z.
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "Europe/Berlin",
+            Clock = new FakeClock(Instant.FromUtc(2026, 7, 15, 12, 0, 0)),
+        };
+
+        clock.SetValue("08:00:00-05:00");
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 7, 15, 13, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void SetValue_with_a_bare_time_of_day_and_no_localMktTz_throws()
+    {
+        // Without localMktTz there is no zone to resolve a date-less time-of-day against.
+        var clock = new Clock_t("clk") { Clock = new FakeClock(Instant.FromUtc(2026, 7, 15, 12, 0, 0)) };
+
+        var act = () => clock.SetValue("08:00:00");
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Theory]
+    [InlineData("08:00:00.5", 500)]
+    [InlineData("08:00:00.25", 250)]
+    [InlineData("08:00:00.5000", 500)]
+    public void InitValueClock_accepts_fractional_seconds_of_any_precision(string raw, int expectedMilliseconds)
+    {
+        // Fractional seconds are not pinned to exactly 3 digits: ".5", ".25" and ".5000" all parse.
+        new InitValueClock(raw)
+            .TimeOfDay!.Value.Millisecond.Should()
+            .Be(expectedMilliseconds);
+    }
+
+    [Fact]
+    public void InitValueClock_accepts_fractional_seconds_on_a_date_bearing_value()
+    {
+        new InitValueClock("20260601-09:30:00.5").DateTime!.Value.Millisecond.Should().Be(500);
+    }
 }
