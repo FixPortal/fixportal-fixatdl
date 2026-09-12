@@ -10,7 +10,14 @@ namespace FixPortal.FixAtdl.Model.Reference;
 /// <summary>
 /// Enumeration of ISO 4217 currency codes.
 /// </summary>
-/// <remarks>Upper case codes are used throughout to avoid clashes with C# language keywords.</remarks>
+/// <remarks>
+/// Upper case codes are used throughout to avoid clashes with C# language keywords. Membership tracks
+/// the live ISO 4217 list (unlike <see cref="IsoCountryCode"/>, which is pinned to the FIXatdl 1.1
+/// regions schema): TMT, VED, XCG and ZWG are current assignments. Historic codes TMM (succeeded by
+/// TMT), ZWD and ANG (succeeded by XCG on 2025-03-31) are retained so existing documents still parse;
+/// ZWL (withdrawn 2024-09-01, succeeded by ZWG) and CUC (withdrawn 2021) are deliberately absent. SPL,
+/// GGP, IMP, JEP and TVD are not ISO 4217 assignments; they are retained as de-facto codes in common use.
+/// </remarks>
 public enum IsoCurrencyCode
 {
     /// <summary>No currency code selected.</summary>
@@ -549,4 +556,16 @@ public enum IsoCurrencyCode
 
     /// <summary>South Sudanese Pound (South Sudan)</summary>
     SSP,
+
+    /// <summary>Manat (Turkmenistan)</summary>
+    TMT,
+
+    /// <summary>Bolívar Digital (Venezuela)</summary>
+    VED,
+
+    /// <summary>Caribbean Guilder (Curaçao and Sint Maarten)</summary>
+    XCG,
+
+    /// <summary>Zimbabwe Gold (Zimbabwe)</summary>
+    ZWG,
 }

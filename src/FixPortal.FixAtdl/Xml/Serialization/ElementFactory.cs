@@ -671,17 +671,14 @@ public class ElementFactory : INotifyClassDeserialized
             );
         }
 
-        PropertyInfo outerProperty = targetType.GetProperty(names[0])!;
-
-        if (outerProperty == null)
-        {
-            throw ThrowHelper.New<InternalErrorException>(
+        PropertyInfo outerProperty =
+            targetType.GetProperty(names[0])
+            ?? throw ThrowHelper.New<InternalErrorException>(
                 this,
                 InternalErrors.PropertyNotFoundOnObjectInternal,
                 names[0],
                 targetType.FullName!
             );
-        }
 
         object? innerObject = outerProperty.GetValue(target, null);
 
@@ -695,34 +692,28 @@ public class ElementFactory : INotifyClassDeserialized
             );
         }
 
-        PropertyInfo property = outerProperty.PropertyType.GetProperty(names[1])!;
-
-        if (property == null)
-        {
-            throw ThrowHelper.New<InvalidPropertyOnObjectException>(
+        PropertyInfo property =
+            outerProperty.PropertyType.GetProperty(names[1])
+            ?? throw ThrowHelper.New<InvalidPropertyOnObjectException>(
                 this,
                 ErrorMessages.PropertyNotFoundOnObject,
                 attrDefn.Property,
                 targetType.Name
             );
-        }
 
         SetPropertyValue(property, innerObject, value);
     }
 
     private void SetDirectPropertyValue(Type targetType, ElementAttribute attrDefn, object target, object value)
     {
-        PropertyInfo property = targetType.GetProperty(attrDefn.Property)!;
-
-        if (property == null)
-        {
-            throw ThrowHelper.New<InvalidPropertyOnObjectException>(
+        PropertyInfo property =
+            targetType.GetProperty(attrDefn.Property)
+            ?? throw ThrowHelper.New<InvalidPropertyOnObjectException>(
                 this,
                 ErrorMessages.PropertyNotFoundOnObject,
                 attrDefn.Property,
                 targetType.Name
             );
-        }
 
         SetPropertyValue(property, target, value);
     }
@@ -812,17 +803,14 @@ public class ElementFactory : INotifyClassDeserialized
             _ => CreateObject(targetDefinition, childElement, target),
         };
 
-        PropertyInfo property = targetType.GetProperty(childDefinition.ContainerProperty)!;
-
-        if (property == null)
-        {
-            throw ThrowHelper.New<InternalErrorException>(
+        PropertyInfo property =
+            targetType.GetProperty(childDefinition.ContainerProperty)
+            ?? throw ThrowHelper.New<InternalErrorException>(
                 this,
                 InternalErrors.PropertyNotFoundOnObjectInternal,
                 childDefinition.ContainerProperty,
                 targetType.FullName!
             );
-        }
 
         try
         {
