@@ -72,7 +72,8 @@ public class EditCollection : KeyedCollection<string, Edit_t>
         where T : class, IValueProvider
     {
         // Carry the source Id across — Clone previously dropped it, producing an anonymous copy (M1).
-        // (The non-generic Edit_t source carries no EditRefs, so there are none to copy here.)
+        // (The non-generic Edit_t source carries no EditRefs — an EditRef under a global Edit is
+        // rejected at load time (#R19) — so there are none to copy here.)
         Edit_t<T> target = new()
         {
             Id = source.Id,

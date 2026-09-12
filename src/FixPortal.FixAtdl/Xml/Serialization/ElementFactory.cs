@@ -755,6 +755,23 @@ public class ElementFactory : INotifyClassDeserialized
                 ProcessMatchingChild(definition, childDefinition, targetDefinition, targetType, target, childElement);
             }
         }
+
+        FailOnUnclaimedEditRef(definition, sourceElement);
+    }
+
+    private void FailOnUnclaimedEditRef(ElementDefinition definition, XElement sourceElement)
+    {
+        // The non-generic Edit_t definition (strategy- and strategies-level edits) declares no EditRefs
+        // child, so an EditRef placed there matches no declared child above and would be silently
+        // discarded - evaluating a hoisted compound edit over fewer operands than the document
+        // specifies, with no diagnostic. Fail at load instead (#R19).
+        if (definition == SchemaDefinitions.Edit_t && sourceElement.Elements(AtdlNamespaces.val + "EditRef").Any())
+        {
+            throw ThrowHelper.New<InconsistentStrategyException>(
+                this,
+                "an EditRef child of a strategy- or strategies-level Edit is not supported; hoist the referenced edit into a StateRule-level EditRef or inline the nested edits"
+            );
+        }
     }
 
     private static IEnumerable<XElement> GetMatchingChildElements(
@@ -1044,6 +1061,21 @@ public class ElementFactory : INotifyClassDeserialized
 
                 property.SetValue(target, newValue, null);
             }
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            // PropertyInfo.SetValue and ConstructorInfo.Invoke wrap a setter- or ctor-thrown domain
+            // exception (e.g. Float_t.Precision outside 0..28) in TargetInvocationException. Unwrap and
+            // rethrow as the original type with element context, mirroring ProcessChildProperty's
+            // handling of container Add invocations, so hosts see the documented exception family (#R20).
+            throw ThrowHelper.Rethrow(
+                this,
+                ex.InnerException,
+                InternalErrors.UnableToSetPropertyValueOnObject,
+                property.Name,
+                value,
+                target.GetType().FullName!
+            );
         }
         catch (ArgumentException ex)
         {
