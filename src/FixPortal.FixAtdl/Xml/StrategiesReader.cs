@@ -51,6 +51,16 @@ public class StrategiesReader
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         _log = _loggerFactory.CreateLogger<StrategiesReader>();
         _clock = clock ?? SystemClock.Instance;
+
+        // Compile eagerly, up-front: XDocument.Validate() compiles an uncompiled schema set lazily on
+        // first use, and XmlSchemaSet's internal compilation is not documented thread-safe. Compiling
+        // here means concurrent Load() calls on this instance (already supported - see the per-call
+        // strategyLoadedCount below) never race on that lazy compilation.
+        if (schemaSet != null && !schemaSet.IsCompiled)
+        {
+            schemaSet.Compile();
+        }
+
         _schemaSet = schemaSet;
     }
 
