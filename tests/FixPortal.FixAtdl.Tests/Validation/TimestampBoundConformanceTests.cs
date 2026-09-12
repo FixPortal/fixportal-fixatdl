@@ -106,4 +106,60 @@ public class TimestampBoundConformanceTests
         var act = () => p.WireValue = "20260101-17:00:00";
         act.Should().Throw<InvalidFieldValueException>();
     }
+
+    [Theory]
+    [InlineData("20260101-21:00:00", true)] // 21:00Z == the bound's own UTC anchor - at the boundary.
+    [InlineData("20260701-21:00:00", true)] // Same UTC instant in EDT (16:00 EDT local) - offset ignores DST.
+    [InlineData("20260101-21:00:01", false)]
+    public void Offset_anchored_max_bound_compares_against_the_values_own_utc_time_not_zone_local(
+        string wire,
+        bool valid
+    )
+    {
+        // maxValue carries its own explicit UTC offset - it must be compared against the value's UTC
+        // time-of-day directly, not the parameter's zone-local (America/New_York) time-of-day, or a
+        // fixed-offset bound and a DST-aware zone conversion would silently disagree.
+        var p = Param(minText: null, maxText: "21:00:00Z");
+        p.Value.LocalMktTz = "America/New_York";
+
+        var act = () => p.WireValue = wire;
+
+        if (valid)
+        {
+            act.Should().NotThrow();
+        }
+        else
+        {
+            act.Should().Throw<InvalidFieldValueException>();
+        }
+    }
+
+    [Fact]
+    public void Min_and_max_bounds_may_independently_carry_or_omit_an_offset()
+    {
+        // minValue is plain (market-local, per the spec's worked example); maxValue carries its own
+        // explicit offset. Each bound is anchored in its own frame on the same parameter.
+        var p = Param(minText: "09:00:00", maxText: "21:00:00Z");
+        p.Value.LocalMktTz = "America/New_York";
+
+        // 20:00Z on 2026-01-01 is 15:00 EST - within [09:00 EST, 21:00Z] on both frames.
+        var act = () => p.WireValue = "20260101-20:00:00";
+        act.Should().NotThrow();
+    }
+
+    [Fact]
+    public void Reassigning_MaxValueText_to_a_plain_bound_clears_the_offset_anchoring_flag()
+    {
+        var p = Param(minText: null, maxText: "21:00:00Z");
+        p.Value.LocalMktTz = "America/New_York";
+
+        // Overwrite the offset-anchored text bound with a plain (market-local) one - the earlier bound's
+        // offset-anchoring must not stick around and get applied to this new bound (TY1-G-shaped: paired
+        // with the existing _maxTimeOfDay reset).
+        p.Value.MaxValueText = "16:00:00";
+
+        // 21:00Z on 2026-01-01 is 16:00 EST - at the plain (zone-local) bound, not the old UTC anchor.
+        var act = () => p.WireValue = "20260101-21:00:00";
+        act.Should().NotThrow();
+    }
 }

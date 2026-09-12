@@ -79,9 +79,14 @@ was replaced merely to agree with a browser implementation.
 - Browser validation does not replace XML schema validation, current ISO code
   lists, or host-side validation before order submission. Unsupported binary-data
   comparisons are reported as unsupported rather than treated as satisfied.
-- Full schema semantics, arbitrary custom parameter implementations, conflicting
-  timezone annotations on bounds, and every possible interaction among rules have
-  not been exhaustively assessed.
+- A time-only `minValue`/`maxValue` bound carrying its own explicit UTC offset
+  (the same base XML Schema `time` type used for Clock `initValue`) is compared
+  against the value's UTC time-of-day directly; a bare bound is compared against
+  the value converted into the parameter's `localMktTz` zone, per the spec's
+  worked example. Min and max are anchored independently, so one may carry an
+  offset while the other does not, on the same parameter.
+- Full schema semantics, arbitrary custom parameter implementations, and every
+  possible interaction among rules have not been exhaustively assessed.
 
 Consumer release order is core, WPF/React, then simulator dependencies. EMS
 integration is the separate fifth programme goal.

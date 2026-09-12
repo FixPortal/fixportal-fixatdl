@@ -6,6 +6,7 @@
 #endregion
 
 using System.Globalization;
+using System.Text.RegularExpressions;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
@@ -19,7 +20,7 @@ namespace FixPortal.FixAtdl.Model.Types.Support;
 /// <summary>
 /// Base class for all date and time related FIXatdl types (except MonthYear_t).
 /// </summary>
-public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConvertible
+public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConvertible
 {
     // TY1-G — MaxValue/MinValue are backed by fields whose setters also clear the corresponding
     // time-only slot, so a programmatic bound assignment cannot leave a stale _maxTimeOfDay/
@@ -37,6 +38,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
         {
             _maxValue = value;
             _maxTimeOfDay = null;
+            _maxTimeOfDayIsOffsetAnchored = false;
         }
     }
 
@@ -50,6 +52,7 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
         {
             _minValue = value;
             _minTimeOfDay = null;
+            _minTimeOfDayIsOffsetAnchored = false;
         }
     }
 
@@ -59,6 +62,17 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     // component only), while a full datetime / date-only value continues to populate MaxValue/MinValue.
     private TimeOnly? _maxTimeOfDay;
     private TimeOnly? _minTimeOfDay;
+
+    // A time-only bound carrying its own explicit offset suffix (the same base XML Schema "time" type
+    // used for Clock initValue) is already UTC-anchored and needs no zone lookup; a bare bound with no
+    // offset is market-local, per the spec's own worked example, and must be compared against the value
+    // converted into the parameter's localMktTz zone (GetTimeOfDayForBounds). Tracked per-bound since
+    // min and max can independently carry (or omit) an offset on the same parameter.
+    private bool _maxTimeOfDayIsOffsetAnchored;
+    private bool _minTimeOfDayIsOffsetAnchored;
+
+    [GeneratedRegex(@"(?:Z|[+-]\d{2}:?\d{2})$")]
+    private static partial Regex TrailingOffsetPattern();
 
     /// <summary>
     /// Indicates whether this type represents a time-only value.
@@ -111,15 +125,18 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
             DateTime parsed = FixDateTime.Parse(text, CultureInfo.InvariantCulture);
             DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
             TimeOnly timeOfDay = TimeOnly.FromDateTime(normalised);
+            bool isOffsetAnchored = TrailingOffsetPattern().IsMatch(text);
             if (isMax)
             {
                 _maxValue = null;
                 _maxTimeOfDay = timeOfDay;
+                _maxTimeOfDayIsOffsetAnchored = isOffsetAnchored;
             }
             else
             {
                 _minValue = null;
                 _minTimeOfDay = timeOfDay;
+                _minTimeOfDayIsOffsetAnchored = isOffsetAnchored;
             }
         }
         else
@@ -200,54 +217,69 @@ public abstract class DateTimeTypeBase : AtdlValueType<DateTime>, IControlConver
     {
         DateTime normalisedVal = NormaliseToUtc(value);
 
-        if (MaxValue != null)
-        {
-            DateTime normalisedMax = NormaliseToUtc(MaxValue.Value);
-            if (normalisedVal > normalisedMax)
-            {
-                return new ValidationResult(
-                    ValidationResult.ResultType.Invalid,
-                    ErrorMessages.MaxValueExceeded,
-                    value,
-                    MaxValue
-                );
-            }
-        }
+        return CheckDateTimeBounds(value, normalisedVal) ?? CheckTimeOfDayBounds(value, normalisedVal);
+    }
 
-        if (MinValue != null)
-        {
-            DateTime normalisedMin = NormaliseToUtc(MinValue.Value);
-            if (normalisedVal < normalisedMin)
-            {
-                return new ValidationResult(
-                    ValidationResult.ResultType.Invalid,
-                    ErrorMessages.MinValueNotMet,
-                    value,
-                    MinValue
-                );
-            }
-        }
-
-        TimeOnly valueTimeOfDay = GetTimeOfDayForBounds(normalisedVal);
-
-        if (_maxTimeOfDay != null && valueTimeOfDay > _maxTimeOfDay)
+    private ValidationResult? CheckDateTimeBounds(DateTime value, DateTime normalisedVal)
+    {
+        if (MaxValue != null && normalisedVal > NormaliseToUtc(MaxValue.Value))
         {
             return new ValidationResult(
                 ValidationResult.ResultType.Invalid,
                 ErrorMessages.MaxValueExceeded,
                 value,
-                _maxTimeOfDay
+                MaxValue
             );
         }
 
-        if (_minTimeOfDay != null && valueTimeOfDay < _minTimeOfDay)
+        if (MinValue != null && normalisedVal < NormaliseToUtc(MinValue.Value))
         {
             return new ValidationResult(
                 ValidationResult.ResultType.Invalid,
                 ErrorMessages.MinValueNotMet,
                 value,
-                _minTimeOfDay
+                MinValue
             );
+        }
+
+        return null;
+    }
+
+    private ValidationResult? CheckTimeOfDayBounds(DateTime value, DateTime normalisedVal)
+    {
+        // An offset-anchored bound already resolved itself to a UTC time-of-day when parsed - compare it
+        // against the value's own UTC time-of-day, not the zone-local one, or the two would be compared
+        // in different frames (the "conflicting timezone annotation" case). Each of min/max is anchored
+        // independently, so the two comparisons may legitimately use different frames on the same value.
+        TimeOnly zoneTimeOfDay = GetTimeOfDayForBounds(normalisedVal);
+        TimeOnly utcTimeOfDay = TimeOnly.FromDateTime(normalisedVal);
+
+        if (_maxTimeOfDay != null)
+        {
+            TimeOnly valueTimeOfDay = _maxTimeOfDayIsOffsetAnchored ? utcTimeOfDay : zoneTimeOfDay;
+            if (valueTimeOfDay > _maxTimeOfDay)
+            {
+                return new ValidationResult(
+                    ValidationResult.ResultType.Invalid,
+                    ErrorMessages.MaxValueExceeded,
+                    value,
+                    _maxTimeOfDay
+                );
+            }
+        }
+
+        if (_minTimeOfDay != null)
+        {
+            TimeOnly valueTimeOfDay = _minTimeOfDayIsOffsetAnchored ? utcTimeOfDay : zoneTimeOfDay;
+            if (valueTimeOfDay < _minTimeOfDay)
+            {
+                return new ValidationResult(
+                    ValidationResult.ResultType.Invalid,
+                    ErrorMessages.MinValueNotMet,
+                    value,
+                    _minTimeOfDay
+                );
+            }
         }
 
         return null;
