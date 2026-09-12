@@ -26,6 +26,13 @@ NuGet package (`FixPortal.FixAtdl`).
 dotnet add package FixPortal.FixAtdl
 ```
 
+## Ecosystem
+
+- [NuGet package](https://www.nuget.org/packages/FixPortal.FixAtdl/) and [source repository](https://github.com/FixPortal/fixportal-fixatdl)
+- [WPF adapter](https://github.com/FixPortal/fixportal-fixatdl-wpf) for editable desktop strategy forms
+- [React adapter](https://github.com/FixPortal/fixportal-fixatdl-react) for browser-side strategy forms
+- [Conformance record](docs/conformance.md) for assessed scope and limits
+
 ## Quick start
 
 ```csharp
@@ -132,5 +139,6 @@ MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.
 
 ## Status
 
-Production-ready 1.0.1 release. The public surface is locked and tracked via `PublicAPI.Shipped.txt` — any future public API change breaks the build.
-Issues and PRs welcome at https://github.com/FixPortal/FixAtdl.
+The current public release is 1.1.2. The public surface is locked and tracked
+via `PublicAPI.Shipped.txt` — any future public API change breaks the build.
+Issues and PRs welcome at https://github.com/FixPortal/fixportal-fixatdl.
