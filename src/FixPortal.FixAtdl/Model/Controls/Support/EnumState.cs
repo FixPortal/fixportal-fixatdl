@@ -132,88 +132,42 @@ public class EnumState
     /// </summary>
     /// <param name="obj">Object to compare this object to.</param>
     /// <returns>true if the state of the supplied object is identical to this object instance; false otherwise.</returns>
-    /// <remarks>This method assumes that both operands have the same set of EnumID values.</remarks>
+    /// <remarks>Selection identity is independent of ListItem declaration order and unselected options.</remarks>
     public override bool Equals(object? obj)
     {
-        if (obj is not EnumState state)
-        {
-            return false;
-        }
-
-        // Cross-check that both operands denote the same EnumIDs in the same order before
-        // comparing bit states (mirrors the identity check in UpdateFrom). The bit comparison
-        // below is positional, so order must match too, not just set membership — otherwise two
-        // EnumStates holding the same EnumIDs in a different order could pass this check while
-        // BitArraysEqual compares unrelated bit positions against each other.
-        if (!_enumIds.SequenceEqual(state._enumIds))
-        {
-            return false;
-        }
-
-        // Compare the bit states element-wise. The previous _enumStates.Equals(state) compared a
-        // BitArray to an EnumState by reference, so it was ALWAYS false for two distinct instances,
-        // breaking equality / HashSet / Dictionary / dirty-checking semantics.
-        return IsExplicitNull == state.IsExplicitNull
+        return obj is EnumState state
+            && IsExplicitNull == state.IsExplicitNull
             && _nonEnumValue == state._nonEnumValue
-            && BitArraysEqual(_enumStates, state._enumStates);
+            && GetSelectedEnumIds().SetEquals(state.GetSelectedEnumIds());
     }
 
-    private static bool BitArraysEqual(BitArray left, BitArray right)
+    private HashSet<string> GetSelectedEnumIds()
     {
-        if (left.Length != right.Length)
+        HashSet<string> selected = new(StringComparer.Ordinal);
+        for (int n = 0; n < _enumIds.Length; n++)
         {
-            return false;
-        }
-
-        for (int n = 0; n < left.Length; n++)
-        {
-            if (left[n] != right[n])
+            if (_enumStates[n])
             {
-                return false;
+                selected.Add(_enumIds[n]);
             }
         }
-
-        return true;
+        return selected;
     }
 
     /// <summary>
-    /// Serves as a hash function for this type.  Overridden because Equals(object) is overridden.
+    /// Serves as a hash function for this type, using the same selection set and state as Equals.
     /// </summary>
     /// <returns>A hash code for the current Object.</returns>
-    /// <remarks>The value 251 is used here because it is a prime number, helpful for generating unique hash values.</remarks>
-#pragma warning disable S2328 // "GetHashCode" should not reference mutable fields
-    // EnumState is a deliberately mutable control-state holder and is never used as a hash-table key.
-    // Equals and GetHashCode are kept consistent over the SAME field set (_enumStates, _nonEnumValue) so
-    // the contract holds at any instant; making the type immutable purely to satisfy this rule would be a
-    // disproportionate redesign of list-control state (batch 5, Sonar disposition).
+#pragma warning disable S2328 // EnumState is deliberately mutable; equality and hashing describe its current value.
     public override int GetHashCode()
     {
-        unchecked // No issue with int overflow
+        int selectionHash = 0;
+        foreach (string enumId in GetSelectedEnumIds())
         {
-            // Size the backing int[] for the full bit count: BitArray.CopyTo into new int[1] throws
-            // ArgumentException once there are more than 32 bits (e.g. a long MultiSelectList).
-            int wordCount = Math.Max(1, (_enumStates.Length + 31) / 32);
-            int[] enumStates = new int[wordCount];
-            _enumStates.CopyTo(enumStates, 0);
-
-            // Hash only the state and the non-enum value — the same fields Equals compares. The old
-            // code mixed in _enumIds.GetHashCode() (a reference/identity hash), which made two equal
-            // states with distinct _enumIds arrays hash differently, violating the Equals/GetHashCode
-            // contract.
-            int hashCode = IsExplicitNull ? 19 : 17;
-
-            foreach (int word in enumStates)
-            {
-                hashCode = hashCode * 251 + word;
-            }
-
-            if (_nonEnumValue != null)
-            {
-                hashCode = hashCode * 251 + _nonEnumValue.GetHashCode(StringComparison.Ordinal);
-            }
-
-            return hashCode;
+            // XOR is commutative: declaration order must not affect selection-set hashing.
+            selectionHash ^= enumId.GetHashCode(StringComparison.Ordinal);
         }
+        return HashCode.Combine(IsExplicitNull, _nonEnumValue, selectionHash);
     }
 #pragma warning restore S2328
 

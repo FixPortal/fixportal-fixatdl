@@ -1,6 +1,7 @@
 using System.Text;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Controls;
+using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Utility;
@@ -110,6 +111,46 @@ public class AdditionalConformanceTests
         edit.Evaluate();
 
         edit.CurrentState.Should().BeTrue();
+    }
+
+    [Fact]
+    public void List_field2_equality_compares_selected_ids_independently_of_declaration_order()
+    {
+        var strategy = LoadControls();
+        strategy.Controls.LoadDefaults(FixFieldValueProvider.Empty);
+        var edit = new Edit_t<Control_t>
+        {
+            Field = "ListForward",
+            Operator = Operator_t.Equal,
+            Field2 = "ListReverse",
+        };
+        ((IResolvable<Strategy_t, Control_t>)edit).Resolve(strategy, strategy.Controls);
+
+        edit.Evaluate();
+
+        edit.CurrentState.Should().BeTrue();
+        strategy
+            .Controls["ListForward"]
+            .GetCurrentValue()
+            .GetHashCode()
+            .Should()
+            .Be(strategy.Controls["ListReverse"].GetCurrentValue().GetHashCode());
+        strategy.Controls["ListReverse"].SetValue(new EnumState(["e_C", "e_B", "e_A"]) { ["e_B"] = true });
+        edit.Evaluate();
+        edit.CurrentState.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Enum_selection_equality_ignores_unselected_options_and_compares_ids_not_positions()
+    {
+        var left = new EnumState(["A", "B"]) { ["A"] = true };
+        var sameSelection = new EnumState(["C", "B", "A"]) { ["A"] = true };
+        var differentSelection = new EnumState(["B", "A"]) { ["B"] = true };
+
+        left.Equals(sameSelection).Should().BeTrue();
+        sameSelection.Equals(left).Should().BeTrue();
+        left.GetHashCode().Should().Be(sameSelection.GetHashCode());
+        left.Equals(differentSelection).Should().BeFalse();
     }
 
     [Fact]

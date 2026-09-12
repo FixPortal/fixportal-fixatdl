@@ -1,12 +1,16 @@
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model;
+using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Model.Types;
 using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Xml;
+using NSubstitute;
 
 namespace FixPortal.FixAtdl.Tests.Conformance;
 
@@ -56,6 +60,63 @@ public class ExpressionAndParameterConformanceTests
         edit.Evaluate();
 
         edit.CurrentState.Should().BeFalse("String_t values retain their declared string identity");
+    }
+
+    [Theory]
+    [InlineData(false, "01", true)]
+    [InlineData(true, "01", true)]
+    [InlineData(false, "1", false)]
+    [InlineData(true, "1", false)]
+    public void String_parameter_and_FIX_field_preserve_text_identity_in_both_directions(
+        bool reverse,
+        string wire,
+        bool expected
+    )
+    {
+        var strategy = Load();
+        strategy.Parameters["Text"].WireValue = "01";
+        var initial = Substitute.For<IInitialFixValueProvider>();
+        initial.InputFixValues.Returns(new FixTagValuesCollection { { 11, wire } });
+        var edit = ParameterEdit(
+            strategy,
+            reverse ? "FIX_ClOrdID" : "Text",
+            Operator_t.Equal,
+            field2: reverse ? "Text" : "FIX_ClOrdID"
+        );
+
+        edit.Evaluate(new FixFieldValueProvider(initial, strategy.Parameters));
+
+        edit.CurrentState.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Boolean_null_wire_literal_matches_suppressed_state_without_changing_native_field2(bool selected)
+    {
+        var strategy = Load();
+        var flag = (Parameter_t<Boolean_t>)strategy.Parameters["Enabled"];
+        flag.Value.TrueWireValue = "{NULL}";
+        var control = new CheckBox_t("Flag");
+        control.SetValue(selected);
+        flag.SetValueFromControl(control).IsValid.Should().BeTrue();
+        var other = new Parameter_t<Boolean_t>("OtherBoolean");
+        other.Value.TrueWireValue = "Yes";
+        other.Value.FalseWireValue = "No";
+        other.WireValue = selected ? "Yes" : "No";
+        strategy.Parameters.Add(other);
+        var literal = ParameterEdit(strategy, "Enabled", Operator_t.Equal, "{NULL}");
+        var field2 = ParameterEdit(strategy, "Enabled", Operator_t.Equal, field2: "OtherBoolean");
+        var exists = ParameterEdit(strategy, "Enabled", Operator_t.Exist);
+
+        literal.Evaluate();
+        field2.Evaluate();
+        exists.Evaluate();
+
+        literal.CurrentState.Should().Be(selected);
+        field2.CurrentState.Should().BeTrue();
+        exists.CurrentState.Should().BeTrue();
+        flag.GetCurrentValue().Should().Be(selected);
     }
 
     [Theory]
