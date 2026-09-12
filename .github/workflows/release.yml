@@ -92,12 +92,12 @@ jobs:
         run: dotnet nuget push artifacts/*.nupkg --source https://nuget.pkg.github.com/FixPortal/index.json --api-key ${{ github.token }} --skip-duplicate
 
       # NuGet.org exchanges this job's GitHub OIDC token for a one-hour, single-use
-      # API key. The trusted-publishing policy is scoped to this repository and workflow.
+      # API key. `user` is the policy creator; package ownership remains FixPortal.
       - name: NuGet.org login
         uses: NuGet/login@ebc737b6fc418a6ca0073cf116ec8dc156d8b81e # v1
         id: nuget-login
         with:
-          user: FixPortal
+          user: chris-fixportal
 
       - name: Push to NuGet.org
         run: dotnet nuget push artifacts/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
