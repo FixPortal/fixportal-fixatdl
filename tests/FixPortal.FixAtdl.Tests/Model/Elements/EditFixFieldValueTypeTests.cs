@@ -79,4 +79,38 @@ public class EditFixFieldValueTypeTests
 
         edit.CurrentState.Should().BeTrue();
     }
+
+    [Fact]
+    public void Field_valid_but_absent_from_the_type_dictionary_defaults_to_non_numeric()
+    {
+        var strategy = LoadTwap();
+        var initial = Substitute.For<IInitialFixValueProvider>();
+
+        // NoUsernames (tag 809) is a real FixField member but is the one tag FIX50SP2.xml's own
+        // <fields> section omits, so it is absent from FixFieldTypes - a numeric-looking value on
+        // an unclassified field must default to string comparison (the safe default), not be
+        // decimal-parsed.
+        initial.InputFixValues.Returns(new FixTagValuesCollection { { 809, "01" } });
+
+        var edit = MakeFixFieldEdit(strategy, "FIX_NoUsernames", "1");
+        edit.Evaluate(new FixFieldValueProvider(initial, strategy.Parameters));
+
+        edit.CurrentState.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Field_name_that_is_not_a_real_FixField_member_is_unresolvable_regardless_of_type()
+    {
+        var strategy = LoadTwap();
+        var initial = Substitute.For<IInitialFixValueProvider>();
+        initial.InputFixValues.Returns([]);
+
+        // "FIX_" plus a name that isn't a defined FixField member: TryGetValue already returns
+        // false for this before any type classification runs, so the comparison finds no value on
+        // either side and the edit does not evaluate true - unchanged from before this change.
+        var edit = MakeFixFieldEdit(strategy, "FIX_NotARealFixField", "1");
+        edit.Evaluate(new FixFieldValueProvider(initial, strategy.Parameters));
+
+        edit.CurrentState.Should().BeFalse();
+    }
 }

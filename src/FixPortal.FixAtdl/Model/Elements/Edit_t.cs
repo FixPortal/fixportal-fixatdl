@@ -618,9 +618,13 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         return result!;
     }
 
-    // Fields outside the standard FIX 5.0 SP2 dictionary (custom/extension fields not present in
-    // FixField) fall back to true - preserving the previous parse-and-guess behaviour for anything
-    // FixFieldTypes cannot classify.
+    // A FixField enum member absent from FixFieldTypes (e.g. one FIX50SP2-absent tag found during
+    // generation) defaults to non-numeric via FixFieldTypes.IsNumeric's own GetValueOrDefault - the
+    // safe default, since it never turns a string value into a misleading number. The catch below
+    // is unreachable in practice: TryGetValue (called by GetFixFieldValue just before this) already
+    // requires fixField to parse as a FixField for gotValue to be true, so this method is never
+    // invoked with a name ParseAsEnum would reject. Kept only as defensive robustness against a
+    // future caller that bypasses that invariant.
     private static bool IsNumericFixField(string fixField)
     {
         try
