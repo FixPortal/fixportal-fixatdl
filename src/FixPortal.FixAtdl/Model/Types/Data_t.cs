@@ -46,6 +46,14 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
     protected override ValidationResult ValidateValue(char[]? value, bool isRequired)
     {
+        // A zero-length array is not a value: normalise to null so a required parameter holding
+        // one reports Missing instead of validating as "set" while emitting nothing on the wire
+        // (R06).
+        if (value is not { Length: > 0 })
+        {
+            value = null;
+        }
+
         if (value != null)
         {
             if (MaxLength != null && value.Length > MaxLength)

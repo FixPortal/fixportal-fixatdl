@@ -1,7 +1,9 @@
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Model.Types;
+using FixPortal.FixAtdl.Validation;
 using Country_t = FixPortal.FixAtdl.Model.Types.Country_t;
 
 namespace FixPortal.FixAtdl.Tests.Model.Types;
@@ -560,6 +562,95 @@ public class ValueTypeConversionTests
     {
         var p = new Parameter_t<MonthYear_t>("Expiry") { WireValue = "202601" };
         p.WireValue = "{NULL}";
+        p.WireValue.Should().BeNull();
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Empty-value normalisation (R06). An empty value is "not set": a required parameter
+    // holding "" previously validated as "set" while ConvertToWireValueFormat emitted
+    // null, silently dropping a required FIX tag from the outgoing message. Clearing a
+    // required text control is now rejected as Missing (old value retained), and any
+    // stored empty (e.g. via ConstValue) throws MissingMandatoryValueException on read.
+    // ──────────────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void String_t_rejects_clearing_a_required_parameter_and_retains_the_old_value()
+    {
+        var p = new Parameter_t<String_t>("Text") { Use = Use_t.Required, WireValue = "abc" };
+        var controlValue = Substitute.For<IParameterConvertible>();
+        controlValue.ToString(p).Returns("");
+
+        ValidationResult result = p.Value.SetValueFromControl(p, controlValue);
+
+        result.IsMissing.Should().BeTrue();
+        p.WireValue.Should().Be("abc");
+    }
+
+    [Fact]
+    public void String_t_required_parameter_holding_an_empty_value_throws_MissingMandatoryValueException_on_read()
+    {
+        var p = new Parameter_t<String_t>("Text") { Use = Use_t.Required };
+        p.Value.ConstValue = "";
+
+        var act = () => p.WireValue;
+
+        act.Should().Throw<MissingMandatoryValueException>();
+    }
+
+    [Fact]
+    public void Data_t_rejects_clearing_a_required_parameter_and_retains_the_old_value()
+    {
+        var p = new Parameter_t<Data_t>("Raw") { Use = Use_t.Required, WireValue = "abc" };
+        var controlValue = Substitute.For<IParameterConvertible>();
+        controlValue.ToString(p).Returns("");
+
+        ValidationResult result = p.Value.SetValueFromControl(p, controlValue);
+
+        result.IsMissing.Should().BeTrue();
+        p.WireValue.Should().Be("abc");
+    }
+
+    [Fact]
+    public void Data_t_required_parameter_holding_a_zero_length_value_throws_MissingMandatoryValueException_on_read()
+    {
+        var p = new Parameter_t<Data_t>("Raw") { Use = Use_t.Required };
+        p.Value.ConstValue = [];
+
+        var act = () => p.WireValue;
+
+        act.Should().Throw<MissingMandatoryValueException>();
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Clearing an optional text control bound to MonthYear_t/Tenor_t yields null, not a
+    // conversion error (R10), matching Country_t/Currency_t/Language_t.
+    // ──────────────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void MonthYear_t_clears_to_null_from_an_empty_control_value()
+    {
+        var p = new Parameter_t<MonthYear_t>("Expiry") { WireValue = "202601" };
+        var controlValue = Substitute.For<IParameterConvertible>();
+        controlValue.ToString(p).Returns("");
+
+        ValidationResult result = p.Value.SetValueFromControl(p, controlValue);
+
+        result.IsValid.Should().BeTrue();
+        p.Value.IsSet.Should().BeFalse();
+        p.WireValue.Should().BeNull();
+    }
+
+    [Fact]
+    public void Tenor_t_clears_to_null_from_an_empty_control_value()
+    {
+        var p = new Parameter_t<Tenor_t>("Tenor") { WireValue = "M3" };
+        var controlValue = Substitute.For<IParameterConvertible>();
+        controlValue.ToString(p).Returns("");
+
+        ValidationResult result = p.Value.SetValueFromControl(p, controlValue);
+
+        result.IsValid.Should().BeTrue();
+        p.Value.IsSet.Should().BeFalse();
         p.WireValue.Should().BeNull();
     }
 }
