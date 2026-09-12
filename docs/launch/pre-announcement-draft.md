@@ -1,6 +1,7 @@
 # FixPortal.FixAtdl pre-announcement draft
 
-**Not for publication.** Internal draft pending Chris's explicit approval.
+**Not approved for publication.** This unlinked draft is publicly visible in
+repository source and awaits Chris's explicit approval.
 
 ## Release copy — Not for publication
 
