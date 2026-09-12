@@ -111,8 +111,8 @@ public class Clock_t : InitializableControl<InitValueClock?>
             return;
         }
 
-        // FIXatdl requires localMktTz whenever initValue is supplied on a Clock_t. Without it the local→UTC
-        // conversion is undefined; fail fast rather than emit a wrong instant (C1).
+        // FIXatdl requires localMktTz whenever initValue is supplied on a Clock_t, even when initValue
+        // carries its own explicit offset (spec attribute table: unconditional on initValue's presence).
         if (string.IsNullOrEmpty(LocalMktTz))
         {
             throw ThrowHelper.New<InvalidFieldValueException>(
@@ -123,38 +123,51 @@ public class Clock_t : InitializableControl<InitValueClock?>
             );
         }
 
-        DateTimeZone? zone = TimeZoneProvider.GetZoneOrNull(LocalMktTz);
-
-        if (zone == null)
-        {
-            throw ThrowHelper.New<InvalidFieldValueException>(
-                this,
-                ErrorMessages.InitControlValueError,
-                Id,
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "localMktTz '{0}' is not a recognised IANA time zone",
-                    LocalMktTz
-                )
-            );
-        }
-
         Instant nowInstant = Clock.GetCurrentInstant();
+        Instant initInstant;
 
-        LocalDateTime localDt;
-        if (InitValue.IsTimeOnly)
+        if (InitValue.IsOffsetTime)
         {
-            LocalDate marketToday = nowInstant.InZone(zone).Date;
-            localDt = marketToday.At(InitValue.TimeOfDay!.Value);
+            // An explicit offset (e.g. "08:00:00-05:00") already pins this value to UTC - it takes
+            // precedence over localMktTz-based resolution rather than needing a zone lookup. "Today" is
+            // anchored in UTC, since the offset itself (not a market zone) supplies the DST-relevant info.
+            OffsetTime offsetTime = InitValue.OffsetTimeOfDay!.Value;
+            LocalDate utcToday = nowInstant.InUtc().Date;
+            initInstant = utcToday.At(offsetTime.TimeOfDay).WithOffset(offsetTime.Offset).ToInstant();
         }
         else
         {
-            localDt = InitValue.DateTime!.Value;
-        }
+            DateTimeZone? zone = TimeZoneProvider.GetZoneOrNull(LocalMktTz);
 
-        // LenientResolver maps DST gaps forward and overlaps to the earlier offset, so resolution never
-        // throws on a spring-forward / fall-back wall-clock time.
-        Instant initInstant = zone.ResolveLocal(localDt, Resolvers.LenientResolver).ToInstant();
+            if (zone == null)
+            {
+                throw ThrowHelper.New<InvalidFieldValueException>(
+                    this,
+                    ErrorMessages.InitControlValueError,
+                    Id,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "localMktTz '{0}' is not a recognised IANA time zone",
+                        LocalMktTz
+                    )
+                );
+            }
+
+            LocalDateTime localDt;
+            if (InitValue.IsTimeOnly)
+            {
+                LocalDate marketToday = nowInstant.InZone(zone).Date;
+                localDt = marketToday.At(InitValue.TimeOfDay!.Value);
+            }
+            else
+            {
+                localDt = InitValue.DateTime!.Value;
+            }
+
+            // LenientResolver maps DST gaps forward and overlaps to the earlier offset, so resolution never
+            // throws on a spring-forward / fall-back wall-clock time.
+            initInstant = zone.ResolveLocal(localDt, Resolvers.LenientResolver).ToInstant();
+        }
 
         // initValueMode 1: use "now" if the initValue instant has already passed. Comparison is on instants.
         _value = (InitValueMode == 1 && nowInstant > initInstant) ? nowInstant : initInstant;

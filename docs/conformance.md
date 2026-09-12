@@ -57,9 +57,10 @@ was replaced merely to agree with a browser implementation.
   output. The React group emitter remains a preview; the host validates and builds
   the final order.
 - `DateTime` cannot represent year 0000 or leap-second 60. These are rejected.
-  Authored Clock `initValue` with an explicit offset is also rejected, with a
-  diagnostic, because its precedence over `localMktTz` is not implemented. Loading
-  an offset-bearing wire value is a separate, supported operation.
+  A Clock `initValue` carrying its own explicit UTC offset (the base XML Schema
+  `time` type's `hh:mm[:ss]{+,-}hh:mm` form) now resolves directly from that
+  offset, taking precedence over `localMktTz`-based zone resolution; `localMktTz`
+  remains a required attribute regardless, per the spec's attribute table.
 - Core DateTime wire formatting and the WPF clock's minute-level edit UI retain
   their existing precision policies. Preserving an untouched loaded value is
   tested separately from editing it.

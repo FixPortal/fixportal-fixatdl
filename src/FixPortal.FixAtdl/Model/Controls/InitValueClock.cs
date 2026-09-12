@@ -81,11 +81,11 @@ public sealed class InitValueClock
             .FirstOrDefault(result => result.Success);
         if (offsetTimeMatch is not null)
         {
-            throw ThrowHelper.New<InvalidFieldValueException>(
-                ExceptionContext,
-                "Offset-bearing Clock initValue '{0}' is unsupported; use local market wall time with localMktTz.",
-                raw
-            );
+            // The FIXatdl-1.1 base XML Schema "time" type (hh:mm[:ss]{+,-}hh:mm) already pins this
+            // value to UTC. It needs no zone lookup, so it takes precedence over localMktTz-based
+            // resolution in Clock_t rather than being rejected.
+            OffsetTimeOfDay = offsetTimeMatch.Value;
+            return;
         }
 
         ParseResult<LocalDateTime>? dateTimeMatch = DateTimePatterns
@@ -109,6 +109,14 @@ public sealed class InitValueClock
     /// <summary>The local date-and-time, when the initValue carried a date; otherwise null.</summary>
     public LocalDateTime? DateTime { get; }
 
-    /// <summary>True when the initValue was a bare time-of-day (no date component).</summary>
+    /// <summary>The time-of-day with an explicit UTC offset (e.g. "08:00:00-05:00"), when the
+    /// initValue was supplied in that form; otherwise null. Already pinned to UTC by its own
+    /// offset, so it is resolved without consulting <see cref="Clock_t.LocalMktTz"/>.</summary>
+    public OffsetTime? OffsetTimeOfDay { get; }
+
+    /// <summary>True when the initValue was a bare time-of-day (no date component, no offset).</summary>
     public bool IsTimeOnly => TimeOfDay.HasValue;
+
+    /// <summary>True when the initValue carried its own explicit UTC offset.</summary>
+    public bool IsOffsetTime => OffsetTimeOfDay.HasValue;
 }

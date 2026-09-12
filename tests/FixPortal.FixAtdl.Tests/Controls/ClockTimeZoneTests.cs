@@ -215,6 +215,64 @@ public class ClockTimeZoneTests
     }
 
     [Fact]
+    public void Offset_bearing_initValue_takes_precedence_over_localMktTz()
+    {
+        // initValue carries its own explicit UTC offset (India, +05:30) - it must convert directly,
+        // ignoring localMktTz's own zone (Berlin), rather than being reinterpreted through it.
+        var clock = new Clock_t("clk")
+        {
+            InitValue = new InitValueClock("13:09:00+05:30"),
+            LocalMktTz = "Europe/Berlin",
+            InitValueMode = 0,
+            Clock = new FakeClock(Instant.FromUtc(2026, 9, 1, 0, 0, 0)),
+        };
+
+        clock.LoadInitValue(FixFieldValueProvider.Empty);
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 9, 1, 7, 39, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void Offset_bearing_initValue_still_requires_localMktTz_attribute()
+    {
+        // localMktTz stays a required Clock_t attribute whenever initValue is supplied (spec table,
+        // unconditional) - even though the offset form does not need it for the conversion itself.
+        var clock = new Clock_t("clk")
+        {
+            InitValue = new InitValueClock("13:09:00+05:30"),
+            InitValueMode = 0,
+            Clock = new FakeClock(Instant.FromUtc(2026, 9, 1, 0, 0, 0)),
+        };
+
+        var act = () => clock.LoadInitValue(FixFieldValueProvider.Empty);
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Mode1_with_offset_bearing_initValue_uses_now_when_passed()
+    {
+        // init = 13:09+05:30 = 07:39Z; now = 2026-09-01 10:00Z is later -> use now.
+        var clock = new Clock_t("clk")
+        {
+            InitValue = new InitValueClock("13:09:00+05:30"),
+            LocalMktTz = "Europe/Berlin",
+            InitValueMode = 1,
+            Clock = new FakeClock(Instant.FromUtc(2026, 9, 1, 10, 0, 0)),
+        };
+
+        clock.LoadInitValue(FixFieldValueProvider.Empty);
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 9, 1, 10, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
     public void GetCurrentValue_with_unresolvable_localMktTz_throws()
     {
         var clock = new Clock_t("clk")
