@@ -14,13 +14,27 @@ A headless library for parsing, validating, and emitting FIX-tag values from
 FIXatdl v1.1 strategy XML documents. It targets .NET 10 and is consumed as a
 NuGet package (`FixPortal.FixAtdl`).
 
+## Want an editable form, not a parser?
+
+This package is the headless core. If what you need is a rendered, editable
+strategy form, take one of the adapters built on it — they are complete
+implementations, not samples.
+
+| Package | For | Install |
+|---|---|---|
+| [`FixPortal.FixAtdl.Wpf`](https://www.nuget.org/packages/FixPortal.FixAtdl.Wpf/) · [repo](https://github.com/FixPortal/fixportal-fixatdl-wpf) | .NET 10 desktop. All 15 FIXatdl control types, nested panel layouts, editable dropdowns, state rules, parameter and strategy validation. Templates load automatically. | `dotnet add package FixPortal.FixAtdl.Wpf` |
+| [`@fix-portal/fixatdl-react`](https://www.npmjs.com/package/@fix-portal/fixatdl-react) · [repo](https://github.com/FixPortal/fixportal-fixatdl-react) | React 19 in the browser. Recursive panels, native controls, form state, validation, state-rule evaluation and explanation, StrategyParametersGrp preview. | `npm install @fix-portal/fixatdl-react` |
+
+The WPF adapter consumes this package directly. The React adapter takes a parsed
+strategy DTO from your backend, which is where this package runs.
+
 ## What it is *not*
 
 - **Not a FIX engine.** It produces FIX tag values; sending them over the wire
   is the host application's responsibility. Pair with QuickFIX/n or similar.
 - **Not a UI library.** The upstream Atdl4net's WPF rendering layer has been
-  removed. Consumers wire their own UI (React, Blazor, WPF, anything) on top
-  of the parsed model.
+  removed from this package. Rendering lives in the adapters above, or in your
+  own UI on top of the parsed model — Blazor, Avalonia, anything.
 
 ## Read these first
 
@@ -31,16 +45,11 @@ NuGet package (`FixPortal.FixAtdl`).
 
 ## Install
 
+[`FixPortal.FixAtdl`](https://www.nuget.org/packages/FixPortal.FixAtdl/) on NuGet.org:
+
 ```
 dotnet add package FixPortal.FixAtdl
 ```
-
-## Ecosystem
-
-- [NuGet package](https://www.nuget.org/packages/FixPortal.FixAtdl/) and [source repository](https://github.com/FixPortal/fixportal-fixatdl)
-- [WPF adapter](https://github.com/FixPortal/fixportal-fixatdl-wpf) for editable desktop strategy forms
-- [React adapter](https://github.com/FixPortal/fixportal-fixatdl-react) for browser-side strategy forms
-- [Conformance record](https://github.com/FixPortal/fixportal-fixatdl/blob/main/docs/conformance.md) for assessed scope and limits
 
 ## Quick start
 

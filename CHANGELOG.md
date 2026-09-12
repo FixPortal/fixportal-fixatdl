@@ -14,6 +14,10 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
 - `docs/usage.md` — consumer guide covering loading, value setting, validation,
   FIX output, and the exception surface.
+- README now leads with the WPF and React adapters, so readers wanting a rendered
+  strategy form find the finished implementations instead of being told to build
+  their own.
+- README hero banner and social preview under `docs/images/`.
 - This changelog.
 
 ### Fixed
