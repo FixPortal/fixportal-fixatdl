@@ -130,10 +130,11 @@ public class Clock_t : InitializableControl<InitValueClock?>
         {
             // An explicit offset (e.g. "08:00:00-05:00") already pins this value to UTC - it takes
             // precedence over localMktTz-based resolution rather than needing a zone lookup. "Today" is
-            // anchored in UTC, since the offset itself (not a market zone) supplies the DST-relevant info.
+            // anchored in the offset's own wall-clock frame (not UTC), since UTC's calendar day can differ
+            // from the offset's for roughly half of any given day (C2-shaped bug: wrong 'today').
             OffsetTime offsetTime = InitValue.OffsetTimeOfDay!.Value;
-            LocalDate utcToday = nowInstant.InUtc().Date;
-            initInstant = utcToday.At(offsetTime.TimeOfDay).WithOffset(offsetTime.Offset).ToInstant();
+            LocalDate offsetToday = nowInstant.WithOffset(offsetTime.Offset).Date;
+            initInstant = offsetToday.At(offsetTime.TimeOfDay).WithOffset(offsetTime.Offset).ToInstant();
         }
         else
         {
