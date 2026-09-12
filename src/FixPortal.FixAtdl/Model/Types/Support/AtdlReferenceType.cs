@@ -148,9 +148,12 @@ public abstract class AtdlReferenceType<T> : IParameterType
 
         T? convertedValue;
 
+        // A '{NULL}' wire value is the FIXatdl "clear this field" instruction. Map it to null
+        // before the per-type converter, mirroring AtdlValueType.SetWireValue (Low 9); the
+        // subclasses' own sentinel arms stay as defence for direct converter calls.
         try
         {
-            convertedValue = ConvertFromWireValueFormat(value);
+            convertedValue = value == Atdl.NullValue ? null : ConvertFromWireValueFormat(value);
         }
         catch (Exception ex)
             when (ex is FormatException or OverflowException or ArgumentException or InvalidCastException)

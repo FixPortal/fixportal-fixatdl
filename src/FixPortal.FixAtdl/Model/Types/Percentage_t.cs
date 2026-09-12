@@ -94,7 +94,8 @@ public class Percentage_t : Float_t
     {
         decimal? decimalValue = base.ConvertFromWireValueFormat(value);
 
-        // base now returns null for a '{NULL}' clear (C4); propagate it rather than dereferencing null through /100.
+        // base returns null for a null input (a cleared field); propagate it rather than dereferencing
+        // null through /100.
         if (decimalValue == null)
         {
             return null;
