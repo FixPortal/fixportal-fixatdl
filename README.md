@@ -1,3 +1,5 @@
+![FixAtdl — broker strategy forms parsed, validated, and emitted as FIX tag values](https://raw.githubusercontent.com/FixPortal/fixportal-fixatdl/main/docs/images/fixatdl-hero.png)
+
 # FixPortal.FixAtdl
 
 ![Release](https://img.shields.io/github/v/release/FixPortal/fixportal-fixatdl)
