@@ -27,7 +27,12 @@ parser / model / validator / FIX-tag emitter; `net10.0` only; no UI layer
 - `README.md` is packed into the nupkg (`PackageReadmeFile` in
   `src/FixPortal.FixAtdl/FixPortal.FixAtdl.csproj`). Keep it NuGet-gallery
   compatible: no YAML frontmatter, no GFM alert (`> [!NOTE]`) blocks — the
-  NuGet renderer does not support them.
+  NuGet renderer does not support them. Links out of `README.md` must be
+  absolute `https://github.com/FixPortal/fixportal-fixatdl/blob/main/...` URLs:
+  a relative path resolves on GitHub but breaks on the NuGet gallery.
+- Every consumer-visible change (public API, behaviour, packaging) gets a
+  `CHANGELOG.md` entry under `## [Unreleased]` in the same PR. CI, test, and
+  internal-refactor commits do not.
 - Parser edge cases (malformed, unusual, or hostile strategy XML) are
   security-relevant. Add tests for any parser change.
 
@@ -40,8 +45,9 @@ parser / model / validator / FIX-tag emitter; `net10.0` only; no UI layer
   `tests/FixPortal.FixAtdl.Tests`, running on Microsoft.Testing.Platform.
 - Assert with `.Should()`, never xUnit `Assert.*`.
 - CI collects coverage with `dotnet-coverage` and enforces a 70% line floor on
-  `FixPortal.FixAtdl` via `scripts/assert-coverage-floor.ps1`; see
-  `docs/coverage-baseline.md`.
+  `FixPortal.FixAtdl` via `scripts/assert-coverage-floor.ps1`. The floor is
+  defined in `ci.yml`, not in `docs/coverage-baseline.md` — that document is the
+  historical 2026-05-30 starting baseline (32% line) and is not current state.
 
 ## Private feed restore
 

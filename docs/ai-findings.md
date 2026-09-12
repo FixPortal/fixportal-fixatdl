@@ -1,10 +1,11 @@
 # AI Findings Ledger
 
-GitHub's Copilot **AI Findings** set has no dismiss API or UI, so the same
-finding resurfaces on every scan; this ledger substitutes for the missing
-dismiss button. Before investigating any AI Finding, match it against this table
-by `file:line` + rule — if it is already `fixed` or `dismissed`, do not
-re-investigate.
+GitHub's Copilot **AI Findings** set has no dismiss API. Its only GitHub-side
+disposition is the PR comment's **Resolve** action, which carries no reason and
+no comment — so the verdict itself has nowhere durable to live. This ledger is
+that record; Resolve is still performed on the thread during triage. Before
+investigating any AI Finding, match it against this table by `file:line` + rule
+— if it is already `fixed` or `dismissed`, do not re-investigate.
 
 Scope is the AI Findings set only. **Code Quality** findings and **code-scanning
 security alerts** are both dismissable on GitHub, which records the verdict

@@ -1,5 +1,9 @@
 # Batch 5 — Conformance Review against real broker ATDL
 
+> **Historical record — findings as observed on 2026-05-31, since remediated.**
+> Every "current behaviour" note describes the source at the time of review. For
+> the assessed conformance surface today, read [`conformance.md`](conformance.md).
+
 **Date:** 2026-05-31
 **Branch:** `reviewer-findings-batch5`
 **Reviewer:** structured audit (not the adversarial-review panel — Phase 3 remains deferred)

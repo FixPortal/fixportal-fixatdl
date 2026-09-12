@@ -20,6 +20,13 @@ NuGet package (`FixPortal.FixAtdl`).
   removed. Consumers wire their own UI (React, Blazor, WPF, anything) on top
   of the parsed model.
 
+## Read these first
+
+- [Usage guide](https://github.com/FixPortal/fixportal-fixatdl/blob/main/docs/usage.md) — loading, setting values, validation, FIX output, exceptions.
+- [Architecture overview](https://github.com/FixPortal/fixportal-fixatdl/blob/main/docs/architecture/README.md) — the pipeline, layers, and load-bearing components.
+- [Conformance record](https://github.com/FixPortal/fixportal-fixatdl/blob/main/docs/conformance.md) — the assessed FIXatdl 1.1 surface and its limits.
+- [Changelog](https://github.com/FixPortal/fixportal-fixatdl/blob/main/CHANGELOG.md) — what changed in each release.
+
 ## Install
 
 ```
@@ -31,7 +38,7 @@ dotnet add package FixPortal.FixAtdl
 - [NuGet package](https://www.nuget.org/packages/FixPortal.FixAtdl/) and [source repository](https://github.com/FixPortal/fixportal-fixatdl)
 - [WPF adapter](https://github.com/FixPortal/fixportal-fixatdl-wpf) for editable desktop strategy forms
 - [React adapter](https://github.com/FixPortal/fixportal-fixatdl-react) for browser-side strategy forms
-- [Conformance record](docs/conformance.md) for assessed scope and limits
+- [Conformance record](https://github.com/FixPortal/fixportal-fixatdl/blob/main/docs/conformance.md) for assessed scope and limits
 
 ## Quick start
 
@@ -62,14 +69,11 @@ foreach (var tag in twap.Parameters.GetOutputValues())
 ## Development
 
 Open `FixPortal.FixAtdl.slnx` in Visual Studio, then build the solution and run
-the tests from Test Explorer. The equivalent command-line checks are:
+the tests from Test Explorer. The command-line checks below are the ones CI
+runs, in CI's order — run them all before pushing.
 
 ```powershell
 dotnet tool restore
-```
-
-```powershell
-dotnet csharpier format .
 ```
 
 ```powershell
@@ -81,16 +85,18 @@ dotnet restore FixPortal.FixAtdl.slnx
 ```
 
 ```powershell
-dotnet format FixPortal.FixAtdl.slnx analyzers --verify-no-changes --no-restore
-```
-
-```powershell
 dotnet build FixPortal.FixAtdl.slnx --configuration Release --no-restore
 ```
 
 ```powershell
 dotnet test --solution FixPortal.FixAtdl.slnx --configuration Release --no-build
 ```
+
+CSharpier is a pinned local tool. CI runs the read-only `check`; fix formatting
+locally with `dotnet csharpier format .` and commit the result — never as the
+gate itself, which would turn a failing check into a silent pass.
+
+To produce a package locally:
 
 ```powershell
 dotnet pack FixPortal.FixAtdl.slnx --configuration Release --no-build --output ./_pkgout
@@ -139,6 +145,8 @@ MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.
 
 ## Status
 
-The latest NuGet.org release is 1.1.2. The public surface is locked and tracked
-via `PublicAPI.Shipped.txt` — any future public API change breaks the build.
+The latest NuGet.org release is 1.1.2. The public surface is governed by
+[semantic versioning](https://semver.org/spec/v2.0.0.html) and recorded in the
+[changelog](CHANGELOG.md); there is no analyzer enforcing it at build time
+(`PublicApiAnalyzers` was removed before 1.0.5).
 [Issues and PRs](https://github.com/FixPortal/fixportal-fixatdl) are welcome.

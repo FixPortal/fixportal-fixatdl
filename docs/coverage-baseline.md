@@ -1,6 +1,11 @@
 # Coverage Baseline
 
-> Measured 2026-05-30 at commit `0006205`. Input artefact for the Phase 1 test-hardening plan.
+> **Historical record — not current state.** Measured 2026-05-30 at commit
+> `0006205` as the input artefact for the Phase 1 test-hardening plan. The
+> figures below are the *starting* point of that work and have long since been
+> superseded: CI now enforces a 70% line floor on `FixPortal.FixAtdl` via
+> `scripts/assert-coverage-floor.ps1`. Kept as the record of where Phase 1
+> started; do not read it as today's coverage.
 
 ## Overall
 - Line coverage: 32%
