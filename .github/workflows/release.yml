@@ -102,8 +102,17 @@ jobs:
       - name: Push to NuGet.org
         run: dotnet nuget push artifacts/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
 
+      # A re-run of this job reaches this step with the release already created (the two
+      # --skip-duplicate pushes above succeed), and bare `gh release create` exits 422 for an
+      # existing tag — making this last step the only non-idempotent one. Upload into the
+      # existing release when it is there; create it only when it is not.
       - name: Create GitHub Release
-        run: gh release create "$RELEASE_TAG" artifacts/*.nupkg --generate-notes
+        run: |
+          if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" artifacts/*.nupkg --clobber
+          else
+            gh release create "$RELEASE_TAG" artifacts/*.nupkg --generate-notes
+          fi
         env:
           GITHUB_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}

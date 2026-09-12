@@ -19,8 +19,8 @@
     <Company>FixPortal</Company>
     <Copyright>Copyright (c) 2010-2011 Steve Wilkinson; modifications (c) 2026 FixPortal contributors. MIT.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/FixPortal/FixAtdl</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/FixPortal/FixAtdl</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/FixPortal/fixportal-fixatdl</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/FixPortal/fixportal-fixatdl</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>FIX;FIXatdl;Atdl4net;algorithmic-trading;FixPortal</PackageTags>
   </PropertyGroup>
