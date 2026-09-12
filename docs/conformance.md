@@ -56,7 +56,12 @@ was replaced merely to agree with a browser implementation.
 - The model does not build a complete FIX order or implement StrategyParametersGrp
   output. The React group emitter remains a preview; the host validates and builds
   the final order.
-- `DateTime` cannot represent year 0000 or leap-second 60. These are rejected.
+- `DateTime` cannot represent year 0000; this is rejected as a deliberate omission -
+  a year-0000 wire value has no legitimate use and no downstream consumer
+  (QuickFIX/n, broker feeds) can act on one either. A declared UTC leap second
+  (literal `:60` seconds field) is normalised: `FixDateTime` rolls it forward by
+  one second, cascading minute/hour/day/month/year via `DateTime` arithmetic,
+  matching the `UTCTimestamp_t` spec's own worked example.
   A Clock `initValue` carrying its own explicit UTC offset (the base XML Schema
   `time` type's `hh:mm[:ss]{+,-}hh:mm` form) now resolves directly from that
   offset, taking precedence over `localMktTz`-based zone resolution; `localMktTz`
