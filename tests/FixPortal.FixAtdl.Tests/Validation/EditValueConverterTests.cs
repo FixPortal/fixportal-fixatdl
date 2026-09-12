@@ -19,6 +19,16 @@ public class EditValueConverterTests
         result.Should().Be("hello");
     }
 
+    [Fact]
+    public void Null_value_throws_even_when_the_prototype_is_also_null()
+    {
+        // The null-operand guard sits before the null-prototype early return, so a (null, null) call
+        // surfaces the documented IllegalUseOfNullError instead of returning a null IComparable.
+        var act = () => EditValueConverter.ConvertToComparableType(null!, null!);
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
     // ── Null value (O-G2): a missing operand must fail fast, not coerce to 0 ──
     // Numeric types previously coerced null silently to zero; parsed-struct types
     // previously threw NullReferenceException inside their Parse. Both must now

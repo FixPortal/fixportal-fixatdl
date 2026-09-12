@@ -1,4 +1,5 @@
 using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
 
 namespace FixPortal.FixAtdl.Tests.Diagnostics;
 
@@ -52,5 +53,15 @@ public class ThrowHelperTests
         ex.Should().BeOfType<InvalidOperationException>();
         ex.Message.Should().Be("Could not parse {NULL}");
         ex.InnerException.Should().BeSameAs(inner);
+    }
+
+    [Fact]
+    public void InternalErrorException_is_catchable_as_FixAtdlException()
+    {
+        // InternalErrorException signals the library itself malfunctioning; it must belong to the
+        // documented FixAtdlException family so a consumer catching the family does not miss it.
+        Action act = () => throw new InternalErrorException("boom");
+
+        act.Should().Throw<InternalErrorException>().Which.Should().BeAssignableTo<FixAtdlException>();
     }
 }

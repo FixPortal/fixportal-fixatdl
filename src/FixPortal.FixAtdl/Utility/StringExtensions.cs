@@ -36,6 +36,22 @@ public static class StringExtensions
             );
         }
 
+        bool isFlags = typeof(T).GetCustomAttribute<FlagsAttribute>() is not null;
+
+        // Enum.Parse treats a comma-separated list as a flags combination for EVERY enum, [Flags] or
+        // not: "AED,AFN" parses to 1 | 2 = 3, which is a *defined* member of IsoCurrencyCode (ALL) and
+        // would slip past the IsDefined guard below as a silently different value. For a non-[Flags]
+        // enum a comma is never a legitimate single member, so reject it before parsing.
+        if (!isFlags && value.Contains(','))
+        {
+            throw ThrowHelper.New<ArgumentException>(
+                ExceptionContext,
+                ErrorMessages.InvalidValueEnumParseFailure,
+                value,
+                typeof(T).Name
+            );
+        }
+
         T result;
 
         try
@@ -57,7 +73,7 @@ public static class StringExtensions
         // (e.g. "999"), letting undefined enum values slip into the model. Reject anything that is
         // not a defined member — except for [Flags] enums, where a combined value (the bitwise OR
         // of several members) is legitimately not itself a single defined member.
-        if (!Enum.IsDefined(result) && typeof(T).GetCustomAttribute<FlagsAttribute>() is null)
+        if (!Enum.IsDefined(result) && !isFlags)
         {
             throw ThrowHelper.New<ArgumentException>(
                 ExceptionContext,

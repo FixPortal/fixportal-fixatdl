@@ -34,19 +34,21 @@ public static class EditValueConverter
     /// <exception cref="Diagnostics.Exceptions.InvalidFieldValueException">Thrown if <paramref name="value"/> is null (a missing operand), or if a conversion fails for the matched type.</exception>
     public static IComparable ConvertToComparableType(object typeInstanceToMatch, string value)
     {
+        // A null operand is a missing Edit value, not a zero. The numeric Convert.To* paths would
+        // silently coerce null to 0 (masking a missing right-hand side and making comparisons pass
+        // spuriously) while the enum/MonthYear/Tenor paths would NRE. Reject it consistently with a
+        // domain exception, matching ConvertToBool's null handling (O-G2). This guard sits before the
+        // typeInstanceToMatch early return so a (null, null) call still throws rather than returning a
+        // null IComparable.
+        if (value == null)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
+        }
+
         // If we don't have a valid type to convert to, then best leave the value alone.
         if (typeInstanceToMatch == null)
         {
             return value;
-        }
-
-        // A null operand is a missing Edit value, not a zero. The numeric Convert.To* paths would
-        // silently coerce null to 0 (masking a missing right-hand side and making comparisons pass
-        // spuriously) while the enum/MonthYear/Tenor paths would NRE. Reject it consistently with a
-        // domain exception, matching ConvertToBool's null handling (O-G2).
-        if (value == null)
-        {
-            throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
         }
 
         // Data_t (char[]) has no meaningful comparison target. Without this check the switch below
