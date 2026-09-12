@@ -4,13 +4,11 @@
     <RootNamespace>FixPortal.FixAtdl</RootNamespace>
     <AssemblyName>FixPortal.FixAtdl</AssemblyName>
     <PackageId>FixPortal.FixAtdl</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.1.2</Version>
     <Authors>FixPortal contributors</Authors>
     <Description>Modernised .NET 10 fork of Atdl4net — parser, model, validator and FIX-tag emitter for FIXatdl v1.1 strategy XML documents. Headless (no UI). Maintained by FixPortal.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageProjectUrl>https://github.com/FixPortal/FixAtdl</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/FixPortal/FixAtdl</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>FIX;FIXatdl;algorithmic-trading;trading;finance</PackageTags>
   </PropertyGroup>
