@@ -28,6 +28,11 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     private Strategy_t Owner { get; set; }
     private readonly Dictionary<string, Control_t> _controls = [];
 
+    // Tracks which control Ids each subscribed panel collection contributed, so a Reset (Clear) from
+    // one collection removes only that collection's controls. Rebuilding from the layout root instead
+    // would silently drop controls living on panels not reachable from the root (#R23).
+    private readonly Dictionary<object, HashSet<string>> _controlIdsBySource = [];
+
     /// <summary>
     /// Initializes a new <see cref="ReadOnlyControlCollection"/>.
     /// </summary>
@@ -42,42 +47,34 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
-                HandleAddAction(e);
+                HandleAddAction(e, sender);
                 break;
 
             // MSDN documentation says helpfully: "The content of the collection changed dramatically."
             case NotifyCollectionChangedAction.Reset:
-                RebuildControlsIndex();
+                HandleResetAction(sender);
                 break;
 
             case NotifyCollectionChangedAction.Remove:
-                HandleRemoveAction(e);
+                HandleRemoveAction(e, sender);
                 break;
 
             case NotifyCollectionChangedAction.Replace:
-                HandleReplaceAction(e);
+                HandleReplaceAction(e, sender);
                 break;
         }
     }
 
-    private void RebuildControlsIndex()
+    private void HandleResetAction(object? sender)
     {
-        _controls.Clear();
-        if (Owner?.StrategyLayout?.StrategyPanel != null)
+        // A Reset carries no item payload, so only the sender's recorded contributions can be removed.
+        // An unknown sender contributed nothing, so there is nothing to do.
+        if (sender != null && _controlIdsBySource.Remove(sender, out HashSet<string>? ids))
         {
-            AddControlsFromPanel(Owner.StrategyLayout.StrategyPanel);
-        }
-    }
-
-    private void AddControlsFromPanel(StrategyPanel_t panel)
-    {
-        foreach (Control_t control in panel.Controls)
-        {
-            AddControl(control);
-        }
-        foreach (StrategyPanel_t childPanel in panel.StrategyPanels)
-        {
-            AddControlsFromPanel(childPanel);
+            foreach (string id in ids)
+            {
+                _controls.Remove(id);
+            }
         }
     }
 
@@ -94,23 +91,36 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         }
     }
 
-    private void HandleAddAction(NotifyCollectionChangedEventArgs e)
+    private void HandleAddAction(NotifyCollectionChangedEventArgs e, object? sender)
     {
         foreach (Control_t item in e.NewItems!)
         {
             AddControl(item);
+            if (sender != null)
+            {
+                if (!_controlIdsBySource.TryGetValue(sender, out HashSet<string>? ids))
+                {
+                    ids = [];
+                    _controlIdsBySource[sender] = ids;
+                }
+                ids.Add(item.Id);
+            }
         }
     }
 
-    private void HandleRemoveAction(NotifyCollectionChangedEventArgs e)
+    private void HandleRemoveAction(NotifyCollectionChangedEventArgs e, object? sender)
     {
         foreach (Control_t item in e.OldItems!)
         {
             _controls.Remove(item.Id);
+            if (sender != null && _controlIdsBySource.TryGetValue(sender, out HashSet<string>? ids))
+            {
+                ids.Remove(item.Id);
+            }
         }
     }
 
-    private void HandleReplaceAction(NotifyCollectionChangedEventArgs e)
+    private void HandleReplaceAction(NotifyCollectionChangedEventArgs e, object? sender)
     {
         for (int n = 0; n < e.OldItems!.Count; n++)
         {
@@ -130,6 +140,11 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             if (newControl.Id != oldId)
             {
                 _controls.Remove(oldId);
+                if (sender != null && _controlIdsBySource.TryGetValue(sender, out HashSet<string>? ids))
+                {
+                    ids.Remove(oldId);
+                    ids.Add(newControl.Id);
+                }
             }
             else
             {
@@ -248,19 +263,22 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     /// <returns>The selected radio sibling, or the supplied control when none is selected.</returns>
     public Control_t GetParameterValueSource(Control_t control)
     {
-        if (control is not RadioButton_t radio || string.IsNullOrEmpty(radio.RadioGroup) || radio.ParameterRef == null)
+        if (control is not RadioButton_t radio || radio.ParameterRef == null)
         {
             return control;
         }
 
+        // radioGroup is optional in the schema: ungrouped radios sharing a parameter act as an implicit
+        // group with their panel siblings (mirroring SetCompanionRadioButton), so the selected sibling
+        // must be resolved there - otherwise the last enumerated unselected radio nulls the value (#R22).
+        IEnumerable<RadioButton_t> candidates = string.IsNullOrEmpty(radio.RadioGroup)
+            ? radio.OwningStrategyPanel?.Controls.OfType<RadioButton_t>() ?? []
+            : this.OfType<RadioButton_t>().Where(candidate => candidate.RadioGroup == radio.RadioGroup);
+
         // ponytail: linear scan per radio, index groups if layouts grow beyond ordinary forms.
-        return this.OfType<RadioButton_t>()
-                .FirstOrDefault(candidate =>
-                    candidate.RadioGroup == radio.RadioGroup
-                    && candidate.ParameterRef == radio.ParameterRef
-                    && candidate.GetCurrentValue() is true
-                )
-            ?? control;
+        return candidates.FirstOrDefault(candidate =>
+                candidate.ParameterRef == radio.ParameterRef && candidate.GetCurrentValue() is true
+            ) ?? control;
     }
 
     /// <summary>

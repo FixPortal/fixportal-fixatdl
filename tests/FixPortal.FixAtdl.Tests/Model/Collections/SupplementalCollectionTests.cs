@@ -250,4 +250,94 @@ public class SupplementalCollectionTests
         var act = () => panel.Controls[0] = ctrlDup; // set ctrl1 to ctrlDup, triggering Replace
         act.Should().Throw<DuplicateKeyException>().WithMessage("*'c_Two'*Controls*");
     }
+
+    // -----------------------------------------------------------------------
+    // ReadOnlyControlCollection — ungrouped radio value source (R22)
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public void GetParameterValueSource_ungrouped_radios_resolve_the_selected_panel_sibling()
+    {
+        // R22: radioGroup is optional; ungrouped radios sharing a ParameterRef act as an implicit group
+        // with their panel siblings, so the selected sibling is the parameter's value source.
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var radioA = new RadioButton_t("r_A") { ParameterRef = "P" };
+        var radioB = new RadioButton_t("r_B") { ParameterRef = "P" };
+        panel.Controls.Add(radioA);
+        panel.Controls.Add(radioB);
+
+        radioB.SetValue(true);
+
+        strategy.Controls.GetParameterValueSource(radioA).Should().BeSameAs(radioB);
+    }
+
+    [Fact]
+    public void GetParameterValueSource_ungrouped_radios_fall_back_to_the_control_when_no_sibling_is_selected()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var radioA = new RadioButton_t("r_A") { ParameterRef = "P" };
+        var radioB = new RadioButton_t("r_B") { ParameterRef = "P" };
+        panel.Controls.Add(radioA);
+        panel.Controls.Add(radioB);
+
+        strategy.Controls.GetParameterValueSource(radioA).Should().BeSameAs(radioA);
+    }
+
+    [Fact]
+    public void GetParameterValueSource_grouped_radios_still_resolve_across_the_whole_strategy()
+    {
+        // A named RadioGroup spans panels: the selected member may live on a different panel.
+        var strategy = new Strategy_t();
+        var panelA = new StrategyPanel_t(strategy);
+        var panelB = new StrategyPanel_t(strategy);
+        var radioA = new RadioButton_t("r_A") { ParameterRef = "P", RadioGroup = "g" };
+        var radioB = new RadioButton_t("r_B") { ParameterRef = "P", RadioGroup = "g" };
+        panelA.Controls.Add(radioA);
+        panelB.Controls.Add(radioB);
+
+        radioB.SetValue(true);
+
+        strategy.Controls.GetParameterValueSource(radioA).Should().BeSameAs(radioB);
+    }
+
+    // -----------------------------------------------------------------------
+    // ReadOnlyControlCollection — Reset removes only the sender's controls (R23)
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public void Reset_from_one_panel_collection_removes_only_that_panels_controls()
+    {
+        // R23: Clear() on one panel's Controls must not drop controls belonging to another panel,
+        // including panels not reachable from the strategy's layout root.
+        var strategy = new Strategy_t();
+        var attachedPanel = new StrategyPanel_t(strategy);
+        var detachedPanel = new StrategyPanel_t(strategy);
+        attachedPanel.Controls.Add(new TextField_t("c_Att"));
+        detachedPanel.Controls.Add(new TextField_t("c_Det"));
+
+        attachedPanel.Controls.Clear();
+
+        strategy.Controls.Contains("c_Att").Should().BeFalse();
+        strategy.Controls.Contains("c_Det").Should().BeTrue();
+    }
+
+    [Fact]
+    public void Reset_then_readd_keeps_the_duplicate_id_guard_intact()
+    {
+        // After a Clear, re-adding the same Id must succeed (it was removed), while a genuinely
+        // duplicated Id from another panel must still be rejected.
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var otherPanel = new StrategyPanel_t(strategy);
+        panel.Controls.Add(new TextField_t("c_One"));
+        otherPanel.Controls.Add(new TextField_t("c_Two"));
+
+        panel.Controls.Clear();
+        panel.Controls.Add(new TextField_t("c_One"));
+
+        var act = () => panel.Controls.Add(new TextField_t("c_Two"));
+        act.Should().Throw<DuplicateKeyException>();
+    }
 }
