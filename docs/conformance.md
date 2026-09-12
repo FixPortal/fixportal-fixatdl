@@ -52,7 +52,13 @@ was replaced merely to agree with a browser implementation.
 ## Explicit limits
 
 - The core model does not schedule UI effects. WPF and React own state transitions,
-  convergence errors, and radio selection exclusion.
+  convergence errors, and radio selection exclusion. This extends to conflict
+  resolution: `StateRuleCollection` is an ordered, unmerged list per control, and
+  `Evaluate()` only computes each rule's own boolean state - core does not decide
+  what a control's actual `Enabled`/`Visible` should be when two of its own
+  StateRules assert opposing effects simultaneously. Precedence for that case
+  (first-wins, last-wins, or otherwise) is left entirely to the adapter and is
+  untested here.
 - The model does not build a complete FIX order or implement StrategyParametersGrp
   output. The React group emitter remains a preview; the host validates and builds
   the final order.
