@@ -437,4 +437,69 @@ public class ClockTimeZoneTests
     {
         new InitValueClock("20260601-09:30:00.5").DateTime!.Value.Millisecond.Should().Be(500);
     }
+
+    [Fact]
+    public void SetValueFromParameter_local_market_date_round_trips_the_same_calendar_day()
+    {
+        // Low 17: a date-only parameter bound to a Clock_t carries a calendar date, not an instant.
+        // The clock pins it at UTC midnight so the emitted yyyyMMdd is the same day even with a
+        // market zone ahead of UTC.
+        var parameter = new Parameter_t<LocalMktDate_t>("P") { WireValue = "20260715" };
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "Asia/Tokyo",
+            Clock = new FakeClock(Instant.FromUtc(2026, 7, 15, 12, 0, 0)),
+        };
+
+        clock.SetValueFromParameter(parameter);
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 7, 15, 0, 0, 0, DateTimeKind.Utc));
+        parameter.SetValueFromControl(clock).IsValid.Should().BeTrue();
+        parameter.WireValue.Should().Be("20260715");
+    }
+
+    [Fact]
+    public void SetValueFromParameter_unspecified_local_market_date_keeps_its_calendar_day()
+    {
+        // Low 17: an off-label programmatic value can arrive Kind=Unspecified. Resolving that midnight
+        // in localMktTz emits the previous date for zones ahead of UTC (Tokyo 2026-07-15 00:00 becomes
+        // 2026-07-14 15:00Z); the date must be pinned at UTC midnight instead.
+        var parameter = new Parameter_t<LocalMktDate_t>("P");
+        parameter.Value.ConstValue = new DateTime(2026, 7, 15, 0, 0, 0, DateTimeKind.Unspecified);
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "Asia/Tokyo",
+            Clock = new FakeClock(Instant.FromUtc(2026, 7, 15, 12, 0, 0)),
+        };
+
+        clock.SetValueFromParameter(parameter);
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 7, 15, 0, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void SetValueFromParameter_unspecified_utc_date_only_keeps_its_calendar_day()
+    {
+        // The same date-only anchoring applies to UTCDateOnly_t, the other date-only parameter type.
+        var parameter = new Parameter_t<UTCDateOnly_t>("P");
+        parameter.Value.ConstValue = new DateTime(2026, 7, 15, 0, 0, 0, DateTimeKind.Unspecified);
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "Asia/Tokyo",
+            Clock = new FakeClock(Instant.FromUtc(2026, 7, 15, 12, 0, 0)),
+        };
+
+        clock.SetValueFromParameter(parameter);
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 7, 15, 0, 0, 0, DateTimeKind.Utc));
+    }
 }

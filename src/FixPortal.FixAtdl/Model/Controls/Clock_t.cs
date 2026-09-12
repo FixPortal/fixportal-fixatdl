@@ -13,6 +13,7 @@ using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Types;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
 using NodaTime;
@@ -73,14 +74,23 @@ public class Clock_t : InitializableControl<InitValueClock?>
     {
         // On a failed parse, leave _value untouched and return false (matching NumericControlBase /
         // ListControlBase): "could not load" must not also clobber existing state to null (D-CLOCK-CLOBBER).
-        if (!FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result))
+        // The catch mirrors those siblings' conversion guards: a value that parses but then cannot be
+        // resolved (e.g. an Unspecified Kind reaching ToInstant with no localMktTz) is "not loadable" too.
+        try
+        {
+            if (!FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result))
+            {
+                return false;
+            }
+
+            _value = ToInstant(result);
+
+            return true;
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidFieldValueException or InvalidCastException)
         {
             return false;
         }
-
-        _value = ToInstant(result);
-
-        return true;
     }
 
     /// <summary>
@@ -200,7 +210,23 @@ public class Clock_t : InitializableControl<InitValueClock?>
 
         DateTime? dateTime = value.ToDateTime();
 
-        _value = dateTime == null ? null : ToInstant(dateTime.Value, parameter);
+        if (dateTime == null)
+        {
+            _value = null;
+            return;
+        }
+
+        // A date-only parameter carries a calendar date, not an instant: pin the date at UTC midnight
+        // whatever the inbound Kind, so a round-trip keeps the same calendar day. Resolving an
+        // Unspecified midnight via localMktTz instead emits the previous date for zones ahead of UTC
+        // (a Tokyo 2026-07-15 becomes 2026-07-14 15:00Z, formatted back as the previous date).
+        if (value is LocalMktDate_t or UTCDateOnly_t)
+        {
+            _value = Instant.FromDateTimeUtc(DateTime.SpecifyKind(dateTime.Value.Date, DateTimeKind.Utc));
+            return;
+        }
+
+        _value = ToInstant(dateTime.Value, parameter);
     }
 
     /// <summary>
