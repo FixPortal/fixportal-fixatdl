@@ -83,7 +83,21 @@ public class ControlCollection : ObservableCollection<Control_t>
     /// <inheritdoc />
     protected override void RemoveItem(int index)
     {
+        Control_t removed = Items[index];
+
         base.RemoveItem(index);
+
+        // Detach the removed control from this panel, mirroring the parent-wiring in InsertItem and
+        // SetItem — otherwise it keeps reporting a panel that no longer holds it.
+        ((IParentable<StrategyPanel_t>)removed).Parent = null!;
+
+        RefreshIndexes();
+    }
+
+    /// <inheritdoc />
+    protected override void MoveItem(int oldIndex, int newIndex)
+    {
+        base.MoveItem(oldIndex, newIndex);
 
         RefreshIndexes();
     }
