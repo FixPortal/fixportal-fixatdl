@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Globalization;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -51,8 +52,15 @@ public class Slider_t : ListControlBase
         _numeric.ParameterRef = ParameterRef;
         _numeric.InitPolicy = InitPolicy;
         _numeric.InitFixField = InitFixField;
-        _numeric.SetValue(InitValue);
-        _numeric.InitValue = (decimal?)_numeric.GetCurrentValue();
+        // Pre-seed only a parseable initValue: a malformed one (e.g. initValue="abc") must not throw
+        // out of initialization here, or it would abort the whole strategy load even when
+        // initPolicy="UseFixField" would have supplied the value from the FIX message (#R16). A null
+        // initValue needs no pre-seed either: the inner spinner's InitValue is already null.
+        if (InitValue != null && decimal.TryParse(InitValue, NumberStyles.Number, CultureInfo.InvariantCulture, out _))
+        {
+            _numeric.SetValue(InitValue);
+            _numeric.InitValue = (decimal?)_numeric.GetCurrentValue();
+        }
         _numeric.LoadInitValue(controlInitValueProvider);
     }
 
