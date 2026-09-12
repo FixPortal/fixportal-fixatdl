@@ -85,8 +85,16 @@ was replaced merely to agree with a browser implementation.
   the value converted into the parameter's `localMktTz` zone, per the spec's
   worked example. Min and max are anchored independently, so one may carry an
   offset while the other does not, on the same parameter.
-- Full schema semantics, arbitrary custom parameter implementations, and every
-  possible interaction among rules have not been exhaustively assessed.
+- FIXatdl 1.1 permits a vendor to define a custom `Parameter` `xsi:type` beyond
+  the standard set, with vendor-specific semantics this library cannot itself
+  provide. `StrategiesReader`'s `customParameterTypes` parameter lets a host
+  register its own CLR type (implementing `IParameterType`, e.g. by extending
+  `AtdlValueType<T>`) and `ElementAttribute` mapping for such a type, keyed by
+  its bare `xsi:type` name; the type is used directly (no `Type.GetType`
+  probing), so it may live in the host's own assembly. Registration is
+  per-`StrategiesReader`-instance and does not touch the standard type set.
+- Full schema semantics and every possible interaction among rules have not
+  been exhaustively assessed.
 
 Consumer release order is core, WPF/React, then simulator dependencies. EMS
 integration is the separate fifth programme goal.
