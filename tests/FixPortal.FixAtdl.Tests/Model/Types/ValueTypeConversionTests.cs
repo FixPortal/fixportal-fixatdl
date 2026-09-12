@@ -410,6 +410,10 @@ public class ValueTypeConversionTests
     [InlineData("USD")]
     [InlineData("GBP")]
     [InlineData("EUR")]
+    [InlineData("TMT")]
+    [InlineData("VED")]
+    [InlineData("XCG")]
+    [InlineData("ZWG")]
     public void Currency_t_round_trips_valid_iso_currency_codes(string wire)
     {
         var p = new Parameter_t<Currency_t>("Ccy") { WireValue = wire };

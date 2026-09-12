@@ -138,6 +138,32 @@ public class CustomParameterTypeTests
     }
 
     [Fact]
+    public void ClrType_that_is_a_value_type_is_rejected_eagerly()
+    {
+        // The value-type guard runs before the IParameterType check, so a plain decimal pins it without
+        // needing a struct that implements IParameterType.
+        var act = () => new CustomParameterType("Struct_t", typeof(decimal), []);
+
+        act.Should().Throw<ArgumentException>().WithMessage("*value type*");
+    }
+
+    [Theory]
+    [InlineData("Value.DoesNotExist", "DoesNotExist")]
+    [InlineData("DoesNotExist", "DoesNotExist")]
+    [InlineData("Value.VendorTag.Extra", "one level")]
+    public void Attribute_with_an_unresolvable_property_path_is_rejected_eagerly(string path, string messageFragment)
+    {
+        var act = () =>
+            new CustomParameterType(
+                "Bad_t",
+                typeof(TestVendorAmountType),
+                [new("badAttr", path, typeof(int), Required.Optional)]
+            );
+
+        act.Should().Throw<ArgumentException>().WithMessage($"*{messageFragment}*");
+    }
+
+    [Fact]
     public void Standard_types_are_unaffected_by_an_unrelated_custom_registration()
     {
         using var stream = StreamOf(StrategyXml("Int_t"));
