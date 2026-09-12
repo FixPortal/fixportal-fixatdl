@@ -63,9 +63,13 @@ was replaced merely to agree with a browser implementation.
 - Core DateTime wire formatting and the WPF clock's minute-level edit UI retain
   their existing precision policies. Preserving an untouched loaded value is
   tested separately from editing it.
-- Standard `FIX_*` operands still need a host value provider and do not carry a
-  complete FIX type dictionary. Untyped numeric-looking control/FIX text retains
-  numeric inference; declared string parameters retain string semantics.
+- Standard `FIX_*` operands still need a host value provider. Comparisons are now
+  type-directed via `FixFieldTypes` (generated from the FIX 5.0 SP2 field
+  dictionary): only fields whose actual FIX type is numeric are decimal-parsed for
+  comparison, so a numeric-looking String/Char field (e.g. a zero-padded ClOrdID)
+  compares as text rather than being silently converted to a number. A FIX field
+  outside that dictionary (custom/extension) falls back to the previous
+  parse-and-guess behaviour.
 - Browser validation does not replace XML schema validation, current ISO code
   lists, or host-side validation before order submission. Unsupported binary-data
   comparisons are reported as unsupported rather than treated as satisfied.
