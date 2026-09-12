@@ -2,6 +2,7 @@ using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Types;
+using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Xml;
 using FixPortal.FixAtdl.Xml.Serialization;
 
@@ -17,6 +18,13 @@ public class TestVendorAmountType : Int_t
 {
     /// <summary>A vendor-specific attribute with no standard-type equivalent.</summary>
     public string? VendorTag { get; set; }
+}
+
+/// <summary>Implements <see cref="IParameterType"/> but deliberately has no parameterless constructor,
+/// for <see cref="CustomParameterTypeTests.ClrType_with_no_public_parameterless_constructor_is_rejected_eagerly"/>.</summary>
+public class NoParameterlessCtorType : Int_t
+{
+    public NoParameterlessCtorType(int requiredArg) => _ = requiredArg;
 }
 
 /// <summary>
@@ -96,6 +104,37 @@ public class CustomParameterTypeTests
         var act = () => new StrategiesReader().Load(stream);
 
         act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Duplicate_XsiTypeName_registrations_throw_a_descriptive_exception()
+    {
+        var act = () =>
+            new StrategiesReader(
+                customParameterTypes:
+                [
+                    new CustomParameterType("Dup_t", typeof(TestVendorAmountType), VendorAmountAttributes),
+                    new CustomParameterType("Dup_t", typeof(TestVendorAmountType), VendorAmountAttributes),
+                ]
+            );
+
+        act.Should().Throw<ArgumentException>().WithMessage("*Dup_t*");
+    }
+
+    [Fact]
+    public void ClrType_not_implementing_IParameterType_is_rejected_eagerly()
+    {
+        var act = () => new CustomParameterType("Bad_t", typeof(string), VendorAmountAttributes);
+
+        act.Should().Throw<ArgumentException>().WithMessage("*IParameterType*");
+    }
+
+    [Fact]
+    public void ClrType_with_no_public_parameterless_constructor_is_rejected_eagerly()
+    {
+        var act = () => new CustomParameterType("Bad_t", typeof(NoParameterlessCtorType), VendorAmountAttributes);
+
+        act.Should().Throw<ArgumentException>().WithMessage("*parameterless constructor*");
     }
 
     [Fact]

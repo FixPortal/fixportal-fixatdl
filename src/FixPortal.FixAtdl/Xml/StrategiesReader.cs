@@ -77,7 +77,7 @@ public class StrategiesReader
 
         // Built once per reader instance, never touching the shared static SchemaDefinitions tree, so
         // one reader's custom types cannot leak into another reader's parse.
-        _customParameterTypes = (customParameterTypes ?? []).ToDictionary(t => t.XsiTypeName, StringComparer.Ordinal);
+        _customParameterTypes = BuildCustomParameterTypeMap(customParameterTypes);
     }
 
     // Hardened reader settings shared by both Load overloads: prohibit DTD processing and use no
@@ -216,6 +216,27 @@ public class StrategiesReader
         }
 
         return strategies;
+    }
+
+    private static Dictionary<string, CustomParameterType> BuildCustomParameterTypeMap(
+        IReadOnlyList<CustomParameterType>? customParameterTypes
+    )
+    {
+        Dictionary<string, CustomParameterType> map = new(StringComparer.Ordinal);
+
+        CustomParameterType? duplicate = (customParameterTypes ?? []).FirstOrDefault(t =>
+            !map.TryAdd(t.XsiTypeName, t)
+        );
+
+        if (duplicate != null)
+        {
+            throw new ArgumentException(
+                $"Duplicate custom Parameter xsi:type registration: '{duplicate.XsiTypeName}'.",
+                nameof(customParameterTypes)
+            );
+        }
+
+        return map;
     }
 
     private void ValidateAgainstSchema(XDocument document)
