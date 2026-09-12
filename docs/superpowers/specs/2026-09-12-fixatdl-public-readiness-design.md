@@ -40,10 +40,11 @@ are in scope.
 
 ### Launch drafts
 
-Each public package repository may contain a clearly labelled internal
-`docs/launch/` draft. Drafts may include release copy, a LinkedIn post and a
-technical article outline. They will not be linked from the README, exposed in
-application navigation, published, or sent to anyone.
+Each public package repository may contain a clearly labelled, unlinked
+`docs/launch/` draft. It is publicly visible in repository source but not
+approved for publication. Drafts may include release copy, a LinkedIn post and
+a technical article outline. They will not be linked from the README, exposed
+in application navigation, published, or sent to anyone.
 
 ### GitHub discovery metadata
 

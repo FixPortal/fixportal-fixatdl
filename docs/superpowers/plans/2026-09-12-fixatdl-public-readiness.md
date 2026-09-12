@@ -4,7 +4,7 @@
 
 **Goal:** Prepare the published FIXatdl packages and evidenced integrations for a future public announcement.
 
-**Architecture:** Package repositories own their adoption documentation and internal launch drafts. Simulator and EMS evidence remains owned by the applications that integrate them; only code-proven integration paths are described. GitHub repository metadata mirrors the final README positioning.
+**Architecture:** Package repositories own their adoption documentation and unlinked launch drafts that are publicly visible in source but not approved for publication. Simulator and EMS evidence remains owned by the applications that integrate them; only code-proven integration paths are described. GitHub repository metadata mirrors the final README positioning.
 
 **Tech Stack:** Markdown, NuGet.org, npm, GitHub repository metadata, .NET 10, React 19.
 
@@ -35,7 +35,7 @@
 - [ ] Inspect package metadata, `NOTICE`, conformance record and current public links.
 - [ ] Replace stale `1.0.1` status language with the current release status; retain the upstream-fork statement and MIT attribution.
 - [ ] Add concise links to the WPF and React adapters, NuGet.org, the source repository and conformance record.
-- [ ] Create an internal-only launch draft containing release copy, a LinkedIn draft and an article outline, each marked `Not for publication`.
+- [ ] Create an unlinked launch draft, publicly visible in source but not approved for publication, containing release copy, a LinkedIn draft and an article outline.
 - [ ] Run `dotnet csharpier check .`, restore/build/test/pack commands from `README.md`, and verify every Markdown URL.
 - [ ] Commit with `docs: prepare core package for public discovery`.
 
@@ -54,7 +54,7 @@
 - [ ] Inspect both package manifests and published registry metadata before editing install and release text.
 - [ ] Update WPF installation wording from GitHub Packages to NuGet.org and link its core package and headless dependency.
 - [ ] Add reciprocal core/WPF/React links, clear host-boundary wording and preserved attribution to both READMEs.
-- [ ] Add internal-only launch drafts with accurate package-specific copy.
+- [ ] Add unlinked launch drafts, publicly visible in source but not approved for publication, with accurate package-specific copy.
 - [ ] Run the WPF Release build/test gate and React `typecheck`, `lint`, `test:coverage`, `build` and `npm pack --dry-run`.
 - [ ] Commit each repository independently with `docs: prepare package for public discovery`.
 
