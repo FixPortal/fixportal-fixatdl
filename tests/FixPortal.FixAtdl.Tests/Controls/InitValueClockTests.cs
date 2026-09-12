@@ -7,14 +7,18 @@ namespace FixPortal.FixAtdl.Tests.Controls;
 public class InitValueClockTests
 {
     [Theory]
-    [InlineData("09:00:00Z")]
-    [InlineData("09:00:00+02:00")]
-    [InlineData("09:00:00-05:00")]
-    public void Offset_bearing_authored_init_values_are_explicitly_rejected(string value)
+    [InlineData("09:00:00Z", 0)]
+    [InlineData("09:00:00+02:00", 120)]
+    [InlineData("09:00:00-05:00", -300)]
+    public void Offset_bearing_value_is_parsed_as_offset_time(string value, int expectedOffsetMinutes)
     {
-        var act = () => new InitValueClock(value);
+        var iv = new InitValueClock(value);
 
-        act.Should().Throw<InvalidFieldValueException>().WithMessage("*Offset-bearing*initValue*localMktTz*");
+        iv.IsOffsetTime.Should().BeTrue();
+        iv.IsTimeOnly.Should().BeFalse();
+        OffsetTime offsetTime = iv.OffsetTimeOfDay!.Value;
+        offsetTime.TimeOfDay.Should().Be(new LocalTime(9, 0, 0));
+        offsetTime.Offset.Should().Be(Offset.FromSeconds(expectedOffsetMinutes * 60));
     }
 
     [Theory]
