@@ -35,7 +35,9 @@ public sealed class InitValueClock
     // is 'uuuu' (absolute year), not BCL 'yyyy'.
     private static readonly LocalTimePattern[] TimePatterns =
     [
-        LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss.fff"),
+        // FFFFFFFFF (not fff): accepts any fractional-second count up to NodaTime's 9-digit
+        // nanosecond precision, so "08:00:00.5" is not rejected for having fewer than 3 digits.
+        LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss.FFFFFFFFF"),
         LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss"),
         LocalTimePattern.CreateWithInvariantCulture("HH:mm"),
     ];
@@ -50,7 +52,7 @@ public sealed class InitValueClock
 
     private static readonly LocalDateTimePattern[] DateTimePatterns =
     [
-        LocalDateTimePattern.CreateWithInvariantCulture("uuuuMMdd-HH:mm:ss.fff"),
+        LocalDateTimePattern.CreateWithInvariantCulture("uuuuMMdd-HH:mm:ss.FFFFFFFFF"),
         LocalDateTimePattern.CreateWithInvariantCulture("uuuuMMdd-HH:mm:ss"),
     ];
 
