@@ -461,3 +461,6 @@ graphify-out/
 
 # FireCrawl local scrape cache (firecrawl-* skills)
 .firecrawl/
+
+# Superpowers runtime directory (brainstorm sessions, sdd scratch)
+.superpowers/
