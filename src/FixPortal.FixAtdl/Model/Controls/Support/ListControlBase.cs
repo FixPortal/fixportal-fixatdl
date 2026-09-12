@@ -186,10 +186,44 @@ public abstract class ListControlBase : InitializableControl<string>
     {
         IControlConvertible value = parameter.GetValueForControl();
 
-        _value = value.ToEnumState(parameter.EnumPairs);
+        EnumState parameterState = ToParameterEnumState(parameter, value);
         if (RequiresWireInversion(parameter))
         {
-            _value.InvertSelection();
+            parameterState.InvertSelection();
+        }
+
+        // Keep the control's own EnumState instance whenever it can represent the parameter's
+        // state: hosts may hold a reference to it (via GetCurrentValue) across a parameter
+        // refresh, and replacing the instance orphans that reference. Only a shape mismatch -
+        // ListItems that do not match the bound parameter's EnumPairs, which nothing validates
+        // at load - falls back to adopting the parameter-shaped state.
+        if (_value != null && _value.HasSameEnumIds(parameterState))
+        {
+            _value.UpdateFrom(parameterState);
+        }
+        else
+        {
+            _value = parameterState;
+        }
+    }
+
+    private EnumState ToParameterEnumState(IParameter parameter, IControlConvertible value)
+    {
+        if (!IsNonEnumValueAllowed)
+        {
+            return value.ToEnumState(parameter.EnumPairs);
+        }
+
+        try
+        {
+            return value.ToEnumState(parameter.EnumPairs);
+        }
+        catch (ArgumentException)
+        {
+            // An EditableDropDownList_t can emit free text that matches none of the declared wire
+            // values; reload it as the non-enum value rather than failing the whole parameter
+            // refresh, mirroring what both init paths already allow.
+            return new EnumState(parameter.EnumPairs.EnumIds) { NonEnumValue = value.ToString(null) };
         }
     }
 

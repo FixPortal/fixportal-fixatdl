@@ -270,20 +270,26 @@ public class FixMessageTests
         act.Should().Throw<InvalidOperationException>();
     }
 
+    [Fact]
+    public void ToFix_throws_for_empty_value_injected_via_indexer()
+    {
+        // An empty value emits "tag=" + SOH - byte-for-byte the output the null guard exists to
+        // prevent, and one this class's own parse constructor rejects.
+        var message = new FixMessage { [(FixField)35] = "" };
+
+        Func<string> act = message.ToFix;
+
+        act.Should().Throw<InvalidOperationException>();
+    }
+
     // FixFieldValueProvider percentage init-value scaling (H3) ----------------
 
+    // FixFieldValueProvider Boolean_t declared-wire-mapping translation (R12) ------------------
+
     [Theory]
-    // multiplyBy100=false (the default): the wire carries the fraction 0.75; the control works in
-    // whole-percent units, so the init value is scaled up by 100 to 75.
-    [InlineData(false, "0.75", "75")]
-    // multiplyBy100=true: the wire already carries the whole number 75; no scaling is applied so the
-    // control still shows 75. (Confirms the wire->control direction is correct, not inverted.)
-    [InlineData(true, "75", "75")]
-    public void FixFieldValueProvider_scales_percentage_init_value_to_whole_percent(
-        bool multiplyBy100,
-        string wireValue,
-        string expected
-    )
+    [InlineData("1", "Y")]
+    [InlineData("0", "N")]
+    public void FixFieldValueProvider_decodes_declared_boolean_wire_mapping(string wireValue, string expected)
     {
         FixTagValuesCollection fixValues = [];
         fixValues.Add(35, wireValue);
@@ -291,14 +297,35 @@ public class FixMessageTests
         var initialProvider = Substitute.For<IInitialFixValueProvider>();
         initialProvider.InputFixValues.Returns(fixValues);
 
-        var percentageParameter = new Parameter_t<Percentage_t>("Pct");
-        percentageParameter.Value.MultiplyBy100 = multiplyBy100;
+        var booleanParameter = new Parameter_t<Boolean_t>("Flag");
+        booleanParameter.Value.TrueWireValue = "1";
+        booleanParameter.Value.FalseWireValue = "0";
 
-        ParameterCollection parameters = [percentageParameter];
+        ParameterCollection parameters = [booleanParameter];
 
         var provider = new FixFieldValueProvider(initialProvider, parameters);
 
-        provider.TryGetValue("FIX_MsgType", "Pct", out var value).Should().BeTrue();
+        provider.TryGetValue("FIX_MsgType", "Flag", out var value).Should().BeTrue();
         value.Should().Be(expected);
+    }
+
+    [Fact]
+    public void FixFieldValueProvider_reports_failure_for_an_unrecognised_boolean_wire_value()
+    {
+        FixTagValuesCollection fixValues = [];
+        fixValues.Add(35, "X");
+
+        var initialProvider = Substitute.For<IInitialFixValueProvider>();
+        initialProvider.InputFixValues.Returns(fixValues);
+
+        var booleanParameter = new Parameter_t<Boolean_t>("Flag");
+        booleanParameter.Value.TrueWireValue = "1";
+        booleanParameter.Value.FalseWireValue = "0";
+
+        ParameterCollection parameters = [booleanParameter];
+
+        var provider = new FixFieldValueProvider(initialProvider, parameters);
+
+        provider.TryGetValue("FIX_MsgType", "Flag", out _).Should().BeFalse();
     }
 }

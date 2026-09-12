@@ -128,7 +128,7 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
             DateTime parsed = FixDateTime.Parse(text, CultureInfo.InvariantCulture);
             DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
             TimeOnly timeOfDay = TimeOnly.FromDateTime(normalised);
-            bool isOffsetAnchored = TrailingOffsetPattern().IsMatch(text);
+            bool isOffsetAnchored = TrailingOffsetPattern().IsMatch(text.Trim());
             if (isMax)
             {
                 _maxValue = null;
@@ -314,22 +314,43 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
     /// <returns>Value converted from a string if the conversion succeeded; otherwise an exception is thrown.</returns>
     protected override DateTime? ConvertFromWireValueFormat(string value)
     {
-        // A '{NULL}' sentinel means "clear this field" — return null rather than throwing, matching
-        // Boolean_t/String_t/Data_t (C4, {NULL}-handling theme). An empty string is not a clear (empty
+        // AtdlValueType.SetWireValue maps the '{NULL}' sentinel to null before this method runs; a
+        // direct C# null means the same "clear this field". An empty string is not a clear (empty
         // FIX fields are invalid) and still falls through to throw.
-        if (value is null or Atdl.NullValue)
+        if (value is null)
         {
             return null;
         }
 
+        // A literal ":60" seconds field is a declared UTC leap second - legal per the UTCTimestamp_t
+        // spec but unrepresentable in a DateTime. Normalise it for parsing, then roll forward one
+        // second, matching the const/control paths (FixDateTime).
+        string parseValue = FixDateTime.NormaliseLeapSecond(value, out bool wasLeapSecond);
+
         string[] formats = GetDateTimeFormatStrings();
 
-        if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, WireParseStyles, out DateTime result))
+        bool parsed = DateTime.TryParseExact(
+            parseValue,
+            formats,
+            CultureInfo.InvariantCulture,
+            WireParseStyles,
+            out DateTime result
+        );
+
+        if (parsed && wasLeapSecond)
         {
-            return result;
+            // A leap second at the last representable instant cannot roll forward; reject the value
+            // rather than throw from AddSeconds.
+            parsed = result <= DateTime.MaxValue.AddSeconds(-1);
+            if (parsed)
+            {
+                result = result.AddSeconds(1);
+            }
         }
 
-        throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidDateOrTimeValue, value);
+        return parsed
+            ? result
+            : throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidDateOrTimeValue, value);
     }
 
     /// <summary>

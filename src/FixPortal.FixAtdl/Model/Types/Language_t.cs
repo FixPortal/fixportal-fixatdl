@@ -79,7 +79,23 @@ public class Language_t : EnumTypeBase<IsoLanguageCode>
     /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
     protected override string? ConvertToWireValueFormat(IsoLanguageCode? value)
     {
-        return value != null && value != IsoLanguageCode.None ? Enum.GetName(typeof(IsoLanguageCode), value) : null;
+        // ISO 639-1 (FIX tag 1474) codes are lower-case; the enum member names are upper-case only
+        // because C# reserves the lower-case words ('in', 'is') needed by the standard.
+        return value != null && value != IsoLanguageCode.None
+            ? Enum.GetName(typeof(IsoLanguageCode), value)?.ToLowerInvariant()
+            : null;
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to its wire-format string (lower-case ISO 639-1), so that
+    /// an ordinal EnumPair lookup against the wire values a strategy declares agrees with
+    /// <see cref="ConvertToWireValueFormat"/>.
+    /// </summary>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
+    public override string? ToString(IFormatProvider? provider)
+    {
+        return base.ToString(provider)?.ToLowerInvariant();
     }
 
     /// <summary>

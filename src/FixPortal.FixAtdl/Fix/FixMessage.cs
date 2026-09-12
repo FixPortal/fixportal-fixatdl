@@ -139,10 +139,11 @@ public class FixMessage : Dictionary<FixField, string>
                 );
             }
 
-            // A null value would emit "tag=" + SOH, which this class's own parse constructor then rejects
-            // (separatorIndex == length - 1). A value containing SOH would split one field into two on the
-            // wire. Guard both at this single serialization chokepoint, mirroring the tag guard above.
-            if (item.Value == null || item.Value.Contains(SOH))
+            // A null or empty value would emit "tag=" + SOH, which this class's own parse constructor
+            // then rejects (separatorIndex == length - 1). A value containing SOH would split one field
+            // into two on the wire. Guard all three at this single serialization chokepoint, mirroring
+            // the tag guard above.
+            if (string.IsNullOrEmpty(item.Value) || item.Value.Contains(SOH))
             {
                 throw ThrowHelper.New<InvalidOperationException>(
                     this,

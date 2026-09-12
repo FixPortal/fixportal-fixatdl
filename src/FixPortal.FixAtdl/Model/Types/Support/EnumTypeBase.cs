@@ -39,7 +39,7 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible
     /// </summary>
     /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
     /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
-    public string? ToString(IFormatProvider? provider)
+    public virtual string? ToString(IFormatProvider? provider)
     {
         T? value = ConstValue ?? _value;
 

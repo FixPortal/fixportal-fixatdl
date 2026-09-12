@@ -184,4 +184,27 @@ public class TimestampBoundConformanceTests
         var act = () => p.WireValue = "20260101-21:00:00";
         act.Should().NotThrow();
     }
+
+    [Theory]
+    [InlineData("20260101-21:00:00", true)]
+    [InlineData("20260101-21:00:01", false)]
+    public void Offset_anchored_bound_with_trailing_whitespace_is_still_recognised(string wire, bool valid)
+    {
+        // The bound parse tolerates surrounding whitespace (AllowWhiteSpaces); the offset-anchoring
+        // classification must trim before matching too, or this bound is misread as market-local and
+        // 21:00:01Z passes against the 16:00 EST wall clock.
+        var p = Param(minText: null, maxText: "21:00:00Z ");
+        p.Value.LocalMktTz = "America/New_York";
+
+        var act = () => p.WireValue = wire;
+
+        if (valid)
+        {
+            act.Should().NotThrow();
+        }
+        else
+        {
+            act.Should().Throw<InvalidFieldValueException>();
+        }
+    }
 }

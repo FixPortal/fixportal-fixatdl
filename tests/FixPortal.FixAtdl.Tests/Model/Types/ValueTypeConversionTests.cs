@@ -407,11 +407,16 @@ public class ValueTypeConversionTests
     // Language_t (IsoLanguageCode enum-backed)
     // ──────────────────────────────────────────────────────────────────────────
 
-    [Fact]
-    public void Language_t_round_trips_valid_iso_language_code()
+    // ISO 639-1 (FIX tag 1474) codes are lower-case on the wire; inbound parse accepts either case
+    // and emission normalises to lower-case.
+    [Theory]
+    [InlineData("en")]
+    [InlineData("EN")]
+    [InlineData("fr")]
+    public void Language_t_round_trips_valid_iso_language_code(string wire)
     {
-        var p = new Parameter_t<Language_t>("Lang") { WireValue = "EN" };
-        p.WireValue.Should().Be("EN");
+        var p = new Parameter_t<Language_t>("Lang") { WireValue = wire };
+        p.WireValue.Should().Be(wire.ToLowerInvariant());
     }
 
     // ──────────────────────────────────────────────────────────────────────────

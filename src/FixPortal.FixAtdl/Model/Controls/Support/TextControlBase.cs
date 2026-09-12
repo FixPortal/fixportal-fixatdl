@@ -124,18 +124,32 @@ public abstract class TextControlBase : InitializableControl<string>
             return null;
         }
 
+        // A Boolean_t parameter's declared wire mapping (trueWireValue/falseWireValue, defaulting to
+        // Y/N) is what parameter-to-control conversion wrote here; decode back through the same
+        // mapping so the value the library itself stored round-trips.
+        if (targetParameter is Elements.Parameter_t<Types.Boolean_t> booleanParameter)
+        {
+            return booleanParameter.Value.ParseWireValue(_value);
+        }
+
         if (bool.TryParse(_value, out bool result))
         {
             return result;
         }
 
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.InvalidBooleanValue,
-            _value,
-            bool.TrueString.ToLower(),
-            bool.FalseString.ToLower()
-        );
+        // Accept the standard FIX boolean spellings alongside the BCL ones.
+        return _value switch
+        {
+            "Y" => true,
+            "N" => false,
+            _ => throw ThrowHelper.New<InvalidCastException>(
+                this,
+                ErrorMessages.InvalidBooleanValue,
+                _value,
+                bool.TrueString.ToLower(),
+                bool.FalseString.ToLower()
+            ),
+        };
     }
 
     /// <summary>
