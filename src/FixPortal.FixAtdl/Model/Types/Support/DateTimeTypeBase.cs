@@ -71,7 +71,10 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
     private bool _maxTimeOfDayIsOffsetAnchored;
     private bool _minTimeOfDayIsOffsetAnchored;
 
-    [GeneratedRegex(@"(?:Z|[+-]\d{2}:?\d{2})$")]
+    // The minutes group is optional: FixDateTimeFormat's "zz"-suffixed formats (FixTimeOnlyWithHourOffset
+    // and friends) produce/accept a bare 2-digit hour offset (e.g. "-05"), which FixDateTime.Parse still
+    // UTC-shifts via AdjustToUniversal - so it must count as offset-anchored too (Gitar finding on PR #120).
+    [GeneratedRegex(@"(?:Z|[+-]\d{2}(?::?\d{2})?)$")]
     private static partial Regex TrailingOffsetPattern();
 
     /// <summary>
