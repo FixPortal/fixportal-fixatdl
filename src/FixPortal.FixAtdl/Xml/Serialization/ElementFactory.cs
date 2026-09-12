@@ -27,6 +27,7 @@ public class ElementFactory : INotifyClassDeserialized
 
     private readonly Type _notifyCreationOfType;
     private readonly ElementDefinition _elementDefinition;
+    private readonly IReadOnlyDictionary<string, CustomParameterType> _customParameterTypes;
 
     // NamedPredecessor cache for a single deserialization pass. Cleared at the start of each
     // DeserializeElement call so reuse of a factory cannot leak cached objects across parses.
@@ -40,10 +41,14 @@ public class ElementFactory : INotifyClassDeserialized
     /// <param name="elementDefinition">The root element definition used for deserialization.</param>
     /// <param name="notifyCreationOfType">The type whose creation should raise <see cref="ClassDeserialized"/>.</param>
     /// <param name="loggerFactory">Optional logger factory; when null, no logging is produced.</param>
+    /// <param name="customParameterTypes">Optional host-supplied custom <c>Parameter</c> <c>xsi:type</c>
+    /// registrations, keyed by <see cref="CustomParameterType.XsiTypeName"/>. When null, no custom types
+    /// are recognised (unchanged behaviour).</param>
     public ElementFactory(
         ElementDefinition elementDefinition,
         Type notifyCreationOfType,
-        ILoggerFactory? loggerFactory = null
+        ILoggerFactory? loggerFactory = null,
+        IReadOnlyDictionary<string, CustomParameterType>? customParameterTypes = null
     )
     {
         _log = (loggerFactory ?? NullLoggerFactory.Instance).CreateLogger<ElementFactory>();
@@ -55,6 +60,7 @@ public class ElementFactory : INotifyClassDeserialized
 
         _elementDefinition = elementDefinition;
         _notifyCreationOfType = notifyCreationOfType;
+        _customParameterTypes = customParameterTypes ?? new Dictionary<string, CustomParameterType>();
     }
 
     /// <summary>
@@ -219,47 +225,65 @@ public class ElementFactory : INotifyClassDeserialized
             );
         }
 
-        Type? innerType = string.IsNullOrEmpty(genericTypeDefinition.InnerTypeNamespace)
-            ? Type.GetType(innerTypeName)
-            : Type.GetType(
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0}.{1}",
-                    genericTypeDefinition.InnerTypeNamespace,
-                    innerTypeName
-                )
-            );
+        Type innerType;
+        ElementAttribute[] innerTypeAttributes;
 
-        if (innerType == null)
+        // A host-registered custom type is used directly - by the Type object already in hand, not by
+        // name resolution - so it may live in any assembly. Checked first (by name) since a custom type
+        // is never reachable via Type.GetType's namespace-pinned probe below regardless of the assembly
+        // it lives in.
+        if (_customParameterTypes.TryGetValue(innerTypeName, out CustomParameterType? customType))
         {
-            throw ThrowHelper.New<InvalidFieldValueException>(
-                this,
-                sourceElement,
-                ErrorMessages.UnrecognisedTypeError,
-                innerTypeName,
-                genericTypeDefinition.AttributeForInnerType.LocalName,
-                genericTypeDefinition.ElementName!.LocalName
-            );
+            innerType = customType.ClrType;
+            innerTypeAttributes = customType.Attributes;
         }
-
-        // SECURITY: gate on the allow-list (InnerTypeToAttributesMap) BEFORE constructing the type.
-        // Constructing a namespace-pinned, ctor-matching but un-mapped type from untrusted ATDL could
-        // trigger its constructor / type-initializer side effects before rejection.
-        if (
-            !genericTypeDefinition.InnerTypeToAttributesMap.TryGetValue(
-                innerType,
-                out ElementAttribute[]? innerTypeAttributes
-            )
-        )
+        else
         {
-            throw ThrowHelper.New<InvalidFieldValueException>(
-                this,
-                sourceElement,
-                ErrorMessages.UnrecognisedTypeError,
-                innerTypeName,
-                genericTypeDefinition.AttributeForInnerType.LocalName,
-                genericTypeDefinition.ElementName!.LocalName
-            );
+            Type? resolvedType = string.IsNullOrEmpty(genericTypeDefinition.InnerTypeNamespace)
+                ? Type.GetType(innerTypeName)
+                : Type.GetType(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0}.{1}",
+                        genericTypeDefinition.InnerTypeNamespace,
+                        innerTypeName
+                    )
+                );
+
+            if (resolvedType == null)
+            {
+                throw ThrowHelper.New<InvalidFieldValueException>(
+                    this,
+                    sourceElement,
+                    ErrorMessages.UnrecognisedTypeError,
+                    innerTypeName,
+                    genericTypeDefinition.AttributeForInnerType.LocalName,
+                    genericTypeDefinition.ElementName!.LocalName
+                );
+            }
+
+            // SECURITY: gate on the allow-list (InnerTypeToAttributesMap) BEFORE constructing the type.
+            // Constructing a namespace-pinned, ctor-matching but un-mapped type from untrusted ATDL could
+            // trigger its constructor / type-initializer side effects before rejection.
+            if (
+                !genericTypeDefinition.InnerTypeToAttributesMap.TryGetValue(
+                    resolvedType,
+                    out ElementAttribute[]? resolvedAttributes
+                )
+            )
+            {
+                throw ThrowHelper.New<InvalidFieldValueException>(
+                    this,
+                    sourceElement,
+                    ErrorMessages.UnrecognisedTypeError,
+                    innerTypeName,
+                    genericTypeDefinition.AttributeForInnerType.LocalName,
+                    genericTypeDefinition.ElementName!.LocalName
+                );
+            }
+
+            innerType = resolvedType;
+            innerTypeAttributes = resolvedAttributes;
         }
 
         object newObject = CreateRawObject(

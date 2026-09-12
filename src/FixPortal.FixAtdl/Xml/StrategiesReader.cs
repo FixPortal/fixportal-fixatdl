@@ -30,6 +30,7 @@ public class StrategiesReader
     private readonly ILogger<StrategiesReader> _log;
     private readonly IClock _clock;
     private readonly XmlSchemaSet? _schemaSet;
+    private readonly IReadOnlyDictionary<string, CustomParameterType> _customParameterTypes;
 
     /// <summary>
     /// Initializes a new <see cref="StrategiesReader"/>.
@@ -46,7 +47,18 @@ public class StrategiesReader
     /// files, or who maintain an independently-authored XSD covering the constructs they care about, can
     /// load it into an <see cref="XmlSchemaSet"/> and pass it here. When null (default), no schema
     /// validation is performed and behaviour is unchanged.</param>
-    public StrategiesReader(ILoggerFactory? loggerFactory = null, IClock? clock = null, XmlSchemaSet? schemaSet = null)
+    /// <param name="customParameterTypes">Optional host-supplied custom (vendor-extension) <c>Parameter</c>
+    /// <c>xsi:type</c> registrations - FIXatdl 1.1 permits a vendor to define a <c>Parameter</c> type
+    /// beyond the standard set, with vendor-specific semantics this library cannot itself provide. Each
+    /// registered <see cref="CustomParameterType"/> is looked up by its bare <c>xsi:type</c> name and used
+    /// directly, so its CLR type may live in the caller's own assembly. When null (default), only the
+    /// standard FIXatdl 1.1 parameter types are recognised (unchanged behaviour).</param>
+    public StrategiesReader(
+        ILoggerFactory? loggerFactory = null,
+        IClock? clock = null,
+        XmlSchemaSet? schemaSet = null,
+        IReadOnlyList<CustomParameterType>? customParameterTypes = null
+    )
     {
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         _log = _loggerFactory.CreateLogger<StrategiesReader>();
@@ -62,6 +74,10 @@ public class StrategiesReader
         }
 
         _schemaSet = schemaSet;
+
+        // Built once per reader instance, never touching the shared static SchemaDefinitions tree, so
+        // one reader's custom types cannot leak into another reader's parse.
+        _customParameterTypes = (customParameterTypes ?? []).ToDictionary(t => t.XsiTypeName, StringComparer.Ordinal);
     }
 
     // Hardened reader settings shared by both Load overloads: prohibit DTD processing and use no
@@ -156,7 +172,12 @@ public class StrategiesReader
             ValidateAgainstSchema(document);
         }
 
-        ElementFactory factory = new(SchemaDefinitions.Strategies_t, typeof(Strategy_t), _loggerFactory);
+        ElementFactory factory = new(
+            SchemaDefinitions.Strategies_t,
+            typeof(Strategy_t),
+            _loggerFactory,
+            _customParameterTypes
+        );
 
         // Counter is local to this call (not instance state), so concurrent Load calls on the same
         // StrategiesReader instance cannot corrupt each other's StrategyLoadedEventArgs.Index.
