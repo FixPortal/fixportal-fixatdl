@@ -6,6 +6,8 @@
 #endregion
 
 using System.Globalization;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements;
@@ -77,6 +79,14 @@ public class FixFieldValueProvider
                     ? TryGetMultipleEnumIds(parameter, wireValue, out result)
                     : parameter.EnumPairs.TryParseWireValue(wireValue, out result);
             }
+            else if (parameter is Parameter_t<Boolean_t> booleanParameter)
+            {
+                // A Boolean_t parameter carries its wire mapping in TrueWireValue/FalseWireValue
+                // (defaulting to Y/N) rather than in EnumPairs, so the branch above never runs for
+                // it; decode the raw FIX value through the declared mapping, mirroring how the
+                // binary controls emit it.
+                retrieved = TryTranslateBooleanValue(booleanParameter.Value, result, out result);
+            }
             else if (parameter is Parameter_t<Percentage_t> t)
             {
                 retrieved = ProcessPercentageValue(t, ref result);
@@ -128,6 +138,33 @@ public class FixFieldValueProvider
 
         value = null!;
         return false;
+    }
+
+    // Translates a raw FIX boolean value into the standard Y/N spelling the binary controls accept,
+    // honouring the parameter's declared TrueWireValue/FalseWireValue mapping; {NULL} (and a null
+    // stored programmatically) passes through so the control reads it as "unset". Returns false for
+    // a value the mapping does not recognise so initialisation falls back to initValue.
+    private static bool TryTranslateBooleanValue(Boolean_t booleanType, string? wireValue, out string value)
+    {
+        bool? parsed;
+        try
+        {
+            parsed = booleanType.ParseWireValue(wireValue!);
+        }
+        catch (InvalidFieldValueException)
+        {
+            value = null!;
+            return false;
+        }
+
+        value = parsed switch
+        {
+            true => "Y",
+            false => "N",
+            null => Atdl.NullValue,
+        };
+
+        return true;
     }
 
     private static bool TryGetMultipleEnumIds(IParameter parameter, string wireValue, out string value)

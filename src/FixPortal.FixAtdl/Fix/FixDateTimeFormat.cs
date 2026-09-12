@@ -96,5 +96,7 @@ public static class FixDateTimeFormat
     /// <summary>
     /// Gets all the FIX date/time formats.
     /// </summary>
-    public static System.Collections.Generic.IReadOnlyList<string> AllFormats => FormatsArray;
+    /// <remarks>The backing array is never handed out: callers receive a read-only wrapper so the
+    /// parser's own format table cannot be mutated through this property.</remarks>
+    public static System.Collections.Generic.IReadOnlyList<string> AllFormats { get; } = Array.AsReadOnly(FormatsArray);
 }

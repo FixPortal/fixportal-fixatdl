@@ -238,6 +238,15 @@ public class EnumState
         return Array.Exists(_enumIds, s => s == enumId);
     }
 
+    /// <summary>
+    /// Determines whether the supplied EnumState holds state for the same set of EnumID values as
+    /// this instance, in any order.
+    /// </summary>
+    internal bool HasSameEnumIds(EnumState other)
+    {
+        return other._enumIds.Length == _enumIds.Length && _enumIds.All(other.IsValidEnumId);
+    }
+
     internal bool Matches(string enumId)
     {
         if (!IsValidEnumId(enumId))

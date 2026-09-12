@@ -25,6 +25,31 @@ public static partial class FixDateTime
     [GeneratedRegex(@"(?<=:\d{2}:)60(?!\d)")]
     private static partial Regex LeapSecondPattern();
 
+    // Matches a fraction field carrying more digits than DateTime can represent (7 tick digits).
+    // FIX timestamps may legitimately carry nanosecond precision beyond that.
+    [GeneratedRegex(@"(\.\d{7})\d+")]
+    private static partial Regex ExcessFractionPattern();
+
+    /// <summary>
+    /// Normalises a declared UTC leap second (a literal ":60" seconds field - legal per the
+    /// UTCTimestamp_t spec) to ":59" so that a DateTime parse can represent it; the caller rolls
+    /// the parsed value forward by one second. DateTime has no 60th second; DateTime.AddSeconds
+    /// cascades minute/hour/day/month/year rollover on its own, matching the spec's own worked
+    /// example (19981231-23:59:60 -&gt; 19990101-00:00:00).
+    /// </summary>
+    internal static string NormaliseLeapSecond(string value, out bool wasLeapSecond)
+    {
+        Match leapSecondMatch = LeapSecondPattern().Match(value);
+        if (!leapSecondMatch.Success)
+        {
+            wasLeapSecond = false;
+            return value;
+        }
+
+        wasLeapSecond = true;
+        return string.Concat(value.AsSpan(0, leapSecondMatch.Index), "59", value.AsSpan(leapSecondMatch.Index + 2));
+    }
+
     /// <summary>
     /// Attempts to convert the supplied string to a <see cref="DateTime"/> using either the specified
     /// format provider or any of the valid FIX date/time formats.
@@ -47,25 +72,40 @@ public static partial class FixDateTime
         const DateTimeStyles styles =
             DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
 
-        // A literal ":60" seconds field is a declared UTC leap second - legal per the UTCTimestamp_t spec,
-        // but unrepresentable directly since DateTime has no 60th second. Normalise to ":59" for parsing,
-        // then roll forward by one second: DateTime.AddSeconds cascades minute/hour/day/month/year rollover
-        // on its own, matching the spec's own worked example (19981231-23:59:60 -> 19990101-00:00:00).
-        Match leapSecondMatch = LeapSecondPattern().Match(value);
-        string parseValue = leapSecondMatch.Success
-            ? string.Concat(value.AsSpan(0, leapSecondMatch.Index), "59", value.AsSpan(leapSecondMatch.Index + 2))
-            : value;
+        // A null (reachable via a programmatically stored null in FixTagValuesCollection) or empty
+        // value is simply not parseable; a Try method must not throw.
+        if (string.IsNullOrEmpty(value))
+        {
+            result = default;
+            return false;
+        }
+
+        string parseValue = NormaliseLeapSecond(value, out bool wasLeapSecond);
+
+        // Truncate any fraction digits beyond what DateTime can hold so a valid nanosecond-precision
+        // timestamp is not rejected outright.
+        parseValue = ExcessFractionPattern().Replace(parseValue, "$1");
 
         bool parsed =
             DateTime.TryParseExact(parseValue, FixDateTimeFormat.FormatsArray, provider, styles, out result)
             || DateTime.TryParse(parseValue, provider, styles, out result);
 
-        if (parsed && leapSecondMatch.Success)
+        if (!parsed || !wasLeapSecond)
         {
-            result = result.AddSeconds(1);
+            return parsed;
         }
 
-        return parsed;
+        // A leap second at the last representable instant would roll past DateTime.MaxValue; report
+        // failure rather than throw from AddSeconds.
+        if (result > DateTime.MaxValue.AddSeconds(-1))
+        {
+            result = default;
+            return false;
+        }
+
+        result = result.AddSeconds(1);
+
+        return true;
     }
 
     /// <summary>
