@@ -93,6 +93,21 @@ public static class FixDateTimeFormat
         FixDateTimeFractionalWithMinuteOffset,
     ];
 
+    // The date-less (time-of-day-only) subset of FormatsArray, used to classify a bound / Edit
+    // operand / clock value as a time-of-day constraint rather than a full date+time (R04).
+    internal static readonly string[] TimeOnlyFormatsArray =
+    [
+        FixTimeOnly,
+        FixTimeOnlyMs,
+        FixTimeOnlyWithTz,
+        FixTimeOnlyMinutesWithUtcDesignator,
+        FixTimeOnlyMinutesWithHourOffset,
+        FixTimeOnlyMinutesWithMinuteOffset,
+        FixTimeOnlyFractionalWithHourOffset,
+        FixTimeOnlyFractionalWithMinuteOffset,
+        FixTimeOnlyWithHourOffset,
+    ];
+
     /// <summary>
     /// Gets all the FIX date/time formats.
     /// </summary>

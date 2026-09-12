@@ -32,10 +32,25 @@ public class UTCTimestamp_t : UTCDateTimeTypeBase
     /// <summary>Gets or sets the local market timezone.<br/>
     /// Describes the time zone without indicating whether daylight savings is in effect. Valid values are taken from
     /// names in the Olson time zone database. All are of the form Area/Location, where Area is the name of a continent
-    /// or ocean, and Location is the name of a specific location within that region. E.g. Americas/Chicago.
+    /// or ocean, and Location is the name of a specific location within that region. E.g. America/Chicago.
     /// Applicable when xsi:type is UTCTimestamp_t.</summary>
     /// <value>The local market timezone; null when not supplied in the ATDL.</value>
-    public string? LocalMktTz { get; set; }
+    /// <exception cref="InvalidFieldValueException">Thrown on assignment of a value that is not a recognised
+    /// TZDB zone id. Validated eagerly here — at the assignment/deserialization boundary — because an
+    /// unrecognised zone otherwise surfaced only on the first time-of-day bound check, bricking every
+    /// read/write of the parameter (R08).</exception>
+    public string? LocalMktTz
+    {
+        get;
+        set
+        {
+            if (!string.IsNullOrEmpty(value) && DateTimeZoneProviders.Tzdb.GetZoneOrNull(value) is null)
+            {
+                throw ThrowHelper.New<InvalidFieldValueException>(this, "Unrecognised localMktTz '{0}'.", value);
+            }
+            field = value;
+        }
+    }
 
     internal override TimeOnly GetTimeOfDayForBounds(DateTime utcValue)
     {

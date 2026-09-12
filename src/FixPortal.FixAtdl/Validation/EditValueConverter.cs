@@ -150,7 +150,7 @@ public static class EditValueConverter
                 normalised.Kind
             ).AddTicks(normalised.Ticks % TimeSpan.TicksPerMillisecond);
         }
-        else if (IsDateLess(value))
+        else if (FixDateTime.IsTimeOnlyText(value))
         {
             // LHS is datetime, but RHS is time-only.
             // If RHS is date-less, it represents a time-of-day comparison on the same date as LHS.
@@ -168,21 +168,5 @@ public static class EditValueConverter
         }
 
         return normalised;
-    }
-
-    private static bool IsDateLess(string text)
-    {
-        if (text.Length < 8)
-        {
-            return true;
-        }
-        for (int i = 0; i < 8; i++)
-        {
-            if (!char.IsDigit(text[i]))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 }

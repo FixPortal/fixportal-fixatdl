@@ -180,6 +180,19 @@ public class EditValueConverterTests
         result.Should().Be(new DateTime(2026, 1, 15, 9, 30, 0, DateTimeKind.Utc));
     }
 
+    [Fact]
+    public void Converts_iso8601_value_without_discarding_its_date()
+    {
+        // R04: the eight-digit heuristic misclassified an ISO-8601 RHS as date-less, so its date
+        // was overwritten with the LHS date and the comparison silently flipped.
+        IComparable result = EditValueConverter.ConvertToComparableType(
+            new DateTime(2025, 12, 31, 10, 0, 0, DateTimeKind.Utc),
+            "2026-01-01T00:00:00Z"
+        );
+
+        result.Should().Be(new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+    }
+
     // ── Enum codes ───────────────────────────────────────────────────────────
 
     [Fact]

@@ -122,7 +122,7 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
 
     private void SetBound(string text, bool isMax)
     {
-        bool isTimeOnly = IsTimeOnlyType || IsDateLess(text);
+        bool isTimeOnly = IsTimeOnlyType || FixDateTime.IsTimeOnlyText(text);
         if (isTimeOnly)
         {
             DateTime parsed = FixDateTime.Parse(text, CultureInfo.InvariantCulture);
@@ -160,22 +160,6 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
                 MinValue = normalised;
             }
         }
-    }
-
-    private static bool IsDateLess(string text)
-    {
-        if (text.Length < 8)
-        {
-            return true;
-        }
-        for (int i = 0; i < 8; i++)
-        {
-            if (!char.IsDigit(text[i]))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     #region AtdlReferenceType<string> Overrides
@@ -250,6 +234,14 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
 
     private ValidationResult? CheckTimeOfDayBounds(DateTime value, DateTime normalisedVal)
     {
+        // No time-of-day bounds declared: nothing to check, and crucially no localMktTz zone
+        // resolution to run. Resolving the zone unconditionally bricked every read/write of a
+        // parameter whose localMktTz was bad, even with no bound declared (R08).
+        if (_maxTimeOfDay == null && _minTimeOfDay == null)
+        {
+            return null;
+        }
+
         // An offset-anchored bound already resolved itself to a UTC time-of-day when parsed - compare it
         // against the value's own UTC time-of-day, not the zone-local one, or the two would be compared
         // in different frames (the "conflicting timezone annotation" case). Each of min/max is anchored

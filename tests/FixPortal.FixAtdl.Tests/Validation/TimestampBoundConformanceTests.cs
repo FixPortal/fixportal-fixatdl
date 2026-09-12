@@ -51,10 +51,12 @@ public class TimestampBoundConformanceTests
     [Fact]
     public void Timestamp_bound_with_unknown_market_zone_is_rejected()
     {
+        // R08: the zone is validated eagerly at assignment (the deserialization boundary), so a bad
+        // zone can no longer lie dormant until the first bound check bricks every read/write of the
+        // parameter - the setter itself is now the rejection point.
         var parameter = Param(null, "16:00:00");
-        parameter.Value.LocalMktTz = "Mars/Phobos";
 
-        var act = () => parameter.WireValue = "20260101-12:00:00";
+        Action act = () => parameter.Value.LocalMktTz = "Mars/Phobos";
 
         act.Should().Throw<InvalidFieldValueException>();
     }
@@ -206,5 +208,43 @@ public class TimestampBoundConformanceTests
         {
             act.Should().Throw<InvalidFieldValueException>();
         }
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Date-bearing bound classification (R04): a bound carrying a date is classified
+    // from the parse result (FixDateTime.IsTimeOnlyText), not the previous "first
+    // eight characters are digits" heuristic, which degraded ISO-8601, date-only and
+    // leading-space bounds to a recurring daily time-of-day window.
+    // ──────────────────────────────────────────────────────────────────────────
+
+    [Theory]
+    [InlineData("2026-06-01T12:00:00Z")] // ISO-8601
+    [InlineData(" 20260601-12:00:00")] // leading-space FIX timestamp
+    public void Date_bearing_max_bound_is_not_degraded_to_a_daily_window(string maxText)
+    {
+        var p = Param(minText: null, maxText: maxText);
+
+        // A year before the bound date is within the bound even though 23:59:59 is after the
+        // bound's time-of-day: the date component must rule, not a recurring daily window.
+        var earlyAct = () => p.WireValue = "20250531-23:59:59";
+        earlyAct.Should().NotThrow();
+
+        // After the bound instant: rejected.
+        var lateAct = () => p.WireValue = "20260601-13:00:00";
+        lateAct.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Date_only_max_bound_is_not_erased()
+    {
+        var p = Param(minText: null, maxText: "2026-06-01");
+
+        // Before the bound date: within.
+        var earlyAct = () => p.WireValue = "20250531-23:59:59";
+        earlyAct.Should().NotThrow();
+
+        // After the bound date: rejected (the bound previously became a 00:00:00 daily window).
+        var lateAct = () => p.WireValue = "20260602-00:00:01";
+        lateAct.Should().Throw<InvalidFieldValueException>();
     }
 }
