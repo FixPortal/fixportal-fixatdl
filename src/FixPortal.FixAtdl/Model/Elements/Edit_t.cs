@@ -13,6 +13,7 @@ using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Model.Types;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Validation;
@@ -439,7 +440,9 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
             return GetFixFieldValue(additionalValues, Field);
         }
 
-        return NormaliseNumericString(FieldValue);
+        // Parameters already supply their declared native type. In particular, String_t "01"
+        // must not become the number 1. Text controls retain their numeric-entry conversion.
+        return isPartOfStrategyEdit ? FieldValue : NormaliseNumericString(FieldValue);
     }
 
     private object GetRhsValue(FixFieldValueProvider additionalValues, object lhs)
@@ -454,7 +457,11 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
                 return Value;
             }
 
-            return EditValueConverter.ConvertToComparableType(lhs, Value);
+            // StrategyEdit literals use the parameter's wire representation, including the
+            // Boolean_t trueWireValue/falseWireValue overrides. StateRules still compare bools.
+            return _fieldSource is Parameter_t<Boolean_t> booleanParameter
+                ? booleanParameter.Value.ParseWireValue(Value)!
+                : EditValueConverter.ConvertToComparableType(lhs, Value);
         }
 
         if (Field2 != null)
@@ -464,7 +471,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
                 return GetFixFieldValue(additionalValues, Field2);
             }
 
-            return NormaliseNumericString(Field2Value);
+            return isPartOfStrategyEdit ? Field2Value : NormaliseNumericString(Field2Value);
         }
 
         return null!;
@@ -519,13 +526,6 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         if (val is float f && (float.IsNaN(f) || float.IsInfinity(f)))
         {
             throw ThrowHelper.New<InvalidOperationException>(null, "Cannot compare NaN or Infinity values.");
-        }
-
-        if (val is string str)
-        {
-            return decimal.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal dec)
-                ? dec
-                : str;
         }
 
         if (IsNumericType(val.GetType()))
@@ -614,13 +614,11 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
 
     private void ValidateInvariants()
     {
+        string editId = string.IsNullOrEmpty(Id) ? "(unnamed)" : Id;
+
         if (Value != null && Field2 != null)
         {
-            throw ThrowHelper.New<InconsistentStrategyException>(
-                this,
-                ErrorMessages.EditValueAndField2BothSet,
-                string.IsNullOrEmpty(Id) ? "(unnamed)" : Id
-            );
+            throw ThrowHelper.New<InconsistentStrategyException>(this, ErrorMessages.EditValueAndField2BothSet, editId);
         }
 
         if (Operator != null && string.IsNullOrEmpty(Field))
@@ -628,7 +626,20 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
             throw ThrowHelper.New<InconsistentStrategyException>(
                 this,
                 "An Edit (Id '{0}') has an operator specified but is missing the 'field' attribute.",
-                string.IsNullOrEmpty(Id) ? "(unnamed)" : Id
+                editId
+            );
+        }
+
+        if (
+            Operator is not null and not Operator_t.Exist and not Operator_t.NotExist
+            && Value == null
+            && Field2 == null
+        )
+        {
+            throw ThrowHelper.New<InconsistentStrategyException>(
+                this,
+                "An Edit (Id '{0}') has a comparison operator but neither 'value' nor 'field2'.",
+                editId
             );
         }
 
@@ -637,7 +648,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
             throw ThrowHelper.New<InconsistentStrategyException>(
                 this,
                 "An Edit (Id '{0}') has both comparison operator and child edits/logicOperator configured.",
-                string.IsNullOrEmpty(Id) ? "(unnamed)" : Id
+                editId
             );
         }
     }

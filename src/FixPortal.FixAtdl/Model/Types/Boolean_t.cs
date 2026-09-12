@@ -78,6 +78,13 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <returns>Value converted from a string.</returns>
     protected override bool? ConvertFromWireValueFormat(string value)
     {
+        return ParseWireValue(value);
+    }
+
+    // Shared by wire assignment and StrategyEdit literal conversion; neither may ignore the
+    // parameter's declared Boolean wire mapping.
+    internal bool? ParseWireValue(string value)
+    {
         if (value is null or Atdl.NullValue)
         {
             return null;
