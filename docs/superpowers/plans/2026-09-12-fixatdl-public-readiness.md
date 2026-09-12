@@ -58,18 +58,17 @@
 - [ ] Run the WPF Release build/test gate and React `typecheck`, `lint`, `test:coverage`, `build` and `npm pack --dry-run`.
 - [ ] Commit each repository independently with `docs: prepare package for public discovery`.
 
-### Task 3: Simulator and EMS integration evidence
+### Task 3: Simulator integration evidence
 
 **Files:**
 - Modify only if evidence warrants it: `D:\fix-portal\fixportal-simulator-backend\README.md`
 - Modify only if evidence warrants it: `D:\fix-portal\fixportal-simulator-frontend\README.md`
-- Modify only if evidence warrants it: `D:\Centerprise\work\ems-win-app\README.md`
 
 **Interfaces:**
-- Consumes: simulator backend FIXatdl parser-to-DTO mapping, frontend published-package consumption, and EMS WPF adapter use.
+- Consumes: simulator backend FIXatdl parser-to-DTO mapping and frontend published-package consumption.
 - Produces: reproducible, source-backed integration documentation; no unverified product claims.
 
-- [ ] Trace each integration from package reference through its visible entry point and existing tests.
+- [ ] Trace each simulator integration from package reference through its visible entry point and existing tests.
 - [ ] Record only a developer-facing run or verification path supported by that trace; make no edit if the existing README already supplies it or no safe public path exists.
 - [ ] Run each touched repository's existing documentation/build gate.
 - [ ] Commit documentation-only changes separately in the owning repository.

@@ -10,7 +10,7 @@ that are not evidenced by source and tests.
 
 The pass covers `fixportal-fixatdl`, `fixportal-fixatdl-wpf`,
 `fixportal-fixatdl-react`, `fixportal-simulator-backend`,
-`fixportal-simulator-frontend`, and `ems-win-app`.
+and `fixportal-simulator-frontend`.
 
 ### Public library repositories
 
@@ -33,10 +33,8 @@ will remain intact.
 
 The simulator repositories will document only the integration already present:
 the backend parses and maps FIXatdl XML to its DTO contract and the frontend
-renders the workbench through the published React package. EMS will be inspected
-for its actual WPF integration and documented only if source evidence supports a
-reproducible developer path. No user-facing simulator or EMS behaviour changes
-are in scope.
+renders the workbench through the published React package. No user-facing
+simulator behaviour changes are in scope.
 
 ### Launch drafts
 
