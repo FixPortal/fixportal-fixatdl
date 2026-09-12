@@ -7,6 +7,7 @@
 
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model.Controls;
@@ -28,6 +29,7 @@ public class StrategiesReader
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<StrategiesReader> _log;
     private readonly IClock _clock;
+    private readonly XmlSchemaSet? _schemaSet;
 
     /// <summary>
     /// Initializes a new <see cref="StrategiesReader"/>.
@@ -37,11 +39,19 @@ public class StrategiesReader
     /// <param name="clock">Optional clock wired into every <see cref="Clock_t"/> control as it is
     /// loaded, so a time-only initValue anchors to a controllable "now". When null, the system clock
     /// is used (unchanged behaviour). Supply a NodaTime FakeClock in tests for deterministic dates.</param>
-    public StrategiesReader(ILoggerFactory? loggerFactory = null, IClock? clock = null)
+    /// <param name="schemaSet">Optional XML Schema set to validate documents against before structural
+    /// deserialization. Not supplied by this library: the FIXatdl 1.1 XSD is FIX Protocol Limited's
+    /// licensed schema (internal-use-only, no redistribution/derivative-works rights), so it cannot be
+    /// vendored into this open-source repo. Callers who hold their own licensed copy of the FPL schema
+    /// files, or who maintain an independently-authored XSD covering the constructs they care about, can
+    /// load it into an <see cref="XmlSchemaSet"/> and pass it here. When null (default), no schema
+    /// validation is performed and behaviour is unchanged.</param>
+    public StrategiesReader(ILoggerFactory? loggerFactory = null, IClock? clock = null, XmlSchemaSet? schemaSet = null)
     {
         _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
         _log = _loggerFactory.CreateLogger<StrategiesReader>();
         _clock = clock ?? SystemClock.Instance;
+        _schemaSet = schemaSet;
     }
 
     // Hardened reader settings shared by both Load overloads: prohibit DTD processing and use no
@@ -131,6 +141,11 @@ public class StrategiesReader
             throw ThrowHelper.New<FixAtdlException>(this, "RepeatingGroup elements are not supported.");
         }
 
+        if (_schemaSet != null)
+        {
+            ValidateAgainstSchema(document);
+        }
+
         ElementFactory factory = new(SchemaDefinitions.Strategies_t, typeof(Strategy_t), _loggerFactory);
 
         // Counter is local to this call (not instance state), so concurrent Load calls on the same
@@ -170,6 +185,18 @@ public class StrategiesReader
         }
 
         return strategies;
+    }
+
+    private void ValidateAgainstSchema(XDocument document)
+    {
+        List<string> errors = [];
+
+        document.Validate(_schemaSet!, (_, e) => errors.Add(e.Exception?.Message ?? e.Message), addSchemaInfo: false);
+
+        if (errors.Count > 0)
+        {
+            throw new SchemaValidationException(errors);
+        }
     }
 
     private void NotifyStrategyLoaded(int index, int total, string strategyName)
