@@ -139,6 +139,6 @@ MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.
 
 ## Status
 
-The current public release is 1.1.2. The public surface is locked and tracked
+The latest NuGet.org release is 1.1.2. The public surface is locked and tracked
 via `PublicAPI.Shipped.txt` — any future public API change breaks the build.
 [Issues and PRs](https://github.com/FixPortal/fixportal-fixatdl) are welcome.
