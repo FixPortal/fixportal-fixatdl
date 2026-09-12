@@ -601,18 +601,36 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
     {
         bool gotValue = additionalValues.TryGetValue(fixField, out var value);
 
-        // If the FIX value can be converted into a number, most likely it should be treated as one
-        // for comparison purposes
         object? result = gotValue switch
         {
             false => null,
             _ when preserveText => value,
-            _ => decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal number)
+            _ => IsNumericFixField(fixField)
+            // A String/Char FIX field (e.g. a zero-padded ClOrdID, or a symbol that happens to
+            // look numeric) must never be silently decimal-parsed - that loses leading zeros and
+            // compares it as a number instead of text. Only convert when the field's actual FIX
+            // data type is numeric.
+            && decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal number)
                 ? number
                 : value,
         };
 
         return result!;
+    }
+
+    // Fields outside the standard FIX 5.0 SP2 dictionary (custom/extension fields not present in
+    // FixField) fall back to true - preserving the previous parse-and-guess behaviour for anything
+    // FixFieldTypes cannot classify.
+    private static bool IsNumericFixField(string fixField)
+    {
+        try
+        {
+            return FixFieldTypes.IsNumeric(fixField.ParseAsEnum<FixField>());
+        }
+        catch (ArgumentException)
+        {
+            return true;
+        }
     }
 
     #region IResolvable<Strategy_t> Members
