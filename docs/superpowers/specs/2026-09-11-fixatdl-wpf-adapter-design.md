@@ -116,9 +116,14 @@ Rejected alternatives:
   `net10.0` test project cannot reference a `net10.0-windows` WPF head
   directly):
   - `FixPortal.FixAtdl.Wpf` — the WPF class library: ported controls,
-    renderers, layout engine, plus the rewritten ViewModels. Targets
-    `net10.0-windows`.
-  - `FixPortal.FixAtdl.Wpf.Tests` — plain `net10.0` xUnit v3 project,
+    renderers, and the layout engine. Targets `net10.0-windows`.
+  - `FixPortal.FixAtdl.Wpf.Core` — plain `net10.0` class library holding the
+    rewritten ViewModels and layout-coordinate/validation logic. Referenced
+    by both the WPF head and the ViewModel test project — the WPF head
+    itself cannot be referenced by a plain `net10.0` test project (MSBuild
+    rejects the incompatible target framework), so ViewModels live here
+    rather than in `FixPortal.FixAtdl.Wpf`.
+  - `FixPortal.FixAtdl.Wpf.Core.Tests` — plain `net10.0` xUnit v3 project,
     ViewModel and layout-logic unit tests only (NSubstitute,
     AwesomeAssertions), zero WPF runtime dependency.
   - `FixPortal.FixAtdl.Wpf.Tests.UI` — STA-runtime smoke test project
