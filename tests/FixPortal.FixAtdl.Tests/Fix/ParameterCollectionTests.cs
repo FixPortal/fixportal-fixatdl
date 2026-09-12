@@ -82,7 +82,7 @@ public class ParameterCollectionTests
     {
         var parameter = new Parameter_t<String_t>("Param");
 
-        var act = () => parameter.WireValue = null;
+        var act = () => parameter.WireValue = null!;
 
         act.Should().Throw<ArgumentNullException>().WithParameterName("value");
     }

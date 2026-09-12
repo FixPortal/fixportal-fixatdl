@@ -295,8 +295,17 @@ public class ElementPropertyTests
     public void Description_t_implicit_cast_to_string()
     {
         var d = new Description_t { Content = "Hello" };
-        string s = d;
+        string? s = d;
         s.Should().Be("Hello");
+    }
+
+    [Fact]
+    public void Description_t_implicit_cast_to_string_is_null_safe()
+    {
+        // A null Description converts to a null string rather than throwing NullReferenceException.
+        Description_t? d = null;
+        string? s = d;
+        s.Should().BeNull();
     }
 
     // ── StrategyPanel_t defaults (C2) ─────────────────────────────────────────

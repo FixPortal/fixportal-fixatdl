@@ -10,6 +10,8 @@ namespace FixPortal.FixAtdl.Model.Elements;
 /// <summary>
 /// Represents the FIXatdl Description sub-element that is used to provide additional descriptive information about an element.
 /// </summary>
+/// <remarks>The strategy reader does not populate Description elements from the XML; the type exists so
+/// hosts can attach their own descriptive text programmatically.</remarks>
 public class Description_t
 {
     /// <summary>
@@ -25,9 +27,9 @@ public class Description_t
     public static implicit operator Description_t(string value) => new() { Content = value };
 
     /// <summary>
-    ///  Implicit case operator that enables a Description to be used where a string is expected.
+    ///  Implicit cast operator that enables a Description to be used where a string is expected.
     /// </summary>
-    /// <param name="description">Description to treated as a string.</param>
-    /// <returns>Content field of this description, i.e., the descriptive text.</returns>
-    public static implicit operator string(Description_t description) => description.Content;
+    /// <param name="description">Description to be treated as a string; may be null.</param>
+    /// <returns>Content field of this description, i.e., the descriptive text; null when description is null.</returns>
+    public static implicit operator string?(Description_t? description) => description?.Content;
 }
