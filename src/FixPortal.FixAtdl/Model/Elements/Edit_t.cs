@@ -525,9 +525,9 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
     // as the literal path is via ConvertToComparableType. Previously only string parameters ever matched
     // the raw FIX string, so char/bool/date-time/MonthYear/Tenor/ISO-enum parameters silently mis-compared
     // (EQ always false, NE always true, inequalities throwing on the type mismatch). A missing FIX field
-    // stays null so EX/NX and null comparisons keep their meaning. Boolean parameters go through their
-    // declared wire mapping first (custom true/false tokens such as 1/0), falling back to the generic
-    // conversion when the field is not one of those tokens.
+    // stays null so EX/NX and null comparisons keep their meaning. Boolean parameters parse through their
+    // declared wire mapping (custom true/false tokens such as 1/0), rejecting anything else exactly as an
+    // undeclared literal token is rejected.
     private static object ConvertFixFieldForParameter(
         FixFieldValueProvider additionalValues,
         string fixField,
@@ -542,14 +542,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
 
         if (parameter is Parameter_t<Boolean_t> booleanParameter)
         {
-            try
-            {
-                return booleanParameter.Value.ParseWireValue(fixString)!;
-            }
-            catch (InvalidFieldValueException)
-            {
-                // Not one of the declared boolean tokens — compare via the generic conversion below.
-            }
+            return booleanParameter.Value.ParseWireValue(fixString)!;
         }
 
         return EditValueConverter.ConvertToComparableType(parameterValue, fixString);

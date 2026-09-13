@@ -370,6 +370,26 @@ public class ExpressionAndParameterConformanceTests
         edit.CurrentState.Should().BeTrue();
     }
 
+    [Fact]
+    public void Boolean_parameter_rejects_a_FIX_field_token_outside_its_declared_mapping()
+    {
+        // A FIX field carrying "True" against a 1/0-mapped Boolean_t must be rejected exactly as an
+        // undeclared literal token is, not silently coerced by the generic bool conversion.
+        var strategy = Load();
+        var flag = new Parameter_t<Boolean_t>("Flag") { FixTag = 97 };
+        flag.Value.TrueWireValue = "1";
+        flag.Value.FalseWireValue = "0";
+        flag.WireValue = "1";
+        strategy.Parameters.Add(flag);
+        var initial = Substitute.For<IInitialFixValueProvider>();
+        initial.InputFixValues.Returns(new FixTagValuesCollection { { 97, "True" } });
+        var edit = ParameterEdit(strategy, "Flag", Operator_t.Equal, field2: "FIX_PossResend");
+
+        var act = () => edit.Evaluate(new FixFieldValueProvider(initial, strategy.Parameters));
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
     [Theory]
     [InlineData(Operator_t.Equal, false)]
     [InlineData(Operator_t.NotEqual, true)]
