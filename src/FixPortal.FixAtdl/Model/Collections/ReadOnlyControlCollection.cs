@@ -116,6 +116,12 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             if (sender != null && _controlIdsBySource.TryGetValue(sender, out HashSet<string>? ids))
             {
                 ids.Remove(item.Id);
+                // Drop an emptied entry: the key is the sender's ControlCollection, so keeping it
+                // would retain that panel for the strategy's lifetime.
+                if (ids.Count == 0)
+                {
+                    _controlIdsBySource.Remove(sender);
+                }
             }
         }
     }

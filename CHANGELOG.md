@@ -113,6 +113,9 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - `ControlCollection` finalizes removal detachment and layout-index refresh
   before the change notification reaches observers, and `Clear()` detaches
   every removed control.
+- Removing every control of a panel one by one no longer retains the panel
+  from the strategy's control index; emptied sender-tracking entries are
+  dropped.
 
 ## [1.1.2] — 2026-09-12
 
