@@ -108,8 +108,8 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - A numeric `Slider_t` no longer restores a value seeded by an earlier
   `LoadInitValue` when a later call has a null or unparseable `initValue`.
 - `FIX_` field operands facing a `Boolean_t` parameter parse through the
-  parameter's declared wire mapping (custom true/false tokens) before the
-  generic conversion.
+  parameter's declared wire mapping (custom true/false tokens), rejecting
+  undeclared tokens exactly as the literal path does.
 - `ControlCollection` finalizes removal detachment and layout-index refresh
   before the change notification reaches observers, and `Clear()` detaches
   every removed control.
