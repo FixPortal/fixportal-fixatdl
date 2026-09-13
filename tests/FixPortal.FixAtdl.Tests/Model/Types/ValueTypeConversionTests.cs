@@ -136,9 +136,14 @@ public class ValueTypeConversionTests
     [Theory]
     [InlineData("1,5")]
     [InlineData("1,000.5")]
-    public void Float_t_rejects_thousands_separated_wire_values(string wire)
+    [InlineData("1E2")]
+    [InlineData("1e-2")]
+    [InlineData(" 1")]
+    [InlineData("1 ")]
+    public void Float_t_rejects_non_fix_float_spellings(string wire)
     {
-        // The FIX float alphabet has no thousands separators; "1,5" must fail, not parse as 15 (R21).
+        // The FIX float alphabet is '-', digits and '.': thousands-separated, exponent and
+        // whitespace-padded spellings must fail, not parse as scaled or trimmed values (R21).
         var p = new Parameter_t<Float_t>("Px");
         var act = () => p.WireValue = wire;
         act.Should().Throw<InvalidFieldValueException>();

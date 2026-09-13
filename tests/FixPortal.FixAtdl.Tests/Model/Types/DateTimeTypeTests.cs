@@ -33,6 +33,20 @@ public class DateTimeTypeTests
     }
 
     [Fact]
+    public void UTCTimestamp_t_truncates_excess_fraction_digits_like_the_parse_path()
+    {
+        // The parameter conversion path applies the same excess-fraction normalisation as
+        // FixDateTime.TryParse: valid digits beyond tick precision truncate rather than reject.
+        // Wire emission stays at the FIX 4.4 millisecond grammar.
+        var p = new Parameter_t<UTCTimestamp_t>("Ts") { WireValue = "20260601-09:30:00.123456789" };
+
+        var value = p.GetCurrentValue().Should().BeOfType<DateTime>().Which;
+        value.Ticks.Should().Be(new DateTime(2026, 6, 1, 9, 30, 0, DateTimeKind.Utc).AddTicks(1_234_567).Ticks);
+        value.Kind.Should().Be(DateTimeKind.Utc);
+        p.WireValue.Should().Be("20260601-09:30:00.123");
+    }
+
+    [Fact]
     public void UTCTimeOnly_t_round_trips_millisecond_wire_value()
     {
         // MS-aware round-tripping: milliseconds are preserved when present.

@@ -66,7 +66,14 @@ public class UTCTimestamp_t : UTCDateTimeTypeBase
         return TimeOnly.FromDateTime(Instant.FromDateTimeUtc(utcValue).InZone(zone).ToDateTimeUnspecified());
     }
 
-    private static readonly string[] _formatStrings = [FixDateTimeFormat.FixDateTime, FixDateTimeFormat.FixDateTimeMs];
+    // The fractional entry is parse-only: it lets a truncated high-precision wire value in, while
+    // emission keeps using the seconds/ms pair above (UTCDataTimeTypeBase selects [0] or [1]).
+    private static readonly string[] _formatStrings =
+    [
+        FixDateTimeFormat.FixDateTime,
+        FixDateTimeFormat.FixDateTimeMs,
+        FixDateTimeFormat.FixDateTimeFractional,
+    ];
 
     /// <summary>
     /// Gets the DateTime format strings to use when converting this date/time to a FIX string and vice versa.

@@ -316,8 +316,10 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
 
         // A literal ":60" seconds field is a declared UTC leap second - legal per the UTCTimestamp_t
         // spec but unrepresentable in a DateTime. Normalise it for parsing, then roll forward one
-        // second, matching the const/control paths (FixDateTime).
+        // second, matching the const/control paths (FixDateTime). Excess fraction digits truncate to
+        // tick precision the same way FixDateTime.TryParse handles them.
         string parseValue = FixDateTime.NormaliseLeapSecond(value, out bool wasLeapSecond);
+        parseValue = FixDateTime.TruncateExcessFraction(parseValue);
 
         string[] formats = GetDateTimeFormatStrings();
 

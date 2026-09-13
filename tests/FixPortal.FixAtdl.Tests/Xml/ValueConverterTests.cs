@@ -72,9 +72,12 @@ public class ValueConverterTests
     [Theory]
     [InlineData("1,5")]
     [InlineData("1,000.5")]
-    public void ConvertTo_rejects_thousands_separated_decimal_values(string value)
+    [InlineData("1e3")]
+    [InlineData("1E-3")]
+    public void ConvertTo_rejects_non_schema_decimal_spellings(string value)
     {
-        // The FIX numeric alphabet has no thousands separators; "1,5" must fail, not parse as 15 (R21).
+        // The XML Schema decimal lexical grammar admits digits, one sign and one point only:
+        // thousands separators must not parse as scaled values, and there is no exponent notation.
         var act = () => ValueConverter.ConvertTo<decimal>(value);
 
         act.Should().Throw<InvalidFieldValueException>();
