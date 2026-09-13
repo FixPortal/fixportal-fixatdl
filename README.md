@@ -1,4 +1,4 @@
-![FixAtdl — broker strategy forms parsed, validated, and emitted as FIX tag values](https://raw.githubusercontent.com/FixPortal/fixportal-fixatdl/main/docs/images/fixatdl-hero.png)
+![FixAtdl: parse XML definitions, validate selections and emit FIX tags, with React and WPF adapters for the UI](https://raw.githubusercontent.com/FixPortal/fixportal-fixatdl/main/docs/images/fixatdl-hero.png)
 
 # FixPortal.FixAtdl
 
