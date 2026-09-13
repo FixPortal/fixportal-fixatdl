@@ -25,9 +25,13 @@
 - **F7 (TagNum leading zeros)** — kept the lenient parse (`"0044"`→`44u`); rejecting leading zeros is
   enforcement-tightening, not a correctness defect, and no conforming ATDL emits leading-zero tags
   (reviewer S rated it needs-evidence). Pinned by a characterization test in `TypeCoverageGapTests`. Commit `7c320e7`.
-- **#7 (Tenor non-positive offset)** — kept the lenient parse (`D0`, `M-3`); `D0` = same-day in several FIX
-  implementations and numeric-range enforcement is a business-layer concern, not a parser invariant (panel
-  split 2:1 needs-evidence). Pinned by a characterization test in `TenorTests`. Commit `7c320e7`.
+- **#7 (Tenor non-positive offset)** — **corrected 2026-09-13.** The original entry claimed the lenient
+  parse was kept; in fact the shipped parser rejects non-positive offsets (`Tenor.cs` throws for
+  `Offset <= 0`) and the `TenorTests` characterization test (`Parse_rejects_non_positive_offsets`)
+  asserts that throw. Test and code agree on rejection; the original text was inverted and is kept for
+  the record: "kept the lenient parse (`D0`, `M-3`); `D0` = same-day in several FIX implementations and
+  numeric-range enforcement is a business-layer concern, not a parser invariant (panel split 2:1
+  needs-evidence). Pinned by a characterization test in `TenorTests`. Commit `7c320e7`."
 - **G-G (`IParentable<T>.Parent` nullability)** — kept the non-nullable contract. Making it `T?` would ripple
   to all five implementers (`Control_t`, `StateRule_t`, `ReadOnlyControlCollection`, `StrategyPanel_t`,
   `Strategy_t`) and every consumer that reads `.Parent`, pushing null-handling onto callers for a condition

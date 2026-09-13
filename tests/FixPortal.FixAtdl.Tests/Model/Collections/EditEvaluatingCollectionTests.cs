@@ -22,28 +22,42 @@ public class EditEvaluatingCollectionTests
 
     private static Strategy_t LoadTwap()
     {
-        // We need the real fixture on disk so we spin up the fixture reader.
-        // ReadAllText is synchronous-friendly from a [Fact]; the async variant is
-        // used in integration tests where the TestContext is available.
+        // We need the real fixture on disk so we spin up the fixture reader. The sync ReadAllText is
+        // fine here: TestContext.Current is available in every xUnit v3 test, so the async variant is a
+        // convenience for callers that flow a CancellationToken, not a separate integration-test path.
         string xml = FixtureFiles.ReadAllText("Fixtures/twap.xml");
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         var strategy = new StrategiesReader().Load(stream).Strategies[0];
         // These operator tests deliberately exercise negative operands; override FIXatdl's zero default.
-        ((Parameter_t<Percentage_t>)strategy.Parameters["Participation"])
-            .Value
-            .MinValue = -10;
+        // Assert the fixture shape rather than cast blind: a fixture change should fail here with a
+        // clear message, not fail every test in the class with an InvalidCastException.
+        Parameter_t<Percentage_t> participation = strategy
+            .Parameters["Participation"]
+            .Should()
+            .BeOfType<Parameter_t<Percentage_t>>()
+            .Which;
+        participation.Value.MinValue = -10;
         return strategy;
     }
 
     [Fact]
     public void LoadTwap_is_not_cwd_dependent()
     {
-        // Assert that the file is loaded from AppContext.BaseDirectory, avoiding process-global CWD mutation.
-        var path = Path.Join(AppContext.BaseDirectory, "Fixtures", "twap.xml");
-        File.Exists(path).Should().BeTrue();
+        // Fixture resolution must be anchored to AppContext.BaseDirectory, not the process CWD — prove
+        // it by pointing the (process-global) CWD elsewhere and loading. Restored in finally so no
+        // other test observes the mutation.
+        string originalCwd = Directory.GetCurrentDirectory();
+        try
+        {
+            Directory.SetCurrentDirectory(Path.GetTempPath());
 
-        Func<Strategy_t> act = LoadTwap;
-        act.Should().NotThrow();
+            Func<Strategy_t> act = LoadTwap;
+            act.Should().NotThrow();
+        }
+        finally
+        {
+            Directory.SetCurrentDirectory(originalCwd);
+        }
     }
 
     /// <summary>

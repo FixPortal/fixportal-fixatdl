@@ -10,7 +10,15 @@ namespace FixPortal.FixAtdl.Model.Reference;
 /// <summary>
 /// Enumeration of ISO 3166-1 alpha-2 country codes.
 /// </summary>
-/// <remarks>Upper case codes are used throughout to avoid clashes with C# language keywords.</remarks>
+/// <remarks>
+/// Upper case codes are used throughout to avoid clashes with C# language keywords. Membership is
+/// pinned to the FIXatdl 1.1 regions schema (fixatdl-regions-1-1.xsd, FPL 2010, build
+/// 2.7.2e20101221): exactly its 242 codes — AN is retained because the schema enumerates it, while
+/// AQ, BV, HM, TF and the post-2010 ISO 3166 additions (SS, BQ, CW, SX) are absent because it does
+/// not. Unlike <see cref="IsoCurrencyCode"/>, which deliberately tracks the live ISO 4217 list, this
+/// enum does not follow ISO 3166 as it evolves; <see cref="Regions"/> partitions the same 242 codes
+/// across its three sets.
+/// </remarks>
 public enum IsoCountryCode
 {
     /// <summary>No country code selected.</summary>
