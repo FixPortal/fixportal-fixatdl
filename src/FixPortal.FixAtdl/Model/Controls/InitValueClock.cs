@@ -37,6 +37,9 @@ public sealed class InitValueClock
     [
         // FFFFFFFFF (not fff): accepts any fractional-second count up to NodaTime's 9-digit
         // nanosecond precision, so "08:00:00.5" is not rejected for having fewer than 3 digits.
+        // Acceptance is deliberately wider than emission: Clock_t emits through the FIX 4.4
+        // UTCTimestamp grammar, which tops out at milliseconds, so digits past the third are
+        // truncated on the wire rather than rejected here (CR5).
         LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss.FFFFFFFFF"),
         LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss"),
         LocalTimePattern.CreateWithInvariantCulture("HH:mm"),
