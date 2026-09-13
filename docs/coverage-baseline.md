@@ -32,7 +32,7 @@ Aggregated from the per-class JsonSummary report. Line % = covered lines ÷ cove
 _The table covers the core namespaces only (~4,004 of ~5,072 coverable lines); the remainder is non-core code (marker/DTO/utility types) that is counted in the overall figure but not gated._
 
 **Notable outliers within buckets:**
-- `Model.Reference`: `Regions` is a 263-line static lookup table (0% — never exercised).
+- `Model.Reference`: `Regions` is a 263-line static lookup table (0% — never exercised). **Superseded 2026-09-13:** exercised directly by `RegionCountriesTests` (a 242-row schema-conformance theory) and earlier by `KeyedCollectionTests` / `ParameterTypeFeatureTests`. This bullet kept tripping reviewers who read it as current state — see the banner above.
 - `Model.Controls`: `EnumState` (209 coverable, 0%) and `BinaryControlBase` (119 coverable, 0%) dominate.
 - `Model.Types`: almost all concrete types are 0%; `UTCDateTimeTypeBase` (89%) and `Percentage_t` (45%) are the outliers on the high side.
 - `Xml.Serialization`: the best-covered core namespace thanks to the XML round-trip tests — `ElementFactory` (71%) and `StrategiesReader` (72%) carry it.
