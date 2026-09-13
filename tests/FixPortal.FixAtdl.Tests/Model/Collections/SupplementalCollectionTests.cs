@@ -448,6 +448,35 @@ public class SupplementalCollectionTests
         replacement.OwningStrategyPanel.Should().BeSameAs(panel);
     }
 
+    [Fact]
+    public void Clear_detaches_every_control_before_the_reset_notification()
+    {
+        // Clear raises a Reset notification with no OldItems, so the detach must already have run in
+        // ClearItems when handlers observe the event (Gitar follow-up on CR13).
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var first = new TextField_t("c_First");
+        var second = new TextField_t("c_Second");
+        panel.Controls.Add(first);
+        panel.Controls.Add(second);
+
+        bool? detachedWhenNotified = null;
+        panel.Controls.CollectionChanged += (_, args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Reset)
+            {
+                detachedWhenNotified = first.OwningStrategyPanel == null && second.OwningStrategyPanel == null;
+            }
+        };
+
+        panel.Controls.Clear();
+
+        panel.Controls.Should().BeEmpty();
+        detachedWhenNotified.Should().BeTrue();
+        first.OwningStrategyPanel.Should().BeNull();
+        second.OwningStrategyPanel.Should().BeNull();
+    }
+
     // -----------------------------------------------------------------------
     // Control_t.Id — ownership guard (CR7)
     // -----------------------------------------------------------------------

@@ -111,7 +111,8 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   parameter's declared wire mapping (custom true/false tokens) before the
   generic conversion.
 - `ControlCollection` finalizes removal detachment and layout-index refresh
-  before the change notification reaches observers.
+  before the change notification reaches observers, and `Clear()` detaches
+  every removed control.
 
 ## [1.1.2] — 2026-09-12
 

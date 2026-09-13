@@ -79,11 +79,28 @@ public class ControlCollection : ObservableCollection<Control_t>
     }
 
     /// <summary>
+    /// Detaches every control before the list is cleared. ObservableCollection raises the Reset
+    /// notification for a clear with no OldItems, so <see cref="OnCollectionChanged"/> never sees the
+    /// removed controls — the detach must happen here to keep the same before-the-notification
+    /// ordering as Insert/Remove.
+    /// </summary>
+    protected override void ClearItems()
+    {
+        foreach (Control_t control in Items)
+        {
+            ((IParentable<StrategyPanel_t>)control).Parent = null!;
+        }
+
+        base.ClearItems();
+    }
+
+    /// <summary>
     /// Finalizes the collection's invariants before the change notification reaches observers: controls
     /// that left the collection are detached from this panel (a same-instance replace or move keeps its
-    /// parent) and layout indexes are refreshed. ObservableCollection raises the notification from inside
-    /// its mutation methods, so doing this work after the base call would let handlers observe stale
-    /// indexes and a removed control still reporting a panel that no longer holds it.
+    /// parent; a clear detaches in <see cref="ClearItems"/>) and layout indexes are refreshed.
+    /// ObservableCollection raises the notification from inside its mutation methods, so doing this work
+    /// after the base call would let handlers observe stale indexes and a removed control still reporting
+    /// a panel that no longer holds it.
     /// </summary>
     /// <param name="e">The change being notified.</param>
     protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
