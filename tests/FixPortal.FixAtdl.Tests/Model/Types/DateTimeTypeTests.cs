@@ -147,6 +147,11 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<TZTimeOnly_t>("T") { WireValue = "02:39:00-05:00" };
         p.WireValue.Should().Be("02:39:00-05:00");
+
+        // CR12: the stored instant is the UTC normalization of the offset wall time, Kind pinned.
+        var value = ((DateTime?)p.GetCurrentValue()).Value;
+        value.Should().Be(new DateTime(1, 1, 1, 7, 39, 0, DateTimeKind.Utc));
+        value.Kind.Should().Be(DateTimeKind.Utc);
     }
 
     [Fact]
@@ -202,6 +207,11 @@ public class DateTimeTypeTests
     {
         var p = new Parameter_t<TZTimestamp_t>("Ts") { WireValue = "20060901-02:39:00-05:00" };
         p.WireValue.Should().Be("20060901-02:39:00-05:00");
+
+        // CR12: the stored instant is the UTC normalization of the offset wall time, Kind pinned.
+        var value = ((DateTime?)p.GetCurrentValue()).Value;
+        value.Should().Be(new DateTime(2006, 9, 1, 7, 39, 0, DateTimeKind.Utc));
+        value.Kind.Should().Be(DateTimeKind.Utc);
     }
 
     [Fact]

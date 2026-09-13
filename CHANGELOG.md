@@ -73,7 +73,9 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   the numeric parsing surface (`IsNumericFixField` now returns the non-numeric
   default its comment describes).
 - Strategy control index hardened: ungrouped radio siblings index correctly,
-  `Reset` is sender-scoped, and `Id` is init-only.
+  `Reset` is sender-scoped, and a control's `Id` rejects renames once the
+  control belongs to a panel (the setter stays public for construction-time
+  and deserialization assignment).
 - `StrategyParameterType` (FIX tag 959) codes corrected for `Language_t` and
   `Tenor_t`.
 - Wire parsing hardening: doubled SOH rejected, empty wire values filtered from
@@ -100,6 +102,16 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   path apply the parse path's leap-second and excess-fraction normalisation, so
   valid values such as `"23:59:60"` or a 9-digit fraction are not misclassified
   as date-bearing or rejected.
+- Parameter updates from controls deduplicate only radio groups; non-radio
+  controls sharing a parameter keep the collection-order overwrite (last one
+  wins) instead of silently dropping later controls' values.
+- A numeric `Slider_t` no longer restores a value seeded by an earlier
+  `LoadInitValue` when a later call has a null or unparseable `initValue`.
+- `FIX_` field operands facing a `Boolean_t` parameter parse through the
+  parameter's declared wire mapping (custom true/false tokens) before the
+  generic conversion.
+- `ControlCollection` finalizes removal detachment and layout-index refresh
+  before the change notification reaches observers.
 
 ## [1.1.2] — 2026-09-12
 

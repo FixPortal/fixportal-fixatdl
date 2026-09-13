@@ -69,6 +69,19 @@ public class ClockTimeZoneTests
     }
 
     [Fact]
+    public void Nanosecond_initValue_is_accepted_and_emitted_truncated_to_milliseconds()
+    {
+        // CR5: acceptance is deliberately wider than emission — InitValueClock parses up to 9
+        // fractional digits, but the FIX 4.4 UTCTimestamp grammar tops out at milliseconds, so the
+        // wire form truncates past the third digit rather than rejecting the value.
+        var clock = BerlinClock(new InitValueClock("08:00:00.123456789"), Instant.FromUtc(2026, 1, 15, 12, 0, 0));
+
+        clock.LoadInitValue(FixFieldValueProvider.Empty);
+
+        clock.ToString(null!).Should().Be("20260115-07:00:00.123");
+    }
+
+    [Fact]
     public void Missing_localMktTz_with_initValue_throws()
     {
         var clock = new Clock_t("clk")
