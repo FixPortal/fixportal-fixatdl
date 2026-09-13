@@ -46,4 +46,23 @@ public class SliderInitValueTests
 
         slider.GetCurrentValue().Should().Be(12.5m);
     }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("not-a-number")]
+    public void A_later_LoadInitValue_without_a_parseable_initValue_does_not_restore_an_earlier_seed(
+        string? laterInitValue
+    )
+    {
+        // CR6: the inner spinner kept the InitValue an earlier LoadInitValue seeded, so a second call
+        // whose initValue was null or malformed restored the previous parse as its fallback value.
+        var slider = new Slider_t("s") { InitValue = "12.5" };
+        slider.LoadInitValue(FixFieldValueProvider.Empty);
+        slider.GetCurrentValue().Should().Be(12.5m);
+
+        slider.InitValue = laterInitValue!;
+        slider.LoadInitValue(FixFieldValueProvider.Empty);
+
+        slider.GetCurrentValue().Should().BeNull();
+    }
 }

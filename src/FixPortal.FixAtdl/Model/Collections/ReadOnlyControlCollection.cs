@@ -239,7 +239,9 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
 
             // Radio-group members share one parameter and resolve to a single value source
             // (GetParameterValueSource): update and report that parameter once, not once per member.
-            if (!handledParameters.Add(parameter))
+            // Radio-only: non-radio controls sharing a parameter keep the historical collection-order
+            // overwrite (last one wins); deduplicating them would silently change whose value lands.
+            if (control is RadioButton_t && !handledParameters.Add(parameter))
             {
                 continue;
             }

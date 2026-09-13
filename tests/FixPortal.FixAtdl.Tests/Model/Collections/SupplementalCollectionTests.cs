@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
@@ -375,6 +376,118 @@ public class SupplementalCollectionTests
         control.OwningStrategyPanel.Should().BeNull();
     }
 
+    [Fact]
+    public void Remove_finalizes_detachment_and_indexes_before_the_notification()
+    {
+        // CR13: ObservableCollection raises CollectionChanged from inside its mutation methods, so the
+        // detach and index refresh must already have run when handlers observe the event.
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var first = new TextField_t("c_First");
+        var second = new TextField_t("c_Second");
+        panel.Controls.Add(first);
+        panel.Controls.Add(second);
+
+        bool? detachedWhenNotified = null;
+        int? siblingIndexWhenNotified = null;
+        panel.Controls.CollectionChanged += (_, args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Remove)
+            {
+                detachedWhenNotified = first.OwningStrategyPanel == null;
+                siblingIndexWhenNotified = second.Index;
+            }
+        };
+
+        panel.Controls.Remove(first);
+
+        detachedWhenNotified.Should().BeTrue();
+        siblingIndexWhenNotified.Should().Be(0);
+    }
+
+    [Fact]
+    public void Move_refreshes_indexes_before_the_notification()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var first = new TextField_t("c_First");
+        var second = new TextField_t("c_Second");
+        panel.Controls.Add(first);
+        panel.Controls.Add(second);
+
+        int? firstIndexWhenNotified = null;
+        panel.Controls.CollectionChanged += (_, args) =>
+        {
+            if (args.Action == NotifyCollectionChangedAction.Move)
+            {
+                firstIndexWhenNotified = first.Index;
+            }
+        };
+
+        panel.Controls.Move(0, 1);
+
+        firstIndexWhenNotified.Should().Be(1);
+    }
+
+    [Fact]
+    public void Replace_detaches_the_old_control_but_keeps_a_same_instance_parented()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var original = new TextField_t("c_One");
+        panel.Controls.Add(original);
+
+        var replacement = new TextField_t("c_Two");
+        panel.Controls[0] = replacement;
+
+        original.OwningStrategyPanel.Should().BeNull();
+        replacement.OwningStrategyPanel.Should().BeSameAs(panel);
+
+        panel.Controls[0] = replacement;
+
+        replacement.OwningStrategyPanel.Should().BeSameAs(panel);
+    }
+
+    // -----------------------------------------------------------------------
+    // Control_t.Id — ownership guard (CR7)
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public void Id_rename_throws_once_the_control_belongs_to_a_panel()
+    {
+        // CR7: the strategy index keys controls by Id at insertion time, so renaming an owned control
+        // would desynchronise every lookup; the guarded setter rejects it.
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var control = new TextField_t("c_One");
+        panel.Controls.Add(control);
+
+        var act = () => control.Id = "c_Renamed";
+
+        act.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void Id_assignment_before_parenting_is_unrestricted()
+    {
+        var control = new TextField_t("c_One") { Id = "c_Two" };
+
+        control.Id.Should().Be("c_Two");
+    }
+
+    [Fact]
+    public void Id_same_value_assignment_is_a_no_op_once_parented()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var control = new TextField_t("c_One");
+        panel.Controls.Add(control);
+
+        var act = () => control.Id = "c_One";
+
+        act.Should().NotThrow();
+    }
+
     // -----------------------------------------------------------------------
     // ReadOnlyControlCollection — shared-parameter update dedup (Low 26)
     // -----------------------------------------------------------------------
@@ -403,5 +516,30 @@ public class SupplementalCollectionTests
 
         result.Should().BeFalse();
         results.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void TryUpdateParameterValues_lets_non_radio_controls_sharing_a_parameter_overwrite_in_order()
+    {
+        // CR4: two non-radio controls may legitimately share one parameter; each must push its value
+        // in collection order (last one wins). Only radio-group members dedup to a single update.
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        panel.Controls.Add(new TextField_t("t_A") { ParameterRef = "P" });
+        panel.Controls.Add(new TextField_t("t_B") { ParameterRef = "P" });
+        var parameter = Substitute.For<IParameter>();
+        parameter.Name.Returns("P");
+        parameter.SetValueFromControl(Arg.Any<Control_t>()).Returns(ValidationResult.ValidResult);
+        strategy.Parameters.Add(parameter);
+
+        bool result = strategy.Controls.TryUpdateParameterValues(
+            strategy.Parameters,
+            shortCircuit: false,
+            out IList<ValidationResult>? results
+        );
+
+        result.Should().BeTrue();
+        results.Should().BeNull();
+        parameter.Received(2).SetValueFromControl(Arg.Any<Control_t>());
     }
 }

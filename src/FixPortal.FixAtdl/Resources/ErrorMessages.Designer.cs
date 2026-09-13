@@ -804,6 +804,17 @@ namespace FixPortal.FixAtdl.Resources
                 return ResourceManager.GetString("InvalidFixValueForSerialization", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to change control Id from &apos;{0}&apos; to &apos;{1}&apos;: the control already belongs to a panel, and the strategy index keys controls by Id at insertion time..
+        /// </summary>
+        internal static string ControlIdCannotBeChangedOnceParented
+        {
+            get
+            {
+                return ResourceManager.GetString("ControlIdCannotBeChangedOnceParented", resourceCulture);
+            }
+        }
     }
 }
 

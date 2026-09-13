@@ -6,6 +6,7 @@
 #endregion
 
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Utility;
 
@@ -30,10 +31,11 @@ public class ControlCollection : ObservableCollection<Control_t>
     }
 
     /// <summary>
-    /// Inserts an item, parenting it to the owning panel and refreshing layout indexes. Implemented
-    /// as overrides of the ObservableCollection virtual hooks (rather than <c>new Add</c>/<c>new
-    /// Remove</c>) so the parent-wiring and index maintenance cannot be bypassed by base-typed
-    /// access, an initializer or AddRange.
+    /// Inserts an item, guarding against duplicate Ids and parenting it to the owning panel before the
+    /// change is applied. Implemented as overrides of the ObservableCollection virtual hooks (rather
+    /// than <c>new Add</c>/<c>new Remove</c>) so the parent-wiring and index maintenance cannot be
+    /// bypassed by base-typed access, an initializer or AddRange. Index refresh and removal detachment
+    /// happen in <see cref="OnCollectionChanged"/> so both are final before observers see the event.
     /// </summary>
     /// <param name="index">The insertion index.</param>
     /// <param name="item">The item.</param>
@@ -52,8 +54,6 @@ public class ControlCollection : ObservableCollection<Control_t>
         ((IParentable<StrategyPanel_t>)item).Parent = _owner;
 
         base.InsertItem(index, item);
-
-        RefreshIndexes();
     }
 
     /// <inheritdoc />
@@ -76,30 +76,32 @@ public class ControlCollection : ObservableCollection<Control_t>
         ((IParentable<StrategyPanel_t>)item).Parent = _owner;
 
         base.SetItem(index, item);
-
-        RefreshIndexes();
     }
 
-    /// <inheritdoc />
-    protected override void RemoveItem(int index)
+    /// <summary>
+    /// Finalizes the collection's invariants before the change notification reaches observers: controls
+    /// that left the collection are detached from this panel (a same-instance replace or move keeps its
+    /// parent) and layout indexes are refreshed. ObservableCollection raises the notification from inside
+    /// its mutation methods, so doing this work after the base call would let handlers observe stale
+    /// indexes and a removed control still reporting a panel that no longer holds it.
+    /// </summary>
+    /// <param name="e">The change being notified.</param>
+    protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
     {
-        Control_t removed = Items[index];
-
-        base.RemoveItem(index);
-
-        // Detach the removed control from this panel, mirroring the parent-wiring in InsertItem and
-        // SetItem — otherwise it keeps reporting a panel that no longer holds it.
-        ((IParentable<StrategyPanel_t>)removed).Parent = null!;
+        if (e.OldItems != null)
+        {
+            foreach (Control_t removed in e.OldItems)
+            {
+                if (e.NewItems == null || !e.NewItems.Contains(removed))
+                {
+                    ((IParentable<StrategyPanel_t>)removed).Parent = null!;
+                }
+            }
+        }
 
         RefreshIndexes();
-    }
 
-    /// <inheritdoc />
-    protected override void MoveItem(int oldIndex, int newIndex)
-    {
-        base.MoveItem(oldIndex, newIndex);
-
-        RefreshIndexes();
+        base.OnCollectionChanged(e);
     }
 
     /// <summary>
