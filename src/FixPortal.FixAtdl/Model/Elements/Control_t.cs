@@ -42,10 +42,32 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     ///  template and not actually used to place an order.</summary>
     public bool? DisableForTemplate { get; set; }
 
+    private string _id = null!;
+
     /// <summary>Unique identifier of this control. No two controls of the same strategy can have the same ID.</summary>
-    /// <remarks>Init-only: the strategy index keys controls by Id at insertion time, so a post-insertion
-    /// rename would desynchronise every lookup (#R24).</remarks>
-    public string Id { get; init; }
+    /// <remarks>Once the control belongs to a panel its Id is fixed: the strategy index keys controls by
+    /// Id at insertion time, so a post-insertion rename would desynchronise every lookup (#R24). The setter
+    /// stays public so construction-time and deserialization assignment keep working (and compiled
+    /// consumers get the same runtime guard); renaming an owned control throws, while assigning the
+    /// current value again is a no-op.</remarks>
+    public string Id
+    {
+        get => _id;
+        set
+        {
+            if (OwningStrategyPanel != null && !string.Equals(_id, value, StringComparison.Ordinal))
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    this,
+                    ErrorMessages.ControlIdCannotBeChangedOnceParented,
+                    _id,
+                    value
+                );
+            }
+
+            _id = value;
+        }
+    }
 
     /// <summary>Zero-based index for this control within a StrategyPanel_t.  For example, if a StrategyPanel_t has three controls,
     /// the first would have index of 0, the second 1 and the third 2.</summary>

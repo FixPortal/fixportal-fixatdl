@@ -52,6 +52,9 @@ public class Slider_t : ListControlBase
         _numeric.ParameterRef = ParameterRef;
         _numeric.InitPolicy = InitPolicy;
         _numeric.InitFixField = InitFixField;
+        // Clear any value an earlier LoadInitValue call seeded: a later call whose initValue is null
+        // or malformed must not let the inner spinner restore the previous parse as its fallback.
+        _numeric.InitValue = null;
         // Pre-seed only a parseable initValue: a malformed one (e.g. initValue="abc") must not throw
         // out of initialization here, or it would abort the whole strategy load even when
         // initPolicy="UseFixField" would have supplied the value from the FIX message (#R16). A null

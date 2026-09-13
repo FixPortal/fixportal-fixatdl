@@ -344,6 +344,33 @@ public class ExpressionAndParameterConformanceTests
     }
 
     [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Boolean_parameter_compares_against_FIX_field_via_its_declared_wire_mapping(bool reverse)
+    {
+        // CR8: a Boolean_t with a custom wire mapping facing a FIX field must parse the field through
+        // that mapping; the generic bool conversion only recognises True/False and would throw on "1".
+        var strategy = Load();
+        var flag = new Parameter_t<Boolean_t>("Flag") { FixTag = 97 };
+        flag.Value.TrueWireValue = "1";
+        flag.Value.FalseWireValue = "0";
+        flag.WireValue = "1";
+        strategy.Parameters.Add(flag);
+        var initial = Substitute.For<IInitialFixValueProvider>();
+        initial.InputFixValues.Returns(new FixTagValuesCollection { { 97, "1" } });
+        var edit = ParameterEdit(
+            strategy,
+            reverse ? "FIX_PossResend" : "Flag",
+            Operator_t.Equal,
+            field2: reverse ? "Flag" : "FIX_PossResend"
+        );
+
+        edit.Evaluate(new FixFieldValueProvider(initial, strategy.Parameters));
+
+        edit.CurrentState.Should().BeTrue();
+    }
+
+    [Theory]
     [InlineData(Operator_t.Equal, false)]
     [InlineData(Operator_t.NotEqual, true)]
     [InlineData(Operator_t.GreaterThan, false)]

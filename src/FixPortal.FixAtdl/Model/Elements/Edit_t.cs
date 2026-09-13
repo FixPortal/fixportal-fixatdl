@@ -460,8 +460,8 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
             // When the opposite operand is a parameter, convert the FIX field's string to the
             // parameter's native type — the same conversion the literal path applies — rather than
             // facing the parameter with a raw string it can never equal (R02).
-            return _field2Source is IParameter
-                ? ConvertFixFieldForParameter(additionalValues, Field, Field2Value)
+            return _field2Source is IParameter parameter
+                ? ConvertFixFieldForParameter(additionalValues, Field, parameter, Field2Value)
                 : GetFixFieldValue(additionalValues, Field);
         }
 
@@ -510,8 +510,8 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         {
             if (Field2.StartsWith("FIX_", StringComparison.Ordinal))
             {
-                return _fieldSource is IParameter
-                    ? ConvertFixFieldForParameter(additionalValues, Field2, lhs)
+                return _fieldSource is IParameter parameter
+                    ? ConvertFixFieldForParameter(additionalValues, Field2, parameter, lhs)
                     : GetFixFieldValue(additionalValues, Field2);
             }
 
@@ -525,16 +525,34 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
     // as the literal path is via ConvertToComparableType. Previously only string parameters ever matched
     // the raw FIX string, so char/bool/date-time/MonthYear/Tenor/ISO-enum parameters silently mis-compared
     // (EQ always false, NE always true, inequalities throwing on the type mismatch). A missing FIX field
-    // stays null so EX/NX and null comparisons keep their meaning.
+    // stays null so EX/NX and null comparisons keep their meaning. Boolean parameters go through their
+    // declared wire mapping first (custom true/false tokens such as 1/0), falling back to the generic
+    // conversion when the field is not one of those tokens.
     private static object ConvertFixFieldForParameter(
         FixFieldValueProvider additionalValues,
         string fixField,
+        IParameter parameter,
         object parameterValue
     )
     {
-        return !additionalValues.TryGetValue(fixField, out string? fixString) || fixString == null
-            ? null!
-            : EditValueConverter.ConvertToComparableType(parameterValue, fixString);
+        if (!additionalValues.TryGetValue(fixField, out string? fixString) || fixString == null)
+        {
+            return null!;
+        }
+
+        if (parameter is Parameter_t<Boolean_t> booleanParameter)
+        {
+            try
+            {
+                return booleanParameter.Value.ParseWireValue(fixString)!;
+            }
+            catch (InvalidFieldValueException)
+            {
+                // Not one of the declared boolean tokens — compare via the generic conversion below.
+            }
+        }
+
+        return EditValueConverter.ConvertToComparableType(parameterValue, fixString);
     }
 
     private static object GetComparisonValue(T source, object value, string? literal = null)
