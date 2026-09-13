@@ -18,6 +18,11 @@ namespace FixPortal.FixAtdl.Model.Types;
 /// 'float field representing a percentage (e.g. 0.05 represents 5% and 0.9525 represents 95.25%). Note the number of
 /// decimal places may vary.'
 /// </summary>
+/// <remarks>
+/// The FIXatdl 1.1 Errata (20101221 p.32, Parameter/@minValue default table) assigns this type a default
+/// <c>minValue</c> of 0, which the constructor applies: negative percentages are rejected unless the parameter
+/// declares an explicit negative bound such as <c>minValue="-1"</c>.
+/// </remarks>
 public class Percentage_t : Float_t
 {
     /// <summary>Initializes the FIXatdl default minimum of zero.</summary>

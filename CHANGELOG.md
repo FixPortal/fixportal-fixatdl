@@ -89,6 +89,9 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - `EditValueConverter.ConvertToComparableType` guards null operands before the
   null-prototype early return, so a `(null, null)` call throws the documented
   `IllegalUseOfNullError`.
+- `Price_t`/`PriceOffset_t`/`Percentage_t` class remarks now name the FIXatdl
+  Errata default `minValue` of 0 these types apply, and the explicit negative
+  bound (e.g. `minValue="-1"`) that opts out of it.
 
 ## [1.1.2] — 2026-09-12
 
