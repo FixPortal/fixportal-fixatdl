@@ -96,15 +96,19 @@ public static class ValueConverter
                 return ParseOrThrow(value, targetType, v => Convert.ToInt32(v, CultureInfo.InvariantCulture));
 
             case "System.Decimal":
-                // Explicit styles: the FIX numeric alphabet has no thousands separators, so
-                // "1,5" (a comma-decimal spelling) must fail rather than parse as 15 (R21).
+                // Explicit styles: thousands separators and exponent notation are both outside the
+                // XML Schema decimal lexical grammar and must fail. Leading and trailing whitespace
+                // stay legal per the XSD whitespace-collapse facet. Tightened on review after R21.
                 return ParseOrThrow(
                     value,
                     targetType,
                     v =>
                         decimal.Parse(
                             v,
-                            NumberStyles.Float | NumberStyles.AllowLeadingSign,
+                            NumberStyles.AllowLeadingWhite
+                                | NumberStyles.AllowTrailingWhite
+                                | NumberStyles.AllowLeadingSign
+                                | NumberStyles.AllowDecimalPoint,
                             CultureInfo.InvariantCulture
                         )
                 );

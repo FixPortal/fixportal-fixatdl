@@ -51,17 +51,28 @@ public static partial class FixDateTime
     }
 
     /// <summary>
+    /// Truncates fractional-second digits beyond what DateTime can hold (seven tick digits), so a valid
+    /// higher-precision value parses/classifies instead of being rejected outright.
+    /// </summary>
+    internal static string TruncateExcessFraction(string value) => ExcessFractionPattern().Replace(value, "$1");
+
+    /// <summary>
     /// Classifies the supplied text as a date-less (time-of-day-only) FIX value: it parses exactly
     /// against one of the <see cref="FixDateTimeFormat"/> time-only formats and nothing else.
     /// </summary>
     /// <remarks>Classifying from the parse result replaces the previous "first eight characters are
     /// digits" heuristic, which misclassified ISO-8601 (<c>2026-06-01T12:00:00Z</c>), date-only
     /// (<c>2026-06-01</c>) and leading-space date-time text as time-only and so silently degraded a
-    /// date-bearing bound to a recurring daily window (R04).</remarks>
+    /// date-bearing bound to a recurring daily window (R04). The same normalisation the parse path
+    /// applies (leap second, excess-fraction truncation) runs here too, so a value the parser accepts
+    /// — "23:59:60", "12:34:56.123456789" — is not misclassified as date-bearing.</remarks>
     internal static bool IsTimeOnlyText(string text)
     {
+        string parseValue = NormaliseLeapSecond(text, out _);
+        parseValue = TruncateExcessFraction(parseValue);
+
         return DateTime.TryParseExact(
-            text,
+            parseValue,
             FixDateTimeFormat.TimeOnlyFormatsArray,
             CultureInfo.InvariantCulture,
             DateTimeStyles.AllowWhiteSpaces,
@@ -103,7 +114,7 @@ public static partial class FixDateTime
 
         // Truncate any fraction digits beyond what DateTime can hold so a valid nanosecond-precision
         // timestamp is not rejected outright.
-        parseValue = ExcessFractionPattern().Replace(parseValue, "$1");
+        parseValue = TruncateExcessFraction(parseValue);
 
         bool parsed =
             DateTime.TryParseExact(parseValue, FixDateTimeFormat.FormatsArray, provider, styles, out result)

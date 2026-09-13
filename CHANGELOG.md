@@ -96,6 +96,14 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - `Price_t`/`PriceOffset_t`/`Percentage_t` class remarks now name the FIXatdl
   Errata default `minValue` of 0 these types apply, and the explicit negative
   bound (e.g. `minValue="-1"`) that opts out of it.
+- `Float_t` wire parsing rejects exponent notation and whitespace padding, and
+  `ValueConverter`'s decimal conversion rejects exponent notation (the XML
+  Schema decimal grammar excludes it); both previously parsed scaled values
+  such as `"1E2"` as `100`.
+- Time-only bound/operand classification and the date-time parameter conversion
+  path apply the parse path's leap-second and excess-fraction normalisation, so
+  valid values such as `"23:59:60"` or a 9-digit fraction are not misclassified
+  as date-bearing or rejected.
 
 ## [1.1.2] — 2026-09-12
 

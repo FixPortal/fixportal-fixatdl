@@ -43,6 +43,11 @@ public static class FixDateTimeFormat
     /// <summary>Time only with an optional-seconds timezone offset including minutes.</summary>
     public static readonly string FixTimeOnlyMinutesWithMinuteOffset = "HH:mmK";
 
+    /// <summary>Time only with fractional seconds and no offset. Internal: needed by the time-only
+    /// classification (R04) so a truncated high-precision fraction still matches a format; the public
+    /// parse path reaches the same spellings through its loose fallback.</summary>
+    internal static readonly string FixTimeOnlyFractional = "HH:mm:ss.FFFFFFF";
+
     /// <summary>Time only with fractional seconds and an appended bare-hour timezone offset.</summary>
     public static readonly string FixTimeOnlyFractionalWithHourOffset = "HH:mm:ss.FFFFFFFzz";
 
@@ -60,6 +65,10 @@ public static class FixDateTimeFormat
 
     /// <summary>Date and time with optional seconds and a timezone offset including minutes.</summary>
     public static readonly string FixDateTimeMinutesWithMinuteOffset = "yyyyMMdd-HH:mmK";
+
+    /// <summary>Date and time with fractional seconds and no offset. Internal: parse-only entry so a
+    /// truncated high-precision fraction still matches a format; emission stays on the seconds/ms pair.</summary>
+    internal static readonly string FixDateTimeFractional = "yyyyMMdd-HH:mm:ss.FFFFFFF";
 
     /// <summary>Date and time with fractional seconds and a bare-hour timezone offset.</summary>
     public static readonly string FixDateTimeFractionalWithHourOffset = "yyyyMMdd-HH:mm:ss.FFFFFFFzz";
@@ -99,6 +108,7 @@ public static class FixDateTimeFormat
     [
         FixTimeOnly,
         FixTimeOnlyMs,
+        FixTimeOnlyFractional,
         FixTimeOnlyWithTz,
         FixTimeOnlyMinutesWithUtcDesignator,
         FixTimeOnlyMinutesWithHourOffset,

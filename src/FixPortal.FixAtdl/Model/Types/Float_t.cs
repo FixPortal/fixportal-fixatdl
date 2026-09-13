@@ -122,8 +122,13 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
         }
 
         // Explicit styles: the FIX float alphabet is '-', '0'-'9' and '.', so a thousands-separated
-        // spelling ("1,000.5") must fail rather than parse as 1000.5 (R21).
-        return decimal.Parse(value, NumberStyles.Float | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
+        // spelling ("1,000.5"), an exponent spelling ("1E2") and a whitespace-padded one (" 1") must
+        // all fail rather than parse as 1000.5, 100 or 1 (R21; exponent/whitespace excluded on review).
+        return decimal.Parse(
+            value,
+            NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+            CultureInfo.InvariantCulture
+        );
     }
 
     /// <summary>

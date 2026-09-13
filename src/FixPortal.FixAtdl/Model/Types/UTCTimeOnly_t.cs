@@ -21,7 +21,14 @@ namespace FixPortal.FixAtdl.Model.Types;
 /// </summary>
 public class UTCTimeOnly_t : UTCDateTimeTypeBase
 {
-    private static readonly string[] _formatStrings = [FixDateTimeFormat.FixTimeOnly, FixDateTimeFormat.FixTimeOnlyMs];
+    // The fractional entry is parse-only: it lets a truncated high-precision wire value in, while
+    // emission keeps using the seconds/ms pair above (UTCDataTimeTypeBase selects [0] or [1]).
+    private static readonly string[] _formatStrings =
+    [
+        FixDateTimeFormat.FixTimeOnly,
+        FixDateTimeFormat.FixTimeOnlyMs,
+        FixDateTimeFormat.FixTimeOnlyFractional,
+    ];
 
     /// <inheritdoc />
     internal override bool IsTimeOnlyType => true;

@@ -102,6 +102,35 @@ public class TimestampBoundConformanceTests
     }
 
     [Fact]
+    public void Leap_second_bound_classifies_as_time_of_day_not_date_bearing()
+    {
+        // The classifier applies the parse path's leap-second normalisation: "08:00:60" rolls to
+        // 08:01:00 and must become a recurring daily window, not a one-off date-time bound (the
+        // far-future value dates pin date-independence).
+        var p = Param(minText: "08:00:60", maxText: null);
+
+        var before = () => p.WireValue = "20990101-08:00:30";
+        before.Should().Throw<InvalidFieldValueException>();
+
+        var at = () => p.WireValue = "20990101-08:01:00";
+        at.Should().NotThrow();
+    }
+
+    [Fact]
+    public void High_precision_fraction_bound_classifies_as_time_of_day_not_date_bearing()
+    {
+        // Excess fraction digits truncate to tick precision (the parse path's rule) and the bound
+        // stays a recurring daily window; previously this was misclassified as date-bearing.
+        var p = Param(minText: "08:00:00.123456789", maxText: null);
+
+        var before = () => p.WireValue = "20990101-08:00:00.123";
+        before.Should().Throw<InvalidFieldValueException>();
+
+        var after = () => p.WireValue = "20990101-08:00:00.124";
+        after.Should().NotThrow();
+    }
+
+    [Fact]
     public void Time_only_max_bound_rejects_value_after_time_of_day()
     {
         var p = Param(minText: null, maxText: "16:00:00");
