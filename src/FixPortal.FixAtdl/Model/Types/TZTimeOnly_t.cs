@@ -51,10 +51,11 @@ public class TZTimeOnly_t : DateTimeTypeBase
     }
 
     /// <summary>
-    /// Normalise the explicit timezone offset carried by the wire value to UTC so that the
-    /// round-tripped value is canonical (emitted as 'Z') and independent of the parsing host's
-    /// local offset. The instant is preserved exactly; the original offset *representation*
-    /// (e.g. "-05") is not retained — full fidelity would require carrying a DateTimeOffset.
+    /// Normalise the explicit timezone offset carried by the wire value to UTC for the stored instant,
+    /// independent of the parsing host's local offset. The instant is preserved exactly. Emission
+    /// round-trips the original wire representation — offset included — while the instant is unchanged
+    /// (see <see cref="ConvertToWireValueFormat"/>); a programmatically-set value is emitted canonical
+    /// UTC ('Z').
     /// </summary>
     protected override DateTimeStyles WireParseStyles =>
         DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;

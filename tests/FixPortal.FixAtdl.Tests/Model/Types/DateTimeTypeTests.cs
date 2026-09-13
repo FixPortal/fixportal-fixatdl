@@ -115,10 +115,10 @@ public class DateTimeTypeTests
 
     // ──────────────────────────────────────────────────────────────────────────
     // TZTimeOnly_t  format: HH:mm:ssK
-    // NOTE: WireParseStyles = AssumeUniversal | AdjustToUniversal.
-    // The UTC offset is normalised to UTC on parse; the emitted form uses 'K'
-    // which renders as "Z" for a UTC DateTime, so a non-Z input (e.g. "-05:00")
-    // is stored as UTC and emitted as "Z". Only a Z input round-trips unchanged.
+    // NOTE: WireParseStyles = AssumeUniversal | AdjustToUniversal normalises the stored instant to
+    // UTC, but emission round-trips the ORIGINAL wire representation — offset included — while the
+    // instant is unchanged (TZTimeOnly_t._originalWireValue). Only a programmatically-set value is
+    // emitted canonical UTC ('Z').
     // ──────────────────────────────────────────────────────────────────────────
 
     [Fact]
@@ -129,9 +129,8 @@ public class DateTimeTypeTests
     }
 
     [Fact]
-    public void TZTimeOnly_t_normalises_offset_to_UTC_Z()
+    public void TZTimeOnly_t_round_trips_original_offset()
     {
-        // NOTE: Now we preserve and round-trip the original offset representation.
         var p = new Parameter_t<TZTimeOnly_t>("T") { WireValue = "02:39:00-05:00" };
         p.WireValue.Should().Be("02:39:00-05:00");
     }
@@ -174,7 +173,7 @@ public class DateTimeTypeTests
 
     // ──────────────────────────────────────────────────────────────────────────
     // TZTimestamp_t  format: yyyyMMdd-HH:mm:ssK
-    // NOTE: same UTC-normalisation as TZTimeOnly_t.
+    // NOTE: same contract as TZTimeOnly_t — instant stored as UTC, original offset round-tripped.
     // ──────────────────────────────────────────────────────────────────────────
 
     [Fact]
@@ -185,9 +184,8 @@ public class DateTimeTypeTests
     }
 
     [Fact]
-    public void TZTimestamp_t_normalises_offset_to_UTC_Z()
+    public void TZTimestamp_t_round_trips_original_offset()
     {
-        // NOTE: Now we preserve and round-trip the original offset representation.
         var p = new Parameter_t<TZTimestamp_t>("Ts") { WireValue = "20060901-02:39:00-05:00" };
         p.WireValue.Should().Be("20060901-02:39:00-05:00");
     }

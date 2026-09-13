@@ -99,6 +99,14 @@ public static class Regions
     /// </summary>
     public static IReadOnlySet<IsoCountryCode> TheAmericasCountries => _theAmericasCountries;
 
+    // All three sets transcribe fixatdl-regions-1-1.xsd (FIX Protocol Limited, 2010, build
+    // 2.7.2e20101221) verbatim — 50 / 133 / 59 = 242 pairwise-disjoint codes whose union is exactly
+    // the non-None IsoCountryCode membership. The grouping is a FIXatdl business partition, NOT
+    // geography: the schema itself places LK (Sri Lanka), SR (Suriname), GF (French Guiana), PN
+    // (Pitcairn), GL (Greenland) and GS (South Georgia) in EuropeMiddleEastAfrica. Do not "correct"
+    // these toward geography — CountryCollection.Add validates against these sets, so moving a code
+    // would reject documents the 1.1 schema validates (adversarial review 2026-09-12, chunk L06b:
+    // four counter-geographic findings refuted spec-conformant against the schema).
     private static readonly FrozenSet<IsoCountryCode> _europeMiddleEastAfricaCountries = new[]
     {
         IsoCountryCode.AD,

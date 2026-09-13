@@ -718,9 +718,14 @@ public class EnumStateTests
     [Fact]
     public void EnumState_load_init_value_non_enum_allowed_stores_as_non_enum()
     {
-        var state = new EnumState(["A", "B"]);
+        // Start with a bit set so the assertion pins the CLEARING, not just the initial state:
+        // storing a non-enum value runs ClearAll first — the inverse of the invariant its indexer and
+        // setter twins pin (setting a bit clears the non-enum value).
+        var state = new EnumState(["A", "B"]) { ["A"] = true };
         state.LoadInitValue("freetext", true);
         state.NonEnumValue.Should().Be("freetext");
+        state["A"].Should().BeFalse();
+        state["B"].Should().BeFalse();
     }
 
     [Fact]
@@ -823,10 +828,12 @@ public class ClockControlTests
         };
         clock.LoadInitValue(FixFieldValueProvider.Empty);
         // Etc/UTC: local display == 09:00 on the FakeClock's "today" (2026-06-01).
-        // GetCurrentValue returns ToDateTimeUnspecified, so match its Kind.
+        // GetCurrentValue returns ToDateTimeUnspecified, so match its Kind — BeIn pins the Kind
+        // itself, which .Be (ticks-only) cannot detect.
         ((DateTime)clock.GetCurrentValue())
             .Should()
-            .Be(new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Unspecified));
+            .Be(new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Unspecified))
+            .And.BeIn(DateTimeKind.Unspecified);
     }
 
     [Fact]
@@ -840,10 +847,12 @@ public class ClockControlTests
             Clock = new FakeClock(Instant.FromUtc(2026, 6, 1, 0, 0, 0)),
         };
         clock.LoadInitValue(FixFieldValueProvider.Empty);
-        // GetCurrentValue returns ToDateTimeUnspecified, so match its Kind.
+        // GetCurrentValue returns ToDateTimeUnspecified, so match its Kind — BeIn pins the Kind
+        // itself, which .Be (ticks-only) cannot detect.
         ((DateTime)clock.GetCurrentValue())
             .Should()
-            .Be(new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Unspecified));
+            .Be(new DateTime(2026, 6, 1, 9, 0, 0, DateTimeKind.Unspecified))
+            .And.BeIn(DateTimeKind.Unspecified);
     }
 
     [Fact]
@@ -852,7 +861,7 @@ public class ClockControlTests
         var clock = new Clock_t("clk");
         var dt = new DateTime(2026, 6, 1, 10, 30, 0, DateTimeKind.Utc);
         clock.SetValue(dt);
-        ((DateTime?)clock.GetCurrentValue()).Should().Be(dt);
+        ((DateTime)clock.GetCurrentValue()).Should().Be(dt).And.BeIn(DateTimeKind.Utc);
     }
 
     [Fact]
@@ -922,7 +931,10 @@ public class ClockControlTests
 
         clock.LoadInitValue(provider);
 
-        ((DateTime?)clock.GetCurrentValue()).Should().Be(new DateTime(2026, 6, 1, 8, 0, 0, DateTimeKind.Utc));
+        ((DateTime)clock.GetCurrentValue())
+            .Should()
+            .Be(new DateTime(2026, 6, 1, 8, 0, 0, DateTimeKind.Utc))
+            .And.BeIn(DateTimeKind.Utc);
     }
 
     [Fact]

@@ -219,7 +219,7 @@ public class KeyedCollectionTests
     }
 
     [Fact]
-    public void RegionCollection_IsApplicableTo_rejects_excluded_country()
+    public void RegionCollection_IsApplicableTo_rejects_country_outside_included_region()
     {
         var regions = new RegionCollection
         {

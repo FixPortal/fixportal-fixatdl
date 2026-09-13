@@ -116,10 +116,10 @@ public class TenorTests
     // Characterization — batch-3 finding #7 (CLOSED)
     // ──────────────────────────────────────────────────────────────────────────
 
-    // Characterization (batch-3 finding #7, deliberately CLOSED — see docs/batch-3-findings-disposition.md):
-    // Tenor.Parse intentionally accepts non-positive offsets. D0 means "same day" in several FIX
-    // implementations and numeric-range enforcement is a business-layer concern, not a parser invariant.
-    // This pins that decision so a future "tighten the parser" change is a conscious one.
+    // Characterization (batch-3 finding #7 — see docs/batch-3-findings-disposition.md):
+    // Tenor.Parse rejects non-positive offsets: the parser throws for Offset <= 0 (Tenor.cs), so D0 is
+    // NOT accepted as "same day". The disposition record previously described the inverse (a kept
+    // lenient parse) in error; the test and the shipped parser agree on rejection.
     [Theory]
     [InlineData("D0")]
     [InlineData("M-3")]
