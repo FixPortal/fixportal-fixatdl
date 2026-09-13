@@ -1,4 +1,5 @@
 using System.Collections.Specialized;
+using System.Runtime.CompilerServices;
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
@@ -570,5 +571,34 @@ public class SupplementalCollectionTests
         result.Should().BeTrue();
         results.Should().BeNull();
         parameter.Received(2).SetValueFromControl(Arg.Any<Control_t>());
+    }
+
+    [Fact]
+    public void Removing_a_collections_last_control_releases_the_panel_from_the_strategy_index()
+    {
+        // The sender-tracking entry keys the panel's ControlCollection; once its last contributed
+        // control is removed individually, the emptied entry must be dropped or it retains the
+        // panel for the strategy's lifetime (CodeRabbit outside-diff follow-up).
+        var strategy = new Strategy_t();
+        var weakPanel = AddThenRemoveControls(strategy);
+
+#pragma warning disable S1215 // A retention assertion has to force the collection it observes.
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+#pragma warning restore S1215
+
+        weakPanel.IsAlive.Should().BeFalse();
+    }
+
+    // NoInlining so the panel local cannot be kept alive by the JIT past the GC assertions.
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference AddThenRemoveControls(Strategy_t strategy)
+    {
+        var panel = new StrategyPanel_t(strategy);
+        panel.Controls.Add(new TextField_t("c_One"));
+        panel.Controls.Remove(panel.Controls[0]);
+        panel.Dispose();
+        return new WeakReference(panel);
     }
 }
