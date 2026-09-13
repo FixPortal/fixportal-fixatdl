@@ -19,11 +19,80 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   their own.
 - README hero banner and social preview under `docs/images/`.
 - This changelog.
+- `IsoCurrencyCode` gains the four active ISO 4217 assignments missing from the
+  enum — TMT, VED, XCG, ZWG. Withdrawn codes ZWL and CUC are deliberately
+  absent; the type remarks document the retained historic (TMM, ZWD, ANG) and
+  de-facto (SPL, GGP, IMP, JEP, TVD) codes.
+- Host-registered custom parameter types validate eagerly: a value-type
+  `ClrType` is rejected at registration (attribute writes would be lost to
+  boxing), and each attribute property path is resolved up front under the rule
+  the deserializer enforces, so a mismatched mapping fails at registration
+  rather than at first document use.
+
+### Changed
+
+- `InternalErrorException` now derives from `FixAtdlException`, so catching the
+  library's documented base exception no longer misses it.
+- Enum wire parsing rejects a comma-bearing value for a non-`[Flags]` enum
+  instead of silently OR-ing the members into a different defined value.
+- Package metadata URLs (`PackageProjectUrl`/`RepositoryUrl`) now name the real
+  `FixPortal/fixportal-fixatdl` repository, and the csproj `<Version>` matches
+  the shipped release (1.1.2) so hand-run packs report correctly.
 
 ### Fixed
 
 - README no longer claims the public surface is locked by `PublicAPI.Shipped.txt`;
   that analyzer was removed before `1.0.5` (see below).
+- Time-only UTC `Clock_t` parameter values re-anchor to today's UTC date instead
+  of resolving as market-local wall clock and re-emitting zone-shifted.
+- `FIX_` field operands facing an `IParameter` convert against the parameter's
+  native value type, so `Char_t`/`Boolean_t`/date-time/`MonthYear_t`/`Tenor_t`/
+  ISO-enum parameters compare correctly (`EQ`/`NE`/inequalities).
+- Numeric text in a text control facing a non-numeric literal compares as
+  strings instead of throwing `InvalidFieldValueException`.
+- Date-less timestamp bounds classify from the parse result, and `localMktTz`
+  is validated eagerly at load.
+- A declared UTC leap second (`":60"`) normalises by rolling forward one second
+  in `ConvertFromWireValueFormat`, matching the const/control paths; a leap at
+  the last representable instant is rejected as an invalid value.
+- Empty `String_t`/`Data_t` values are treated as unset, and `MonthYear_t`/
+  `Tenor_t` clear from a text control.
+- Control/parameter wire conversions round-trip symmetrically:
+  `TextControlBase.ToBoolean` decodes through `Boolean_t.ParseWireValue`;
+  `Language_t` emits lower-case ISO 639-1 codes; FIX initialisation honours a
+  `Boolean_t` parameter's declared wire mapping; unmatched free text reloads as
+  `EnumState.NonEnumValue`; matching shapes update the existing `EnumState` in
+  place; `FixMessage.ToFix` refuses empty field values, not just null.
+- Precision-rounded output is re-validated before wire emission.
+- Date-less `Clock_t` `SetValue` strings resolve via the `initValue`
+  market-zone path, keeping date-only bindings on their calendar day.
+- A numeric `Slider_t` skips its `initValue` pre-seed when the value cannot
+  parse, so `UseFixField` still runs.
+- Edit evaluation fails fast: an `Edit` with neither `operator` nor
+  `logicOperator` throws at `Resolve`; an `EditRef` under a global `Edit` is
+  rejected; property-setter failures unwrap from `TargetInvocationException`;
+  redundant null assignments are a no-op; evaluating an unresolved edit throws
+  a domain error instead of a `NullReferenceException`.
+- FIX wire values compare ordinally, and explicit `NumberStyles` apply across
+  the numeric parsing surface (`IsNumericFixField` now returns the non-numeric
+  default its comment describes).
+- Strategy control index hardened: ungrouped radio siblings index correctly,
+  `Reset` is sender-scoped, and `Id` is init-only.
+- `StrategyParameterType` (FIX tag 959) codes corrected for `Language_t` and
+  `Tenor_t`.
+- Wire parsing hardening: doubled SOH rejected, empty wire values filtered from
+  tag 960, bare numeric user tags resolve.
+- `{NULL}` sentinel mapping mirrored at the reference-type base; `ToEnumState`
+  uses the subclass wire converter; `ConstValue` coalesces in messages.
+- `decimal.MaxValue` is no longer used as an invalid sentinel; `EnumState` id
+  arrays are cloned; clock FIX-load conversion failures are caught.
+- `Description_t` string conversion is null-safe; same-typed numeric edit
+  operands compare natively; `WireValue` is annotated `DisallowNull`.
+- Layout indexes refresh on `Move`; a removed control detaches from its panel;
+  a shared radio parameter is reported once.
+- `EditValueConverter.ConvertToComparableType` guards null operands before the
+  null-prototype early return, so a `(null, null)` call throws the documented
+  `IllegalUseOfNullError`.
 
 ## [1.1.2] — 2026-09-12
 
