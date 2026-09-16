@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Core and its two adapters</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f7f8fa;
+      --color-ink:     #1f2937;
+      --color-muted:   #5b6b85;
+      --color-accent:  #0f766e;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1200px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 900px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Architecture · The three-pack</p>
+    <h1>Core and its two adapters</h1>
+
+    <svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="threepack-title threepack-desc">
+      <title id="threepack-title">Core and its two adapters</title>
+      <desc id="threepack-desc">Broker FIXatdl XML is parsed by the headless core package, which the WPF adapter consumes directly as Strategy_t while the React adapter consumes a JSON DTO the host maps itself; the host assembles the final FIX order from direct tags and adapter read-back, and the React group emitter is only a preview.</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#5b6b85"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#0f766e"/></marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f7f8fa"/>
+
+      <!-- ===== ARROWS (before boxes) ===== -->
+      <!-- XML -> core -->
+      <line x1="176" y1="284" x2="232" y2="284" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="186" y="258" width="36" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="204" y="267" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">PARSE</text>
+
+      <!-- core -> WPF (up) -->
+      <path d="M 432,268 H 460 Q 468,268 468,260 V 180 Q 468,172 476,172 H 504" fill="none" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="360" y="194" width="72" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="396" y="203" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">STRATEGY_T</text>
+
+      <!-- core -> host mapper (down) -->
+      <path d="M 432,300 H 460 Q 468,300 468,308 V 380 Q 468,388 476,388 H 504" fill="none" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="360" y="362" width="72" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="396" y="371" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">STRATEGY_T</text>
+
+      <!-- core -> FIX order (direct tags, straight through the middle) -->
+      <line x1="432" y1="284" x2="776" y2="284" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="568" y="258" width="72" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="604" y="267" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">DIRECT TAGS</text>
+
+      <!-- mapper -> react -->
+      <line x1="608" y1="420" x2="608" y2="452" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="616" y="428" width="64" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="648" y="437" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">JSON DTO</text>
+
+      <!-- WPF -> FIX order -->
+      <path d="M 712,172 H 736 Q 744,172 744,180 V 260 Q 744,268 752,268 H 776" fill="none" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="748" y="194" width="68" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="782" y="203" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">READ-BACK</text>
+
+      <!-- ===== NODES ===== -->
+      <!-- N1 broker XML -->
+      <rect x="40" y="252" width="136" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="40" y="252" width="136" height="64" rx="6" fill="rgba(91,107,133,0.10)" stroke="#6b7280" stroke-width="1"/>
+      <rect x="48" y="260" width="32" height="12" rx="2" fill="transparent" stroke="rgba(107,114,128,0.40)" stroke-width="0.8"/>
+      <text x="64" y="269" fill="rgba(107,114,128,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">XML</text>
+      <text x="108" y="292" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">FIXatdl 1.1</text>
+      <text x="108" y="308" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">from the broker</text>
+
+      <!-- N2 core (FOCAL) -->
+      <rect x="232" y="244" width="200" height="80" rx="6" fill="#f7f8fa"/>
+      <rect x="232" y="244" width="200" height="80" rx="6" fill="rgba(15,118,110,0.08)" stroke="#0f766e" stroke-width="1"/>
+      <rect x="240" y="252" width="44" height="12" rx="2" fill="transparent" stroke="rgba(15,118,110,0.40)" stroke-width="0.8"/>
+      <text x="262" y="261" fill="rgba(15,118,110,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">NUGET</text>
+      <text x="332" y="288" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">FixPortal.FixAtdl</text>
+      <text x="332" y="304" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">headless: parse, validate, emit</text>
+      <text x="332" y="316" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">no UI, no I/O</text>
+
+      <!-- N3 WPF adapter -->
+      <rect x="504" y="140" width="208" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="504" y="140" width="208" height="64" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <rect x="512" y="148" width="44" height="12" rx="2" fill="transparent" stroke="rgba(31,41,55,0.40)" stroke-width="0.8"/>
+      <text x="534" y="157" fill="rgba(31,41,55,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">NUGET</text>
+      <text x="608" y="180" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">FixPortal.FixAtdl.Wpf</text>
+      <text x="608" y="196" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">consumes Strategy_t directly</text>
+
+      <!-- N4 host mapper -->
+      <rect x="504" y="356" width="208" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="504" y="356" width="208" height="64" rx="6" fill="rgba(91,107,133,0.10)" stroke="#6b7280" stroke-width="1"/>
+      <rect x="512" y="364" width="36" height="12" rx="2" fill="transparent" stroke="rgba(107,114,128,0.40)" stroke-width="0.8"/>
+      <text x="530" y="373" fill="rgba(107,114,128,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">HOST</text>
+      <text x="608" y="396" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Your JSON mapper</text>
+      <text x="608" y="412" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">not shipped &mdash; you write it</text>
+
+      <!-- N5 React adapter -->
+      <rect x="504" y="452" width="208" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="504" y="452" width="208" height="64" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <rect x="512" y="460" width="32" height="12" rx="2" fill="transparent" stroke="rgba(31,41,55,0.40)" stroke-width="0.8"/>
+      <text x="528" y="469" fill="rgba(31,41,55,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">NPM</text>
+      <text x="608" y="492" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">@fix-portal/fixatdl-react</text>
+      <text x="608" y="508" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">957-960 preview only</text>
+
+      <!-- N6 FIX order -->
+      <rect x="776" y="244" width="144" height="80" rx="6" fill="#f7f8fa"/>
+      <rect x="776" y="244" width="144" height="80" rx="6" fill="rgba(91,107,133,0.10)" stroke="#6b7280" stroke-width="1"/>
+      <rect x="784" y="252" width="36" height="12" rx="2" fill="transparent" stroke="rgba(107,114,128,0.40)" stroke-width="0.8"/>
+      <text x="802" y="261" fill="rgba(107,114,128,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">HOST</text>
+      <text x="848" y="288" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">FIX order</text>
+      <text x="848" y="304" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">your engine</text>
+      <text x="848" y="316" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">builds the wire</text>
+
+      <!-- ===== LEGEND ===== -->
+      <line x1="40" y1="548" x2="920" y2="548" stroke="rgba(31,41,55,0.10)" stroke-width="0.8"/>
+      <text x="40" y="568" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEGEND</text>
+
+      <rect x="124" y="559" width="12" height="10" rx="2" fill="rgba(15,118,110,0.08)" stroke="#0f766e" stroke-width="1"/>
+      <text x="144" y="568" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">THIS REPOSITORY</text>
+
+      <rect x="304" y="559" width="12" height="10" rx="2" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="324" y="568" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">PUBLISHED ADAPTER</text>
+
+      <rect x="500" y="559" width="12" height="10" rx="2" fill="rgba(91,107,133,0.10)" stroke="#6b7280" stroke-width="1"/>
+      <text x="520" y="568" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">HOST-OWNED / EXTERNAL</text>
+    </svg>
+  </div>
+</body>
+</html>

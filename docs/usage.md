@@ -8,6 +8,13 @@ been assessed against see [the conformance record](conformance.md).
 The library is headless. It never sends anything: you get tag/value pairs and
 your FIX engine puts them on the wire.
 
+![One strategy end to end: the host loads a document through StrategiesReader, seeds control values, sets and validates entered values, pushes them into parameters, runs strategy edits, and reads the 957-960 tags back from the group emitter](images/usage-sequence.png)
+
+The rest of this page walks that sequence call by call. For a rendered form see the
+[WPF](https://github.com/FixPortal/fixportal-fixatdl-wpf) or
+[React](https://github.com/FixPortal/fixportal-fixatdl-react) adapter. The
+[API reference](api.md) lists the types this page walks through.
+
 ## Loading a document
 
 ```csharp
@@ -56,6 +63,8 @@ the constructor.
 own assembly, and is used directly with no `Type.GetType` probing:
 
 ```csharp
+using FixPortal.FixAtdl.Xml.Serialization;
+
 var customTypes = new[]
 {
     new CustomParameterType(
@@ -126,7 +135,7 @@ Three mechanisms, all driven by the document:
 |---|---|---|
 | Parameter type and constraints | On every `WireValue` set or control update | `InvalidFieldValueException`, or a failed `ValidationResult` on the control path |
 | `StrategyEdit`s | `strategy.EvaluateAllStrategyEdits(provider, shortCircuit)` | `bool`; each `StrategyEdit` holds its own error text |
-| `StateRule`s | `strategy.RunAllStateRules()` | Mutates control enabled/visible state |
+| `StateRule`s | `strategy.RunAllStateRules()` | Evaluates each rule's condition into `CurrentState`. Does **not** change control enabled/visible — `Control_t` has no such flags. The host (or an adapter) reads `StateRule_t.Enabled` / `Visible` / `Value` when `CurrentState` is true and applies the effect. `{NULL}` in `Value` means clear. Precedence when two rules on the same control conflict is the adapter's. |
 
 `ValidationResult` reports `IsValid`, `IsMissing`, and `ErrorText`. Pass
 `shortCircuit: false` to collect every failure rather than stopping at the first —
@@ -160,12 +169,31 @@ IReadOnlyList<(int Tag, string Value)> group = StrategyParametersGrpEmitter.Emit
 
 Unset parameters are skipped and the 957 count reflects only those emitted; when
 nothing is set, tag 957 is omitted entirely rather than emitted as an empty group.
+A parameter name or wire value containing the FIX field delimiter (SOH) throws
+`InvalidOperationException` rather than splitting one field into two on the wire.
+
+Decimal wire parsing rejects a thousands separator (`"1,5"` is not `15`). Use
+invariant `0.1` for ten percent on a `Percentage_t`.
 
 ## Exceptions
 
-All live in `FixPortal.FixAtdl.Diagnostics.Exceptions` and derive from
-`FixAtdlException` — except `InternalErrorException`, which derives from
-`Exception` directly, so a blanket `catch (FixAtdlException)` will not see it.
+Every exception in `FixPortal.FixAtdl.Diagnostics.Exceptions` derives from
+`FixAtdlException`, including `InternalErrorException` — which signals a broken
+library invariant, so report it rather than swallowing it.
+
+`catch (FixAtdlException)` does **not** cover the whole surface. The library
+also raises BCL exception types for argument and state faults, and two of them
+are reachable from the operations documented above:
+
+| BCL type | Reachable from |
+|---|---|
+| `InvalidCastException` | A control asked to convert to a type its parameter cannot carry, e.g. `Clock_t.ToDecimal` |
+| `InvalidOperationException` | The SOH guards in `StrategyParametersGrpEmitter.Emit` (tags 958 and 960) |
+| `ArgumentException` / `ArgumentOutOfRangeException` / `ArgumentNullException` | Invalid arguments on public methods |
+| `NotSupportedException` | An operation a concrete type does not implement |
+
+Catch `FixAtdlException` for document and value faults; let the BCL types
+surface as the programming errors they indicate.
 
 | Exception | Raised when |
 |---|---|
@@ -178,7 +206,7 @@ All live in `FixPortal.FixAtdl.Diagnostics.Exceptions` and derive from
 | `InconsistentStrategyException` | The strategy is internally inconsistent, e.g. `ListItem`s but no `EnumPair`s |
 | `InvalidPropertyOnObjectException` | A document supplies a property the target object does not support |
 | `DuplicateKeyException` | Two items claim the same key in one collection |
-| `RenderingException` | A strategy could not be rendered; inspect `InnerException` |
+| `RenderingException` | Retained for the WPF adapter (no layout / no root panel). This package no longer throws it |
 | `InternalErrorException` | A library invariant broke — report it |
 
 ## Testing against a fixed clock

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI control types</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f7f8fa;
+      --color-ink:     #1f2937;
+      --color-muted:   #5b6b85;
+      --color-accent:  #0f766e;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1200px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 900px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Tree · FixPortal.FixAtdl</p>
+    <h1>UI control types &mdash; how does a user enter this?</h1>
+
+    <svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="controltypes-title controltypes-desc">
+      <title id="controltypes-title">UI control types</title>
+      <desc id="controltypes-desc">Every FIXatdl control descends from Control_t through InitializableControl into one of four abstract bases covering binary, list, numeric and text entry; the list base is the most connected type in the codebase.</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#5b6b85"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#0f766e"/></marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f7f8fa"/>
+
+      <!-- ===== CONNECTORS (before nodes) ===== -->
+      <!-- root -> single child -->
+      <line x1="480" y1="124" x2="480" y2="200" stroke="#5b6b85" stroke-width="1" marker-end="url(#arrow)"/>
+
+      <!-- InitializableControl stem + bus + four drops -->
+      <line x1="480" y1="252" x2="480" y2="300" stroke="#5b6b85" stroke-width="1"/>
+      <line x1="152" y1="300" x2="800" y2="300" stroke="#5b6b85" stroke-width="1"/>
+      <line x1="152" y1="300" x2="152" y2="348" stroke="#5b6b85" stroke-width="1" marker-end="url(#arrow)"/>
+      <line x1="368" y1="300" x2="368" y2="348" stroke="#5b6b85" stroke-width="1" marker-end="url(#arrow)"/>
+      <line x1="584" y1="300" x2="584" y2="348" stroke="#5b6b85" stroke-width="1" marker-end="url(#arrow)"/>
+      <line x1="800" y1="300" x2="800" y2="348" stroke="#5b6b85" stroke-width="1" marker-end="url(#arrow)"/>
+
+      <!-- ===== NODES ===== -->
+      <!-- ROOT Control_t -->
+      <rect x="380" y="72" width="200" height="52" rx="6" fill="#f7f8fa"/>
+      <rect x="380" y="72" width="200" height="52" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="480" y="98" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Control_t</text>
+      <text x="480" y="113" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Id / ParameterRef / StateRules</text>
+
+      <!-- L1 InitializableControl -->
+      <rect x="372" y="200" width="216" height="52" rx="6" fill="#f7f8fa"/>
+      <rect x="372" y="200" width="216" height="52" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="480" y="226" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">InitializableControl</text>
+      <text x="480" y="241" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">adds InitValue</text>
+
+      <!-- L2-1 BinaryControlBase -->
+      <rect x="56" y="348" width="192" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="56" y="348" width="192" height="64" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="152" y="378" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">BinaryControlBase</text>
+      <text x="152" y="394" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">CheckBox_t</text>
+      <text x="152" y="406" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">RadioButton_t</text>
+
+      <!-- L2-2 ListControlBase (FOCAL) -->
+      <rect x="272" y="348" width="192" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="272" y="348" width="192" height="64" rx="6" fill="rgba(15,118,110,0.08)" stroke="#0f766e" stroke-width="1"/>
+      <text x="368" y="378" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">ListControlBase</text>
+      <text x="368" y="394" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">DropDownList_t, Slider_t</text>
+      <text x="368" y="406" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">uses EnumState</text>
+
+      <!-- L2-3 NumericControlBase -->
+      <rect x="488" y="348" width="192" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="488" y="348" width="192" height="64" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="584" y="378" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">NumericControlBase</text>
+      <text x="584" y="394" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">SingleSpinner_t</text>
+      <text x="584" y="406" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">DoubleSpinner_t</text>
+
+      <!-- L2-4 TextControlBase -->
+      <rect x="704" y="348" width="192" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="704" y="348" width="192" height="64" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="800" y="378" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">TextControlBase</text>
+      <text x="800" y="394" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">TextField_t, Label_t</text>
+      <text x="800" y="406" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">HiddenField_t</text>
+
+      <!-- ===== LEGEND ===== -->
+      <line x1="40" y1="500" x2="920" y2="500" stroke="rgba(31,41,55,0.10)" stroke-width="0.8"/>
+      <text x="40" y="520" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEGEND</text>
+
+      <rect x="124" y="511" width="12" height="10" rx="2" fill="rgba(15,118,110,0.08)" stroke="#0f766e" stroke-width="1"/>
+      <text x="144" y="520" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">GOD NODE (DEGREE 24)</text>
+
+      <rect x="332" y="511" width="12" height="10" rx="2" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="352" y="520" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">ABSTRACT BASE</text>
+
+    </svg>
+  </div>
+</body>
+</html>

@@ -28,11 +28,11 @@ The figures in this section are the record of the September 2026 pass and are no
 updated as the suite grows. Current state: **1261 passing tests** against package
 **1.1.3**.
 
-The starting core revision was `bd0e35b` with 731 passing tests. The completed
-core source has **822 passing tests**, no failures or skips. CSharpier checks
+The starting core revision was `bd0e35b` with 731 passing tests. The September
+2026 pass ends with **1261 passing tests**, no failures or skips. CSharpier checks
 219 files. The coverage command below reports **76.1% library line coverage**,
 above the existing 70% floor. WPF's corresponding local integration run has
-89 passing tests against the updated core package.
+165 passing tests against the updated core package.
 
 ```sh
 dotnet test --solution FixPortal.FixAtdl.slnx -c Release
@@ -42,8 +42,8 @@ dotnet dotnet-coverage collect -f cobertura -o coverage.cobertura.xml "dotnet te
 
 Run `scripts/assert-coverage-floor.ps1` with `-ReportPath coverage.cobertura.xml
 -Package FixPortal.FixAtdl -MinimumLineRate 70` to check the library floor.
-The source changes are intended for core package **1.0.5**; local intermediate
-packages 1.0.2–1.0.4 were integration candidates, not releases.
+Release history, including the untagged 1.0.2–1.0.4 integration candidates,
+is recorded in the changelog.
 
 ## Findings that were refuted
 
@@ -63,9 +63,10 @@ was replaced merely to agree with a browser implementation.
   StateRules assert opposing effects simultaneously. Precedence for that case
   (first-wins, last-wins, or otherwise) is left entirely to the adapter and is
   untested here.
-- The model does not build a complete FIX order or implement StrategyParametersGrp
-  output. The React group emitter remains a preview; the host validates and builds
-  the final order.
+- The model does not build a complete FIX order. `StrategyParametersGrpEmitter`
+  emits tags 957–960 from the current parameter values; the React adapter's
+  group emitter is a **preview** of the same sequence. The host still validates
+  and builds the final order, including any direct per-parameter tags.
 - `DateTime` cannot represent year 0000; this is rejected as a deliberate omission -
   a year-0000 wire value has no legitimate use and no downstream consumer
   (QuickFIX/n, broker feeds) can act on one either. A declared UTC leap second
