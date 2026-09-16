@@ -41,6 +41,23 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
 ### Fixed
 
+- The NuGet package now carries `LICENSE` and `NOTICE` alongside the README, so
+  the upstream Atdl4net attribution travels with the redistributed binary.
+- The package `<Authors>` no longer overrides the solution-wide value, so the
+  gallery listing credits Steve Wilkinson (Atdl4net) as well as FixPortal.
+- Decimal parsing across the model rejects a thousands separator: `NumberStyles.Number`
+  read `"1,5"` as `15`, silently and by a factor of ten, for a wire value the FIX
+  protocol cannot produce. `Control_t.TryConvertToDecimal`, `NumericControlBase`'s
+  FIX-load and `SetValue` paths, `Slider_t`'s `initValue` pre-seed, `Edit_t`'s
+  numeric-string normalisation and `EditValueConverter`'s decimal arm now share one
+  `Atdl.FixDecimalStyles` constant. The WPF adapter already rejected these values.
+- `StrategyParametersGrpEmitter` rejects a parameter name or wire value containing
+  the FIX field delimiter (SOH). Names come from broker-supplied ATDL XML and were
+  emitted into tag 958 unchecked, which would split one field into two and inject
+  arbitrary FIX fields once a host joined the emitted tuples onto the wire.
+- `DropDownList_t` carried a stale upstream header claiming GNU LGPLv3 and
+  referencing a `Licenses/Commercial.txt` that does not exist in this repository.
+  It now matches the MIT header every other file carries; the licence is unchanged.
 - README no longer claims the public surface is locked by `PublicAPI.Shipped.txt`;
   that analyzer was removed before `1.0.5` (see below).
 - Time-only UTC `Clock_t` parameter values re-anchor to today's UTC date instead

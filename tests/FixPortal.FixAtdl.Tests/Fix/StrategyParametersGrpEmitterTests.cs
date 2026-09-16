@@ -80,6 +80,30 @@ public class StrategyParametersGrpEmitterTests
     }
 
     [Theory]
+    // Parameter names come from broker-supplied ATDL XML and nothing upstream constrains them the way
+    // String_t constrains a value. A name or wire value carrying SOH splits one field into two and injects
+    // arbitrary FIX fields once the host joins these tuples onto the wire.
+    [InlineData("Injected100", "5", "tag 958")]
+    [InlineData("Injected", "5100=1", "tag 960")]
+    public void Rejects_a_parameter_whose_name_or_wire_value_contains_the_field_delimiter(
+        string name,
+        string wireValue,
+        string expectedTagInMessage
+    )
+    {
+        var strategy = Load();
+        var parameter = Substitute.For<IParameter>();
+        parameter.Name.Returns(name);
+        parameter.IsSet.Returns(true);
+        parameter.WireValue.Returns(wireValue);
+        strategy.Parameters.Add(parameter);
+
+        var act = () => StrategyParametersGrpEmitter.Emit(strategy);
+
+        act.Should().Throw<InvalidOperationException>().WithMessage($"*{expectedTagInMessage}*");
+    }
+
+    [Theory]
     [InlineData("Text", "x", 14)]
     [InlineData("Amount", "5", 1)]
     [InlineData("OtherAmount", "1.5", 6)]

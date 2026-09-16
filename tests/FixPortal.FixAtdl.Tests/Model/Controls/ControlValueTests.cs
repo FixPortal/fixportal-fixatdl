@@ -256,6 +256,33 @@ public class NumericControlTests
     }
 
     [Fact]
+    public void SingleSpinner_set_value_rejects_a_thousands_separator()
+    {
+        // NumberStyles.Number accepted "1,5" and parsed it as 15 — a silent factor of ten. A FIX decimal
+        // wire value cannot legally carry a thousands separator; the WPF adapter already rejected it.
+        var control = new SingleSpinner_t("ss");
+        control.LoadInitValue(FixFieldValueProvider.Empty);
+
+        var act = () => control.SetValue("1,5");
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void SingleSpinner_fix_load_rejects_a_thousands_separator()
+    {
+        // The load path used Convert.ToDecimal, which parses with NumberStyles.Number. A wire value the
+        // protocol cannot produce must leave the control uninitialised, not loaded as a different number.
+        var control = new SingleSpinner_t("ss") { InitPolicy = InitPolicy_t.UseFixField, InitFixField = "9500" };
+        var initial = Substitute.For<IInitialFixValueProvider>();
+        initial.InputFixValues.Returns(new FixTagValuesCollection { { 9500, "1,5" } });
+
+        control.LoadInitValue(new FixFieldValueProvider(initial, null));
+
+        control.GetCurrentValue().Should().BeNull();
+    }
+
+    [Fact]
     public void SingleSpinner_reset_yields_null()
     {
         var control = new SingleSpinner_t("ss") { InitValue = 7m };

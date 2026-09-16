@@ -561,8 +561,8 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
         if (
             literal != null
             && value is string text
-            && decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out _)
-            && !decimal.TryParse(literal, NumberStyles.Number, CultureInfo.InvariantCulture, out _)
+            && decimal.TryParse(text, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out _)
+            && !decimal.TryParse(literal, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out _)
         )
         {
             return text;
@@ -581,7 +581,7 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
             return fieldValue;
         }
 
-        return decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal number)
+        return decimal.TryParse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out decimal number)
             ? number
             : value;
     }

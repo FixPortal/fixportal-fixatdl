@@ -31,7 +31,7 @@
 **This task is executed by the controller, not an implementer subagent.** It is documented here for traceability and review.
 
 **Files:**
-- Create (scratch, NOT committed): `D:\Centerprise\work\_atdl-review\obfuscate-specs.ps1`
+- Create (scratch, NOT committed, outside the repository): `obfuscate-specs.ps1`
 - Create (committed): `tests/FixPortal.FixAtdl.Tests/Fixtures/RealWorld/tz-clock.xml`, `tests/FixPortal.FixAtdl.Tests/Fixtures/RealWorld/regions-enums.xml`
 - Modify (committed): `docs/batch-5-conformance-review.md`
 

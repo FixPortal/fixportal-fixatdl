@@ -24,6 +24,10 @@ including `publication/FIXatdl-1 1-Specification_with_Errata_20101221.pdf`.
 
 ## Core verification
 
+The figures in this section are the record of the September 2026 pass and are not
+updated as the suite grows. Current state: **1261 passing tests** against package
+**1.1.3**.
+
 The starting core revision was `bd0e35b` with 731 passing tests. The completed
 core source has **822 passing tests**, no failures or skips. CSharpier checks
 219 files. The coverage command below reports **76.1% library line coverage**,

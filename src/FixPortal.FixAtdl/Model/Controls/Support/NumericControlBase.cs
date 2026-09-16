@@ -48,16 +48,17 @@ public class NumericControlBase : InitializableControl<decimal?>
             return false;
         }
 
-        try
-        {
-            _value = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
-
-            return true;
-        }
-        catch (Exception ex) when (ex is FormatException or OverflowException)
+        // TryParse with the FIX decimal styles replaces Convert.ToDecimal, which parses with
+        // NumberStyles.Number and so read "1,5" from the wire as 15. Malformed and out-of-range both
+        // return false here, as the FormatException/OverflowException catch did before.
+        if (!decimal.TryParse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out decimal parsed))
         {
             return false;
         }
+
+        _value = parsed;
+
+        return true;
     }
 
     /// <summary>
@@ -100,7 +101,7 @@ public class NumericControlBase : InitializableControl<decimal?>
             {
                 _value = null;
             }
-            else if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal parsed))
+            else if (decimal.TryParse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out decimal parsed))
             {
                 // Accept a numeric string (symmetry with TextControlBase) rather than rejecting it.
                 _value = parsed;

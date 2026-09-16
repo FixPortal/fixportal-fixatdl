@@ -31,8 +31,8 @@ wire is the host application's responsibility and out of this repo's scope.
 
 | Version | Supported |
 |---|---|
-| 1.0.x (latest release) | Yes |
-| < 1.0 | No |
+| 1.1.x (latest release) | Yes |
+| < 1.1 | No |
 
 Fixes land on `main` and ship in the next patch release of the
 `FixPortal.FixAtdl` package.

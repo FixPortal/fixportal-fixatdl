@@ -9,6 +9,7 @@ using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model;
 using FixPortal.FixAtdl.Model.Reference;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
@@ -71,7 +72,9 @@ public static class EditValueConverter
         {
             return type switch
             {
-                "System.Decimal" => Convert.ToDecimal(value, CultureInfo.InvariantCulture),
+                // decimal.Parse with the FIX decimal styles rather than Convert.ToDecimal, which parses with
+                // NumberStyles.Number and so read a thousands-separated operand as a different number.
+                "System.Decimal" => decimal.Parse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture),
                 "System.Boolean" => ConvertToBool(value),
                 "System.Int32" => Convert.ToInt32(value, CultureInfo.InvariantCulture),
                 "System.UInt32" => Convert.ToUInt32(value, CultureInfo.InvariantCulture),

@@ -1,6 +1,8 @@
 using System.Globalization;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Resources;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Fix;
 
@@ -49,11 +51,34 @@ public static class StrategyParametersGrpEmitter
 
         foreach (var parameter in filled)
         {
+            // Parameter names come from broker-supplied ATDL XML and reach the wire unvalidated — nothing
+            // upstream constrains them the way String_t constrains a value. A name (or a wire value, for a
+            // host that joins these tuples itself rather than routing them through FixMessage.ToFix)
+            // carrying SOH would split one field into two and inject arbitrary FIX fields. Guard both at
+            // this single emission chokepoint, mirroring FixMessage.ToFix.
+            if (parameter.Name.Contains(FixMessage.SOH))
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    strategy,
+                    ErrorMessages.ValueContainsDelimiter,
+                    "StrategyParameterName (tag 958)"
+                );
+            }
+
+            if (parameter.WireValue!.Contains(FixMessage.SOH))
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    strategy,
+                    ErrorMessages.ValueContainsDelimiter,
+                    "StrategyParameterValue (tag 960)"
+                );
+            }
+
             result.Add((958, parameter.Name));
             result.Add(
                 (959, FixStrategyParameterTypeCodes.Resolve(parameter.Type).ToString(CultureInfo.InvariantCulture))
             );
-            result.Add((960, parameter.WireValue!));
+            result.Add((960, parameter.WireValue));
         }
 
         return result;

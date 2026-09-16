@@ -302,7 +302,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
         result = 0;
         bool hasValue = !string.IsNullOrEmpty(value);
 
-        if (hasValue && !decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out result))
+        if (hasValue && !decimal.TryParse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out result))
         {
             throw ThrowHelper.New<InvalidCastException>(this, ErrorMessages.InvalidNumericValue, value);
         }
