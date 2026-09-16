@@ -12,11 +12,20 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
 ### Added
 
+- Diagrams. `docs/architecture/README.md` gains a parse-to-emit pipeline, both
+  type hierarchies as trees, a six-layer stack and the three-pack architecture;
+  `docs/usage.md` gains an end-to-end host sequence; the README leads with the
+  three-pack. All four ASCII block diagrams and the one hand-written Mermaid
+  graph are gone. Sources are self-contained HTML in `docs/diagrams/`, exported
+  to PNG in `docs/images/` so they render on GitHub *and* the NuGet gallery.
 - `docs/usage.md` — consumer guide covering loading, value setting, validation,
   FIX output, and the exception surface.
+- `docs/api.md` — consumer-facing list of the types a host actually calls.
 - README now leads with the WPF and React adapters, so readers wanting a rendered
   strategy form find the finished implementations instead of being told to build
   their own.
+- Architecture overview notes that graphify / understand-anything artefacts
+  are generated locally (gitignored) and includes the three-pack data flow.
 - README hero banner and social preview under `docs/images/`.
 - This changelog.
 - `IsoCurrencyCode` gains the four active ISO 4217 assignments missing from the
@@ -36,10 +45,30 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - Enum wire parsing rejects a comma-bearing value for a non-`[Flags]` enum
   instead of silently OR-ing the members into a different defined value.
 - Package metadata URLs (`PackageProjectUrl`/`RepositoryUrl`) now name the real
-  `FixPortal/fixportal-fixatdl` repository, and the csproj `<Version>` matches
-  the shipped release (1.1.2) so hand-run packs report correctly.
+  `FixPortal/fixportal-fixatdl` repository. The csproj `<Version>` is 1.1.3
+  (unreleased); the latest tagged NuGet.org release remains 1.1.2.
 
 ### Fixed
+
+- `docs/usage.md` stated `InternalErrorException` derives from `Exception`
+  directly, so a blanket `catch (FixAtdlException)` would miss it. It derives
+  from `FixAtdlException` like every other library exception; the guide now
+  says so. The same section then claimed `catch (FixAtdlException)` covers the
+  whole surface - it does not. The BCL types the library also raises
+  (`InvalidCastException` on a control/parameter type mismatch,
+  `InvalidOperationException` from the emitter's SOH guards) are now tabulated.
+- `docs/usage.md` stated `RunAllStateRules()` mutates control enabled/visible
+  state. Core only evaluates each rule into `CurrentState`; adapters apply
+  effects. The custom-parameter-type sample now imports
+  `FixPortal.FixAtdl.Xml.Serialization`.
+- `docs/conformance.md` mixed two passes (822 vs 1261 tests) and still aimed
+  the work at package 1.0.5. The figures now match the September 2026 record.
+  It also denied StrategyParametersGrp output, which
+  `StrategyParametersGrpEmitter` has provided since 1.0.6.
+- `docs/architecture/README.md` layer table counted `Configuration` as 2 files
+  (it is 1) and named an `ExceptionInfo` type that does not exist in the source.
+- README Status used a relative changelog link (broken on the NuGet gallery)
+  and did not distinguish the published 1.1.2 from in-tree 1.1.3.
 
 - The NuGet package now carries `LICENSE` and `NOTICE` alongside the README, so
   the upstream Atdl4net attribution travels with the redistributed binary.

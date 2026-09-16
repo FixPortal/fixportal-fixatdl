@@ -36,9 +36,12 @@ strategy DTO from your backend, which is where this package runs.
   removed from this package. Rendering lives in the adapters above, or in your
   own UI on top of the parsed model — Blazor, Avalonia, anything.
 
+![Core and its two adapters: broker XML parsed by the headless core, consumed directly by the WPF adapter and through a host-written JSON mapper by the React adapter, with the host assembling the final FIX order](https://raw.githubusercontent.com/FixPortal/fixportal-fixatdl/main/docs/images/three-pack.png)
+
 ## Read these first
 
 - [Usage guide](https://github.com/FixPortal/fixportal-fixatdl/blob/main/docs/usage.md) — loading, setting values, validation, FIX output, exceptions.
+- [API reference](https://github.com/FixPortal/fixportal-fixatdl/blob/main/docs/api.md) — the types a host actually calls.
 - [Architecture overview](https://github.com/FixPortal/fixportal-fixatdl/blob/main/docs/architecture/README.md) — the pipeline, layers, and load-bearing components.
 - [Conformance record](https://github.com/FixPortal/fixportal-fixatdl/blob/main/docs/conformance.md) — the assessed FIXatdl 1.1 surface and its limits.
 - [Changelog](https://github.com/FixPortal/fixportal-fixatdl/blob/main/CHANGELOG.md) — what changed in each release.
@@ -156,8 +159,18 @@ MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.
 
 ## Status
 
-The latest NuGet.org release is 1.1.2. The public surface is governed by
+The latest NuGet.org release is 1.1.2. Source on `main` is versioned 1.1.3
+(unreleased). Adapter versions that consume this package:
+
+| Package | Latest published | Notes |
+|---|---|---|
+| `FixPortal.FixAtdl` | 1.1.2 | In-tree 1.1.3 unreleased |
+| `FixPortal.FixAtdl.Wpf` / `.Wpf.Core` | 1.0.2 | Pins core 1.1.2 |
+| `@fix-portal/fixatdl-react` | 0.2.0 | In-tree 0.2.1 unreleased; takes a mapped JSON DTO, not this NuGet |
+
+The public surface is governed by
 [semantic versioning](https://semver.org/spec/v2.0.0.html) and recorded in the
-[changelog](CHANGELOG.md); there is no analyzer enforcing it at build time
-(`PublicApiAnalyzers` was removed before 1.0.5).
+[changelog](https://github.com/FixPortal/fixportal-fixatdl/blob/main/CHANGELOG.md);
+there is no analyzer enforcing it at build time (`PublicApiAnalyzers` was
+removed before 1.0.5).
 [Issues and PRs](https://github.com/FixPortal/fixportal-fixatdl) are welcome.
