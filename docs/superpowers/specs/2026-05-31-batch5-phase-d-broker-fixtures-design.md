@@ -17,9 +17,8 @@ content may be committed, and the obfuscation mapping must never enter the repos
 ## Background
 
 The Phase A–C findings (C1, C2, H1–H4, M1–M4) were derived by auditing the library against
-two distinct, live production broker ATDL documents held in a local scratch directory
-(`D:\Centerprise\work\_atdl-review\`), extracted from a private database. For this design they
-are referred to neutrally:
+two distinct, live production broker ATDL documents held in a local scratch directory outside
+the repository. For this design they are referred to neutrally:
 
 - **The timezone spec** — exercises `Clock_t` with `localMktTz` (an IANA market zone) feeding
   `UTCTimestamp_t`, a time-only `maxValue`, and `SecurityTypes`. This is the document that
