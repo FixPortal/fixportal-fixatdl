@@ -8,6 +8,20 @@ Dates are the release-tag date, in UTC. Entries are consumer-facing: build,
 CI, and test-infrastructure commits are omitted unless they change what a
 consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
+## [1.1.4] — 2026-09-17
+
+### Fixed
+
+- A time-only clock value set through `Clock_t.SetValue` on a control with a
+  `localMktTz` was resolved against the literal year-1 date the time-only
+  sentinel carries, where a zone still runs on its pre-standard Local Mean
+  Time. `America/New_York` is `-04:56:02` there, so a 10:31 edit emitted
+  `00010101-15:27:02` — the wrong calendar day, and seconds of LMT offset in a
+  value entered to the minute. It now anchors to the market's today first,
+  matching what a bare `initValue` time-of-day has always done. This is the
+  path every UI time picker uses, so 1.1.3 is not safe for a host that edits a
+  zoned `Clock_t`.
+
 ## [1.1.3] — 2026-09-17
 
 ### Added
@@ -272,7 +286,8 @@ First stable release of the modernised fork.
 First packaged fork of [Atdl4net](https://github.com/atdl4net/atdl4net),
 pre-release.
 
-[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.3...HEAD
+[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.4...HEAD
+[1.1.4]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.0...v1.1.1
