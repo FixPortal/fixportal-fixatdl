@@ -8,7 +8,7 @@ Dates are the release-tag date, in UTC. Entries are consumer-facing: build,
 CI, and test-infrastructure commits are omitted unless they change what a
 consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
-## [Unreleased]
+## [1.1.3] — 2026-09-17
 
 ### Added
 
@@ -272,7 +272,8 @@ First stable release of the modernised fork.
 First packaged fork of [Atdl4net](https://github.com/atdl4net/atdl4net),
 pre-release.
 
-[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.0.6...v1.1.0
