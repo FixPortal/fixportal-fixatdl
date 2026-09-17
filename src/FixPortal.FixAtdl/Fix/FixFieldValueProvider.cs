@@ -130,16 +130,10 @@ public class FixFieldValueProvider
             return true;
         }
 
-        // Explicit styles: the FIX numeric alphabet has no thousands separators, so "1,234.5" must
-        // fail rather than scale to 123450 (R21).
-        if (
-            !decimal.TryParse(
-                value,
-                NumberStyles.Float | NumberStyles.AllowLeadingSign,
-                CultureInfo.InvariantCulture,
-                out decimal decimalValue
-            )
-        )
+        // Explicit styles: the FIX numeric alphabet carries neither a thousands separator nor an
+        // exponent, so "1,234.5" and "1E2" must fail rather than read as 123450 and 100 (R21).
+        // Atdl.FixDecimalStyles is that alphabet stated once for every decimal parse in the model.
+        if (!decimal.TryParse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out decimal decimalValue))
         {
             value = null!;
             return false;

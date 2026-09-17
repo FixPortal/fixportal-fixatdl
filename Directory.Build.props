@@ -15,7 +15,11 @@
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
   <PropertyGroup Label="Package metadata">
-    <Authors>FixPortal contributors; originally Steve Wilkinson (Atdl4net)</Authors>
+    <!-- MSBuild splits Authors on ';', and NuGet renders each part as a separate gallery author.
+         Prose here therefore becomes a person: "FixPortal contributors; originally Steve Wilkinson
+         (Atdl4net)" listed an author literally named "originally Steve Wilkinson (Atdl4net)". Two
+         clean names; the relationship is stated in Copyright and NOTICE. -->
+    <Authors>FixPortal contributors;Steve Wilkinson (Atdl4net)</Authors>
     <Company>FixPortal</Company>
     <Copyright>Copyright (c) 2010-2011 Steve Wilkinson; modifications (c) 2026 FixPortal contributors. MIT.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

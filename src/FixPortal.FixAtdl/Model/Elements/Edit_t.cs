@@ -686,14 +686,9 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
             // A String/Char FIX field (e.g. a zero-padded ClOrdID, or a symbol that happens to
             // look numeric) must never be silently decimal-parsed - that loses leading zeros and
             // compares it as a number instead of text. Only convert when the field's actual FIX
-            // data type is numeric. NumberStyles is stated explicitly so thousands separators are
-            // rejected rather than silently swallowed (R21).
-            && decimal.TryParse(
-                value,
-                NumberStyles.Float | NumberStyles.AllowLeadingSign,
-                CultureInfo.InvariantCulture,
-                out decimal number
-            )
+            // data type is numeric. NumberStyles is stated explicitly so thousands separators and
+            // exponent spellings are rejected rather than silently swallowed (R21).
+            && decimal.TryParse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out decimal number)
                 ? number
                 : value,
         };
