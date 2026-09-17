@@ -488,6 +488,8 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// Unspecified value throws an exception to prevent timezone shift bugs. A time-only value (anchored to
     /// 0001-01-01 by UTCTimeOnly_t / TZTimeOnly_t) is re-anchored to today's UTC date, keeping its UTC
     /// wall-clock time — the market zone must not be applied to a value that is already a UTC time-of-day.
+    /// An Unspecified time-only value resolved through localMktTz is anchored to the market's today for
+    /// the same reason, so it never resolves against the zone's pre-standard Local Mean Time.
     /// </summary>
     private Instant ToInstant(DateTime dateTime, IParameter? parameter = null)
     {
@@ -512,7 +514,24 @@ public class Clock_t : InitializableControl<InitValueClock?>
             DateTimeZone? zone = TimeZoneProvider.GetZoneOrNull(LocalMktTz);
             if (zone != null)
             {
-                LocalDateTime localDt = LocalDateTime.FromDateTime(dateTime);
+                // A year-1 value is the time-only sentinel - UTCTimeOnly_t / TZTimeOnly_t anchor to
+                // 0001-01-01, and so do the WPF and React time pickers. Resolving it literally leaves the
+                // value IN year 1, where a zone still runs on Local Mean Time: America/New_York is
+                // -04:56:02 there, so a 10:31 edit came back as 00010101-15:27:02 - wrong date, and
+                // seconds of LMT offset in a value the user entered to the minute. Anchor a time-only
+                // value to the market's today first, exactly as ResolveMarketLocalValue does for an
+                // initValue time-of-day.
+                LocalDateTime localDt;
+                if (dateTime.Year == 1)
+                {
+                    LocalDate marketToday = Clock.GetCurrentInstant().InZone(zone).Date;
+                    localDt = marketToday.At(LocalTime.FromTicksSinceMidnight(dateTime.TimeOfDay.Ticks));
+                }
+                else
+                {
+                    localDt = LocalDateTime.FromDateTime(dateTime);
+                }
+
                 return zone.ResolveLocal(localDt, Resolvers.LenientResolver).ToInstant();
             }
         }

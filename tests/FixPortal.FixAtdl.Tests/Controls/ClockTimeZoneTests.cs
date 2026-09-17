@@ -515,4 +515,36 @@ public class ClockTimeZoneTests
             .Should()
             .Be(new DateTime(2026, 7, 15, 0, 0, 0, DateTimeKind.Utc));
     }
+
+    [Theory]
+    [InlineData(2026, 1, 2, 1, 2026, 1, 1, 15)] // 01:00Z on the 2nd is still the 1st in New York (EST)
+    [InlineData(2026, 7, 15, 12, 2026, 7, 15, 14)] // EDT (UTC-4)
+    public void SetValue_with_an_unspecified_time_only_anchors_to_the_market_today(
+        int nowYear,
+        int nowMonth,
+        int nowDay,
+        int nowHour,
+        int expectedYear,
+        int expectedMonth,
+        int expectedDay,
+        int expectedHour
+    )
+    {
+        // A Year-1 Kind=Unspecified value is the time-only sentinel every UI time picker emits. Resolved
+        // literally it stays in year 1, where America/New_York still runs on Local Mean Time (-04:56:02):
+        // a 10:31 edit came back as 00010101-15:27:02 - wrong date, and seconds of LMT offset in a value
+        // entered to the minute. It must anchor to the market's today, like a bare initValue time-of-day.
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "America/New_York",
+            Clock = new FakeClock(Instant.FromUtc(nowYear, nowMonth, nowDay, nowHour, 0, 0)),
+        };
+
+        clock.SetValue(new DateTime(1, 1, 1, 10, 31, 0, DateTimeKind.Unspecified));
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(expectedYear, expectedMonth, expectedDay, expectedHour, 31, 0, DateTimeKind.Utc));
+    }
 }
