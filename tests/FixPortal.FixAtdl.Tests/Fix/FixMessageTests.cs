@@ -354,6 +354,7 @@ public class FixMessageTests
 
     [Theory]
     [InlineData("1,234.5")] // thousands separator is outside the FIX numeric alphabet (R21)
+    [InlineData("1E2")] // exponent is outside it too - this must fail, not read as 100 (R21)
     [InlineData("79228162514264337593543950335")] // decimal.MaxValue: the x100 scale-up overflows (Low 3)
     public void FixFieldValueProvider_reports_failure_for_unscalable_percentage_wire_values(string wireValue)
     {

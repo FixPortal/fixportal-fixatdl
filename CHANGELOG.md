@@ -50,6 +50,15 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
 ### Fixed
 
+- FIX field values spelled with an exponent (`1E2`) were decimal-parsed as the
+  expanded number (100) when read through `FixFieldValueProvider` and compared
+  in an `Edit_t` FIX-field condition. The FIX numeric alphabet has no exponent,
+  so both sites now use the model's own `Atdl.FixDecimalStyles` and the
+  spelling fails, as it already did in `Float_t`.
+- The NuGet gallery listed a second author literally named
+  `originally Steve Wilkinson (Atdl4net)`, because MSBuild splits `Authors` on
+  `;` and the prose separator was read as one. Two clean author names; the
+  relationship between them stays in `Copyright` and `NOTICE`.
 - `docs/usage.md` stated `InternalErrorException` derives from `Exception`
   directly, so a blanket `catch (FixAtdlException)` would miss it. It derives
   from `FixAtdlException` like every other library exception; the guide now

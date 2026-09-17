@@ -81,6 +81,21 @@ public class EditFixFieldValueTypeTests
     }
 
     [Fact]
+    public void OrderQty_exponent_wire_value_is_not_read_as_its_expanded_number()
+    {
+        var strategy = LoadTwap();
+        var initial = Substitute.For<IInitialFixValueProvider>();
+        initial.InputFixValues.Returns(new FixTagValuesCollection { { 38, "1E2" } });
+
+        // The FIX numeric alphabet has no exponent, so "1E2" is not the number 100 - the parse
+        // must fail and leave the value to compare as the string it is (R21).
+        var edit = MakeFixFieldEdit(strategy, "FIX_OrderQty", "100");
+        edit.Evaluate(new FixFieldValueProvider(initial, strategy.Parameters));
+
+        edit.CurrentState.Should().BeFalse();
+    }
+
+    [Fact]
     public void Field_valid_but_absent_from_the_type_dictionary_defaults_to_non_numeric()
     {
         var strategy = LoadTwap();
