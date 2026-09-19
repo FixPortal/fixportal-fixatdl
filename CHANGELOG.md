@@ -8,6 +8,13 @@ Dates are the release-tag date, in UTC. Entries are consumer-facing: build,
 CI, and test-infrastructure commits are omitted unless they change what a
 consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
+## [Unreleased]
+
+### Changed
+
+- README hero and GitHub social preview drop the angel wings from the XML
+  card. The markdown image URL is unchanged.
+
 ## [1.1.4] — 2026-09-17
 
 ### Fixed
