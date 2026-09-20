@@ -423,9 +423,9 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         {
             sourceControl.SetValue(!result);
         }
-        else
+        else if (sourceControl is RadioButton_t radioButton)
         {
-            SetCompanionRadioButton((sourceControl as RadioButton_t)!);
+            SetCompanionRadioButton(radioButton);
         }
     }
 
@@ -434,8 +434,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         return this.Any(c => c.Id == value);
     }
 
-    // This method looks for all the radio buttons in the same group as the supplied radio button
-    // and if there are only two
+    // This method looks for the sole companion radio button in the same group as the supplied button.
     private void SetCompanionRadioButton(RadioButton_t radioButton)
     {
         // Approach 1: RadioGroup name; Approach 2 (fallback): sibling controls on same panel.
