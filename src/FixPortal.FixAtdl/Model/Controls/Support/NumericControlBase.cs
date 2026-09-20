@@ -86,9 +86,7 @@ public class NumericControlBase : InitializableControl<decimal?>
     /// <summary>
     /// Sets the value of this control; either via a boolean, or using the FIXatdl '{NULL}' value.
     /// </summary>
-    /// <param name="newValue">One of three bool? states, true, false or null (meaning do not send this value over FIX).
-    /// May also contain the FIXatdl '{NULL}' value as a string, or either of the CheckedEnumRef or
-    /// UncheckedEnumRef string values.</param>
+    /// <param name="newValue">A numeric value, or the FIXatdl '{NULL}' value as a string.</param>
     public override void SetValue(object newValue)
     {
         bool isString = newValue is string;

@@ -92,4 +92,12 @@ public class StrategiesReaderSchemaValidationTests
             .Which.Errors.Should()
             .ContainSingle(e => e.Contains("strategyIdentifierTag", StringComparison.Ordinal));
     }
+
+    [Fact]
+    public void SchemaValidationException_rejects_null_errors()
+    {
+        var act = () => new SchemaValidationException(null!);
+
+        act.Should().Throw<ArgumentNullException>();
+    }
 }

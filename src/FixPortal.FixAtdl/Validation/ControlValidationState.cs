@@ -57,12 +57,12 @@ public class ControlValidationState
     /// <summary>
     /// Used to hold the results obtained from the control set/validation operation.
     /// </summary>
-    public ValidationResult ControlValidationResult { get; set; } = null!;
+    public ValidationResult? ControlValidationResult { get; set; }
 
     /// <summary>
     /// Used to hold the results obtained from the parameter set and validation operation.
     /// </summary>
-    public ValidationResult ParameterValidationResult { get; set; } = null!;
+    public ValidationResult? ParameterValidationResult { get; set; }
 
     /// <summary>
     /// Adds the supplied StrategyEdit_t to this <see cref="ControlValidationState"/>.
@@ -124,7 +124,7 @@ public class ControlValidationState
 
             if (parameterIsInvalid)
             {
-                sb.Append(ParameterValidationResult.ErrorText);
+                sb.Append(ParameterValidationResult!.ErrorText);
 
                 if (count > 0)
                 {

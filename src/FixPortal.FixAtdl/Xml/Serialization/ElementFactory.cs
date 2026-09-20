@@ -950,6 +950,11 @@ public class ElementFactory : INotifyClassDeserialized
         {
             try
             {
+                if (attribute.Value.Contains(',') && !type.IsDefined(typeof(FlagsAttribute), inherit: false))
+                {
+                    throw new ArgumentException("Comma-separated values are only valid for flags enums.");
+                }
+
                 object result = Enum.Parse(type, attribute.Value);
                 if (!Enum.IsDefined(type, result))
                 {
@@ -1039,7 +1044,12 @@ public class ElementFactory : INotifyClassDeserialized
             // derived/assignable type); only fall back to the single-arg converting-ctor path when a
             // genuine conversion is required. The previous exact-type-only check pushed assignable
             // values through CreateRawObject, which fails for any property type lacking such a ctor.
-            if (property.PropertyType.IsInstanceOfType(value))
+            Type? nullablePropertyType = Nullable.GetUnderlyingType(property.PropertyType);
+            if (nullablePropertyType?.IsInstanceOfType(value) == true)
+            {
+                property.SetValue(target, value, null);
+            }
+            else if (property.PropertyType.IsInstanceOfType(value))
             {
                 property.SetValue(target, value, null);
             }

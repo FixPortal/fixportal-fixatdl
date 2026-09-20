@@ -95,6 +95,9 @@ public static class ValueConverter
             case "System.Int32":
                 return ParseOrThrow(value, targetType, v => Convert.ToInt32(v, CultureInfo.InvariantCulture));
 
+            case "System.UInt32":
+                return ParseOrThrow(value, targetType, v => Convert.ToUInt32(v, CultureInfo.InvariantCulture));
+
             case "System.Decimal":
                 // Explicit styles: thousands separators and exponent notation are both outside the
                 // XML Schema decimal lexical grammar and must fail. Leading and trailing whitespace

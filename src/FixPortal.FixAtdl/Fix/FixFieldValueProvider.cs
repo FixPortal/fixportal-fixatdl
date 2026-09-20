@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Model;
@@ -59,7 +60,7 @@ public class FixFieldValueProvider
     /// <param name="targetParameterName">Target parameter for this field value.  May be null.</param>
     /// <param name="value">Contains the value of the FIX field if it could successfully be retrieved.</param>
     /// <returns>true if the field could be retrieved; false otherwise.</returns>
-    public bool TryGetValue(string fixField, string targetParameterName, out string value)
+    public bool TryGetValue(string fixField, string? targetParameterName, [NotNullWhen(true)] out string? value)
     {
         bool retrieved = TryGetValue(fixField, out var result);
 
@@ -72,14 +73,14 @@ public class FixFieldValueProvider
         {
             IParameter parameter = Parameters[targetParameterName];
 
-            if (parameter.HasEnumPairs)
+            if (parameter.HasEnumPairs && result is not null)
             {
                 string wireValue = result;
                 retrieved = parameter is Parameter_t<MultipleCharValue_t> or Parameter_t<MultipleStringValue_t>
                     ? TryGetMultipleEnumIds(parameter, wireValue, out result)
                     : parameter.EnumPairs.TryParseWireValue(wireValue, out result);
             }
-            else if (parameter is Parameter_t<Boolean_t> booleanParameter)
+            else if (parameter is Parameter_t<Boolean_t> booleanParameter && result is not null)
             {
                 // A Boolean_t parameter carries its wire mapping in TrueWireValue/FalseWireValue
                 // (defaulting to Y/N) rather than in EnumPairs, so the branch above never runs for
@@ -87,13 +88,13 @@ public class FixFieldValueProvider
                 // binary controls emit it.
                 retrieved = TryTranslateBooleanValue(booleanParameter.Value, result, out result);
             }
-            else if (parameter is Parameter_t<Percentage_t> t)
+            else if (parameter is Parameter_t<Percentage_t> t && result is not null)
             {
                 retrieved = ProcessPercentageValue(t, ref result);
             }
         }
 
-        value = result!;
+        value = result;
 
         return retrieved;
     }
@@ -106,7 +107,7 @@ public class FixFieldValueProvider
     /// <param name="fixField">FIX field value to retrieve, in FIX_ format.</param>
     /// <param name="value">Contains the value of the FIX field if it could successfully be retrieved.</param>
     /// <returns>true if the field could be retrieved; false otherwise.</returns>
-    public bool TryGetValue(string fixField, out string value)
+    public bool TryGetValue(string fixField, [NotNullWhen(true)] out string? value)
     {
         bool retrieved = false;
         string? result = null;
@@ -116,12 +117,12 @@ public class FixFieldValueProvider
             retrieved = inputFixValues.TryGetValue(fixField, out result);
         }
 
-        value = retrieved ? result! : null!;
+        value = retrieved ? result : null;
 
         return retrieved;
     }
 
-    private static bool ProcessPercentageValue(Parameter_t<Percentage_t> parameter, ref string value)
+    private static bool ProcessPercentageValue(Parameter_t<Percentage_t> parameter, ref string? value)
     {
         bool adjustmentNeeded = parameter.Value.MultiplyBy100 != true;
 
@@ -135,7 +136,7 @@ public class FixFieldValueProvider
         // Atdl.FixDecimalStyles is that alphabet stated once for every decimal parse in the model.
         if (!decimal.TryParse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out decimal decimalValue))
         {
-            value = null!;
+            value = null;
             return false;
         }
 
@@ -152,7 +153,7 @@ public class FixFieldValueProvider
         catch (OverflowException)
         {
             // A Try-style method must not throw: an unrepresentable scale-up is a failed lookup.
-            value = null!;
+            value = null;
             return false;
         }
     }
@@ -161,7 +162,7 @@ public class FixFieldValueProvider
     // honouring the parameter's declared TrueWireValue/FalseWireValue mapping; {NULL} (and a null
     // stored programmatically) passes through so the control reads it as "unset". Returns false for
     // a value the mapping does not recognise so initialisation falls back to initValue.
-    private static bool TryTranslateBooleanValue(Boolean_t booleanType, string? wireValue, out string value)
+    private static bool TryTranslateBooleanValue(Boolean_t booleanType, string? wireValue, out string? value)
     {
         bool? parsed;
         try
@@ -170,7 +171,7 @@ public class FixFieldValueProvider
         }
         catch (InvalidFieldValueException)
         {
-            value = null!;
+            value = null;
             return false;
         }
 
@@ -184,9 +185,9 @@ public class FixFieldValueProvider
         return true;
     }
 
-    private static bool TryGetMultipleEnumIds(IParameter parameter, string wireValue, out string value)
+    private static bool TryGetMultipleEnumIds(IParameter parameter, string wireValue, out string? value)
     {
-        value = null!;
+        value = null;
         if (string.IsNullOrEmpty(wireValue))
         {
             return false;

@@ -321,13 +321,7 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// <returns>One of true, false or null which is equivalent to the value of this instance.</returns>
     public override bool? ToBoolean(IParameter targetParameter)
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedControlValueConversion,
-            _value,
-            "Boolean",
-            Id
-        );
+        throw UnsupportedConversion("Boolean");
     }
 
     /// <summary>
@@ -338,13 +332,7 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public override decimal? ToDecimal(IParameter targetParameter, IFormatProvider provider)
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedControlValueConversion,
-            _value,
-            "Decimal",
-            Id
-        );
+        throw UnsupportedConversion("Decimal");
     }
 
     /// <summary>
@@ -355,13 +343,7 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// <returns>A nullable 32-bit signed integer equivalent to the value of this instance.</returns>
     public override int? ToInt32(IParameter targetParameter, IFormatProvider provider)
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedControlValueConversion,
-            _value,
-            "Int32",
-            Id
-        );
+        throw UnsupportedConversion("Int32");
     }
 
     /// <summary>
@@ -372,13 +354,7 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// <returns>A nullable 32-bit unsigned integer equivalent to the value of this instance.</returns>
     public override uint? ToUInt32(IParameter targetParameter, IFormatProvider provider)
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedControlValueConversion,
-            _value,
-            "UInt32",
-            Id
-        );
+        throw UnsupportedConversion("UInt32");
     }
 
     /// <summary>
@@ -388,14 +364,17 @@ public class Clock_t : InitializableControl<InitValueClock?>
     /// <returns>A nullable char value equivalent to the value of this instance. May be null.</returns>
     public override char? ToChar(IParameter targetParameter)
     {
-        throw ThrowHelper.New<InvalidCastException>(
+        throw UnsupportedConversion("Char");
+    }
+
+    private InvalidCastException UnsupportedConversion(string targetType) =>
+        ThrowHelper.New<InvalidCastException>(
             this,
             ErrorMessages.UnsupportedControlValueConversion,
             _value,
-            "Char",
+            targetType,
             Id
         );
-    }
 
     /// <summary>
     /// Converts the value of this instance to an equivalent string value (the UTC wire representation, YYYYMMDD-HH:MM:SS).

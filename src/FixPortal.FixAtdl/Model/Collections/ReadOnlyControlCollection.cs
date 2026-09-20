@@ -173,7 +173,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     /// Gets the control with the specified identifier.
     /// </summary>
     /// <param name="key">The control identifier.</param>
-    public Control_t this[string key] => _controls.TryGetValue(key, out Control_t? value) ? value : null!;
+    public Control_t this[string key] => _controls[key];
 
     /// <summary>
     /// Loads the initial values for each control based on the InitPolicy, InitFixField and InitValue attributes.
@@ -227,7 +227,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
 
         foreach (Control_t control in this)
         {
-            string parameter = control.ParameterRef;
+            string? parameter = control.ParameterRef;
 
             if (parameter == null)
             {
@@ -322,31 +322,34 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                 );
             }
 
-            // We only want to update the control value if the parameter has a value
-            if (parameterValue != null)
+            // An empty parameter clears its bound control rather than leaving stale UI state behind.
+            if (parameterValue == null)
             {
-                try
-                {
-                    control.SetValueFromParameter(parameter);
-                }
-                catch (Exception ex)
-                    when (ex is ArgumentException or FormatException or InvalidCastException or OverflowException)
-                {
-                    // Defense in depth: a value/type-conversion failure while pushing a parameter value into
-                    // its bound control (e.g. an unresolvable date/time Kind) must not propagate as a raw,
-                    // uncaught exception (D-F8) - wrap it with control/parameter context instead.
-                    throw ThrowHelper.Rethrow(
-                        this,
-                        ex,
-                        ErrorMessages.UnsuccessfulSetParameterOperation,
-                        control.ParameterRef!,
-                        control.Id,
-                        ex.Message
-                    );
-                }
-
-                UpdateRelatedHelperControls(control);
+                control.Reset();
+                continue;
             }
+
+            try
+            {
+                control.SetValueFromParameter(parameter);
+            }
+            catch (Exception ex)
+                when (ex is ArgumentException or FormatException or InvalidCastException or OverflowException)
+            {
+                // Defense in depth: a value/type-conversion failure while pushing a parameter value into
+                // its bound control (e.g. an unresolvable date/time Kind) must not propagate as a raw,
+                // uncaught exception (D-F8) - wrap it with control/parameter context instead.
+                throw ThrowHelper.Rethrow(
+                    this,
+                    ex,
+                    ErrorMessages.UnsuccessfulSetParameterOperation,
+                    control.ParameterRef!,
+                    control.Id,
+                    ex.Message
+                );
+            }
+
+            UpdateRelatedHelperControls(control);
         }
     }
 
@@ -403,11 +406,12 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
 
             if (
                 IsValidControlId(sourceControlId)
-                && this[sourceControlId].IsToggleable
+                && this[sourceControlId] is { } sourceControl
+                && sourceControl.IsToggleable
                 && bool.TryParse(edit.Value, out bool result)
             )
             {
-                ApplyHelperControlToggle(this[sourceControlId], result);
+                ApplyHelperControlToggle(sourceControl, result);
             }
         }
     }
@@ -435,12 +439,12 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     private void SetCompanionRadioButton(RadioButton_t radioButton)
     {
         // Approach 1: RadioGroup name; Approach 2 (fallback): sibling controls on same panel.
-        IEnumerable<RadioButton_t> radioButtons =
-            radioButton.RadioGroup != null
-                ? _controls
-                    .Values.OfType<RadioButton_t>()
-                    .Where(c => c.Id != radioButton.Id && c.RadioGroup == radioButton.RadioGroup)
-                : radioButton.OwningStrategyPanel.Controls.OfType<RadioButton_t>().Where(c => c.Id != radioButton.Id);
+        IEnumerable<RadioButton_t> radioButtons = !string.IsNullOrEmpty(radioButton.RadioGroup)
+            ? _controls
+                .Values.OfType<RadioButton_t>()
+                .Where(c => c.Id != radioButton.Id && c.RadioGroup == radioButton.RadioGroup)
+            : radioButton.OwningStrategyPanel?.Controls.OfType<RadioButton_t>().Where(c => c.Id != radioButton.Id)
+                ?? Enumerable.Empty<RadioButton_t>();
 
         // The query is lazy; Count() + First() would enumerate it twice. Materialise once
         // (Take(2) is enough to distinguish "exactly one companion").

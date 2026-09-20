@@ -492,7 +492,7 @@ public static class FixFieldTypes
         { FixField.FIX_LastForwardPoints, true }, // PRICEOFFSET
         { FixField.FIX_LastForwardPoints2, true }, // PRICEOFFSET
         { FixField.FIX_LastFragment, false }, // BOOLEAN
-        { FixField.FIX_LastLiquidityInd, false }, // CHAR
+        { FixField.FIX_LastLiquidityInd, true }, // INT
         { FixField.FIX_LastMkt, false }, // EXCHANGE
         { FixField.FIX_LastMsgSeqNumProcessed, true }, // SEQNUM
         { FixField.FIX_LastNetworkResponseID, false }, // STRING

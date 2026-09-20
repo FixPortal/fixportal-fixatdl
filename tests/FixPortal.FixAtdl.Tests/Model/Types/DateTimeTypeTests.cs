@@ -333,6 +333,17 @@ public class DateTimeTypeTests
     }
 
     [Fact]
+    public void DateTimeTypeBase_direct_bound_assignment_clears_stale_raw_text()
+    {
+        var param = new Parameter_t<UTCTimestamp_t>("Ts");
+        param.Value.MaxValueText = "12:00:00";
+
+        param.Value.MaxValue = new DateTime(2026, 6, 2, 15, 0, 0, DateTimeKind.Utc);
+
+        param.Value.MaxValueText.Should().BeNull();
+    }
+
+    [Fact]
     public void DateTimeTypeBase_SetBound_handles_offset_bearing_and_minute_only_bounds()
     {
         var param = new Parameter_t<UTCTimeOnly_t>("T");

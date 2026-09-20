@@ -17,9 +17,15 @@ public class SchemaValidationException : FixAtdlException
     /// </summary>
     /// <param name="errors">The individual schema validation error messages, in document order.</param>
     public SchemaValidationException(IReadOnlyList<string> errors)
-        : base(BuildMessage(errors))
+        : base(BuildMessage(RequireErrors(errors)))
     {
-        Errors = errors;
+        Errors = errors.ToArray();
+    }
+
+    private static IReadOnlyList<string> RequireErrors(IReadOnlyList<string>? errors)
+    {
+        ArgumentNullException.ThrowIfNull(errors);
+        return errors;
     }
 
     private static string BuildMessage(IReadOnlyList<string> errors) =>

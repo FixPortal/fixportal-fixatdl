@@ -10,6 +10,21 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
 ## [Unreleased]
 
+### Fixed
+
+- Nullable annotations now describe unset validation results, optional control
+  attributes, and failed FIX-field lookups instead of suppressing nullability
+  warnings with `null!`.
+- Empty parameters now reset their bound controls when control values are
+  refreshed; schema validation errors reject null input without throwing while
+  constructing the diagnostic.
+- Fractional offsetless timestamps use the exact FIX format table, unsigned
+  XML parameter constants deserialize with their declared type, non-flag enum
+  constants reject comma-separated values, and FIX tag 851 is treated as
+  numeric.
+- Missing control lookups now follow dictionary semantics and throw
+  `KeyNotFoundException` instead of returning an undocumented null.
+
 ### Changed
 
 - README hero and GitHub social preview drop the angel wings from the XML

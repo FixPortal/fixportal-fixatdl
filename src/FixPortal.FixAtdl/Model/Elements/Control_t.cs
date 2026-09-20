@@ -91,7 +91,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// must be defined within the same strategy as this control.</summary>
     /// <remarks>The resolved parameter instance itself is available via the owning strategy, whilst
     /// this property provides access to the name of the parameter.</remarks>
-    public string ParameterRef { get; set; } = null!;
+    public string? ParameterRef { get; set; }
 
     /// <summary>Tool tip text for rendered GUI objects rendered for the parameter.</summary>
     public string ToolTip { get; set; } = null!;

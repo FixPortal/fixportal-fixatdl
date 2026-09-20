@@ -271,46 +271,38 @@ public static class ThrowHelper
     {
         Type classType = typeof(T);
 
-        switch (classType.Name)
+        if (classType == typeof(ArgumentNullException) || classType == typeof(ArgumentOutOfRangeException))
         {
-            // Special treatment is needed for ArgumentOutOfRangeException and ArgumentNullException because the constructor that takes
-            // a single string for these types makes its own message.
-            case "ArgumentOutOfRangeException":
-            case "ArgumentNullException":
-                ConstructorInfo argumentNullConstructor =
-                    classType.GetConstructor([typeof(string), typeof(string)])
-                    ?? throw new InternalErrorException(
-                        $"Exception type '{classType.FullName}' has no (string, string) constructor required by ThrowHelper. Message: {message}"
-                    );
-                T argumentNullException = (T)argumentNullConstructor.Invoke([paramName, message]);
-                argumentNullException.Source = source?.ToString();
-                PopulateXmlLineInfo(argumentNullException, xmlNode);
+            return CreateWithArguments([paramName, message]);
+        }
 
-                return argumentNullException;
+        if (typeof(ArgumentException).IsAssignableFrom(classType))
+        {
+            return CreateWithArguments([message, paramName]);
+        }
 
-            case "ArgumentException":
-                ConstructorInfo argumentConstructor =
-                    classType.GetConstructor([typeof(string), typeof(string)])
-                    ?? throw new InternalErrorException(
-                        $"Exception type '{classType.FullName}' has no (string, string) constructor required by ThrowHelper. Message: {message}"
-                    );
-                T argumentException = (T)argumentConstructor.Invoke([message, paramName]);
-                argumentException.Source = source?.ToString();
-                PopulateXmlLineInfo(argumentException, xmlNode);
+        ConstructorInfo defaultConstructor =
+            classType.GetConstructor([typeof(string)])
+            ?? throw new InternalErrorException(
+                $"Exception type '{classType.FullName}' has no (string) constructor required by ThrowHelper. Message: {message}"
+            );
+        T defaultException = (T)defaultConstructor.Invoke([message]);
+        defaultException.Source = source?.ToString();
+        PopulateXmlLineInfo(defaultException, xmlNode);
 
-                return argumentException;
+        return defaultException;
 
-            default:
-                ConstructorInfo defaultConstructor =
-                    classType.GetConstructor([typeof(string)])
-                    ?? throw new InternalErrorException(
-                        $"Exception type '{classType.FullName}' has no (string) constructor required by ThrowHelper. Message: {message}"
-                    );
-                T defaultException = (T)defaultConstructor.Invoke([message]);
-                defaultException.Source = source?.ToString();
-                PopulateXmlLineInfo(defaultException, xmlNode);
-
-                return defaultException;
+        T CreateWithArguments(object?[] arguments)
+        {
+            ConstructorInfo constructor =
+                classType.GetConstructor([typeof(string), typeof(string)])
+                ?? throw new InternalErrorException(
+                    $"Exception type '{classType.FullName}' has no (string, string) constructor required by ThrowHelper. Message: {message}"
+                );
+            T exception = (T)constructor.Invoke(arguments);
+            exception.Source = source?.ToString();
+            PopulateXmlLineInfo(exception, xmlNode);
+            return exception;
         }
     }
 

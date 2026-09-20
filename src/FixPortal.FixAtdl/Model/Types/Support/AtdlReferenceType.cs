@@ -92,12 +92,16 @@ public abstract class AtdlReferenceType<T> : IParameterType
         {
             T? candidate = ConvertToNativeType(hostParameter, value);
 
+            if (candidate is string { Length: 0 })
+            {
+                candidate = null;
+            }
+
             ValidationResult result = ValidateValue(candidate, hostParameter.Use == Use_t.Required);
 
-            // Commit the converted value only when it validates (or is a legitimate null/cleared
-            // state). A rejected candidate must NOT leave the parameter reporting IsSet==true with
-            // the bad value still stored.
-            if (result.IsValid || candidate == null)
+            // A rejected candidate must not replace the last valid value. Optional clears still
+            // commit because ValidateValue returns Valid for null when the parameter is optional.
+            if (result.IsValid)
             {
                 _value = candidate;
             }

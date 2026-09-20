@@ -27,6 +27,8 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
     // _minTimeOfDay (written earlier via MaxValueText/MinValueText) applying alongside the new bound.
     private DateTime? _maxValue;
     private DateTime? _minValue;
+    private string? _maxValueText;
+    private string? _minValueText;
 
     /// <summary>
     /// Maximum value for this date/time type, i.e., the latest acceptable date/time.
@@ -37,6 +39,7 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
         set
         {
             _maxValue = value;
+            _maxValueText = null;
             _maxTimeOfDay = null;
             _maxTimeOfDayIsOffsetAnchored = false;
         }
@@ -51,6 +54,7 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
         set
         {
             _minValue = value;
+            _minValueText = null;
             _minTimeOfDay = null;
             _minTimeOfDayIsOffsetAnchored = false;
         }
@@ -88,16 +92,17 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
     /// <see cref="MaxValue"/> directly for a full date+time bound.</summary>
     public string? MaxValueText
     {
-        get;
+        get => _maxValueText;
         set
         {
-            field = value;
             if (value == null)
             {
+                _maxValueText = null;
                 MaxValue = null;
                 return;
             }
             SetBound(value, isMax: true);
+            _maxValueText = value;
         }
     }
 
@@ -107,16 +112,17 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
     /// <see cref="MinValue"/> directly for a full date+time bound.</summary>
     public string? MinValueText
     {
-        get;
+        get => _minValueText;
         set
         {
-            field = value;
             if (value == null)
             {
+                _minValueText = null;
                 MinValue = null;
                 return;
             }
             SetBound(value, isMax: false);
+            _minValueText = value;
         }
     }
 
