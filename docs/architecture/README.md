@@ -155,7 +155,7 @@ never sees this NuGet package, and its group emitter is a browser-side preview,
 not the authoritative wire. Core also exposes direct per-parameter tag values;
 the host assembles the complete FIX order.
 
-![The three-pack: broker XML parsed by the headless core, which emits direct parameter tag values and the authoritative 957–960 group; WPF reads back through the core emitter, React previews 957–960 through a host-mapped DTO, and the host assembles the final FIX wire](../images/three-pack.png)
+![The three-pack: broker XML parsed by the headless core, which emits direct parameter tag values and the authoritative 957–960 group; WPF reads back through the core emitter, React emits 957–960 tag tuples through a host-mapped DTO, and the host validates and assembles the final FIX wire](../images/three-pack.png)
 
 ---
 
