@@ -117,6 +117,15 @@ public class EditValueConverterTests
         result.Should().Be('B');
     }
 
+    [Fact]
+    public void Rejects_data_values_as_unsupported_comparison_operands()
+    {
+        char[] dataValue = ['A'];
+        var act = () => EditValueConverter.ConvertToComparableType(dataValue, "B");
+
+        act.Should().Throw<InvalidOperationException>();
+    }
+
     // ── Boolean ─────────────────────────────────────────────────────────────
 
     [Theory]

@@ -1,3 +1,4 @@
+using System.Xml.Linq;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 
@@ -52,6 +53,29 @@ public class ThrowHelperTests
 
         ex.Should().BeOfType<InvalidOperationException>();
         ex.Message.Should().Be("Could not parse {NULL}");
+        ex.InnerException.Should().BeSameAs(inner);
+    }
+
+    [Fact]
+    public void Rethrow_single_argument_overload_preserves_inner_exception()
+    {
+        var inner = new InvalidOperationException("inner");
+
+        var ex = ThrowHelper.Rethrow(null, inner, "Could not parse {0}", "field");
+
+        ex.Message.Should().Be("Could not parse field");
+        ex.InnerException.Should().BeSameAs(inner);
+    }
+
+    [Fact]
+    public void Rethrow_xml_overload_preserves_inner_exception()
+    {
+        var inner = new InvalidOperationException("inner");
+        var xml = new XElement("Root");
+
+        var ex = ThrowHelper.Rethrow(null, inner, xml, "Could not parse {0}: {1}", "field");
+
+        ex.Message.Should().Be("Could not parse field: inner");
         ex.InnerException.Should().BeSameAs(inner);
     }
 
