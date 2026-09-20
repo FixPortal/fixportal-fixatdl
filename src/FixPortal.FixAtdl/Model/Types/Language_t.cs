@@ -1,0 +1,126 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Reference;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Utility;
+using FixPortal.FixAtdl.Validation;
+
+namespace FixPortal.FixAtdl.Model.Types;
+
+/// <summary>
+/// Represents an identifier for a national language using the ISO 639-1 standard.
+/// </summary>
+public class Language_t : EnumTypeBase<IsoLanguageCode>
+{
+    #region AtdlValueType<T> Overrides
+
+    /// <summary>
+    /// Validates the supplied value in terms of the parameters constraints.  This method does nothing because
+    /// is not possible for an IsoLanguageCode value to be invalid.
+    /// </summary>
+    /// <param name="value">Value to validate, may be null in which case no validation is applied.</param>
+    /// <param name="isRequired">Set to true to check that this parameter is non-null.</param>
+    /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
+    protected override ValidationResult ValidateValue(IsoLanguageCode? value, bool isRequired)
+    {
+        if (isRequired && value == null)
+        {
+            return new ValidationResult(
+                ValidationResult.ResultType.Missing,
+                ErrorMessages.NonOptionalParameterNotSupplied2
+            );
+        }
+
+        return ValidationResult.ValidResult;
+    }
+
+    /// <summary>
+    /// Converts the supplied value from string format (as might be used on the FIX wire) into the type of the type
+    /// parameter for this type.
+    /// </summary>
+    /// <param name="value">Type to convert from string; cannot be null as empty fields are invalid in FIX.</param>
+    /// <returns>Value converted from a string.</returns>
+    protected override IsoLanguageCode? ConvertFromWireValueFormat(string value)
+    {
+        if (value == "None")
+        {
+            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(
+                this,
+                Resources.ErrorMessages.InvalidValueEnumParseFailure,
+                value,
+                nameof(IsoLanguageCode)
+            );
+        }
+        IsoLanguageCode parsed = value.ParseAsEnum<IsoLanguageCode>();
+        if (parsed == IsoLanguageCode.None)
+        {
+            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(
+                this,
+                Resources.ErrorMessages.InvalidValueEnumParseFailure,
+                value,
+                nameof(IsoLanguageCode)
+            );
+        }
+        return parsed;
+    }
+
+    /// <summary>
+    /// Converts the supplied value to a string, as might be used on the FIX wire.
+    /// </summary>
+    /// <param name="value">Value to convert, may be null.</param>
+    /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
+    protected override string? ConvertToWireValueFormat(IsoLanguageCode? value)
+    {
+        // ISO 639-1 (FIX tag 1474) codes are lower-case; the enum member names are upper-case only
+        // because C# reserves the lower-case words ('in', 'is') needed by the standard.
+        return value != null && value != IsoLanguageCode.None
+            ? Enum.GetName(typeof(IsoLanguageCode), value)?.ToLowerInvariant()
+            : null;
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to its wire-format string (lower-case ISO 639-1), so that
+    /// an ordinal EnumPair lookup against the wire values a strategy declares agrees with
+    /// <see cref="ConvertToWireValueFormat"/>.
+    /// </summary>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
+    public override string? ToString(IFormatProvider? provider)
+    {
+        return base.ToString(provider)?.ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// Converts the supplied value to the type parameter type (T?) for this class.
+    /// </summary>
+    /// <param name="hostParameter">Parameter that this value belongs to.</param>
+    /// <param name="value">Value to convert, may be null.</param>
+    /// <returns>If input value is not null, returns value converted to T?; null otherwise.</returns>
+    /// <remarks>Used when setting a parameter value from a control (or anything else that
+    /// implements <see cref="IParameterConvertible"/>).</remarks>
+    protected override IsoLanguageCode? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
+    {
+        string wireValue = value.ToString(hostParameter);
+
+        return !string.IsNullOrEmpty(wireValue) ? ConvertFromWireValueFormat(wireValue) : null;
+    }
+
+    /// <summary>
+    /// Gets the human-readable type name for use in error messages shown to the user.
+    /// </summary>
+    /// <returns>Human-readable type name.</returns>
+    protected override string GetHumanReadableTypeName()
+    {
+        return HumanReadableTypeNames.LanguageType;
+    }
+
+    #endregion
+}

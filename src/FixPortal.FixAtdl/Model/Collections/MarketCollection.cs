@@ -1,0 +1,27 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using System.Collections.ObjectModel;
+using FixPortal.FixAtdl.Model.Elements;
+
+namespace FixPortal.FixAtdl.Model.Collections;
+
+/// <summary>
+/// Represents a collection of Markets.
+/// </summary>
+public class MarketCollection : KeyedCollection<string, Market_t>
+{
+    /// <summary>
+    /// Gets the key for items in this collection, i.e., the MIC code.
+    /// </summary>
+    /// <param name="item">Market_t instance.</param>
+    /// <returns>MIC code for this Market</returns>
+    protected override string GetKeyForItem(Market_t item)
+    {
+        return item.MICCode;
+    }
+}

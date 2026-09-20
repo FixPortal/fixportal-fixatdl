@@ -1,0 +1,524 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+// FP Enhancement: 2026-05-31 — apply localMktTz via NodaTime; emit UTC at the wire boundary (batch 5, C1).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Types;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
+using NodaTime;
+using NodaTime.TimeZones;
+
+namespace FixPortal.FixAtdl.Model.Controls;
+
+/// <summary>
+/// Represents the Clock_t control element within FIXatdl.
+/// </summary>
+/// <remarks>
+/// A clock value is expressed in the market-local zone given by <see cref="LocalMktTz"/> and feeds a
+/// UTCTimestamp_t FIX field, whose wire value must be UTC. This control is therefore the local→UTC bridge
+/// (the only place that knows the market zone). It stores the resolved value as a NodaTime
+/// <see cref="Instant"/> (a UTC point-in-time): <see cref="GetCurrentValue"/> returns the local-market
+/// representation for display, while <see cref="ToDateTime(IParameter, IFormatProvider)"/> returns the UTC
+/// instant for the wire. The BCL↔NodaTime seam is confined to this control and <see cref="InitValueClock"/>.
+/// </remarks>
+public class Clock_t : InitializableControl<InitValueClock?>
+{
+    private Instant? _value;
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="Clock_t"/> using the supplied ID.
+    /// </summary>
+    /// <param name="id">ID for this control.</param>
+    public Clock_t(string id)
+        : base(id) { }
+
+    /// <summary>The IANA/Olson zone in which initValue is represented. Required when initValue is supplied.
+    /// Applicable when xsi:type is Clock_t. Null when not supplied in the ATDL.</summary>
+    public string? LocalMktTz { get; set; }
+
+    /// <summary>Defines the treatment of initValue time. 0: use initValue; 1: use current time if initValue time has passed.
+    /// The default value is 0.</summary>
+    public int? InitValueMode { get; set; }
+
+    /// <summary>
+    /// The clock used to read "now" (for <see cref="InitValueMode"/> == 1 and to determine the market's
+    /// current date for a time-only initValue). Defaults to the system clock; assign a NodaTime FakeClock
+    /// in tests. Set after reflective construction.
+    /// </summary>
+    public IClock Clock { get; set; } = SystemClock.Instance;
+
+    /// <summary>
+    /// The time-zone provider used to resolve <see cref="LocalMktTz"/>. Defaults to the TZDB provider.
+    /// </summary>
+    public IDateTimeZoneProvider TimeZoneProvider { get; set; } = DateTimeZoneProviders.Tzdb;
+
+    #region InitializableControl<T> Overrides
+
+    /// <summary>
+    /// Attempts to load the supplied FIX field value (a UTC timestamp) into this control.
+    /// </summary>
+    /// <param name="value">Value to set this control to.</param>
+    /// <returns>true if the supplied value could set this control; false otherwise.</returns>
+    protected override bool LoadDefaultFromFixValue(string value)
+    {
+        // On a failed parse, leave _value untouched and return false (matching NumericControlBase /
+        // ListControlBase): "could not load" must not also clobber existing state to null (D-CLOCK-CLOBBER).
+        // The catch mirrors those siblings' conversion guards: a value that parses but then cannot be
+        // resolved (e.g. an Unspecified Kind reaching ToInstant with no localMktTz) is "not loadable" too.
+        try
+        {
+            if (!FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result))
+            {
+                return false;
+            }
+
+            _value = ToInstant(result);
+
+            return true;
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidFieldValueException or InvalidCastException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Loads this control from <see cref="InitializableControl{T}.InitValue"/>, converting the
+    /// market-local time to a UTC instant via <see cref="LocalMktTz"/>. If no initValue was supplied the
+    /// control value is left null.
+    /// </summary>
+    protected override void LoadDefaultFromInitValue()
+    {
+        // Surface an invalid initValueMode (only null/0/1 are defined) before anything else, rather than
+        // silently treating anything that is not 1 as 0 (#4).
+        if (InitValueMode is not (null or 0 or 1))
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(
+                this,
+                ErrorMessages.InitControlValueError,
+                Id,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "initValueMode '{0}' is invalid; expected 0 or 1",
+                    InitValueMode
+                )
+            );
+        }
+
+        if (InitValue == null)
+        {
+            _value = null;
+            return;
+        }
+
+        // FIXatdl requires localMktTz whenever initValue is supplied on a Clock_t, even when initValue
+        // carries its own explicit offset (spec attribute table: unconditional on initValue's presence).
+        if (string.IsNullOrEmpty(LocalMktTz))
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(
+                this,
+                ErrorMessages.InitControlValueError,
+                Id,
+                "localMktTz is required when initValue is supplied on a Clock_t control"
+            );
+        }
+
+        Instant nowInstant = Clock.GetCurrentInstant();
+        Instant initInstant = ResolveMarketLocalValue(InitValue, nowInstant);
+
+        // initValueMode 1: use "now" if the initValue instant has already passed. Comparison is on instants.
+        _value = (InitValueMode == 1 && nowInstant > initInstant) ? nowInstant : initInstant;
+    }
+
+    /// <summary>
+    /// Resolves an initValue-shaped clock value (bare time-of-day, offset-bearing time-of-day, or local
+    /// date-and-time) to an instant, using this control's <see cref="LocalMktTz"/> zone where the value
+    /// does not pin one down itself.
+    /// </summary>
+    /// <param name="value">The parsed initValue-shaped value.</param>
+    /// <param name="nowInstant">The current instant, used to anchor a bare time-of-day to the market's "today".</param>
+    private Instant ResolveMarketLocalValue(InitValueClock value, Instant nowInstant)
+    {
+        if (value.IsOffsetTime)
+        {
+            // An explicit offset (e.g. "08:00:00-05:00") already pins this value to UTC - it takes
+            // precedence over localMktTz-based resolution rather than needing a zone lookup. "Today" is
+            // anchored in the offset's own wall-clock frame (not UTC), since UTC's calendar day can differ
+            // from the offset's for roughly half of any given day (C2-shaped bug: wrong 'today').
+            OffsetTime offsetTime = value.OffsetTimeOfDay!.Value;
+            LocalDate offsetToday = nowInstant.WithOffset(offsetTime.Offset).Date;
+            return offsetToday.At(offsetTime.TimeOfDay).WithOffset(offsetTime.Offset).ToInstant();
+        }
+
+        if (string.IsNullOrEmpty(LocalMktTz))
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(
+                this,
+                ErrorMessages.InitControlValueError,
+                Id,
+                "localMktTz is required to resolve a time-of-day clock value"
+            );
+        }
+
+        DateTimeZone? zone = TimeZoneProvider.GetZoneOrNull(LocalMktTz);
+
+        if (zone == null)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(
+                this,
+                ErrorMessages.InitControlValueError,
+                Id,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "localMktTz '{0}' is not a recognised IANA time zone",
+                    LocalMktTz
+                )
+            );
+        }
+
+        LocalDateTime localDt = value.IsTimeOnly
+            ? nowInstant.InZone(zone).Date.At(value.TimeOfDay!.Value)
+            : value.DateTime!.Value;
+
+        // LenientResolver maps DST gaps forward and overlaps to the earlier offset, so resolution never
+        // throws on a spring-forward / fall-back wall-clock time.
+        return zone.ResolveLocal(localDt, Resolvers.LenientResolver).ToInstant();
+    }
+
+    #endregion
+
+    #region Control_t Overrides
+
+    /// <summary>
+    /// Sets the value of this control using the value of the supplied parameter.
+    /// </summary>
+    /// <param name="parameter">Parameter to set this control's value from.</param>
+    public override void SetValueFromParameter(IParameter parameter)
+    {
+        IControlConvertible value = parameter.GetValueForControl();
+
+        DateTime? dateTime = value.ToDateTime();
+
+        if (dateTime == null)
+        {
+            _value = null;
+            return;
+        }
+
+        // A date-only parameter carries a calendar date, not an instant: pin the date at UTC midnight
+        // whatever the inbound Kind, so a round-trip keeps the same calendar day. Resolving an
+        // Unspecified midnight via localMktTz instead emits the previous date for zones ahead of UTC
+        // (a Tokyo 2026-07-15 becomes 2026-07-14 15:00Z, formatted back as the previous date).
+        if (value is LocalMktDate_t or UTCDateOnly_t)
+        {
+            _value = Instant.FromDateTimeUtc(DateTime.SpecifyKind(dateTime.Value.Date, DateTimeKind.Utc));
+            return;
+        }
+
+        _value = ToInstant(dateTime.Value, parameter);
+    }
+
+    /// <summary>
+    /// Sets the value of this control; either via a DateTime, or using the FIXatdl '{NULL}' value. This method
+    /// is either called indirectly from the user interface, or by a StateRule.
+    /// </summary>
+    /// <param name="newValue">Either a valid DateTime or null (meaning do not send this value over FIX).
+    /// May also contain the FIXatdl '{NULL}' value as a string, a full FIX timestamp (round-tripped as
+    /// UTC), or a date-less time-of-day (e.g. "08:00:00" or "08:00:00-05:00"), which resolves against
+    /// <see cref="LocalMktTz"/> exactly as the same literal would as an initValue.</param>
+    public override void SetValue(object newValue)
+    {
+        if (newValue is string value)
+        {
+            if (value == Atdl.NullValue)
+            {
+                _value = null;
+            }
+            else if (TryCreateDateLessInitValue(value, out InitValueClock? dateLess))
+            {
+                // A bare or offset-bearing time-of-day (e.g. "08:00:00", "08:00:00-05:00") has no date
+                // component, so FixDateTime.TryParse would anchor it to the host's "today" at UTC instead
+                // of the market's "today" in localMktTz. Route it through the same zone-aware resolution
+                // the identical literal receives as an initValue (#R14).
+                _value = ResolveMarketLocalValue(dateLess, Clock.GetCurrentInstant());
+            }
+            else if (FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime parsed))
+            {
+                // Accept a serialized timestamp so the control can round-trip its own ToString output,
+                // not just {NULL} (#3).
+                _value = ToInstant(parsed);
+            }
+            else
+            {
+                throw ThrowHelper.New<InvalidFieldValueException>(
+                    this,
+                    ErrorMessages.InitControlValueError,
+                    Id,
+                    string.Format(CultureInfo.InvariantCulture, "'{0}' is not a valid value for this control", value)
+                );
+            }
+        }
+        else
+        {
+            _value = newValue switch
+            {
+                DateTime dateTime => ToInstant(dateTime),
+                null => null,
+                _ => throw ThrowHelper.New<InternalErrorException>(
+                    this,
+                    InternalErrors.UnexpectedArgumentType,
+                    newValue.GetType().FullName,
+                    "System.String, System.DateTime"
+                ),
+            };
+        }
+    }
+
+    /// <summary>
+    /// Attempts to parse the supplied text as a date-less clock value — a bare time-of-day or an
+    /// offset-bearing time-of-day. Full date-and-time text (e.g. "20260715-06:00:00") is deliberately
+    /// not reported here: it keeps the UTC wire interpretation via <see cref="FixDateTime.TryParse"/>
+    /// so the control round-trips its own serialized output unchanged.
+    /// </summary>
+    private static bool TryCreateDateLessInitValue(string value, [NotNullWhen(true)] out InitValueClock? dateLess)
+    {
+        try
+        {
+            InitValueClock candidate = new(value);
+            dateLess = candidate.IsTimeOnly || candidate.IsOffsetTime ? candidate : null;
+            return dateLess != null;
+        }
+        catch (InvalidFieldValueException)
+        {
+            dateLess = null;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Resets this control to a null value.
+    /// </summary>
+    public override void Reset()
+    {
+        _value = null;
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent nullable boolean value.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <returns>One of true, false or null which is equivalent to the value of this instance.</returns>
+    public override bool? ToBoolean(IParameter targetParameter)
+    {
+        throw UnsupportedConversion("Boolean");
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
+    public override decimal? ToDecimal(IParameter targetParameter, IFormatProvider provider)
+    {
+        throw UnsupportedConversion("Decimal");
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent 32-bit signed integer using the specified culture-specific formatting information.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A nullable 32-bit signed integer equivalent to the value of this instance.</returns>
+    public override int? ToInt32(IParameter targetParameter, IFormatProvider provider)
+    {
+        throw UnsupportedConversion("Int32");
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified culture-specific formatting information.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A nullable 32-bit unsigned integer equivalent to the value of this instance.</returns>
+    public override uint? ToUInt32(IParameter targetParameter, IFormatProvider provider)
+    {
+        throw UnsupportedConversion("UInt32");
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent char value.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <returns>A nullable char value equivalent to the value of this instance. May be null.</returns>
+    public override char? ToChar(IParameter targetParameter)
+    {
+        throw UnsupportedConversion("Char");
+    }
+
+    private InvalidCastException UnsupportedConversion(string targetType) =>
+        ThrowHelper.New<InvalidCastException>(
+            this,
+            ErrorMessages.UnsupportedControlValueConversion,
+            _value,
+            targetType,
+            Id
+        );
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent string value (the UTC wire representation, YYYYMMDD-HH:MM:SS).
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <returns>A string value equivalent to the value of this instance. May be null.</returns>
+    public override string ToString(IParameter targetParameter)
+    {
+        if (_value == null)
+        {
+            return null!;
+        }
+
+        DateTime utc = _value.Value.ToDateTimeUtc();
+
+        // Emit milliseconds only when present, so whole-second values keep the compact seconds form
+        // while sub-second precision is no longer silently dropped (batch 5, Phase-A follow-up).
+        string format = utc.Millisecond == 0 ? FixDateTimeFormat.FixDateTime : FixDateTimeFormat.FixDateTimeMs;
+
+        return utc.ToString(format, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to the equivalent UTC <see cref="DateTime"/> for the FIX wire.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>The UTC instant (Kind = Utc), or null.</returns>
+    public override DateTime? ToDateTime(IParameter targetParameter, IFormatProvider provider)
+    {
+        return _value?.ToDateTimeUtc();
+    }
+
+    /// <summary>
+    /// Indicates whether the control has enumerated state.
+    /// </summary>
+    public override bool HasEnumeratedState => false;
+
+    #endregion
+
+    #region IValueProvider Members
+
+    /// <summary>
+    /// Gets the current value of this control (the LOCAL-market representation for display / Edits), for
+    /// use in Edits as part of StateRules.
+    /// </summary>
+    /// <remarks>
+    /// The returned value is the local-market wall-clock representation intended for DISPLAY and Edit-rule
+    /// evaluation only. It must NOT be fed back into <see cref="SetValue"/>, which interprets an inbound
+    /// DateTime as UTC — round-tripping it that way would shift the instant by the zone offset.
+    /// </remarks>
+    /// <returns>Either a valid DateTime (local-market wall-clock when <see cref="LocalMktTz"/> is set,
+    /// otherwise UTC) or null.</returns>
+    public override object GetCurrentValue()
+    {
+        if (_value == null)
+        {
+            return null!;
+        }
+
+        if (!string.IsNullOrEmpty(LocalMktTz))
+        {
+            DateTimeZone? zone = TimeZoneProvider.GetZoneOrNull(LocalMktTz);
+
+            if (zone == null)
+            {
+                throw ThrowHelper.New<InvalidFieldValueException>(
+                    this,
+                    ErrorMessages.InitControlValueError,
+                    Id,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "localMktTz '{0}' is not a recognised IANA time zone",
+                        LocalMktTz
+                    )
+                );
+            }
+
+            return _value.Value.InZone(zone).ToDateTimeUnspecified();
+        }
+
+        return _value.Value.ToDateTimeUtc();
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Converts an inbound BCL <see cref="DateTime"/> (from a FIX wire value or a UI/StateRule set) to a
+    /// NodaTime <see cref="Instant"/>. These values are UTC by convention; a Local value is converted and an
+    /// Unspecified value throws an exception to prevent timezone shift bugs. A time-only value (anchored to
+    /// 0001-01-01 by UTCTimeOnly_t / TZTimeOnly_t) is re-anchored to today's UTC date, keeping its UTC
+    /// wall-clock time — the market zone must not be applied to a value that is already a UTC time-of-day.
+    /// An Unspecified time-only value resolved through localMktTz is anchored to the market's today for
+    /// the same reason, so it never resolves against the zone's pre-standard Local Mean Time.
+    /// </summary>
+    private Instant ToInstant(DateTime dateTime, IParameter? parameter = null)
+    {
+        if (dateTime.Kind is DateTimeKind.Utc or DateTimeKind.Local)
+        {
+            if (dateTime.Year == 1)
+            {
+                // Time-only: re-anchor to today's UTC date, keeping the UTC time-of-day (R01).
+                LocalDate utcToday = Clock.GetCurrentInstant().InUtc().Date;
+                LocalTime time = LocalTime.FromTicksSinceMidnight(dateTime.TimeOfDay.Ticks);
+                return utcToday.At(time).InUtc().ToInstant();
+            }
+
+            return dateTime.Kind == DateTimeKind.Utc
+                ? Instant.FromDateTimeUtc(dateTime)
+                : Instant.FromDateTimeUtc(dateTime.ToUniversalTime());
+        }
+
+        // dateTime.Kind == DateTimeKind.Unspecified
+        if (!string.IsNullOrEmpty(LocalMktTz))
+        {
+            DateTimeZone? zone = TimeZoneProvider.GetZoneOrNull(LocalMktTz);
+            if (zone != null)
+            {
+                // A year-1 value is the time-only sentinel - UTCTimeOnly_t / TZTimeOnly_t anchor to
+                // 0001-01-01, and so do the WPF and React time pickers. Resolving it literally leaves the
+                // value IN year 1, where a zone still runs on Local Mean Time: America/New_York is
+                // -04:56:02 there, so a 10:31 edit came back as 00010101-15:27:02 - wrong date, and
+                // seconds of LMT offset in a value the user entered to the minute. Anchor a time-only
+                // value to the market's today first, exactly as ResolveMarketLocalValue does for an
+                // initValue time-of-day.
+                LocalDateTime localDt;
+                if (dateTime.Year == 1)
+                {
+                    LocalDate marketToday = Clock.GetCurrentInstant().InZone(zone).Date;
+                    localDt = marketToday.At(LocalTime.FromTicksSinceMidnight(dateTime.TimeOfDay.Ticks));
+                }
+                else
+                {
+                    localDt = LocalDateTime.FromDateTime(dateTime);
+                }
+
+                return zone.ResolveLocal(localDt, Resolvers.LenientResolver).ToInstant();
+            }
+        }
+
+        string paramInfo = parameter != null ? $" bound to parameter '{parameter.Name}'" : string.Empty;
+        throw ThrowHelper.New<ArgumentException>(
+            this,
+            $"DateTimeKind.Unspecified is not supported to avoid timezone ambiguity; Kind must be Utc or Local. Control '{Id}'{paramInfo} has no localMktTz set."
+        );
+    }
+}

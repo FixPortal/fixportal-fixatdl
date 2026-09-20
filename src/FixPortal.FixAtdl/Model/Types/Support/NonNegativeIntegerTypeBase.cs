@@ -1,0 +1,161 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using System.Globalization;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Validation;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
+
+namespace FixPortal.FixAtdl.Model.Types.Support;
+
+/// <summary>
+/// Abstract base class for FIXatdl types backed by a non-negative integer (zero or greater). Types
+/// that additionally forbid zero derive from <see cref="NonZeroPositiveIntegerTypeBase"/>.
+/// </summary>
+public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControlConvertible
+{
+    #region AtdlValueType<T> Overrides
+
+    /// <summary>
+    /// Validates the supplied value in terms of the parameters constraints (e.g., MinValue, MaxValue, etc.).
+    /// </summary>
+    /// <param name="value">Value to validate, may be null in which case no validation is applied.</param>
+    /// <param name="isRequired">Set to true to check that this parameter is non-null.</param>
+    /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
+    protected override ValidationResult ValidateValue(uint? value, bool isRequired)
+    {
+        if (isRequired && value == null)
+        {
+            return new ValidationResult(
+                ValidationResult.ResultType.Missing,
+                ErrorMessages.NonOptionalParameterNotSupplied2
+            );
+        }
+
+        return ValidationResult.ValidResult;
+    }
+
+    /// <summary>
+    /// Converts the supplied value from string format (as might be used on the FIX wire) into the type of the type
+    /// parameter for this type.
+    /// </summary>
+    /// <param name="value">Type to convert from string; cannot be null as empty fields are invalid in FIX.</param>
+    /// <returns>Value converted from a string.</returns>
+    protected override uint? ConvertFromWireValueFormat(string value)
+    {
+        // 'value' is non-nullable (an empty FIX field is invalid); the dead null branch is removed.
+        // Convert.ToUInt32 FormatException/OverflowException are translated at the SetWireValue boundary.
+        return Convert.ToUInt32(value, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Converts the supplied value to a string, as might be used on the FIX wire.  If the supplied value is
+    /// null, this means the field is not to be included in the outgoing FIX message.
+    /// </summary>
+    /// <param name="value">Value to convert, may be null.</param>
+    /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
+    protected override string? ConvertToWireValueFormat(uint? value)
+    {
+        return value?.ToString(CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Converts the supplied value to the type parameter type (int?) for this class.
+    /// </summary>
+    /// <param name="hostParameter"><see cref="IParameter"/> that hosts this value.</param>
+    /// <param name="value">Value to convert, may be null.</param>
+    /// <returns>If input value is not null, returns value converted to T?; null otherwise.</returns>
+    /// <remarks>Used when setting a parameter value from a control (or anything else that
+    /// implements <see cref="IParameterConvertible"/>).</remarks>
+    protected override uint? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
+    {
+        return value.ToUInt32(hostParameter, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Gets the human-readable type name for use in error messages shown to the user.
+    /// </summary>
+    /// <returns>Human-readable type name.</returns>
+    protected override string GetHumanReadableTypeName()
+    {
+        return HumanReadableTypeNames.NumericType;
+    }
+
+    #endregion
+
+    #region IControlConvertible Members
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent nullable boolean value.
+    /// </summary>
+    /// <returns>One of true, false or null which is equivalent to the value of this instance.</returns>
+    public bool? ToBoolean()
+    {
+        throw ThrowHelper.New<InvalidCastException>(
+            this,
+            ErrorMessages.UnsupportedParameterValueConversion,
+            _value,
+            "Boolean"
+        );
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent string value using the specified culture-specific formatting information.
+    /// </summary>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
+    public string? ToString(IFormatProvider? provider)
+    {
+        uint? value = ConstValue ?? _value;
+
+        return value?.ToString(provider);
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
+    /// </summary>
+    /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
+    public decimal? ToDecimal()
+    {
+        return ConstValue ?? _value;
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
+    /// </summary>
+    /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
+    public DateTime? ToDateTime()
+    {
+        throw ThrowHelper.New<InvalidCastException>(
+            this,
+            ErrorMessages.UnsupportedParameterValueConversion,
+            _value,
+            "DateTime"
+        );
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent EnumState value.
+    /// </summary>
+    /// <returns>A valid EnumState, assuming the source value can be correctly converted.</returns>
+    public EnumState ToEnumState(EnumPairCollection enumPairs)
+    {
+        uint? value = ConstValue ?? _value;
+
+        if (value == null)
+        {
+            return new EnumState(enumPairs.EnumIds);
+        }
+
+        return EnumState.FromWireValue(enumPairs, ToString(CultureInfo.InvariantCulture)!);
+    }
+
+    #endregion
+}

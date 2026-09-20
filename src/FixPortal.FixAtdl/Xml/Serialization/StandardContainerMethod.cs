@@ -1,0 +1,24 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+namespace FixPortal.FixAtdl.Xml.Serialization;
+
+/// <summary>
+/// Enumeration that defines what type of containing is being deserialized.
+/// </summary>
+public enum StandardContainerMethod
+{
+    /// <summary>
+    /// The child item should be added to added to the container.
+    /// </summary>
+    Add = 0,
+
+    /// <summary>
+    /// The item should be assigned as the container.
+    /// </summary>
+    Assign,
+}

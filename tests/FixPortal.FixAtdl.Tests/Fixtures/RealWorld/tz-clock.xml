@@ -1,0 +1,1892 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Synthetic FIXatdl 1.1 conformance fixture. Structurally derived from a real-world production broker spec, with all firm-, product-, and identity-bearing content removed (provider, brand/product names, comments). Retained solely to exercise the parser and model against real-world construct combinations. -->
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow" xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core fixatdl-core-1-1.xsd" strategyIdentifierTag="7120" changeStrategyOnCxlRpl="true">
+  <Strategy uiRep="VWAP" name="VWAP" wireValue="VWAP" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Style" fixTag="7148" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Alpha" wireValue="MAX_ALPHA" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_Strict" wireValue="STRICT" />
+    </Parameter>
+    <Parameter name="p_Tilt" fixTag="7173" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_MajorBackTilt" wireValue="MAJOR_BACK_TILT" />
+      <EnumPair enumID="e_MinorBackTilt" wireValue="MINOR_BACK_TILT" />
+      <EnumPair enumID="e_BestFit" wireValue="OPTIMAL" />
+      <EnumPair enumID="e_MinorFrontTilt" wireValue="MINOR_FRONT_TILT" />
+      <EnumPair enumID="e_MajorFrontTilt" wireValue="MAJOR_FRONT_TILT" />
+    </Parameter>
+    <Parameter name="p_Auction" fixTag="7130" xsi:type="Char_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_All" wireValue="Y" />
+      <EnumPair enumID="e_Open" wireValue="O" />
+      <EnumPair enumID="e_Close" wireValue="C" />
+      <EnumPair enumID="e_None" wireValue="N" />
+    </Parameter>
+    <Parameter name="p_VolMaxPct" xsi:type="Int_t" fixTag="7126" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_WouldLitPx" xsi:type="Float_t" fixTag="7129" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldLitPct" xsi:type="Int_t" fixTag="7149" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_WouldDarkPx" xsi:type="Float_t" fixTag="7137" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldDarkPct" xsi:type="Int_t" fixTag="7128" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_RelPxRef" fixTag="7168" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_MarketArrival" wireValue="MARKET_ARRIVAL" />
+      <EnumPair enumID="e_MarketPrevClose" wireValue="MARKET_PREV_CLOSE" />
+      <EnumPair enumID="e_InternalVWAP" wireValue="IVWAP" />
+      <EnumPair enumID="e_ArrivalMid" wireValue="ARRIVAL" />
+      <EnumPair enumID="e_Open" wireValue="OPEN" />
+      <EnumPair enumID="e_PrevClose" wireValue="PREV_CLOSE" />
+    </Parameter>
+    <Parameter name="p_RelPxOffset" xsi:type="Float_t" fixTag="7169" use="optional" minValue="-10" maxValue="10" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control label="Execution Style" parameterRef="p_Style" ID="i_Style" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_Alpha" uiRep="Max Alpha" />
+            <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+            <lay:ListItem enumID="e_Strict" uiRep="Strict" />
+          </lay:Control>
+          <lay:Control label="Vol Max%" parameterRef="p_VolMaxPct" ID="i_VolMaxPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          <lay:Control label="Tilt" ID="i_Tilt" parameterRef="p_Tilt" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_MajorBackTilt" uiRep="Back Tilt" />
+            <lay:ListItem enumID="e_MinorBackTilt" uiRep="Minor Back Tilt" />
+            <lay:ListItem enumID="e_BestFit" uiRep="Optimal" />
+            <lay:ListItem enumID="e_MinorFrontTilt" uiRep="Minor Front Tilt" />
+            <lay:ListItem enumID="e_MajorFrontTilt" uiRep="Front Tilt" />
+          </lay:Control>
+          <lay:Control label="Auction" ID="i_Auction" parameterRef="p_Auction" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_All" uiRep="All" />
+            <lay:ListItem enumID="e_Open" uiRep="Open" />
+            <lay:ListItem enumID="e_Close" uiRep="Close" />
+            <lay:ListItem enumID="e_None" uiRep="None" />
+          </lay:Control>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Lit IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldLitPx" parameterRef="p_WouldLitPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldLitPct" parameterRef="p_WouldLitPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Dark IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldDarkPx" parameterRef="p_WouldDarkPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldDarkPct" parameterRef="p_WouldDarkPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Relative Price Limit" orientation="HORIZONTAL" border="Line" collapsible="false">
+            <lay:Control ID="i_RelPxRef" parameterRef="p_RelPxRef" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_MarketArrival" uiRep="Market Arrival" />
+              <lay:ListItem enumID="e_MarketPrevClose" uiRep="Market Prev Close" />
+              <lay:ListItem enumID="e_InternalVWAP" uiRep="Interval VWAP" />
+              <lay:ListItem enumID="e_ArrivalMid" uiRep="Arrival Mid" />
+              <lay:ListItem enumID="e_Open" uiRep="Open" />
+              <lay:ListItem enumID="e_PrevClose" uiRep="Previous Close" />
+            </lay:Control>
+            <lay:Control ID="i_RelPxOffset" parameterRef="p_RelPxOffset" xsi:type="lay:SingleSpinner_t" label="Offset (%)" increment="1" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Custom Instructions" orientation="HORIZONTAL" border="Line" collapsible="false">
+            <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="TWAP" name="TWAP" wireValue="TWAP" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Style" fixTag="7148" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Alpha" wireValue="MAX_ALPHA" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_Strict" wireValue="STRICT" />
+    </Parameter>
+    <Parameter name="p_Auction" fixTag="7130" xsi:type="Char_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_All" wireValue="Y" />
+      <EnumPair enumID="e_Open" wireValue="O" />
+      <EnumPair enumID="e_Close" wireValue="C" />
+      <EnumPair enumID="e_None" wireValue="N" />
+    </Parameter>
+    <Parameter name="p_VolMaxPct" xsi:type="Int_t" fixTag="7126" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_WouldLitPx" xsi:type="Float_t" fixTag="7129" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldLitPct" xsi:type="Int_t" fixTag="7149" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_WouldDarkPx" xsi:type="Float_t" fixTag="7137" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldDarkPct" xsi:type="Int_t" fixTag="7128" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_RelPxRef" fixTag="7168" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_MarketArrival" wireValue="MARKET_ARRIVAL" />
+      <EnumPair enumID="e_MarketPrevClose" wireValue="MARKET_PREV_CLOSE" />
+      <EnumPair enumID="e_InternalVWAP" wireValue="IVWAP" />
+      <EnumPair enumID="e_ArrivalMid" wireValue="ARRIVAL" />
+      <EnumPair enumID="e_Open" wireValue="OPEN" />
+      <EnumPair enumID="e_PrevClose" wireValue="PREV_CLOSE" />
+    </Parameter>
+    <Parameter name="p_RelPxOffset" xsi:type="Float_t" fixTag="7169" use="optional" minValue="-10" maxValue="10" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control label="Execution Style" parameterRef="p_Style" ID="i_Style" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_Alpha" uiRep="Max Alpha" />
+            <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+            <lay:ListItem enumID="e_Strict" uiRep="Strict" />
+          </lay:Control>
+          <lay:Control label="Vol Max%" parameterRef="p_VolMaxPct" ID="i_VolMaxPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          <lay:Control label="Auction" ID="i_Auction" parameterRef="p_Auction" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_All" uiRep="All" />
+            <lay:ListItem enumID="e_Open" uiRep="Open" />
+            <lay:ListItem enumID="e_Close" uiRep="Close" />
+            <lay:ListItem enumID="e_None" uiRep="None" />
+          </lay:Control>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Lit IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldLitPx" parameterRef="p_WouldLitPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldLitPct" parameterRef="p_WouldLitPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Dark IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldDarkPx" parameterRef="p_WouldDarkPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldDarkPct" parameterRef="p_WouldDarkPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Relative Price Limit" orientation="HORIZONTAL" border="Line" collapsible="false">
+            <lay:Control ID="i_RelPxRef" parameterRef="p_RelPxRef" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_MarketArrival" uiRep="Market Arrival" />
+              <lay:ListItem enumID="e_MarketPrevClose" uiRep="Market Prev Close" />
+              <lay:ListItem enumID="e_InternalVWAP" uiRep="Interval VWAP" />
+              <lay:ListItem enumID="e_ArrivalMid" uiRep="Arrival Mid" />
+              <lay:ListItem enumID="e_Open" uiRep="Open" />
+              <lay:ListItem enumID="e_PrevClose" uiRep="Previous Close" />
+            </lay:Control>
+            <lay:Control ID="i_RelPxOffset" parameterRef="p_RelPxOffset" xsi:type="lay:SingleSpinner_t" label="Offset (%)" increment="1" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Custom Instructions" orientation="HORIZONTAL" border="Line" collapsible="false">
+            <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="Target Open" name="TARGET_OPEN" wireValue="TARGET_OPEN" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Style" fixTag="7148" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Alpha" wireValue="MAX_ALPHA" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_Strict" wireValue="STRICT" />
+    </Parameter>
+    <Parameter name="p_AuctionOnly" fixTag="7122" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+    </Parameter>
+    <Parameter name="p_AuctionMaxPct" xsi:type="Int_t" fixTag="7121" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_ContMaxPct" xsi:type="Int_t" fixTag="7144" use="optional" minValue="1" maxValue="100" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control label="Style" parameterRef="p_Style" ID="i_Style" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_Alpha" uiRep="Max Alpha" />
+            <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+            <lay:ListItem enumID="e_Strict" uiRep="Strict" />
+          </lay:Control>
+          <lay:Control ID="i_AuctionOnly" parameterRef="p_AuctionOnly" label="Auction Only" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+            <lay:ListItem enumID="e_No" uiRep="No" />
+          </lay:Control>
+          <lay:Control ID="i_AuctionMaxPct" parameterRef="p_AuctionMaxPct" xsi:type="lay:SingleSpinner_t" label="Auction Max%" increment="5" />
+          <lay:Control ID="i_ContMaxPct" parameterRef="p_ContMaxPct" xsi:type="lay:SingleSpinner_t" label="Continuous Max%" increment="5" />
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+          <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+  <Strategy uiRep="Target Close" name="TARGET_CLOSE" wireValue="TARGET_CLOSE" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_AuctionOnly" fixTag="7122" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+    </Parameter>
+    <Parameter name="p_Style" fixTag="7148" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Alpha" wireValue="MAX_ALPHA" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_Strict" wireValue="STRICT" />
+    </Parameter>
+    <Parameter name="p_Target" xsi:type="Float_t" fixTag="7134" use="optional" minValue="1" />
+    <Parameter name="p_AuctionMaxPct" xsi:type="Int_t" fixTag="7121" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_Target_Type" fixTag="7135" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_%Predicted_Close" wireValue="PREDICTED_CLOSE" />
+      <EnumPair enumID="e_%Historic_Close" wireValue="HISTORIC_CLOSE" />
+      <EnumPair enumID="e_%Orders" wireValue="ORDERS" />
+      <EnumPair enumID="e_%Shares" wireValue="SHARES" />
+    </Parameter>
+    <Parameter name="p_TargetPct" xsi:type="Int_t" fixTag="7172" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_ContMaxPct" xsi:type="Int_t" fixTag="7144" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_RefPx" fixTag="7136" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Off" wireValue="OFF" />
+      <EnumPair enumID="e_%Last_Trade" wireValue="LAST_TRADE" />
+      <EnumPair enumID="e_5_min_VWAP" wireValue="5MIN_VWAP" />
+      <EnumPair enumID="e_Avg_Order" wireValue="AVERAGE_ORDER" />
+    </Parameter>
+    <Parameter name="p_Offset" xsi:type="Float_t" fixTag="7139" use="optional" minValue="-10" maxValue="10" />
+    <Parameter name="p_Unit" fixTag="7131" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Pct" wireValue="PCT" />
+      <EnumPair enumID="e_BPS" wireValue="BPS" />
+      <EnumPair enumID="e_Ticks" wireValue="TICK" />
+      <EnumPair enumID="e_Spread" wireValue="SPRD" />
+    </Parameter>
+    <Parameter name="p_MarketDirection" fixTag="7133" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Favourable" wireValue="FAVOURABLE" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_Unfavourable" wireValue="UNFAVOURABLE" />
+    </Parameter>
+    <Parameter name="p_IWPrice" xsi:type="Float_t" fixTag="7129" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_IWPrct" xsi:type="Int_t" fixTag="7149" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_IWPhase" fixTag="7167" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Auction" wireValue="AUC" />
+      <EnumPair enumID="e_Continuous" wireValue="CONT" />
+      <EnumPair enumID="e_AllPhase" wireValue="ALL" />
+    </Parameter>
+    <Parameter name="p_IWLitBench" fixTag="7180" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_None" wireValue="NONE" />
+      <EnumPair enumID="e_Limit_Price" wireValue="LIMPRICE" />
+      <EnumPair enumID="e_IntervalVWAP" wireValue="INTERVWAP" />
+      <EnumPair enumID="e_ArrivalMid" wireValue="ARRMID" />
+      <EnumPair enumID="e_ArrivalLast" wireValue="ARRLAST" />
+      <EnumPair enumID="e_ArrivalFar" wireValue="ARRFAR" />
+      <EnumPair enumID="e_ArrivalNear" wireValue="ARRNEAR" />
+      <EnumPair enumID="e_Open" wireValue="OPEN" />
+    </Parameter>
+    <Parameter name="p_RelPxRef" fixTag="7168" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_MarketArrival" wireValue="MARKET_ARRIVAL" />
+      <EnumPair enumID="e_MarketPrevClose" wireValue="MARKET_PREV_CLOSE" />
+      <EnumPair enumID="e_InternalVWAP" wireValue="IVWAP" />
+      <EnumPair enumID="e_ArrivalMid" wireValue="ARRIVAL" />
+      <EnumPair enumID="e_Open" wireValue="OPEN" />
+      <EnumPair enumID="e_PrevClose" wireValue="PREV_CLOSE" />
+    </Parameter>
+    <Parameter name="p_RelPxOffset" xsi:type="Float_t" fixTag="7169" use="optional" minValue="-10" maxValue="10" />
+    <Parameter name="p_RelLimitTicker" xsi:type="String_t" fixTag="7127" use="optional" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time (UTC)" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_AuctionOnly" parameterRef="p_AuctionOnly" label="Auction Only" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Sytle" parameterRef="p_Style" label="Execution Style" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Strict" uiRep="Strict" />
+              <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+              <lay:ListItem enumID="e_Alpha" uiRep="Max Alpha" />
+            </lay:Control>
+            <lay:Control ID="i_MarketDirection" parameterRef="p_MarketDirection" label="Market Direction" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Unfavourable" uiRep="Unfavourable" />
+              <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+              <lay:ListItem enumID="e_Favourable" uiRep="Favourable" />
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Auction Participation" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Target" parameterRef="p_Target" xsi:type="lay:SingleSpinner_t" label="target" increment="5" />
+            <lay:Control ID="i_Target_Type" parameterRef="p_Target_Type" label="Target Type" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_%Predicted_Close" uiRep="% of Predicted Close" />
+              <lay:ListItem enumID="e_%Historic_Close" uiRep="% of Historic Close" />
+              <lay:ListItem enumID="e_%Orders" uiRep="% of Orders" />
+              <lay:ListItem enumID="e_%Shares" uiRep="Shares" />
+            </lay:Control>
+            <lay:Control ID="i_MaxPct" parameterRef="p_AuctionMaxPct" xsi:type="lay:SingleSpinner_t" label="Max%" increment="5" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Continuous Participation" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_TargetPct" parameterRef="p_TargetPct" xsi:type="lay:SingleSpinner_t" label="Target %" increment="5" />
+            <lay:Control ID="i_ContMaxPct" parameterRef="p_ContMaxPct" xsi:type="lay:SingleSpinner_t" label="Max %" increment="5" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Auction Limit Price" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_RefPx" parameterRef="p_RefPx" label="Reference" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Off" uiRep="Off" />
+              <lay:ListItem enumID="e_%Last_Trade" uiRep="Last Trade" />
+              <lay:ListItem enumID="e_5_min_VWAP" uiRep="5 min VWAP" />
+              <lay:ListItem enumID="e_Avg_Order" uiRep="Avg Order" />
+            </lay:Control>
+            <lay:Control ID="i_Offset" parameterRef="p_Offset" xsi:type="lay:SingleSpinner_t" label="Offset" increment="1" />
+            <lay:Control ID="i_Units" parameterRef="p_Unit" label="Units" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Pct" uiRep="%" />
+              <lay:ListItem enumID="e_BPS" uiRep="BPS" />
+              <lay:ListItem enumID="e_Ticks" uiRep="Ticks" />
+              <lay:ListItem enumID="e_Spread" uiRep="Spread" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="IWould Parameters" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_IWPrice" parameterRef="p_IWPrice" xsi:type="lay:SingleSpinner_t" label="IW Price" increment="1" />
+            <lay:Control ID="i_IWPrct" parameterRef="p_IWPrct" xsi:type="lay:SingleSpinner_t" label="IWould %" increment="1" />
+            <lay:Control ID="i_IWPhase" parameterRef="p_IWPhase" label="IW Phases" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_AllPhase" uiRep="All" />
+              <lay:ListItem enumID="e_Auction" uiRep="Auction" />
+              <lay:ListItem enumID="e_Continuous" uiRep="Continuous" />
+            </lay:Control>
+            <lay:Control ID="i_IWLitBench" parameterRef="p_IWLitBench" label="IWould Lit Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_None" uiRep="None" />
+              <lay:ListItem enumID="e_Limit_Price" uiRep="Limit Price" />
+              <lay:ListItem enumID="e_IntervalVWAP" uiRep="Interval VWAP" />
+              <lay:ListItem enumID="e_ArrivalMid" uiRep="Arrival Mid" />
+              <lay:ListItem enumID="e_ArrivalLast" uiRep="Arrival Last" />
+              <lay:ListItem enumID="e_ArrivalFar" uiRep="Arrival Far" />
+              <lay:ListItem enumID="e_ArrivalNear" uiRep="Arrival Near" />
+              <lay:ListItem enumID="e_Open" uiRep="Open" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Relative Price Limit" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_RelPxRef" parameterRef="p_RelPxRef" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_MarketArrival" uiRep="Market Arrival" />
+              <lay:ListItem enumID="e_MarketPrevClose" uiRep="Market Prev Close" />
+              <lay:ListItem enumID="e_InternalVWAP" uiRep="Interval VWAP" />
+              <lay:ListItem enumID="e_ArrivalMid" uiRep="Arrival Mid" />
+              <lay:ListItem enumID="e_Open" uiRep="Open" />
+              <lay:ListItem enumID="e_PrevClose" uiRep="Previous Close" />
+            </lay:Control>
+            <lay:Control ID="i_RelPxOffset" parameterRef="p_RelPxOffset" xsi:type="lay:SingleSpinner_t" label="Offset (%)" increment="1" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+  <Strategy uiRep="POV" name="POV" wireValue="POV" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Style" fixTag="7148" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Alpha" wireValue="MAX_ALPHA" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_Strict" wireValue="STRICT" />
+    </Parameter>
+    <Parameter name="p_Auction" fixTag="7130" xsi:type="Char_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_All" wireValue="Y" />
+      <EnumPair enumID="e_Open" wireValue="O" />
+      <EnumPair enumID="e_Close" wireValue="C" />
+      <EnumPair enumID="e_None" wireValue="N" />
+    </Parameter>
+    <Parameter name="p_TargetPct" xsi:type="Int_t" fixTag="7172" use="optional" minValue="0" maxValue="100" />
+    <Parameter name="p_WouldLitPx" xsi:type="Float_t" fixTag="7129" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldLitPct" xsi:type="Int_t" fixTag="7149" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_WouldDarkPx" xsi:type="Float_t" fixTag="7137" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldDarkPct" xsi:type="Int_t" fixTag="7128" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_RelPxRef" fixTag="7168" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_MarketArrival" wireValue="MARKET_ARRIVAL" />
+      <EnumPair enumID="e_MarketPrevClose" wireValue="MARKET_PREV_CLOSE" />
+      <EnumPair enumID="e_InternalVWAP" wireValue="IVWAP" />
+      <EnumPair enumID="e_ArrivalMid" wireValue="ARRIVAL" />
+      <EnumPair enumID="e_Open" wireValue="OPEN" />
+      <EnumPair enumID="e_PrevClose" wireValue="PREV_CLOSE" />
+    </Parameter>
+    <Parameter name="p_RelPxOffset" xsi:type="Float_t" fixTag="7169" use="optional" minValue="-10" maxValue="10" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control label="Execution Style" parameterRef="p_Style" ID="i_Style" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_Alpha" uiRep="Max Alpha" />
+            <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+            <lay:ListItem enumID="e_Strict" uiRep="Strict" />
+          </lay:Control>
+          <lay:Control label="Target%" parameterRef="p_TargetPct" ID="p_TargetPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          <lay:Control label="Auction" ID="i_Auction" parameterRef="p_Auction" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_All" uiRep="All" />
+            <lay:ListItem enumID="e_Open" uiRep="Open" />
+            <lay:ListItem enumID="e_Close" uiRep="Close" />
+            <lay:ListItem enumID="e_None" uiRep="None" />
+          </lay:Control>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Lit IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldLitPx" parameterRef="p_WouldLitPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldLitPct" parameterRef="p_WouldLitPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Dark IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldDarkPx" parameterRef="p_WouldDarkPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldDarkPct" parameterRef="p_WouldDarkPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Relative Price Limit" orientation="HORIZONTAL" border="Line" collapsible="false">
+            <lay:Control ID="i_RelPxRef" parameterRef="p_RelPxRef" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_MarketArrival" uiRep="Market Arrival" />
+              <lay:ListItem enumID="e_MarketPrevClose" uiRep="Market Prev Close" />
+              <lay:ListItem enumID="e_InternalVWAP" uiRep="Interval VWAP" />
+              <lay:ListItem enumID="e_ArrivalMid" uiRep="Arrival Mid" />
+              <lay:ListItem enumID="e_Open" uiRep="Open" />
+              <lay:ListItem enumID="e_PrevClose" uiRep="Previous Close" />
+            </lay:Control>
+            <lay:Control ID="i_RelPxOffset" parameterRef="p_RelPxOffset" xsi:type="lay:SingleSpinner_t" label="Offset (%)" increment="1" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Custom Instructions" orientation="HORIZONTAL" border="Line" collapsible="false">
+            <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="PEG" name="PEG" wireValue="PEG" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Auction" fixTag="7130" xsi:type="Char_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_All" wireValue="Y" />
+      <EnumPair enumID="e_Open" wireValue="O" />
+      <EnumPair enumID="e_Close" wireValue="C" />
+      <EnumPair enumID="e_None" wireValue="N" />
+    </Parameter>
+    <Parameter name="p_WouldLitPx" xsi:type="Float_t" fixTag="7129" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldLitPct" xsi:type="Int_t" fixTag="7149" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_WouldDarkPx" xsi:type="Float_t" fixTag="7137" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_DisplaySize" xsi:type="Int_t" fixTag="7147" use="optional" minValue="0" />
+    <Parameter name="p_PegOffset" xsi:type="Int_t" fixTag="7162" use="optional" minValue="-20" maxValue="20" />
+    <Parameter name="p_MinTakeShares" xsi:type="Int_t" fixTag="7132" use="optional" minValue="0" />
+    <Parameter name="p_MinTakeAQxShares" xsi:type="Float_t" fixTag="7159" use="optional" minValue="0" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_DisplaySize" parameterRef="p_DisplaySize" label="Display Size" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_PegOffset" parameterRef="p_PegOffset" label="Peg Offset" xsi:type="lay:SingleSpinner_t" increment="1" />
+            <lay:Control label="Auction" ID="i_Auction" parameterRef="p_Auction" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_All" uiRep="All" />
+              <lay:ListItem enumID="e_Open" uiRep="Open" />
+              <lay:ListItem enumID="e_Close" uiRep="Close" />
+              <lay:ListItem enumID="e_None" uiRep="None" />
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Minimum Take Size" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_MinTakeShares" parameterRef="p_MinTakeShares" label="Shares" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_MinTakeAQxShares" parameterRef="p_MinTakeAQxShares" label="Quote Factor" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Lit IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldLitPx" parameterRef="p_WouldLitPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldLitPct" parameterRef="p_WouldLitPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Dark IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldDarkPx" parameterRef="p_WouldDarkPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+          <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="LIQUIDITYSEEK" name="LIQUIDITYSEEK" wireValue="LIQUIDITYSEEK" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_WouldLitPx" xsi:type="Float_t" fixTag="7129" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_DisplaySize" xsi:type="Int_t" fixTag="7147" use="optional" minValue="0" />
+    <Parameter name="p_MinTakeShares" xsi:type="Int_t" fixTag="7132" use="optional" minValue="0" />
+    <Parameter name="p_MinTakeAQxShares" xsi:type="Float_t" fixTag="7159" use="optional" minValue="0" />
+    <Parameter name="p_Style" fixTag="7148" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Alpha" wireValue="MAX_ALPHA" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_Strict" wireValue="STRICT" />
+    </Parameter>
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Minimum Take Size" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_MinTakeShares" parameterRef="p_MinTakeShares" label="Shares" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_MinTakeAQxShares" parameterRef="p_MinTakeAQxShares" label="Quote Factor" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control label="Execution Style" parameterRef="p_Style" ID="i_Style" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Alpha" uiRep="Max Alpha" />
+              <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+              <lay:ListItem enumID="e_Strict" uiRep="Strict" />
+            </lay:Control>
+            <lay:Control ID="i_DisplaySize" parameterRef="p_DisplaySize" label="Display Size" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_WouldLitPx" parameterRef="p_WouldLitPx" label="IWould Lit Price" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+          <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="Level" name="LEVEL" wireValue="LEVEL" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Style" fixTag="7148" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Alpha" wireValue="MAX_ALPHA" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_Strict" wireValue="STRICT" />
+    </Parameter>
+    <Parameter name="p_Auction" fixTag="7130" xsi:type="Char_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_All" wireValue="Y" />
+      <EnumPair enumID="e_Open" wireValue="O" />
+      <EnumPair enumID="e_Close" wireValue="C" />
+      <EnumPair enumID="e_None" wireValue="N" />
+    </Parameter>
+    <Parameter name="p_L1Pct" xsi:type="Int_t" fixTag="7152" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_L2Pct" xsi:type="Int_t" fixTag="7153" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_L2Px" xsi:type="Float_t" fixTag="7164" use="optional" precision="4" />
+    <Parameter name="p_L3Pct" xsi:type="Int_t" fixTag="7154" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_L3Px" xsi:type="Float_t" fixTag="7165" use="optional" precision="4" />
+    <Parameter name="p_L4Pct" xsi:type="Int_t" fixTag="7155" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_L4Px" xsi:type="Float_t" fixTag="7166" use="optional" precision="4" />
+    <Parameter name="p_WouldLitPx" xsi:type="Float_t" fixTag="7129" use="optional" minValue="0" precision="4" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Strategy" border="Line" orientation="VERTICAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+            <lay:Control label="Execution Style" parameterRef="p_Style" ID="i_Style" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Alpha" uiRep="Max Alpha" />
+              <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+              <lay:ListItem enumID="e_Strict" uiRep="Strict" />
+            </lay:Control>
+            <lay:Control label="Auction" ID="i_Auction" parameterRef="p_Auction" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_All" uiRep="All" />
+              <lay:ListItem enumID="e_Open" uiRep="Open" />
+              <lay:ListItem enumID="e_Close" uiRep="Close" />
+              <lay:ListItem enumID="e_None" uiRep="None" />
+            </lay:Control>
+            <lay:Control ID="i_L1Pct" parameterRef="p_L1Pct" label="Level 1 %" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+            <lay:StrategyPanel title="Level 2" border="Line" orientation="VERTICAL" collapsible="false">
+              <lay:Control ID="i_L2Pct" parameterRef="p_L2Pct" label="  %" xsi:type="lay:SingleSpinner_t" increment="5" />
+              <lay:Control ID="i_L2Px" parameterRef="p_L2Px" label="Price" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            </lay:StrategyPanel>
+            <lay:StrategyPanel title="Level 3" border="Line" orientation="VERTICAL" collapsible="false">
+              <lay:Control ID="i_L3Pct" parameterRef="p_L3Pct" label="  %" xsi:type="lay:SingleSpinner_t" increment="5" />
+              <lay:Control ID="i_L3Px" parameterRef="p_L3Px" label="Price" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            </lay:StrategyPanel>
+            <lay:StrategyPanel title="Level 4" border="Line" orientation="VERTICAL" collapsible="false">
+              <lay:Control ID="i_L4Pct" parameterRef="p_L4Pct" label="  %" xsi:type="lay:SingleSpinner_t" increment="5" />
+              <lay:Control ID="i_L4Px" parameterRef="p_L4Px" label="Price" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="IWould Lit" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldLitPx" parameterRef="p_WouldLitPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="IS" name="IS" wireValue="IS" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Style" fixTag="7148" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Alpha" wireValue="MAX_ALPHA" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_Strict" wireValue="STRICT" />
+    </Parameter>
+    <Parameter name="p_Auction" fixTag="7130" xsi:type="Char_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_All" wireValue="Y" />
+      <EnumPair enumID="e_Open" wireValue="O" />
+      <EnumPair enumID="e_Close" wireValue="C" />
+      <EnumPair enumID="e_None" wireValue="N" />
+    </Parameter>
+    <Parameter name="p_VolMaxPct" xsi:type="Int_t" fixTag="7126" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_WouldLitPx" xsi:type="Float_t" fixTag="7129" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldLitPct" xsi:type="Int_t" fixTag="7149" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_WouldDarkPx" xsi:type="Float_t" fixTag="7137" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldDarkPct" xsi:type="Int_t" fixTag="7128" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_RelPxRef" fixTag="7168" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_MarketArrival" wireValue="MARKET_ARRIVAL" />
+      <EnumPair enumID="e_MarketPrevClose" wireValue="MARKET_PREV_CLOSE" />
+      <EnumPair enumID="e_InternalVWAP" wireValue="IVWAP" />
+      <EnumPair enumID="e_ArrivalMid" wireValue="ARRIVAL" />
+      <EnumPair enumID="e_Open" wireValue="OPEN" />
+      <EnumPair enumID="e_PrevClose" wireValue="PREV_CLOSE" />
+    </Parameter>
+    <Parameter name="p_RelPxOffset" xsi:type="Float_t" fixTag="7169" use="optional" minValue="-10" maxValue="10" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control label="Execution Style" parameterRef="p_Style" ID="i_Style" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_Alpha" uiRep="Max Alpha" />
+            <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+            <lay:ListItem enumID="e_Strict" uiRep="Strict" />
+          </lay:Control>
+          <lay:Control label="Auction" ID="i_Auction" parameterRef="p_Auction" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_All" uiRep="All" />
+            <lay:ListItem enumID="e_Open" uiRep="Open" />
+            <lay:ListItem enumID="e_Close" uiRep="Close" />
+            <lay:ListItem enumID="e_None" uiRep="None" />
+          </lay:Control>
+          <lay:Control ID="i_VolMaxPct" parameterRef="p_VolMaxPct" label="Vol Max%" xsi:type="lay:SingleSpinner_t" increment="5" />
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Lit IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldLitPx" parameterRef="p_WouldLitPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldLitPct" parameterRef="p_WouldLitPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Dark IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldDarkPx" parameterRef="p_WouldDarkPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldDarkPct" parameterRef="p_WouldDarkPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Relative Price Limit" orientation="HORIZONTAL" border="Line" collapsible="false">
+            <lay:Control ID="i_RelPxRef" parameterRef="p_RelPxRef" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_MarketArrival" uiRep="Market Arrival" />
+              <lay:ListItem enumID="e_MarketPrevClose" uiRep="Market Prev Close" />
+              <lay:ListItem enumID="e_InternalVWAP" uiRep="Interval VWAP" />
+              <lay:ListItem enumID="e_ArrivalMid" uiRep="Arrival Mid" />
+              <lay:ListItem enumID="e_Open" uiRep="Open" />
+              <lay:ListItem enumID="e_PrevClose" uiRep="Previous Close" />
+            </lay:Control>
+            <lay:Control ID="i_RelPxOffset" parameterRef="p_RelPxOffset" xsi:type="lay:SingleSpinner_t" label="Offset (%)" increment="1" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Custom Instructions" orientation="HORIZONTAL" border="Line" collapsible="false">
+            <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="DYNAMIC" name="DYNAMIC" wireValue="DYNAMIC" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Urgency" fixTag="7174" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_VeryLow" wireValue="VERY_LOW" />
+      <EnumPair enumID="e_Low" wireValue="LOW" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_High" wireValue="HIGH" />
+      <EnumPair enumID="e_VeryHigh" wireValue="VERY_HIGH" />
+    </Parameter>
+    <Parameter name="p_Auction" fixTag="7130" xsi:type="Char_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_All" wireValue="Y" />
+      <EnumPair enumID="e_Open" wireValue="O" />
+      <EnumPair enumID="e_Close" wireValue="C" />
+      <EnumPair enumID="e_None" wireValue="N" />
+    </Parameter>
+    <Parameter name="p_VolMaxPct" xsi:type="Int_t" fixTag="7126" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_WouldLitPx" xsi:type="Float_t" fixTag="7129" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldDarkPx" xsi:type="Float_t" fixTag="7137" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldDarkPct" xsi:type="Int_t" fixTag="7128" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_MinDarkFill" xsi:type="Int_t" fixTag="7158" use="optional" minValue="0" />
+    <Parameter name="p_MinDarkType" fixTag="7157" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Shares" wireValue="Shares" />
+      <EnumPair enumID="e_LIS" wireValue="LIS" />
+    </Parameter>
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control ID="i_Urgency" parameterRef="p_Urgency" label="Urgency" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_VeryLow" uiRep="Very Low" />
+            <lay:ListItem enumID="e_Low" uiRep="Low" />
+            <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+            <lay:ListItem enumID="e_High" uiRep="High" />
+            <lay:ListItem enumID="e_VeryHigh" uiRep="Very High" />
+          </lay:Control>
+          <lay:Control label="Auction" ID="i_Auction" parameterRef="p_Auction" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_All" uiRep="All" />
+            <lay:ListItem enumID="e_Open" uiRep="Open" />
+            <lay:ListItem enumID="e_Close" uiRep="Close" />
+            <lay:ListItem enumID="e_None" uiRep="None" />
+          </lay:Control>
+          <lay:Control ID="i_VolMaxPct" parameterRef="p_VolMaxPct" label="Max%" xsi:type="lay:SingleSpinner_t" increment="5" />
+          <lay:Control ID="i_MinDarkFill" parameterRef="p_MinDarkFill" label="Min Dark Fill" xsi:type="lay:SingleSpinner_t" increment="5" />
+          <lay:Control ID="i_MinDarkType" parameterRef="p_MinDarkType" label="Min Dark Fill Type" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_Shares" uiRep="Shares" />
+            <lay:ListItem enumID="e_LIS" uiRep="LIS" />
+          </lay:Control>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Lit IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldLitPx" parameterRef="p_WouldLitPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Dark IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldDarkPx" parameterRef="p_WouldDarkPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldDarkPct" parameterRef="p_WouldDarkPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+          <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="DYNAMIC Dark" name="DYNAMIC_DARK" wireValue="DYNAMIC_DARK" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Urgency" fixTag="7174" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_VeryLow" wireValue="VERY_LOW" />
+      <EnumPair enumID="e_Low" wireValue="LOW" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_High" wireValue="HIGH" />
+      <EnumPair enumID="e_VeryHigh" wireValue="VERY_HIGH" />
+    </Parameter>
+    <Parameter name="p_LisFactor" xsi:type="Float_t" fixTag="7157" use="optional" minValue="0.25" maxValue="10" />
+    <Parameter name="p_MinDarkFill" xsi:type="Int_t" fixTag="7158" use="optional" minValue="0" />
+    <Parameter name="p_MinDarkType" fixTag="7157" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Shares" wireValue="Shares" />
+      <EnumPair enumID="e_LIS" wireValue="LIS" />
+    </Parameter>
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control ID="i_Urgency" parameterRef="p_Urgency" label="Urgency" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_VeryLow" uiRep="Very Low" />
+            <lay:ListItem enumID="e_Low" uiRep="Low" />
+            <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+            <lay:ListItem enumID="e_High" uiRep="High" />
+            <lay:ListItem enumID="e_VeryHigh" uiRep="Very High" />
+          </lay:Control>
+          <lay:Control ID="i_MinDarkFill" parameterRef="p_MinDarkFill" label="Min Dark Fill" xsi:type="lay:SingleSpinner_t" increment="5" />
+          <lay:Control ID="i_MinDarkType" parameterRef="p_MinDarkType" label="Min Dark Fill Type" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_Shares" uiRep="Shares" />
+            <lay:ListItem enumID="e_LIS" uiRep="LIS" />
+          </lay:Control>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+          <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="ADAPTIVE" name="ADAPTIVE" wireValue="ADAPTIVE" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Auction" fixTag="7130" xsi:type="Char_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_All" wireValue="Y" />
+      <EnumPair enumID="e_Open" wireValue="O" />
+      <EnumPair enumID="e_Close" wireValue="C" />
+      <EnumPair enumID="e_None" wireValue="N" />
+    </Parameter>
+    <Parameter name="p_VolMaxPct" xsi:type="Int_t" fixTag="7126" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_MinDarkFill" xsi:type="Int_t" fixTag="7158" use="optional" minValue="0" />
+    <Parameter name="p_WouldLitPx" xsi:type="Float_t" fixTag="7129" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldDarkPx" xsi:type="Float_t" fixTag="7137" use="optional" minValue="0" precision="4" />
+    <Parameter name="p_WouldDarkPct" xsi:type="Int_t" fixTag="7128" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="p_DisplaySize" xsi:type="Int_t" fixTag="7147" use="optional" minValue="0" />
+    <Parameter name="p_PegOffset" xsi:type="Int_t" fixTag="7162" use="optional" minValue="-20" maxValue="20" />
+    <Parameter name="p_MinTakeShares" xsi:type="Int_t" fixTag="7132" use="optional" minValue="0" />
+    <Parameter name="p_MinTakeAQxShares" xsi:type="Float_t" fixTag="7159" use="optional" minValue="0" />
+    <Parameter name="p_Urgency" fixTag="7174" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_VeryLow" wireValue="VERY_LOW" />
+      <EnumPair enumID="e_Low" wireValue="LOW" />
+      <EnumPair enumID="e_Neutral" wireValue="NEUTRAL" />
+      <EnumPair enumID="e_High" wireValue="HIGH" />
+      <EnumPair enumID="e_VeryHigh" wireValue="VERY_HIGH" />
+    </Parameter>
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+            <lay:Control ID="i_Urgency" parameterRef="p_Urgency" label="Urgency" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_VeryLow" uiRep="Very Low" />
+              <lay:ListItem enumID="e_Low" uiRep="Low" />
+              <lay:ListItem enumID="e_Neutral" uiRep="Neutral" />
+              <lay:ListItem enumID="e_High" uiRep="High" />
+              <lay:ListItem enumID="e_VeryHigh" uiRep="Very High" />
+            </lay:Control>
+            <lay:Control label="Auction" ID="i_Auction" parameterRef="p_Auction" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_All" uiRep="All" />
+              <lay:ListItem enumID="e_Open" uiRep="Open" />
+              <lay:ListItem enumID="e_Close" uiRep="Close" />
+              <lay:ListItem enumID="e_None" uiRep="None" />
+            </lay:Control>
+            <lay:Control ID="i_VolMaxPct" parameterRef="p_VolMaxPct" label="Max%" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+            <lay:Control ID="i_MinDarkFill" parameterRef="p_MinDarkFill" label="Min Dark Fill" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Peg" orientation="VERTICAL" collapsible="false">
+            <lay:Control ID="i_DisplaySize" parameterRef="p_DisplaySize" label="Display Size" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_PegOffset" parameterRef="p_PegOffset" label="Peg Offset" xsi:type="lay:SingleSpinner_t" increment="1" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Minimum Take Size" orientation="VERTICAL" collapsible="false">
+            <lay:Control ID="i_MinTakeShares" parameterRef="p_MinTakeShares" label="Shares" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_MinTakeAQxShares" parameterRef="p_MinTakeAQxShares" label="Quote Factor" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Lit IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldLitPx" parameterRef="p_WouldLitPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Dark IWould" border="Line" orientation="VERTICAL" collapsible="false">
+            <lay:Control label="Price" ID="i_WouldDarkPx" parameterRef="p_WouldDarkPx" xsi:type="lay:SingleSpinner_t" incrementPolicy="Tick" />
+            <lay:Control label="Order%" ID="i_WouldDarkPct" parameterRef="p_WouldDarkPct" xsi:type="lay:SingleSpinner_t" increment="5" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+          <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="Switch" name="SWITCH" wireValue="SWITCH" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Strat1" fixTag="7175" xsi:type="String_t" use="required">
+      <EnumPair enumID="e_POV" wireValue="POV" />
+      <EnumPair enumID="e_VWAP" wireValue="VWAP" />
+    </Parameter>
+    <Parameter name="p_Strat2" fixTag="7176" xsi:type="String_t" use="required">
+      <EnumPair enumID="e_POV" wireValue="POV" />
+      <EnumPair enumID="e_VWAP" wireValue="VWAP" />
+      <EnumPair enumID="e_CLOSE" wireValue="TARGET_CLOSE" />
+    </Parameter>
+    <Parameter name="p_SwitchRemainPct" fixTag="7177" xsi:type="Int_t">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_90" wireValue="90" />
+      <EnumPair enumID="e_80" wireValue="80" />
+      <EnumPair enumID="e_70" wireValue="70" />
+      <EnumPair enumID="e_60" wireValue="60" />
+      <EnumPair enumID="e_50" wireValue="50" />
+      <EnumPair enumID="e_40" wireValue="40" />
+      <EnumPair enumID="e_30" wireValue="30" />
+      <EnumPair enumID="e_20" wireValue="20" />
+      <EnumPair enumID="e_10" wireValue="10" />
+    </Parameter>
+    <Parameter name="p_SwitchTime" fixTag="7178" xsi:type="String_t">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_0830" wireValue="08:30" />
+      <EnumPair enumID="e_0900" wireValue="09:00" />
+      <EnumPair enumID="e_0930" wireValue="09:30" />
+      <EnumPair enumID="e_1000" wireValue="10:00" />
+      <EnumPair enumID="e_1030" wireValue="10:30" />
+      <EnumPair enumID="e_1100" wireValue="11:00" />
+      <EnumPair enumID="e_1130" wireValue="11:30" />
+      <EnumPair enumID="e_1200" wireValue="12:00" />
+      <EnumPair enumID="e_1230" wireValue="12:30" />
+      <EnumPair enumID="e_1300" wireValue="13:00" />
+      <EnumPair enumID="e_1330" wireValue="13:30" />
+      <EnumPair enumID="e_1400" wireValue="14:00" />
+      <EnumPair enumID="e_1430" wireValue="14:30" />
+      <EnumPair enumID="e_1500" wireValue="15:00" />
+      <EnumPair enumID="e_1530" wireValue="15:30" />
+      <EnumPair enumID="e_1600" wireValue="16:00" />
+      <EnumPair enumID="e_1630" wireValue="16:30" />
+    </Parameter>
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control ID="i_Strat1" parameterRef="p_Strat1" label="Strategy 1" xsi:type="lay:DropDownList_t" initValue="e_POV">
+            <lay:ListItem enumID="e_POV" uiRep="POV" />
+            <lay:ListItem enumID="e_VWAP" uiRep="VWAP" />
+          </lay:Control>
+          <lay:Control ID="i_Strat2" parameterRef="p_Strat2" label="Strategy 2" xsi:type="lay:DropDownList_t" initValue="e_VWAP">
+            <lay:ListItem enumID="e_POV" uiRep="POV" />
+            <lay:ListItem enumID="e_VWAP" uiRep="VWAP" />
+            <lay:ListItem enumID="e_CLOSE" uiRep="CLOSE" />
+          </lay:Control>
+          <lay:Control ID="i_SwitchRemainPct" parameterRef="p_SwitchRemainPct" label="Switch Remaining%" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_90" uiRep="90" />
+            <lay:ListItem enumID="e_80" uiRep="80" />
+            <lay:ListItem enumID="e_70" uiRep="70" />
+            <lay:ListItem enumID="e_60" uiRep="60" />
+            <lay:ListItem enumID="e_50" uiRep="50" />
+            <lay:ListItem enumID="e_40" uiRep="40" />
+            <lay:ListItem enumID="e_30" uiRep="30" />
+            <lay:ListItem enumID="e_20" uiRep="20" />
+            <lay:ListItem enumID="e_10" uiRep="10" />
+          </lay:Control>
+          <lay:Control ID="i_SwitchTime" parameterRef="p_SwitchTime" label="Switch Time" xsi:type="lay:DropDownList_t" initValue="e_Default">
+            <lay:ListItem enumID="e_Default" uiRep="" />
+            <lay:ListItem enumID="e_0830" uiRep="08:30" />
+            <lay:ListItem enumID="e_0900" uiRep="09:00" />
+            <lay:ListItem enumID="e_0930" uiRep="09:30" />
+            <lay:ListItem enumID="e_1000" uiRep="10:00" />
+            <lay:ListItem enumID="e_1030" uiRep="10:30" />
+            <lay:ListItem enumID="e_1100" uiRep="11:00" />
+            <lay:ListItem enumID="e_1130" uiRep="11:30" />
+            <lay:ListItem enumID="e_1200" uiRep="12:00" />
+            <lay:ListItem enumID="e_1230" uiRep="12:30" />
+            <lay:ListItem enumID="e_1300" uiRep="13:00" />
+            <lay:ListItem enumID="e_1330" uiRep="13:30" />
+            <lay:ListItem enumID="e_1400" uiRep="14:00" />
+            <lay:ListItem enumID="e_1430" uiRep="14:30" />
+            <lay:ListItem enumID="e_1500" uiRep="15:00" />
+            <lay:ListItem enumID="e_1530" uiRep="15:30" />
+            <lay:ListItem enumID="e_1600" uiRep="16:00" />
+            <lay:ListItem enumID="e_1630" uiRep="16:30" />
+          </lay:Control>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+          <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+          <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+  <Strategy uiRep="SOR" name="SOR" wireValue="SOR" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_DisplaySize" xsi:type="Int_t" fixTag="7147" use="optional" minValue="0" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_DisplaySize" parameterRef="p_DisplaySize" label="Display Size" xsi:type="lay:TextField_t" />
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy uiRep="Care" name="CARE" wireValue="CARE" version="1" fixMsgType="D" providerID="DEMO">
+    <SecurityTypes>
+      <SecurityType name="CS" inclusion="Include" />
+    </SecurityTypes>
+    <Parameter name="p_StartTime" xsi:type="UTCTimestamp_t" fixTag="7113" use="optional" />
+    <Parameter name="p_EndTime" xsi:type="UTCTimestamp_t" fixTag="7114" use="optional" maxValue="23:59:59" />
+    <Parameter name="p_Benchmark" fixTag="7115" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Block" fixTag="7140" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_BeatX" fixTag="7119" xsi:type="String_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_Yes" wireValue="YES" />
+      <EnumPair enumID="e_No" wireValue="NO" />
+    </Parameter>
+    <Parameter name="p_Custom1" fixTag="7145" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Custom2" fixTag="7146" xsi:type="String_t" use="optional" />
+    <Parameter name="p_Auction" fixTag="7130" xsi:type="Char_t" use="optional">
+      <EnumPair enumID="e_Default" wireValue="" />
+      <EnumPair enumID="e_All" wireValue="Y" />
+      <EnumPair enumID="e_Open" wireValue="O" />
+      <EnumPair enumID="e_Close" wireValue="C" />
+      <EnumPair enumID="e_None" wireValue="N" />
+    </Parameter>
+    <lay:StrategyLayout>
+      <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel orientation="HORIZONTAL" title="Time Configuration" collapsed="true">
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableStartTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_StartTime" parameterRef="p_StartTime" label="Start Time" initValue="08:00:00" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableStartTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+            <lay:Control xsi:type="lay:CheckBox_t" ID="EnableEndTime" label="" initValue="false" />
+            <lay:Control xsi:type="lay:Clock_t" ID="i_EndTime" parameterRef="p_EndTime" label="End Time" initValue="23:59:59" localMktTz="Europe/Berlin">
+              <flow:StateRule enabled="false" value="{NULL}">
+                <val:Edit field="EnableEndTime" operator="EQ" value="false" />
+              </flow:StateRule>
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Open To Natural" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Benchmark" parameterRef="p_Benchmark" label="Benchmark" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_Block" parameterRef="p_Block" label="Block" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+            <lay:Control ID="i_BeatX" parameterRef="p_BeatX" label="BEAT Cross" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_Yes" uiRep="Yes" />
+              <lay:ListItem enumID="e_No" uiRep="No" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+          <lay:StrategyPanel title="Strategy" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control label="Auction" ID="i_Auction" parameterRef="p_Auction" xsi:type="lay:DropDownList_t" initValue="e_Default">
+              <lay:ListItem enumID="e_Default" uiRep="" />
+              <lay:ListItem enumID="e_All" uiRep="All" />
+              <lay:ListItem enumID="e_Open" uiRep="Open" />
+              <lay:ListItem enumID="e_Close" uiRep="Close" />
+              <lay:ListItem enumID="e_None" uiRep="None" />
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel title="Custom Instructions" border="Line" orientation="HORIZONTAL" collapsible="false">
+            <lay:Control ID="i_Custom1" parameterRef="p_Custom1" label="Custom 1" xsi:type="lay:TextField_t" />
+            <lay:Control ID="i_Custom2" parameterRef="p_Custom2" label="Custom 2" xsi:type="lay:TextField_t" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start time must be less than end time.">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="p_StartTime" operator="NX" />
+        <val:Edit field="p_EndTime" operator="NX" />
+        <val:Edit field="p_StartTime" field2="p_EndTime" operator="LT" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+</Strategies>

@@ -1,0 +1,14 @@
+FixPortal.FixAtdl
+
+This product is a modernised fork of Atdl4net, originally created by
+Steve Wilkinson (2010-2011) as the .NET reference implementation of the
+FIXatdl v1.1 standard.
+
+Upstream:        https://github.com/atdl4net/atdl4net
+Upstream author: Steve Wilkinson
+Upstream licence: MIT
+
+Modifications and ongoing maintenance: FixPortal contributors (2026-).
+Modifications licensed under the same MIT licence.
+
+FIX Protocol and FIXatdl are trademarks or service marks of FIX Protocol Limited.

@@ -1,0 +1,73 @@
+name: mutation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 4 * * 2'
+
+concurrency:
+  group: mutation-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  stryker:
+    name: Mutation tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # Restoring the private FixPortal.CodeStyle package needs read:packages.
+      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Lint workflow and shell scripts
+        uses: raven-actions/actionlint@3d39aea434753780c3b3d4a1a31c854b4dbf49d7 # v2
+        with:
+          shellcheck: true
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore solution
+        run: dotnet restore FixPortal.FixAtdl.slnx
+
+      - name: Restore local tools
+        run: dotnet tool restore
+
+      - name: Run Stryker
+        working-directory: tests/FixPortal.FixAtdl.Tests
+        run: dotnet stryker --config-file ../../stryker-config.json
+
+      - name: Summarize mutation report
+        if: always()
+        shell: pwsh
+        run: |
+          $latest = Get-ChildItem tests/FixPortal.FixAtdl.Tests/StrykerOutput -Directory | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $latest) { throw "No StrykerOutput directory found." }
+          $report = Join-Path $latest.FullName 'reports/mutation-report.json'
+          $jsonSummary = Join-Path $latest.FullName 'reports/mutation-summary.json'
+          $mdSummary = Join-Path $latest.FullName 'reports/mutation-summary.md'
+          ./scripts/summarize-stryker.ps1 -ReportPath $report -JsonOutputPath $jsonSummary -MarkdownOutputPath $mdSummary -FailOnInconclusive | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
+      - name: Upload mutation summary
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mutation-summary
+          path: tests/FixPortal.FixAtdl.Tests/StrykerOutput/**/reports/mutation-summary.*
+
+      - name: Upload mutation report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mutation-report
+          path: tests/FixPortal.FixAtdl.Tests/StrykerOutput/**
+          if-no-files-found: error

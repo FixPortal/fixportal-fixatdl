@@ -1,0 +1,26 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+namespace FixPortal.FixAtdl.Model.Enumerations;
+
+/// <summary>
+/// FIXatdl LogicOperator type.
+/// </summary>
+public enum LogicOperator_t
+{
+    /// <summary>AND</summary>
+    And,
+
+    /// <summary>OR</summary>
+    Or,
+
+    /// <summary>Exclusive OR</summary>
+    Xor,
+
+    /// <summary>Not</summary>
+    Not,
+}

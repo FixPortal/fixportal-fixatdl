@@ -1,0 +1,217 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using System.Globalization;
+using System.Text;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Resources;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
+
+namespace FixPortal.FixAtdl.Fix;
+
+/// <summary>
+/// Represents a FIX message.
+/// </summary>
+public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
+{
+    private readonly Dictionary<FixField, string> _fields;
+
+    /// <summary>Field separator.</summary>
+    public const char SOH = '\x01';
+
+    /// <summary>Field/value separator.</summary>
+    public const char Separator = '=';
+
+    /// <summary>
+    /// Initializes an empty message for use by <see cref="FixTagValuesCollection"/>.
+    /// </summary>
+    internal FixMessage()
+    {
+        _fields = [];
+    }
+
+    internal FixMessage(FixMessage source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        _fields = new(source._fields);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="FixMessage"/> using the supplied FIX message.
+    /// </summary>
+    /// <param name="rawMessage">The FIX message to parse.</param>
+    /// <remarks>The current implementation of this class does NOT support repeating blocks.</remarks>
+    public FixMessage(string rawMessage)
+    {
+        _fields = [];
+
+        if (string.IsNullOrEmpty(rawMessage))
+        {
+            throw ThrowHelper.New<FixParseException>(this, ErrorMessages.UnableToParseFixMessageEmpty);
+        }
+
+        // Split without RemoveEmptyEntries so a doubled SOH surfaces as an empty field and is rejected
+        // by the separator check below, rather than being silently skipped (Low 5). The single
+        // trailing SOH every FIX message carries is trimmed first.
+        string trimmedMessage = rawMessage.EndsWith(SOH) ? rawMessage[..^1] : rawMessage;
+        string[] nameValuePairs = trimmedMessage.Split(SOH);
+
+        if (nameValuePairs.Length == 0)
+        {
+            throw ThrowHelper.New<FixParseException>(
+                this,
+                ErrorMessages.UnableToParseFixMessageInvalidContent,
+                rawMessage
+            );
+        }
+
+        string tagText = string.Empty;
+        string valueText = string.Empty;
+
+        try
+        {
+            foreach (string nameValuePair in nameValuePairs)
+            {
+                int separatorIndex = nameValuePair.IndexOf(Separator);
+
+                if (separatorIndex <= 0 || separatorIndex == nameValuePair.Length - 1)
+                {
+                    throw ThrowHelper.New<FixParseException>(
+                        this,
+                        ErrorMessages.UnableToParseFixMessageInvalidContent,
+                        nameValuePair
+                    );
+                }
+
+                tagText = nameValuePair[..separatorIndex];
+                valueText = nameValuePair[(separatorIndex + 1)..];
+
+                // Digits only: a FIX tag carries no sign or whitespace, so "+35" and " 35" are
+                // rejected here just as the guard below rejects non-positive tags (R21).
+                int tag = int.Parse(tagText, NumberStyles.None, CultureInfo.InvariantCulture);
+
+                // FIX tags are positive. Reject non-positive tags here so a negative tag cannot be
+                // admitted and then corrupted by the (uint) cast in ToFix (e.g. -1 -> 4294967295).
+                if (tag <= 0)
+                {
+                    throw ThrowHelper.New<FixParseException>(
+                        this,
+                        ErrorMessages.UnableToParseFixMessageInvalidContent,
+                        nameValuePair
+                    );
+                }
+
+                if (!_fields.TryAdd((FixField)tag, valueText))
+                {
+                    throw ThrowHelper.New<FixParseException>(
+                        this,
+                        ErrorMessages.UnableToParseFixMessageInvalidContent,
+                        nameValuePair
+                    );
+                }
+            }
+        }
+        catch (Exception ex) when (ex is FormatException or OverflowException)
+        {
+            throw ThrowHelper.New<FixParseException>(
+                this,
+                ex,
+                ErrorMessages.UnableToParseFixMessageInvalidFormat,
+                tagText,
+                valueText,
+                ex.Message
+            );
+        }
+    }
+
+    /// <summary>
+    /// Gets the complete set of fix fields for this message.
+    /// </summary>
+    /// <value>The fix fields.</value>
+    public IReadOnlyCollection<FixField> FixFields => _fields.Keys;
+
+    /// <summary>Gets the number of fields in the message.</summary>
+    public int Count => _fields.Count;
+
+    /// <summary>Gets the message's field keys.</summary>
+    public IEnumerable<FixField> Keys => _fields.Keys;
+
+    /// <summary>Gets the message's field values.</summary>
+    public IEnumerable<string> Values => _fields.Values;
+
+    /// <summary>Gets the value for a parsed field.</summary>
+    public string this[FixField key]
+    {
+        get => _fields[key];
+        internal set => _fields[key] = value;
+    }
+
+    /// <summary>Returns whether the message contains the specified field.</summary>
+    public bool ContainsKey(FixField key) => _fields.ContainsKey(key);
+
+    /// <summary>Attempts to get the value for a parsed field.</summary>
+    public bool TryGetValue(FixField key, out string value) => _fields.TryGetValue(key, out value!);
+
+    /// <summary>
+    /// Adds a value while a mutable <see cref="FixTagValuesCollection"/> is being built.
+    /// </summary>
+    internal bool TryAdd(FixField key, string value) => _fields.TryAdd(key, value);
+
+    /// <summary>
+    /// Provides the string representation of this FixMessage.
+    /// </summary>
+    /// <returns>String representation of this message.</returns>
+    /// <remarks>Emits the fields in the dictionary's enumeration order; FIX-spec ordering (header/trailer
+    /// positions, repeating groups) is the responsibility of the host FIX engine.</remarks>
+    public string ToFix()
+    {
+        StringBuilder sb = new();
+
+        foreach (KeyValuePair<FixField, string> item in _fields)
+        {
+            // Guard at the serialization chokepoint so malformed values supplied by the mutable
+            // FixTagValuesCollection cannot be emitted and silently corrupted on the wire.
+            if ((int)item.Key <= 0)
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    this,
+                    ErrorMessages.InvalidFixTagForSerialization,
+                    ((int)item.Key).ToString(CultureInfo.InvariantCulture)
+                );
+            }
+
+            // A null or empty value would emit "tag=" + SOH, which this class's own parse constructor
+            // then rejects (separatorIndex == length - 1). A value containing SOH would split one field
+            // into two on the wire. Guard all three at this single serialization chokepoint, mirroring
+            // the tag guard above.
+            if (string.IsNullOrEmpty(item.Value) || item.Value.Contains(SOH))
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    this,
+                    ErrorMessages.InvalidFixValueForSerialization,
+                    ((uint)item.Key).ToString(CultureInfo.InvariantCulture)
+                );
+            }
+
+            sb.AppendFormat(
+                CultureInfo.InvariantCulture,
+                "{0}{1}{2}{3}",
+                ((uint)item.Key).ToString(CultureInfo.InvariantCulture),
+                Separator,
+                item.Value,
+                SOH
+            );
+        }
+
+        return sb.ToString();
+    }
+
+    /// <inheritdoc />
+    public IEnumerator<KeyValuePair<FixField, string>> GetEnumerator() => _fields.GetEnumerator();
+
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+}

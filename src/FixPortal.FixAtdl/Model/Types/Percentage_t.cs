@@ -1,0 +1,248 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using System.Globalization;
+using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Validation;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
+
+namespace FixPortal.FixAtdl.Model.Types;
+
+/// <summary>
+/// 'float field representing a percentage (e.g. 0.05 represents 5% and 0.9525 represents 95.25%). Note the number of
+/// decimal places may vary.'
+/// </summary>
+/// <remarks>
+/// The FIXatdl 1.1 Errata (20101221 p.32, Parameter/@minValue default table) assigns this type a default
+/// <c>minValue</c> of 0, which the constructor applies: negative percentages are rejected unless the parameter
+/// declares an explicit negative bound such as <c>minValue="-1"</c>.
+/// </remarks>
+public class Percentage_t : Float_t
+{
+    /// <summary>Initializes the FIXatdl default minimum of zero.</summary>
+    public Percentage_t()
+    {
+        MinValue = 0;
+    }
+
+    /// <summary>
+    /// Applicable for xsi:type of Percentage_t. If true then percent values must be multiplied by 100 before being
+    /// sent on the wire. For example, if multiplyBy100 were false then the percentage, 75%, would be sent as 0.75
+    /// on the wire. However, if multiplyBy100 were true then 75 would be sent on the wire.
+    /// If not provided it should be interpreted as false.
+    /// Use of this attribute is not recommended. The motivation for this attribute is to maximize compatibility
+    /// with algorithmic interfaces that are non-compliant with FIX in regard to their handling of percentages. In
+    /// these cases an integer parameter should be used instead of a percentage.
+    /// </summary>
+    public bool? MultiplyBy100 { get; set; }
+
+    #region AtdlValueType<T> Overrides
+
+    /// <summary>
+    /// Validates the supplied value in terms of the parameters constraints (e.g., MinValue, MaxValue, etc.).
+    /// </summary>
+    /// <param name="value">Value to validate, may be null in which case no validation is applied.</param>
+    /// <param name="isRequired">Set to true to check that this parameter is non-null.</param>
+    /// <returns>ValidationResult indicating whether the supplied value is valid.</returns>
+    protected override ValidationResult ValidateValue(decimal? value, bool isRequired)
+    {
+        if (value != null)
+        {
+            // The bound comparison is against the native fraction (0.75 == 75%); the error message,
+            // however, is shown in the user-facing whole-percent units the control uses, so always
+            // scale by 100 regardless of MultiplyBy100 (which governs only the wire representation).
+            if (MaxValue != null && (decimal)value > MaxValue)
+            {
+                return new ValidationResult(
+                    ValidationResult.ResultType.Invalid,
+                    ErrorMessages.MaxValueExceeded,
+                    RemoveTrailingZeroes(value * 100)!,
+                    RemoveTrailingZeroes(MaxValue.Value * 100)!
+                );
+            }
+
+            if (MinValue != null && (decimal)value < MinValue)
+            {
+                return new ValidationResult(
+                    ValidationResult.ResultType.Invalid,
+                    ErrorMessages.MinValueNotMet,
+                    RemoveTrailingZeroes(value * 100)!,
+                    RemoveTrailingZeroes(MinValue.Value * 100)!
+                );
+            }
+        }
+        else if (isRequired)
+        {
+            return new ValidationResult(
+                ValidationResult.ResultType.Missing,
+                ErrorMessages.NonOptionalParameterNotSupplied2
+            );
+        }
+
+        return ValidationResult.ValidResult;
+    }
+
+    /// <summary>
+    /// Converts the supplied value from string format (as might be used on the FIX wire) into the type of the type
+    /// parameter for this type.  This implementation adjusts for the fact that percentage values are typically
+    /// shown as whole numbers (5, 10, 15) on the user interface but sent over the FIX wire as decimals (0.05, 0.1, 0.15).
+    /// </summary>
+    /// <param name="value">Type to convert from string; cannot be null as empty fields are invalid in FIX.</param>
+    /// <returns>Value converted from a string.</returns>
+    protected override decimal? ConvertFromWireValueFormat(string value)
+    {
+        decimal? decimalValue = base.ConvertFromWireValueFormat(value);
+
+        // base returns null for a null input (a cleared field); propagate it rather than dereferencing
+        // null through /100.
+        if (decimalValue == null)
+        {
+            return null;
+        }
+
+        return MultiplyBy100 == true ? decimalValue.Value / 100 : decimalValue.Value;
+    }
+
+    /// <summary>
+    /// Converts the supplied value to a string, as might be used on the FIX wire.  If the supplied value is
+    /// null, this means the field is not to be included in the outgoing FIX message.  This implementation adjusts for the
+    /// fact that percentage values are typically shown as whole numbers (5, 10, 15) on the user interface but sent over
+    /// the FIX wire as decimals (0.05, 0.1, 0.15).
+    /// </summary>
+    /// <param name="value">Value to convert, may be null.</param>
+    /// <returns>If input value is not null, returns value converted to a string; null otherwise.</returns>
+    protected override string? ConvertToWireValueFormat(decimal? value)
+    {
+        if (value == null)
+        {
+            return null;
+        }
+
+        decimal adjustedValue = MultiplyBy100 == true ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value;
+
+        if (Precision == null)
+        {
+            return adjustedValue.ToString(CultureInfo.InvariantCulture);
+        }
+
+        int effectivePrecision = Math.Min(28, MultiplyBy100 == true ? Precision.Value : Precision.Value + 2);
+        decimal rounded = Round(adjustedValue, effectivePrecision)!.Value;
+
+        // As Float_t: re-validate the rounded output (mapped back to native units) before emission,
+        // since rounding after validation can push the value outside the validated bounds (R11).
+        decimal roundedNative = MultiplyBy100 == true ? rounded / 100 : rounded;
+        ValidationResult validity = ValidateValue(roundedNative, isRequired: false);
+        if (!validity.IsValid)
+        {
+            throw ThrowHelper.New<Diagnostics.Exceptions.InvalidFieldValueException>(
+                this,
+                "Rounded value {0} at precision {1} falls outside the validated bounds ({2}).",
+                rounded,
+                Precision.Value,
+                validity.ErrorText
+            );
+        }
+
+        return rounded.ToString(CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Converts the supplied value to the type parameter type (T?) for this class.
+    /// </summary>
+    /// <param name="hostParameter">Parameter that this value belongs to.</param>
+    /// <param name="value">Value to convert, may be null.</param>
+    /// <returns>If input value is not null, returns value converted to T?; null otherwise.</returns>
+    /// <remarks>Used when setting a parameter value from a control (or anything else that
+    /// implements <see cref="IParameterConvertible"/>).<br/><br/>
+    /// Unlike all other (non-enumerated) control/parameter relationships, Percentage_t does not have a
+    /// one-to-one mapping with its associated control value as the control will typically contain a user-oriented
+    /// format (e.g., 25) when the parameter must contain the true value (i.e., 0.25, assuming multiplyBy100
+    /// is not set to true).</remarks>
+    protected override decimal? ConvertToNativeType(IParameter hostParameter, IParameterConvertible value)
+    {
+        decimal? convertedValue = value.ToDecimal(hostParameter, CultureInfo.InvariantCulture);
+
+        return convertedValue / 100;
+    }
+
+    /// <summary>
+    /// Gets the value of this parameter type in its native (i.e., raw) form, such as int, char, string, etc.
+    /// </summary>
+    /// <param name="applyWireValueFormat">If set to true, the value returned is adjusted to be in the 'format'
+    /// it would be if sent on the FIX wire.  In this case, we have to apply both Precision and the MultiplyBy100
+    /// flag.</param>
+    /// <returns>Native parameter value.</returns>
+    public override object GetNativeValue(bool applyWireValueFormat)
+    {
+        decimal? value = ConstValue ?? _value;
+
+        if (value != null && applyWireValueFormat)
+        {
+            decimal adjustedValue =
+                MultiplyBy100 == true ? (decimal)RemoveTrailingZeroes(value * 100)! : (decimal)value;
+
+            if (Precision != null)
+            {
+                int effectivePrecision = Math.Min(28, MultiplyBy100 == true ? Precision.Value : Precision.Value + 2);
+                return Round(adjustedValue, effectivePrecision)!;
+            }
+            return adjustedValue;
+        }
+
+        return value!;
+    }
+
+    #endregion
+
+    #region IControlConvertible Members
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
+    /// </summary>
+    /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
+    public override decimal? ToDecimal()
+    {
+        decimal? value = ConstValue ?? _value;
+
+        // The control always works in whole-percent units (75 for 75%); MultiplyBy100 affects only
+        // the wire representation, not the control. The native value is always the fraction (0.75),
+        // so scale up by 100 in both cases. (Previously the MultiplyBy100==true branch returned the
+        // raw fraction, so a load/edit/save cycle shrank the displayed value 100x.)
+        return value != null ? RemoveTrailingZeroes(value * 100) : null;
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent string value using the specified culture-specific formatting information.
+    /// </summary>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
+    public override string? ToString(IFormatProvider? provider)
+    {
+        decimal? value = ToDecimal();
+
+        return value?.ToString(provider);
+    }
+
+    #endregion
+
+    private static decimal? RemoveTrailingZeroes(decimal? value)
+    {
+        if (value == null)
+        {
+            return null;
+        }
+
+        // We use this slightly ugly manipulation to remove the trailing zeroes that multiplication by 100 produces
+        return decimal.Parse(
+            ((decimal)value).ToString("G29", CultureInfo.InvariantCulture),
+            NumberStyles.Float,
+            CultureInfo.InvariantCulture
+        );
+    }
+}

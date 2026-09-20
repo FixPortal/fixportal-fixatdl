@@ -1,0 +1,127 @@
+// FP Enhancement: 2026-05-31 — NodaTime-backed holder for Clock_t initValue (batch 5, C1/C2).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Resources;
+using NodaTime;
+using NodaTime.Text;
+
+namespace FixPortal.FixAtdl.Model.Controls;
+
+/// <summary>
+/// Parse-layer holder for a <see cref="Clock_t"/> <c>initValue</c>. A clock initValue is either a
+/// time-of-day (e.g. <c>08:00:00</c>) or a full local date-and-time (e.g. <c>20260601-09:30:00</c>),
+/// expressed in the control's <c>localMktTz</c> zone. Holding it as a NodaTime <see cref="LocalTime"/>
+/// or <see cref="LocalDateTime"/> — rather than a BCL <see cref="System.DateTime"/> — avoids injecting a
+/// spurious "today" date into a time-only value (the C2 contamination) and keeps the value zone-agnostic
+/// until <see cref="Clock_t"/> resolves it against the market zone.
+/// </summary>
+/// <remarks>
+/// The single-<see cref="string"/> constructor is required: the reflective deserializer routes the
+/// <c>initValue</c> attribute here via the <c>ValueConverter</c> "InitValue*" escape hatch, which passes
+/// the raw XML text to a one-arg-string constructor. The type name MUST begin with <c>InitValue</c>.
+/// </remarks>
+public sealed class InitValueClock
+{
+    private const string ExceptionContext = "InitValueClock";
+
+    // Time-only is tried before date+time; the format sets are disjoint (a time-only string never
+    // matches the date+time pattern and vice-versa), so order is for clarity only. NodaTime year token
+    // is 'uuuu' (absolute year), not BCL 'yyyy'.
+    private static readonly LocalTimePattern[] TimePatterns =
+    [
+        // FFFFFFFFF (not fff): accepts any fractional-second count up to NodaTime's 9-digit
+        // nanosecond precision, so "08:00:00.5" is not rejected for having fewer than 3 digits.
+        // Acceptance is deliberately wider than emission: Clock_t emits through the FIX 4.4
+        // UTCTimestamp grammar, which tops out at milliseconds, so digits past the third are
+        // truncated on the wire rather than rejected here (CR5).
+        LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss.FFFFFFFFF"),
+        LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss"),
+        LocalTimePattern.CreateWithInvariantCulture("HH:mm"),
+    ];
+
+    private static readonly OffsetTimePattern[] OffsetTimePatterns =
+    [
+        OffsetTimePattern.GeneralIso,
+        OffsetTimePattern.CreateWithInvariantCulture("HH:mm:ss.fffo<g>"),
+        OffsetTimePattern.CreateWithInvariantCulture("HH:mm:sso<g>"),
+        OffsetTimePattern.CreateWithInvariantCulture("HH:mmo<g>"),
+    ];
+
+    private static readonly LocalDateTimePattern[] DateTimePatterns =
+    [
+        LocalDateTimePattern.CreateWithInvariantCulture("uuuuMMdd-HH:mm:ss.FFFFFFFFF"),
+        LocalDateTimePattern.CreateWithInvariantCulture("uuuuMMdd-HH:mm:ss"),
+    ];
+
+    /// <summary>
+    /// Parses the supplied raw initValue text into a time-of-day or a local date-and-time.
+    /// </summary>
+    /// <param name="raw">The raw <c>initValue</c> attribute text.</param>
+    /// <exception cref="InvalidFieldValueException">The text matches no supported FIX time/date-time format.</exception>
+    public InitValueClock(string raw)
+    {
+        ArgumentNullException.ThrowIfNull(raw);
+        Raw = raw;
+
+        // Try each pattern set in turn and take the first that parses. Select is lazy and
+        // FirstOrDefault short-circuits, so no pattern past the first match is evaluated. A
+        // ParseResult is a reference type, so a null result means "no pattern matched".
+        ParseResult<LocalTime>? timeMatch = TimePatterns
+            .Select(pattern => pattern.Parse(raw))
+            .FirstOrDefault(result => result.Success);
+        if (timeMatch is not null)
+        {
+            TimeOfDay = timeMatch.Value;
+            return;
+        }
+
+        ParseResult<OffsetTime>? offsetTimeMatch = OffsetTimePatterns
+            .Select(pattern => pattern.Parse(raw))
+            .FirstOrDefault(result => result.Success);
+        if (offsetTimeMatch is not null)
+        {
+            // The FIXatdl-1.1 base XML Schema "time" type (hh:mm[:ss]{+,-}hh:mm) already pins this
+            // value to UTC. It needs no zone lookup, so it takes precedence over localMktTz-based
+            // resolution in Clock_t rather than being rejected.
+            OffsetTimeOfDay = offsetTimeMatch.Value;
+            return;
+        }
+
+        ParseResult<LocalDateTime>? dateTimeMatch = DateTimePatterns
+            .Select(pattern => pattern.Parse(raw))
+            .FirstOrDefault(result => result.Success);
+        if (dateTimeMatch is not null)
+        {
+            DateTime = dateTimeMatch.Value;
+            return;
+        }
+
+        throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.InvalidDateOrTimeValue, raw);
+    }
+
+    /// <summary>The raw initValue text, retained for diagnostics.</summary>
+    public string Raw { get; }
+
+    /// <summary>The time-of-day, when the initValue was supplied time-only; otherwise null.</summary>
+    public LocalTime? TimeOfDay { get; }
+
+    /// <summary>The local date-and-time, when the initValue carried a date; otherwise null.</summary>
+    public LocalDateTime? DateTime { get; }
+
+    /// <summary>The time-of-day with an explicit UTC offset (e.g. "08:00:00-05:00"), when the
+    /// initValue was supplied in that form; otherwise null. Already pinned to UTC by its own
+    /// offset, so it is resolved without consulting <see cref="Clock_t.LocalMktTz"/>.</summary>
+    public OffsetTime? OffsetTimeOfDay { get; }
+
+    /// <summary>True when the initValue was a bare time-of-day (no date component, no offset).</summary>
+    public bool IsTimeOnly => TimeOfDay.HasValue;
+
+    /// <summary>True when the initValue carried its own explicit UTC offset.</summary>
+    public bool IsOffsetTime => OffsetTimeOfDay.HasValue;
+}

@@ -1,0 +1,26 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup Label="Runtime">
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+    <PackageVersion Include="NodaTime" Version="3.3.3" />
+  </ItemGroup>
+  <ItemGroup Label="Test">
+    <PackageVersion Include="xunit.v3" Version="4.0.0" />
+    <PackageVersion Include="AwesomeAssertions" Version="9.5.0" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="NSubstitute" Version="6.2.0" />
+    <PackageVersion Include="NodaTime.Testing" Version="3.3.3" />
+    <PackageVersion Include="FixPortal.CodeStyle.ArchRules" Version="0.1.12" />
+    <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.4" />
+  </ItemGroup>
+  <!-- House style/analyzer rules applied to every project (CPM GlobalPackageReference =
+       implicit PrivateAssets=all). The package carries the global AnalyzerConfig (all rule
+       severities), sets EnforceCodeStyleInBuild, and bundles SonarAnalyzer.CSharp — do not
+       reference SonarAnalyzer.CSharp separately. -->
+  <ItemGroup Label="Analyzers">
+    <GlobalPackageReference Include="FixPortal.CodeStyle" Version="0.1.12" />
+  </ItemGroup>
+</Project>

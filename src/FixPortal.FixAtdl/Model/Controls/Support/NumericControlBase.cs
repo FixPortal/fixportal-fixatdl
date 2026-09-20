@@ -1,0 +1,290 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using System.Globalization;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
+
+namespace FixPortal.FixAtdl.Model.Controls.Support;
+
+/// <summary>
+/// Represents control elements within FIXatdl that can optionally contain numeric values.
+/// </summary>
+public class NumericControlBase : InitializableControl<decimal?>
+{
+    /// <summary>
+    /// The state value for this control.
+    /// </summary>
+    protected decimal? _value;
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="NumericControlBase"/> using the supplied ID.
+    /// </summary>
+    /// <param name="id">ID for this control.</param>
+    protected NumericControlBase(string id)
+        : base(id) { }
+
+    #region InitializableControl<T> Overrides
+
+    /// <summary>
+    /// Attempts to load the supplied FIX field value into this control.
+    /// </summary>
+    /// <param name="value">Value to set this control to.</param>
+    /// <returns>true if it was possible to set the value of this control using the supplied value; false otherwise.</returns>
+    protected override bool LoadDefaultFromFixValue(string value)
+    {
+        // Convert.ToDecimal(null) returns 0m (not an exception), which would load a spurious 0 and report
+        // success; guard null/empty explicitly so an absent value is "not initialised", matching
+        // ListControlBase (D-NUM-ZERO).
+        if (string.IsNullOrEmpty(value))
+        {
+            return false;
+        }
+
+        // TryParse with the FIX decimal styles replaces Convert.ToDecimal, which parses with
+        // NumberStyles.Number and so read "1,5" from the wire as 15. Malformed and out-of-range both
+        // return false here, as the FormatException/OverflowException catch did before.
+        if (!decimal.TryParse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out decimal parsed))
+        {
+            return false;
+        }
+
+        _value = parsed;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Loads this control with any supplied InitValue. If InitValue is not supplied, then control value will
+    /// be set to default/empty value.
+    /// </summary>
+    protected override void LoadDefaultFromInitValue()
+    {
+        _value = InitValue;
+    }
+
+    #endregion
+
+    #region Control_t Overrides
+
+    /// <summary>
+    /// Gets the value of this control.  May be null.
+    /// </summary>
+    /// <returns>Either a valid decimal value or null (meaning do not send this value over FIX).</returns>
+    public override object GetCurrentValue()
+    {
+        return _value!;
+    }
+
+    /// <summary>
+    /// Sets the value of this control; either via a boolean, or using the FIXatdl '{NULL}' value.
+    /// </summary>
+    /// <param name="newValue">A numeric value, or the FIXatdl '{NULL}' value as a string.</param>
+    public override void SetValue(object newValue)
+    {
+        bool isString = newValue is string;
+
+        if (isString)
+        {
+            string? value = newValue as string;
+
+            if (value == Atdl.NullValue)
+            {
+                _value = null;
+            }
+            else if (decimal.TryParse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture, out decimal parsed))
+            {
+                // Accept a numeric string (symmetry with TextControlBase) rather than rejecting it.
+                _value = parsed;
+            }
+            else
+            {
+                throw ThrowHelper.New<InvalidFieldValueException>(
+                    this,
+                    ErrorMessages.InitControlValueError,
+                    Id,
+                    string.Format(CultureInfo.InvariantCulture, "'{0}' is not a valid value for this control", value)
+                );
+            }
+        }
+        else
+        {
+            _value = newValue switch
+            {
+                decimal d => d,
+                null => null,
+                _ => throw ThrowHelper.New<InternalErrorException>(
+                    this,
+                    InternalErrors.UnexpectedArgumentType,
+                    newValue.GetType().FullName,
+                    "System.String, System.Decimal"
+                ),
+            };
+        }
+    }
+
+    /// <summary>
+    /// Resets this control to either a null value or for list controls, all options unselected.
+    /// </summary>
+    public override void Reset()
+    {
+        _value = null;
+    }
+
+    /// <summary>
+    /// Sets the value of this control using the value of the supplied parameter.
+    /// </summary>
+    /// <param name="parameter">Parameter to set this control's value from.</param>
+    public override void SetValueFromParameter(IParameter parameter)
+    {
+        IControlConvertible value = parameter.GetValueForControl();
+
+        _value = value.ToDecimal();
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent nullable boolean value.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <returns>One of true, false or null which is equivalent to the value of this instance.</returns>
+    public override bool? ToBoolean(IParameter targetParameter)
+    {
+        throw ThrowHelper.New<InvalidCastException>(
+            this,
+            ErrorMessages.UnsupportedControlValueConversion,
+            _value,
+            "Boolean",
+            Id
+        );
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent nullable decimal value using the specified culture-specific formatting information.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
+    public override decimal? ToDecimal(IParameter targetParameter, IFormatProvider provider)
+    {
+        return _value;
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent 32-bit signed integer using the specified culture-specific formatting information.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A nullable 32-bit signed integer equivalent to the value of this instance.</returns>
+    public override int? ToInt32(IParameter targetParameter, IFormatProvider provider)
+    {
+        if (_value == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return decimal.ToInt32((decimal)_value);
+        }
+        catch (OverflowException ex)
+        {
+            // Surface an out-of-range numeric as a domain error rather than a raw late OverflowException.
+            throw ThrowHelper.New<InvalidFieldValueException>(
+                this,
+                ex,
+                ErrorMessages.UnsupportedControlValueConversion,
+                _value,
+                "Int32",
+                Id
+            );
+        }
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent 32-bit unsigned integer using the specified culture-specific formatting information.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A nullable 32-bit unsigned integer equivalent to the value of this instance.</returns>
+    public override uint? ToUInt32(IParameter targetParameter, IFormatProvider provider)
+    {
+        if (_value == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return decimal.ToUInt32((decimal)_value);
+        }
+        catch (OverflowException ex)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(
+                this,
+                ex,
+                ErrorMessages.UnsupportedControlValueConversion,
+                _value,
+                "UInt32",
+                Id
+            );
+        }
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent char value.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <returns>A nullable char value equivalent to the value of this instance.  May be null.</returns>
+    public override char? ToChar(IParameter targetParameter)
+    {
+        throw ThrowHelper.New<InvalidCastException>(
+            this,
+            ErrorMessages.UnsupportedControlValueConversion,
+            _value,
+            "Char",
+            Id
+        );
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent string value using the specified culture-specific formatting information.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <returns>A string value equivalent to the value of this instance.  May be null.</returns>
+    public override string ToString(IParameter targetParameter)
+    {
+        return _value?.ToString(CultureInfo.InvariantCulture)!;
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent nullable DateTime value using the specified culture-specific formatting information.
+    /// </summary>
+    /// <param name="targetParameter">Target parameter for this conversion.</param>
+    /// <param name="provider">An <see cref="IFormatProvider"/> interface implementation that supplies culture-specific formatting information.</param>
+    /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
+    public override DateTime? ToDateTime(IParameter targetParameter, IFormatProvider provider)
+    {
+        throw ThrowHelper.New<InvalidCastException>(
+            this,
+            ErrorMessages.UnsupportedControlValueConversion,
+            _value,
+            "DateTime",
+            Id
+        );
+    }
+
+    /// <summary>
+    /// Indicates whether the control has enumerated state (i.e., its state is held internally in an <see cref="EnumState"/> which
+    /// requires special conversion, or if instead a regular value conversion is appropriate).
+    /// </summary>
+    public override bool HasEnumeratedState => false;
+
+    #endregion
+}
