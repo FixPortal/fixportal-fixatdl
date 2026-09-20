@@ -19,10 +19,9 @@ public static class Atdl
     /// </summary>
     public const string NullValue = "{NULL}";
 
-    // Shared styles for decimal parses of FIX/control text. This is NumberStyles.Number minus
-    // AllowThousands: a FIX decimal wire value cannot legally carry a thousands separator, so accepting one
-    // means reading "1,5" as 15 — silently, and by a factor of ten. Format-specific parsers may still
-    // use their own styles when their wire grammar differs.
+    // Shared styles for decimal parses of FIX/control text: NumberStyles.Number without
+    // AllowTrailingSign or AllowThousands. Format-specific parsers may still use their own
+    // styles when their wire grammar differs.
     internal const NumberStyles FixDecimalStyles =
         NumberStyles.AllowLeadingWhite
         | NumberStyles.AllowTrailingWhite
