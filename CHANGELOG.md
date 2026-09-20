@@ -66,8 +66,8 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - Enum wire parsing rejects a comma-bearing value for a non-`[Flags]` enum
   instead of silently OR-ing the members into a different defined value.
 - Package metadata URLs (`PackageProjectUrl`/`RepositoryUrl`) now name the real
-  `FixPortal/fixportal-fixatdl` repository. The csproj `<Version>` is 1.1.3
-  (unreleased); the latest tagged NuGet.org release remains 1.1.2.
+  `FixPortal/fixportal-fixatdl` repository. The project is now at version 1.1.4;
+  releases 1.1.3 and 1.1.4 are tagged.
 
 ### Fixed
 

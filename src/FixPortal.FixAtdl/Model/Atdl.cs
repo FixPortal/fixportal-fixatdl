@@ -19,11 +19,10 @@ public static class Atdl
     /// </summary>
     public const string NullValue = "{NULL}";
 
-    // The NumberStyles for parsing a FIX decimal string. This is NumberStyles.Number minus
+    // Shared styles for decimal parses of FIX/control text. This is NumberStyles.Number minus
     // AllowThousands: a FIX decimal wire value cannot legally carry a thousands separator, so accepting one
-    // means reading "1,5" as 15 — silently, and by a factor of ten. The WPF adapter already rejects it, and
-    // Edit_t's FIX-field conversion already stated its styles explicitly for this reason (R21); this
-    // constant is that decision made once for every decimal parse in the model.
+    // means reading "1,5" as 15 — silently, and by a factor of ten. Format-specific parsers may still
+    // use their own styles when their wire grammar differs.
     internal const NumberStyles FixDecimalStyles =
         NumberStyles.AllowLeadingWhite
         | NumberStyles.AllowTrailingWhite
