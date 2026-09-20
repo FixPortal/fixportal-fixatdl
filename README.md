@@ -6,7 +6,7 @@
 ![CI](https://github.com/FixPortal/fixportal-fixatdl/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/github/license/FixPortal/fixportal-fixatdl)
 
-> Modernised .NET 10 fork of [Atdl4net](https://github.com/atdl4net/atdl4net) — the open-source reference implementation of FIXatdl v1.1. Maintained by [FixPortal](https://www.fixportal.org).
+> Modernised .NET 10 fork of [atdl4net](https://github.com/atdl4net/atdl4net), the open-source .NET reference implementation of FIXatdl v1.1. All credit must go to the original author of atdl4net, Steve Wilkinson (and contributors), for the work that went into the original. This is simply a modernisation and facelift built atop their efforts. This version, and its associated adapters, is maintained by [FixPortal](https://www.fixportal.org) and you can see it in action in their [FIXatdl Inspector](https://www.fixportal.org/dashboard/tools/atdl).
 
 ## What this is
 
