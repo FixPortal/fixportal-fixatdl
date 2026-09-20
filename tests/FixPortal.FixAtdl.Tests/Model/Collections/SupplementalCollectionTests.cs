@@ -2,6 +2,7 @@ using System.Collections.Specialized;
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Elements;
@@ -589,5 +590,37 @@ public class SupplementalCollectionTests
         strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
 
         control.GetCurrentValue().Should().BeNull();
+    }
+
+    [Fact]
+    public void UpdateValuesFromParameters_refreshes_helper_controls_after_reset()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var source = new CheckBox_t("source") { ParameterRef = "S" };
+        var helper = new CheckBox_t("helper") { ParameterRef = "P" };
+        helper.StateRules.Add(
+            new StateRule_t
+            {
+                Value = Atdl.NullValue,
+                Edit = new Edit_t<Control_t>
+                {
+                    Field = "source",
+                    Operator = Operator_t.Equal,
+                    Value = "true",
+                },
+            }
+        );
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("S") { WireValue = "Y" });
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
+        panel.Controls.Add(source);
+        panel.Controls.Add(helper);
+
+        strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
+        source.SetValue(true);
+        strategy.Parameters["P"].Reset();
+        strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
+
+        source.GetCurrentValue().Should().Be(false);
     }
 }

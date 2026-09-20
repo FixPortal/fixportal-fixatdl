@@ -326,6 +326,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             if (parameterValue == null)
             {
                 control.Reset();
+                UpdateRelatedHelperControls(control);
                 continue;
             }
 
