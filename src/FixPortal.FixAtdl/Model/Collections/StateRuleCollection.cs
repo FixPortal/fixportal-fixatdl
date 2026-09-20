@@ -28,7 +28,8 @@ public class StateRuleCollection : Collection<StateRule_t>
     }
 
     /// <summary>
-    /// Adds a state rule to the collection and assigns its parent control.
+    /// Adds a state rule to the collection. Parent assignment is performed by the collection's
+    /// <see cref="InsertItem"/> override for every insertion path.
     /// </summary>
     /// <param name="item">The state rule to add.</param>
     public new void Add(StateRule_t item)
@@ -69,7 +70,10 @@ public class StateRuleCollection : Collection<StateRule_t>
     {
         foreach (StateRule_t rule in Items)
         {
-            (rule as IResolvable<Strategy_t, Control_t>).Resolve(strategy, strategy.Controls);
+            if (rule is IResolvable<Strategy_t, Control_t> resolvable)
+            {
+                resolvable.Resolve(strategy, strategy.Controls);
+            }
         }
     }
 }

@@ -48,7 +48,7 @@ public abstract class InitializableControl<T> : Control_t
         if (
             InitPolicy == InitPolicy_t.UseFixField
             && !string.IsNullOrEmpty(InitFixField)
-            && controlInitValueProvider.TryGetValue(InitFixField, ParameterRef, out string value)
+            && controlInitValueProvider.TryGetValue(InitFixField, ParameterRef, out string? value)
             && LoadDefaultFromFixValue(value)
         )
         {

@@ -6,6 +6,7 @@
 #endregion
 
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Resources;
@@ -89,20 +90,18 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     /// <param name="fixField">The FIX field name.</param>
     /// <param name="value">When this method returns, contains the field value if found.</param>
     /// <returns><see langword="true"/> if the field was present; otherwise, <see langword="false"/>.</returns>
-    public bool TryGetValue(string fixField, out string value)
+    public bool TryGetValue(string fixField, [NotNullWhen(true)] out string? value)
     {
         // Honour the Try-pattern: an unknown/extension/symbolic field name returns false rather than
         // throwing out of ParseAsEnum. A bare numeric tag ("5000") resolves to a user-defined field,
         // so initFixField and Edit_t field references can address tags outside the FIX_ enum (Low 7).
         if (!TryResolveField(fixField, out FixField field))
         {
-            value = null!;
+            value = null;
             return false;
         }
 
-        bool result = _message.TryGetValue(field, out string? v);
-        value = v!;
-        return result;
+        return TryGetValue(field, out value);
     }
 
     /// <summary>
@@ -111,35 +110,35 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     /// <param name="tag">The FIX tag to look up.</param>
     /// <param name="value">When this method returns, contains the field value if found.</param>
     /// <returns><see langword="true"/> if the field was present; otherwise, <see langword="false"/>.</returns>
-    public bool TryGetValue(FixTag tag, out string value)
+    public bool TryGetValue(FixTag tag, [NotNullWhen(true)] out string? value)
     {
         FixField field = tag;
 
-        bool result = _message.TryGetValue(field, out string? v);
-        value = v!;
-        return result;
+        return TryGetValue(field, out value);
+    }
+
+    private bool TryGetValue(FixField field, [NotNullWhen(true)] out string? value)
+    {
+        return _message.TryGetValue(field, out value);
     }
 
     // A field name resolves either as a defined FixField member ("FIX_MsgType") or as a bare positive
     // numeric tag ("5000") for user-defined fields, matching the wire grammar and the numeric indexer.
     private static bool TryResolveField(string fixField, out FixField field)
     {
-        try
+        if (Enum.TryParse(fixField, ignoreCase: true, out field) && Enum.IsDefined(field))
         {
-            field = fixField.ParseAsEnum<FixField>();
             return true;
         }
-        catch (ArgumentException)
-        {
-            if (int.TryParse(fixField, NumberStyles.None, CultureInfo.InvariantCulture, out int tag) && tag > 0)
-            {
-                field = (FixField)tag;
-                return true;
-            }
 
-            field = default;
-            return false;
+        if (int.TryParse(fixField, NumberStyles.None, CultureInfo.InvariantCulture, out int tag) && tag > 0)
+        {
+            field = (FixField)tag;
+            return true;
         }
+
+        field = default;
+        return false;
     }
 
     /// <summary>

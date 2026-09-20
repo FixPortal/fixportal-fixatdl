@@ -36,7 +36,7 @@ public class ParameterCollection : KeyedCollection<string, IParameter>, ISimpleD
     {
         foreach (IParameter parameter in Items)
         {
-            if (parameter.FixTag != null && initialValues.TryGetValue((FixTag)parameter.FixTag, out string value))
+            if (parameter.FixTag != null && initialValues.TryGetValue((FixTag)parameter.FixTag, out string? value))
             {
                 parameter.WireValue = value;
             }

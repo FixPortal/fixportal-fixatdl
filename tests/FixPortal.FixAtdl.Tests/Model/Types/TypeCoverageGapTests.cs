@@ -228,6 +228,20 @@ public class TypeCoverageGapTests
     }
 
     [Fact]
+    public void String_t_SetValueFromControl_normalises_empty_string_to_unset()
+    {
+        var p = new Parameter_t<String_t>("X");
+        var convertible = Substitute.For<IParameterConvertible>();
+        convertible.ToString(p).Returns(string.Empty);
+
+        var result = p.Value.SetValueFromControl(p, convertible);
+
+        result.IsValid.Should().BeTrue();
+        p.IsSet.Should().BeFalse();
+        p.WireValue.Should().BeNull();
+    }
+
+    [Fact]
     public void String_t_SetValueFromControl_blocks_when_ConstValue_is_set()
     {
         // NOTE: SetValueFromControl returns an Invalid ValidationResult (not a throw) when

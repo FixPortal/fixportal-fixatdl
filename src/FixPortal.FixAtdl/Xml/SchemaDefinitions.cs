@@ -170,7 +170,7 @@ public static class SchemaDefinitions
     // Used for Length_t, NumInGroup_t, SeqNum_t, TagNum_t
     private static readonly ElementAttribute[] LengthDefinition =
     [
-        new("constValue", "Value.ConstValue", typeof(int), Required.Optional),
+        new("constValue", "Value.ConstValue", typeof(uint), Required.Optional),
     ];
 
     private static readonly ElementAttribute[] LocalMktDateDefinition =

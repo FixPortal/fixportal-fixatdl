@@ -39,7 +39,7 @@ public class SchemaValidationTests
             TestContext.Current.CancellationToken
         );
         var act = () => Load(xml);
-        act.Should().Throw<FixAtdlException>();
+        act.Should().Throw<MissingMandatoryValueException>();
     }
 
     [Fact]

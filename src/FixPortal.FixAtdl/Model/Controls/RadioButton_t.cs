@@ -23,5 +23,5 @@ public class RadioButton_t : BinaryControlBase
 
     /// <summary>Identifies a common group name used by a set of RadioButton_t among which only one radio button
     /// may be selected at a time.  Applicable when xsi:type is RadioButton_t.</summary>
-    public string RadioGroup { get; set; } = null!;
+    public string? RadioGroup { get; set; }
 }

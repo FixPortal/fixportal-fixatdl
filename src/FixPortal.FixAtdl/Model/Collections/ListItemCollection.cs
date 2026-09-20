@@ -44,7 +44,7 @@ public class ListItemCollection : KeyedCollection<string, ListItem_t>
         {
             base.InsertItem(index, item);
         }
-        catch (ArgumentException ex)
+        catch (ArgumentException ex) when (ex is not ArgumentNullException)
         {
             throw ThrowHelper.New<DuplicateKeyException>(
                 this,

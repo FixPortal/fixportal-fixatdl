@@ -99,6 +99,16 @@ public class FixDateTimeTests
         result.Should().Be(new DateTime(2026, 6, 1, 9, 30, 0, DateTimeKind.Utc).AddTicks(1234567));
     }
 
+    [Theory]
+    [InlineData("20260601-09:30:00.1234")]
+    [InlineData("20260601-09:30:00.1234567")]
+    public void Offsetless_fractional_timestamp_with_four_to_seven_digits_parses_exactly(string value)
+    {
+        FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result).Should().BeTrue();
+
+        result.Kind.Should().Be(DateTimeKind.Utc);
+    }
+
     [Fact]
     public void Leap_second_beyond_the_last_representable_instant_returns_false_instead_of_throwing()
     {

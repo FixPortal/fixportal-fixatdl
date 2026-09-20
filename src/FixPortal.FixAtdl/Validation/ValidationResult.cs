@@ -45,7 +45,7 @@ public class ValidationResult
     /// <summary>
     /// Gets the error text for this ValidationResult; used when a validation has failed.
     /// </summary>
-    public string ErrorText { get; } = null!;
+    public string? ErrorText { get; }
 
     /// <summary>
     /// Gets a static ValidationResult instance that corresponds to a successful validation.

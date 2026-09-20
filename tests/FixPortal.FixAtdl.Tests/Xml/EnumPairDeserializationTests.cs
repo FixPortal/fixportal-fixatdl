@@ -32,6 +32,29 @@ public class EnumPairDeserializationTests
         </Strategies>
         """;
 
+    private const string InvalidCurrencyConstValueXml = """
+        <Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    strategyIdentifierTag="5001">
+          <Strategy name="EnumTest" version="1" wireValue="EnumTest" uiRep="EnumTest" providerID="DEMO">
+            <Parameter name="Currency" xsi:type="Currency_t" fixTag="15" constValue="AED,AFN" />
+          </Strategy>
+        </Strategies>
+        """;
+
+    private const string UnsignedConstValueStrategyXml = """
+        <Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    strategyIdentifierTag="5001">
+          <Strategy name="Unsigned" version="1" wireValue="Unsigned" uiRep="Unsigned" providerID="DEMO">
+            <Parameter name="Length" xsi:type="Length_t" constValue="1" />
+            <Parameter name="Group" xsi:type="NumInGroup_t" constValue="1" />
+            <Parameter name="Sequence" xsi:type="SeqNum_t" constValue="1" />
+            <Parameter name="Tag" xsi:type="TagNum_t" constValue="1" />
+          </Strategy>
+        </Strategies>
+        """;
+
     private static Strategies_t Load(string xml)
     {
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
@@ -64,5 +87,24 @@ public class EnumPairDeserializationTests
         var enumPairs = strategies.Strategies[0].Parameters[0].EnumPairs;
 
         enumPairs["o1"].WireValue.Should().Be("1");
+    }
+
+    [Fact]
+    public void Currency_constValue_rejects_comma_separated_non_flags()
+    {
+        var act = () => Load(InvalidCurrencyConstValueXml);
+
+        act.Should().Throw<FixPortal.FixAtdl.Diagnostics.Exceptions.InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Unsigned_parameter_constValues_deserialize_from_xml()
+    {
+        var strategy = Load(UnsignedConstValueStrategyXml).Strategies[0];
+
+        strategy.Parameters["Length"].WireValue.Should().Be("1");
+        strategy.Parameters["Group"].WireValue.Should().Be("1");
+        strategy.Parameters["Sequence"].WireValue.Should().Be("1");
+        strategy.Parameters["Tag"].WireValue.Should().Be("1");
     }
 }

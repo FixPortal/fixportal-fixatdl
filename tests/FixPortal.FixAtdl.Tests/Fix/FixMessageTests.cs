@@ -145,6 +145,12 @@ public class FixMessageTests
         msg.ToFix().Should().BeEmpty();
     }
 
+    [Fact]
+    public void LastLiquidityInd_is_numeric_per_the_FIX_dictionary()
+    {
+        FixFieldTypes.IsNumeric(FixField.FIX_LastLiquidityInd).Should().BeTrue();
+    }
+
     // FixFieldValueProvider --------------------------------------------------
 
     [Fact]

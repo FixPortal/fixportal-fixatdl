@@ -7,6 +7,7 @@ using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
+using FixPortal.FixAtdl.Model.Types;
 using FixPortal.FixAtdl.Utility;
 using FixPortal.FixAtdl.Validation;
 using FixPortal.FixAtdl.Xml;
@@ -219,12 +220,11 @@ public class SupplementalCollectionTests
     }
 
     [Fact]
-    public void ReadOnlyControlCollection_indexer_returns_null_for_missing_key()
+    public void ReadOnlyControlCollection_indexer_throws_for_missing_key()
     {
         var twap = LoadTwap();
-        // NOTE: ReadOnlyControlCollection indexer returns null! for missing keys (source design).
-        var missing = twap.Controls["doesNotExist"];
-        missing.Should().BeNull();
+        var act = () => twap.Controls["doesNotExist"];
+        act.Should().Throw<KeyNotFoundException>();
     }
 
     [Fact]
@@ -570,5 +570,24 @@ public class SupplementalCollectionTests
         result.Should().BeTrue();
         results.Should().BeNull();
         parameter.Received(2).SetValueFromControl(Arg.Any<Control_t>());
+    }
+
+    [Fact]
+    public void UpdateValuesFromParameters_resets_control_when_parameter_is_empty()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var parameter = new Parameter_t<String_t>("P") { WireValue = "old" };
+        var control = new TextField_t("text") { ParameterRef = "P" };
+        strategy.Parameters.Add(parameter);
+        panel.Controls.Add(control);
+
+        strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
+        control.GetCurrentValue().Should().Be("old");
+
+        parameter.Reset();
+        strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
+
+        control.GetCurrentValue().Should().BeNull();
     }
 }
