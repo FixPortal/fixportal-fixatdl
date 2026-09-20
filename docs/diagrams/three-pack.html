@@ -55,7 +55,7 @@
 
     <svg viewBox="0 100 960 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="threepack-title threepack-desc">
       <title id="threepack-title">Core and its two adapters</title>
-      <desc id="threepack-desc">Broker FIXatdl XML is parsed by the headless core package. The core emits direct parameter tag values and the authoritative 957 to 960 group; WPF consumes Strategy_t directly and reads the group back through the core emitter, while the React adapter receives a host-mapped JSON DTO and emits only a 957 to 960 preview. The host assembles and serializes the final FIX order.</desc>
+      <desc id="threepack-desc">Broker FIXatdl XML is parsed by the headless core package. The core emits direct parameter tag values and the authoritative 957 to 960 group; WPF consumes Strategy_t directly and reads the group back through the core emitter, while the React adapter receives a host-mapped JSON DTO and emits the 957 to 960 group as tag tuples. The host validates, assembles and serializes the final FIX order.</desc>
       <defs>
         <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#5b6b85"/></marker>
         <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#0f766e"/></marker>
@@ -95,10 +95,10 @@
       <rect x="748" y="194" width="68" height="12" rx="2" fill="#f7f8fa"/>
       <text x="782" y="203" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">CORE 957-960</text>
 
-      <!-- React -> host FIX order (browser-side preview only; host owns final wire) -->
+      <!-- React -> host FIX order (real 957-960 tag tuples; host owns final wire) -->
       <path d="M 712,484 H 736 Q 744,484 744,476 V 332 Q 744,324 752,324 H 776" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrow-link)"/>
       <rect x="748" y="396" width="96" height="12" rx="2" fill="#f7f8fa"/>
-      <text x="796" y="405" fill="#7c3aed" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em">PREVIEW ONLY</text>
+      <text x="796" y="405" fill="#7c3aed" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em">GROUP TAGS</text>
 
       <!-- ===== NODES ===== -->
       <!-- N1 broker XML -->
@@ -140,7 +140,7 @@
       <rect x="512" y="460" width="32" height="12" rx="2" fill="transparent" stroke="rgba(15,118,110,0.40)" stroke-width="0.8"/>
       <text x="528" y="469" fill="rgba(15,118,110,0.90)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">NPM</text>
       <text x="608" y="492" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">@fix-portal/fixatdl-react</text>
-      <text x="608" y="508" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">957-960 preview only</text>
+      <text x="608" y="508" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">957-960 tag tuples</text>
 
       <!-- N6 FIX order -->
       <rect x="776" y="244" width="144" height="80" rx="6" fill="#f7f8fa"/>
@@ -165,7 +165,7 @@
       <text x="520" y="568" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">HOST-OWNED / EXTERNAL</text>
 
       <line x1="720" y1="564" x2="744" y2="564" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4 3"/>
-      <text x="752" y="568" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">REACT PREVIEW</text>
+      <text x="752" y="568" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">REACT GROUP TAGS</text>
     </svg>
   </div>
 </body>
