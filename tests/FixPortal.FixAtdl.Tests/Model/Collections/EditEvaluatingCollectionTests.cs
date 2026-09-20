@@ -41,23 +41,9 @@ public class EditEvaluatingCollectionTests
     }
 
     [Fact]
-    public void LoadTwap_is_not_cwd_dependent()
+    public void LoadTwap_reads_the_expected_fixture()
     {
-        // Fixture resolution must be anchored to AppContext.BaseDirectory, not the process CWD — prove
-        // it by pointing the (process-global) CWD elsewhere and loading. Restored in finally so no
-        // other test observes the mutation.
-        string originalCwd = Directory.GetCurrentDirectory();
-        try
-        {
-            Directory.SetCurrentDirectory(Path.GetTempPath());
-
-            Func<Strategy_t> act = LoadTwap;
-            act.Should().NotThrow();
-        }
-        finally
-        {
-            Directory.SetCurrentDirectory(originalCwd);
-        }
+        LoadTwap().Name.Should().Be("TWAP");
     }
 
     /// <summary>

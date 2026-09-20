@@ -43,7 +43,7 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     /// <param name="message">The backing FIX message.</param>
     public FixTagValuesCollection(FixMessage message)
     {
-        _message = message;
+        _message = message ?? throw new ArgumentNullException(nameof(message));
     }
 
     /// <summary>

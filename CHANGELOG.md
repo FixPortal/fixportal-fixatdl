@@ -24,6 +24,9 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   numeric.
 - Missing control lookups now follow dictionary semantics and throw
   `KeyNotFoundException` instead of returning an undocumented null.
+- Fixture tests no longer mutate the process-wide working directory; schema
+  acceptance tests assert the loaded strategy, and fixture-backed XML docs and
+  constructor inputs now reject malformed state explicitly.
 
 ### Changed
 

@@ -2,6 +2,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Xml;
 
 namespace FixPortal.FixAtdl.Tests.Xml;
@@ -64,9 +65,9 @@ public class StrategiesReaderSchemaValidationTests
     {
         using var stream = StreamOf(MinimalStrategyXml);
 
-        Action act = () => new StrategiesReader().Load(stream);
+        Strategies_t strategies = new StrategiesReader().Load(stream);
 
-        act.Should().NotThrow();
+        strategies.Strategies.Should().ContainSingle(strategy => strategy.Name == "Test");
     }
 
     [Fact]
@@ -74,9 +75,9 @@ public class StrategiesReaderSchemaValidationTests
     {
         using var stream = StreamOf(MinimalStrategyXml);
 
-        Action act = () => new StrategiesReader(schemaSet: LoadMinimalSchemaSet()).Load(stream);
+        Strategies_t strategies = new StrategiesReader(schemaSet: LoadMinimalSchemaSet()).Load(stream);
 
-        act.Should().NotThrow();
+        strategies.Strategies.Should().ContainSingle(strategy => strategy.Name == "Test");
     }
 
     [Fact]

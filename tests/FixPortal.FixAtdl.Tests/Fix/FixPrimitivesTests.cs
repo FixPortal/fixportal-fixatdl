@@ -142,21 +142,23 @@ public class FixPrimitivesTests
 
         result.Should().BeTrue();
         dt.Kind.Should().Be(DateTimeKind.Utc);
-        dt.TimeOfDay.Should().Be(new TimeSpan(0, hour, minute, second, millisecond));
         if (year != 0)
         {
-            dt.Date.Should().Be(new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc));
+            dt.Year.Should().Be(year);
+            dt.Month.Should().Be(month);
+            dt.Day.Should().Be(day);
         }
+        dt.TimeOfDay.Should().Be(new TimeSpan(0, hour, minute, second, millisecond));
     }
 
     [Fact]
     public void FixDateTime_TryParse_full_datetime_produces_correct_year_and_month()
     {
-        // NOTE: AssumeUniversal in FixDateTime converts UTC to local time before returning,
-        // so the date/time components depend on the host timezone. Only assert year/month/minute.
         FixDateTime.TryParse("20260530-14:45:00", CultureInfo.InvariantCulture, out var dt).Should().BeTrue();
         dt.Year.Should().Be(2026);
         dt.Month.Should().Be(5);
+        dt.Day.Should().Be(30);
+        dt.Hour.Should().Be(14);
         dt.Minute.Should().Be(45);
     }
 
