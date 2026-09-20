@@ -1204,8 +1204,10 @@ def step_can_fail(block, span, key_indent):
         # backslash-continued echo read as failable commands.
         joined = "\n".join(body)
         joined = re.sub(r"\\\n\s*", " ", joined)
-        if shell.startswith("pwsh") and not re.fullmatch(r"\s*throw\s*", joined):
-            return False, "uses `pwsh`; only a bare unconditional `throw` is supported"
+        if shell.startswith("pwsh") and not re.fullmatch(
+            r"\s*throw(?:\s+(?:'[^'\n]*'|\"[^\"\n]*\"))?\s*", joined
+        ):
+            return False, "uses pwsh; only an unconditional throw with an optional static message is supported"
         if ends_non_zero(joined):
             return True, ""
         return False, (
@@ -1479,7 +1481,7 @@ GATE_SCRIPT = re.compile(
 # body. Same reasoning as step_key_pattern, and the same dash-form hazard: a `- run: |`
 # opens at the key, two columns right of the dash.
 RUN_KEY = re.compile(r"""^(\s*(?:-\s+)?)(?:'run'|"run"|run)\s*:\s*(.*?)\s*$""")
-LOCAL_USES = re.compile(r"""^\s*(?:-\s+)?(?:'uses'|"uses"|uses)\s*:\s*['"]?(\./[^\s#'"]+)""")
+LOCAL_USES = re.compile(r"""^\s*(?:-\s+)?(?:'uses'|"uses"|uses)\s*:\s*['"]?((?:\./|\$/)[^\s#'"]+)""")
 
 
 def glob_to_regex(pattern):
@@ -1535,7 +1537,7 @@ def policy_root(workflow_path):
 
 
 def delegated_run_bodies(root, ref, visited):
-    """Yield run-body lines from a local action or reusable workflow delegation."""
+    """Yield run-body lines from a local composite action or reusable workflow."""
     relative = ref[2:]
     target = root / relative
     if target.is_dir():
@@ -1547,6 +1549,12 @@ def delegated_run_bodies(root, ref, visited):
         return
     visited.add(key)
     lines = target.read_text(encoding="utf-8").splitlines()
+    using = re.search(r"^\s+using:\s*['\"]?([^\s#'\"]+)", "\n".join(lines), re.MULTILINE)
+    if using and using.group(1) != "composite":
+        raise ValueError(
+            f"{target}: local action uses runs.using {using.group(1)}; "
+            "gate coverage only follows composite action bodies"
+        )
     index = 0
     while index < len(lines):
         match = RUN_KEY.match(lines[index])
