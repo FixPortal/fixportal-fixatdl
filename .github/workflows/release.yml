@@ -18,6 +18,7 @@ jobs:
       contents: write
       packages: write
       id-token: write
+      pull-requests: read
     env:
       # Restoring the private FixPortal.CodeStyle package needs read:packages.
       GITHUB_PACKAGES_TOKEN: ${{ github.token }}
@@ -39,7 +40,9 @@ jobs:
       # reachability instead: it fails closed and is visible in the diff. This workflow
       # is tag-only, so the step needs no `if:` of its own. Public repo, so the fetch
       # needs no token even though checkout ran with persist-credentials: false.
-      - name: Assert the tagged commit is reachable from main
+      - name: Assert the tagged commit is reviewed and reachable from main
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           # Full fetch of main, not --depth: the tag may name an older main commit, and a
@@ -52,6 +55,15 @@ jobs:
           tagged_commit="$(git rev-parse "${GITHUB_SHA}^{commit}")"
           if ! git merge-base --is-ancestor "$tagged_commit" FETCH_HEAD; then
             echo "::error::Tag '${GITHUB_REF_NAME}' names a commit that is not reachable from main. Only reviewed, merged commits may be released."
+            exit 1
+          fi
+
+          # Reachability alone still permits a tag to select an arbitrary older
+          # main commit. Require GitHub to associate the commit with a merged PR
+          # into main as a second, API-backed review boundary.
+          merged_pr="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${tagged_commit}/pulls" --jq 'any(.[]; .merged_at != null and .base.ref == "main")')"
+          if [ "$merged_pr" != "true" ]; then
+            echo "::error::Tag '${GITHUB_REF_NAME}' names a main commit with no merged pull request into main."
             exit 1
           fi
 
