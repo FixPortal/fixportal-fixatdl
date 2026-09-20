@@ -158,12 +158,12 @@ MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.
 
 ## Status
 
-The latest NuGet.org release is 1.1.2. Source on `main` is versioned 1.1.3
-(unreleased). Adapter versions that consume this package:
+The latest NuGet.org release is 1.1.4. Source on `main` is versioned 1.1.5
+(pending release). Adapter versions that consume this package:
 
 | Package | Latest published | Notes |
 |---|---|---|
-| `FixPortal.FixAtdl` | 1.1.2 | In-tree 1.1.3 unreleased |
+| `FixPortal.FixAtdl` | 1.1.4 | In-tree 1.1.5 pending release |
 | `FixPortal.FixAtdl.Wpf` / `.Wpf.Core` | 1.0.2 | Pins core 1.1.2 |
 | `@fix-portal/fixatdl-react` | 0.2.0 | In-tree 0.2.1 unreleased; takes a mapped JSON DTO, not this NuGet |
 

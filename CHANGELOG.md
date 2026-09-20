@@ -10,6 +10,8 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
 ## [Unreleased]
 
+## [1.1.5] — 2026-09-20
+
 ### Fixed
 
 - Nullable annotations now describe unset validation results, optional control
