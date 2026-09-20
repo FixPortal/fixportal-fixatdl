@@ -25,22 +25,13 @@ public class FixMessageTests
         FixMessage.Separator.Should().Be('=');
     }
 
-    // FixMessage default constructor -----------------------------------------
-
-    [Fact]
-    public void Default_constructor_creates_empty_dictionary()
-    {
-        var msg = new FixMessage();
-        msg.Should().BeEmpty();
-    }
-
     // FixMessage string constructor ------------------------------------------
 
     [Fact]
     public void String_constructor_parses_single_tag()
     {
         var msg = new FixMessage($"35{Sep}D{Soh}");
-        msg.Should().ContainKey((FixField)35);
+        msg.ContainsKey((FixField)35).Should().BeTrue();
         msg[(FixField)35].Should().Be("D");
     }
 
@@ -139,9 +130,9 @@ public class FixMessageTests
     }
 
     [Fact]
-    public void ToFix_empty_message_returns_empty_string()
+    public void FixTagValuesCollection_ToFix_empty_message_returns_empty_string()
     {
-        var msg = new FixMessage();
+        var msg = new FixTagValuesCollection();
         msg.ToFix().Should().BeEmpty();
     }
 
@@ -263,11 +254,9 @@ public class FixMessageTests
     // FixMessage.ToFix tag guard (M4) ----------------------------------------
 
     [Fact]
-    public void ToFix_throws_for_non_positive_tag_injected_via_indexer()
+    public void FixTagValuesCollection_ToFix_throws_for_non_positive_tag()
     {
-        // The inherited Dictionary surface lets a caller inject a non-positive tag that the string ctor
-        // would have rejected; ToFix must refuse to serialize it rather than emit a (uint)-corrupted tag.
-        var message = new FixMessage { [(FixField)(-1)] = "x" };
+        var message = new FixTagValuesCollection { [(FixField)(-1)] = "x" };
 
         Func<string> act = message.ToFix;
 
@@ -275,9 +264,9 @@ public class FixMessageTests
     }
 
     [Fact]
-    public void ToFix_throws_for_soh_in_value_injected_via_indexer()
+    public void FixTagValuesCollection_ToFix_throws_for_soh_in_value()
     {
-        var message = new FixMessage { [(FixField)35] = $"A{FixMessage.SOH}B" };
+        var message = new FixTagValuesCollection { [(FixField)35] = $"A{FixMessage.SOH}B" };
 
         Func<string> act = message.ToFix;
 
@@ -285,11 +274,11 @@ public class FixMessageTests
     }
 
     [Fact]
-    public void ToFix_throws_for_empty_value_injected_via_indexer()
+    public void FixTagValuesCollection_ToFix_throws_for_empty_value()
     {
         // An empty value emits "tag=" + SOH - byte-for-byte the output the null guard exists to
         // prevent, and one this class's own parse constructor rejects.
-        var message = new FixMessage { [(FixField)35] = "" };
+        var message = new FixTagValuesCollection { [(FixField)35] = "" };
 
         Func<string> act = message.ToFix;
 

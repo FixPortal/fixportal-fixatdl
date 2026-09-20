@@ -51,7 +51,7 @@ NodaTime `IClock`, `XmlSchemaSet`, `IReadOnlyList<CustomParameterType>`.
 | `FixTagValuesCollection` | `FixPortal.FixAtdl.Fix` | Result of `GetOutputValues`. `ToFix()` joins `tag=value` with SOH and **rejects** a value that itself contains SOH. |
 | `StrategyParametersGrpEmitter.Emit(Strategy_t)` | same | Tags 957–960 for `Tag957Support` transport. Unset parameters omitted; tag 957 omitted when nothing is set. Rejects SOH in the parameter **name** (958) and **value** (960). |
 | `FixFieldValueProvider` / `IInitialFixValueProvider` | same | Inbound FIX values for init/`UseFixField` and `FIX_` operands. |
-| `FixMessage` | same | Parses a raw FIX string. Not a session engine. |
+| `FixMessage` | same | Parses a raw FIX string into an immutable read-only tag map. Not a session engine. |
 
 Tag 959 type codes follow FIX 5.0 SP2 (`Language_t=26`, `Tenor_t=29`).
 Unknown types fall back to String (14).
@@ -77,12 +77,6 @@ mismatch), `InvalidOperationException` (the emitter's SOH guards),
 
 `RenderingException` is retained for the WPF adapter (no layout / no root
 panel). This package no longer throws it.
-
-## Configuration
-
-`FixAtdlOptions` (`FixPortal.FixAtdl.Configuration`) is an empty placeholder
-replacing upstream `System.Configuration`. It has no knobs; do not take a
-dependency on it.
 
 ## Adapters
 

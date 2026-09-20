@@ -16,7 +16,7 @@ using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 namespace FixPortal.FixAtdl.Fix;
 
 /// <summary>
-/// Represents a collection of FIX tag values backed by a <see cref="FixMessage"/>.
+/// Represents a mutable collection of FIX tag values backed by an internal <see cref="FixMessage"/>.
 /// </summary>
 public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>>
 {
@@ -40,10 +40,11 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     /// <summary>
     /// Initializes a new <see cref="FixTagValuesCollection"/> from an existing <see cref="FixMessage"/>.
     /// </summary>
-    /// <param name="message">The backing FIX message.</param>
+    /// <param name="message">The initial FIX message to copy.</param>
     public FixTagValuesCollection(FixMessage message)
     {
-        _message = message ?? throw new ArgumentNullException(nameof(message));
+        ArgumentNullException.ThrowIfNull(message);
+        _message = new FixMessage(message);
     }
 
     /// <summary>
