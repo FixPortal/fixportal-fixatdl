@@ -142,6 +142,14 @@ public class TenorTests
     }
 
     [Fact]
+    public void ToString_rejects_the_default_invalid_tenor_with_context()
+    {
+        var act = () => default(Tenor).ToString();
+
+        act.Should().Throw<InvalidOperationException>().Which.Source.Should().Be("Tenor");
+    }
+
+    [Fact]
     public void Cross_unit_ordering_does_not_throw_and_uses_approximate_magnitude()
     {
         var d40 = Tenor.Parse("D40"); // ~40 days

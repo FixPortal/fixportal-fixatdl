@@ -164,8 +164,10 @@ public struct Tenor : IComparable
             TenorTypeValue.Year => string.Format(CultureInfo.InvariantCulture, "Y{0}", Offset),
             // A default/unparsed Tenor (TenorType=Invalid) must not be silently serialized as the
             // syntactically-valid-but-wrong wire value "Y0"; surface it instead of corrupting the wire.
-            _ => throw new InvalidOperationException(
-                $"Cannot serialize a Tenor with an invalid tenor type (offset {Offset})."
+            _ => throw ThrowHelper.New<InvalidOperationException>(
+                ExceptionContext,
+                "Cannot serialize a Tenor with an invalid tenor type (offset {0}).",
+                Offset
             ),
         };
     }

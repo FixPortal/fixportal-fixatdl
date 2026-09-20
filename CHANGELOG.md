@@ -27,6 +27,8 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - Fixture tests no longer mutate the process-wide working directory; schema
   acceptance tests assert the loaded strategy, and fixture-backed XML docs and
   constructor inputs now reject malformed state explicitly.
+- Tenor serialization now uses the shared diagnostic helper, and previously
+  uncovered exception and edit-conversion branches have regression coverage.
 
 ### Changed
 
