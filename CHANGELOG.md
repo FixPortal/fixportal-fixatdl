@@ -29,6 +29,8 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   constructor inputs now reject malformed state explicitly.
 - Tenor serialization now uses the shared diagnostic helper, and previously
   uncovered exception and edit-conversion branches have regression coverage.
+- Resetting an empty parameter now also refreshes related helper controls so
+  their state rules cannot remain stale.
 
 ### Changed
 
