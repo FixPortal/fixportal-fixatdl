@@ -66,7 +66,6 @@ reference, and adds the three cross-cutting layers the stack omits.
 | **FIX Emission** | 12 | `FixTagValuesCollection`, `FixTag`, `FixField` (generated tag constants), `FixFieldValueProvider`, `FixMessage`, `StrategyParametersGrpEmitter` — the library's output. |
 | **Diagnostics** | 19 | `FixAtdlException` hierarchy (11 subclasses), `ThrowHelper` (reflective exception factory), and the three localized `Resources` resx/designer pairs. |
 | **Utility** | 5 | `IParentable`, `IResolvable`, `ModelUtils`, `StringExtensions`, `DataEntryMode` (defined, unused). |
-| **Configuration** | 1 | `FixAtdlOptions` POCO (replaces upstream `System.Configuration`; no knobs yet). |
 
 `Domain Model` and `Control Model` are kept separate deliberately: the
 `Model/Controls` subtree is its own abstract base-class hierarchy, architecturally

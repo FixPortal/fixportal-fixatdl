@@ -16,8 +16,10 @@ namespace FixPortal.FixAtdl.Fix;
 /// <summary>
 /// Represents a FIX message.
 /// </summary>
-public class FixMessage : Dictionary<FixField, string>
+public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
 {
+    private readonly Dictionary<FixField, string> _fields;
+
     /// <summary>Field separator.</summary>
     public const char SOH = '\x01';
 
@@ -25,9 +27,18 @@ public class FixMessage : Dictionary<FixField, string>
     public const char Separator = '=';
 
     /// <summary>
-    /// Initializes a new instance of <see cref="FixMessage"/>.
+    /// Initializes an empty message for use by <see cref="FixTagValuesCollection"/>.
     /// </summary>
-    public FixMessage() { }
+    internal FixMessage()
+    {
+        _fields = [];
+    }
+
+    internal FixMessage(FixMessage source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        _fields = new(source._fields);
+    }
 
     /// <summary>
     /// Initializes a new instance of <see cref="FixMessage"/> using the supplied FIX message.
@@ -36,6 +47,8 @@ public class FixMessage : Dictionary<FixField, string>
     /// <remarks>The current implementation of this class does NOT support repeating blocks.</remarks>
     public FixMessage(string rawMessage)
     {
+        _fields = [];
+
         if (string.IsNullOrEmpty(rawMessage))
         {
             throw ThrowHelper.New<FixParseException>(this, ErrorMessages.UnableToParseFixMessageEmpty);
@@ -92,7 +105,7 @@ public class FixMessage : Dictionary<FixField, string>
                     );
                 }
 
-                if (!TryAdd((FixField)tag, valueText))
+                if (!_fields.TryAdd((FixField)tag, valueText))
                 {
                     throw ThrowHelper.New<FixParseException>(
                         this,
@@ -119,7 +132,34 @@ public class FixMessage : Dictionary<FixField, string>
     /// Gets the complete set of fix fields for this message.
     /// </summary>
     /// <value>The fix fields.</value>
-    public ICollection<FixField> FixFields => Keys;
+    public IReadOnlyCollection<FixField> FixFields => _fields.Keys;
+
+    /// <summary>Gets the number of fields in the message.</summary>
+    public int Count => _fields.Count;
+
+    /// <summary>Gets the message's field keys.</summary>
+    public IEnumerable<FixField> Keys => _fields.Keys;
+
+    /// <summary>Gets the message's field values.</summary>
+    public IEnumerable<string> Values => _fields.Values;
+
+    /// <summary>Gets the value for a parsed field.</summary>
+    public string this[FixField key]
+    {
+        get => _fields[key];
+        internal set => _fields[key] = value;
+    }
+
+    /// <summary>Returns whether the message contains the specified field.</summary>
+    public bool ContainsKey(FixField key) => _fields.ContainsKey(key);
+
+    /// <summary>Attempts to get the value for a parsed field.</summary>
+    public bool TryGetValue(FixField key, out string value) => _fields.TryGetValue(key, out value!);
+
+    /// <summary>
+    /// Adds a value while a mutable <see cref="FixTagValuesCollection"/> is being built.
+    /// </summary>
+    internal bool TryAdd(FixField key, string value) => _fields.TryAdd(key, value);
 
     /// <summary>
     /// Provides the string representation of this FixMessage.
@@ -131,12 +171,10 @@ public class FixMessage : Dictionary<FixField, string>
     {
         StringBuilder sb = new();
 
-        foreach (KeyValuePair<FixField, string> item in this)
+        foreach (KeyValuePair<FixField, string> item in _fields)
         {
-            // The string-parsing constructor rejects non-positive tags, but the inherited
-            // Dictionary<FixField, string> surface (indexer / Add) can still admit one programmatically
-            // (e.g. (FixField)(-1)). Guard at this single serialization chokepoint so such a tag cannot be
-            // emitted and silently corrupted by the (uint) cast below (-1 -> 4294967295).
+            // Guard at the serialization chokepoint so malformed values supplied by the mutable
+            // FixTagValuesCollection cannot be emitted and silently corrupted on the wire.
             if ((int)item.Key <= 0)
             {
                 throw ThrowHelper.New<InvalidOperationException>(
@@ -171,4 +209,9 @@ public class FixMessage : Dictionary<FixField, string>
 
         return sb.ToString();
     }
+
+    /// <inheritdoc />
+    public IEnumerator<KeyValuePair<FixField, string>> GetEnumerator() => _fields.GetEnumerator();
+
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 }

@@ -32,6 +32,12 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
 ### Changed
 
+- `FixMessage` is now a sealed, read-only parsed message instead of inheriting
+  the mutable `Dictionary` API; use `FixTagValuesCollection` to build or edit
+  outbound tag values.
+- Removed the unused `FixAtdlOptions` placeholder; configuration will be added
+  when the library has real runtime options to expose.
+
 - README hero and GitHub social preview drop the angel wings from the XML
   card. The markdown image URL is unchanged.
 

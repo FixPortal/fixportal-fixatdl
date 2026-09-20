@@ -76,7 +76,6 @@ foreach (var tag in twap.Parameters.GetOutputValues())
 - Namespace: `FixPortal.FixAtdl.*` (upstream: `Atdl4net.*`).
 - WPF UI controls removed; library is now UI-agnostic.
 - `Common.Logging` → `Microsoft.Extensions.Logging.Abstractions`.
-- `System.Configuration` glue replaced with `FixAtdlOptions` POCO.
 - Nullable reference types enabled throughout.
 - New xUnit v3 test suite (AwesomeAssertions + NSubstitute).
 
