@@ -36,7 +36,7 @@ strategy DTO from your backend, which is where this package runs.
   removed from this package. Rendering lives in the adapters above, or in your
   own UI on top of the parsed model — Blazor, Avalonia, anything.
 
-![Core and its two adapters: broker XML parsed by the headless core, consumed directly by the WPF adapter and through a host-written JSON mapper by the React adapter, with the host assembling the final FIX order](https://raw.githubusercontent.com/FixPortal/fixportal-fixatdl/main/docs/images/three-pack.png)
+![Core and its two adapters: broker XML parsed by the headless core, which emits direct parameter tag values and the authoritative 957–960 group; WPF reads back through the core emitter, React previews 957–960 through a host-mapped DTO, and the host assembles the final FIX wire](https://raw.githubusercontent.com/FixPortal/fixportal-fixatdl/main/docs/images/three-pack.png)
 
 ## Read these first
 
