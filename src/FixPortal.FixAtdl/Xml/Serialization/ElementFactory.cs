@@ -891,17 +891,14 @@ public class ElementFactory : INotifyClassDeserialized
             );
         }
 
-        MethodInfo targetMethod = property.PropertyType.GetMethod(containerMethod, [targetType])!;
-
-        if (targetMethod == null)
-        {
-            throw ThrowHelper.New<InternalErrorException>(
+        MethodInfo targetMethod =
+            property.PropertyType.GetMethod(containerMethod, [targetType])
+            ?? throw ThrowHelper.New<InternalErrorException>(
                 this,
                 InternalErrors.ContainerMethodNotFoundOnObject,
                 containerMethod,
                 targetType.FullName!
             );
-        }
 
         try
         {

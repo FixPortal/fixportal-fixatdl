@@ -52,7 +52,7 @@ public interface IParameter : IValueProvider
     /// <value>The FIX tag to use.</value>
     FixTag? FixTag { get; set; }
 
-    /// <summary>Indicates whether this parameter�s value can be modified by an Order Cancel/Replace Request message.
+    /// <summary>Indicates whether this parameter's value can be modified by an Order Cancel/Replace Request message.
     /// The default value for this field is true.
     /// </summary>
     bool? MutableOnCxlRpl { get; set; }
@@ -65,7 +65,7 @@ public interface IParameter : IValueProvider
 
     /// <summary>Indicates how to interpret those tags that were populated in an original order but are not populated in
     /// a subsequent cancel/replace of the order message. If this value is true then revert to the value of the original
-    /// order, otherwise a null value or the parameter�s default value (Control/@initValue) is to be used or if none is
+    /// order, otherwise a null value or the parameter's default value (Control/@initValue) is to be used or if none is
     /// specified, the parameter is to be omitted.  The default value for this field is false.<br/>
     /// </summary>
     /// <remarks>Although revertOnCxlRpl and mutableOnCxlRpl might appear to be mutually exclusive, this is not strictly

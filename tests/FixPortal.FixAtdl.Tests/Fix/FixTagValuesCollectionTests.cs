@@ -178,6 +178,14 @@ public class FixTagValuesCollectionTests
         v.Should().Be("D");
     }
 
+    [Fact]
+    public void Constructor_rejects_a_null_FixMessage()
+    {
+        var act = () => new FixTagValuesCollection((FixMessage)null!);
+
+        act.Should().Throw<ArgumentNullException>();
+    }
+
     // ToString ---------------------------------------------------------------
 
     [Fact]
