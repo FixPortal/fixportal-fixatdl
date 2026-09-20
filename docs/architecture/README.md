@@ -149,11 +149,13 @@ and `/understand` (human graph) after code changes. Keep this doc in sync when a
 layer boundary or load-bearing seam actually moves — not on every commit.
 
 Rendered, editable forms live in the sibling adapter repos, not here. The WPF
-adapter consumes `Strategy_t` directly; the React adapter consumes a JSON DTO
-**your host maps** — it never sees this NuGet package, and its group emitter is
-a preview rather than the authoritative wire.
+adapter consumes `Strategy_t` directly and delegates 957–960 read-back to the
+core emitter. The React adapter consumes a JSON DTO **your host maps** — it
+never sees this NuGet package, and its group emitter is a browser-side preview,
+not the authoritative wire. Core also exposes direct per-parameter tag values;
+the host assembles the complete FIX order.
 
-![The three-pack: broker XML parsed by the headless core, consumed directly by the WPF adapter and through a host-written JSON mapper by the React adapter, with the host assembling the final FIX order](../images/three-pack.png)
+![The three-pack: broker XML parsed by the headless core, which emits direct parameter tag values and the authoritative 957–960 group; WPF reads back through the core emitter, React previews 957–960 through a host-mapped DTO, and the host assembles the final FIX wire](../images/three-pack.png)
 
 ---
 
