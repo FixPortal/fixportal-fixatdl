@@ -527,10 +527,22 @@ def tolerant_jobs(lines, jobs, job_indent):
         tolerant_key = key_pattern(indent, "continue-on-error")
         for i in range(start + 1, end):
             match = tolerant_key.match(lines[i].rstrip("\r\n"))
-            if match and normalise_condition(strip_comment(match.group(1)).strip()) not in (
-                "false",
-                "",
-            ):
+            if not match:
+                continue
+            value = strip_comment(match.group(1)).strip()
+            if not value or is_block_scalar_header(value):
+                body, _ = continuation_lines(lines, i, indent)
+                value = " ".join(strip_comment(line).strip() for line in body)
+            value = normalise_condition(value)
+            # Two shapes the bare membership test misread, both false REDs on a feeder
+            # that tolerates nothing: a block-scalar spelling (`continue-on-error: >`
+            # then `false`) never unfolded past the header, and a compound like
+            # `${{ false && inputs.allow_failure }}` survives normalisation as itself
+            # while static_truth folds it to False (mirror fixportal-claude-skills#110;
+            # unit review 2026-09-21). UNKNOWN stays tolerant -- an expression this
+            # checker cannot fold may still evaluate true at runtime, and that is the
+            # conservative direction.
+            if value not in ("false", "") and static_truth(value) is not False:
                 tolerant.add(job_id)
                 break
     return tolerant
@@ -1158,7 +1170,14 @@ def step_can_fail(block, span, key_indent):
         if not value or is_block_scalar_header(value):
             body, _ = continuation_lines(block, i, key_indent)
             value = " ".join(strip_comment(line).strip() for line in body)
-        if normalise_condition(value) not in ("false", ""):
+        value = normalise_condition(value)
+        # The job-level sibling consults static_truth for the same expression: a
+        # compound like `${{ false && inputs.allow_failure }}` normalises to itself but
+        # folds to False, and a step whose continue-on-error cannot evaluate true CAN
+        # still fail the job. Without the consult the two levels disagreed about the
+        # same expression (unit review 2026-09-21). UNKNOWN stays cannot-fail, the
+        # conservative direction.
+        if value not in ("false", "") and static_truth(value) is not False:
             return False, "carries `continue-on-error`, so it cannot fail the job"
 
     shell = "bash"
@@ -1723,6 +1742,41 @@ def policy_root(workflow_path):
     return None
 
 
+def run_payload_indexes(lines):
+    """The line indexes consumed by block-scalar `run:` payloads in `lines`.
+
+    A `run: |` body is SHELL TEXT at workflow indentation, and a LOCAL_USES scan over
+    physical lines cannot tell it from syntax: an indented `uses: ./action` inside the
+    payload -- a heredoc writing an action manifest, say -- matched and read as a local
+    delegation. A missing target was silently ignored, but an EXISTING non-composite one
+    raised the ValueError in delegated_run_bodies and failed gate coverage over a line
+    the workflow never executes as a step. That is a false RED on a correct workflow --
+    the direction that gets a working control deleted to make CI green. (CodeRabbit,
+    fixportal-claude-skills#110.)
+
+    Only BLOCK-SCALAR payloads are indexed. A single-line `run: foo` carries its command
+    on the `run:` line itself, which starts with the key and so cannot match LOCAL_USES.
+    The value test reads the COMMENT-STRIPPED value, exactly as the run-body loops in
+    delegated_run_bodies and gated_run_bodies do -- `run: | # build log` is a real
+    spelling, and BLOCK_SCALAR is anchored.
+    """
+    payloads = set()
+    index = 0
+    while index < len(lines):
+        match = RUN_KEY.match(lines[index])
+        if not match:
+            index += 1
+            continue
+        value = strip_inline_comment(match.group(2)).strip()
+        if BLOCK_SCALAR.match(value):
+            _, following = continuation_lines(lines, index, len(match.group(1)))
+            payloads.update(range(index + 1, following))
+            index = following
+        else:
+            index += 1
+    return payloads
+
+
 def delegated_run_bodies(root, ref, visited):
     """Yield run-body lines from a local composite action or reusable workflow."""
     relative = ref[2:]
@@ -1757,7 +1811,10 @@ def delegated_run_bodies(root, ref, visited):
         else:
             body, index = ([value] if value else []), index + 1
         yield from body
-    for line in lines:
+    payload_indexes = run_payload_indexes(lines)
+    for index, line in enumerate(lines):
+        if index in payload_indexes:
+            continue
         match = LOCAL_USES.match(line)
         if match:
             yield from delegated_run_bodies(root, match.group(1), visited)
@@ -1803,7 +1860,10 @@ def gated_run_bodies(lines, jobs, needs, gate_job, root):
                 body, index = ([value] if value else []), index + 1
             for body_line in body:
                 yield job_id, body_line
-        for line in block:
+        payload_indexes = run_payload_indexes(block)
+        for index, line in enumerate(block):
+            if index in payload_indexes:
+                continue
             match = LOCAL_USES.match(line)
             if match:
                 for body_line in delegated_run_bodies(root, match.group(1), set()):
