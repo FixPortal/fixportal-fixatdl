@@ -28,6 +28,36 @@ public class FixDateTimeTests
     }
 
     [Fact]
+    public void Explicit_offset_fix_timestamp_converts_to_the_equivalent_utc_instant()
+    {
+        // "yyyyMMdd-HH:mm:sszz" is one of the exact FIX formats and carries a literal
+        // hour offset; the parser must convert it to the equivalent UTC instant (not
+        // just relabel the local wall-clock value as UTC).
+        FixDateTime
+            .TryParse("20260601-10:00:00+02:00", CultureInfo.InvariantCulture, out DateTime result)
+            .Should()
+            .BeTrue();
+
+        result.Kind.Should().Be(DateTimeKind.Utc);
+        result.Should().Be(new DateTime(2026, 6, 1, 8, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void Explicit_offset_fallback_timestamp_converts_to_the_equivalent_utc_instant()
+    {
+        // An ISO-8601 value with an explicit offset is not one of the exact FIX formats,
+        // so it falls through to the loose parse. That fallback must convert the offset
+        // to the equivalent UTC instant too, not just stamp Kind=Utc onto the local value.
+        FixDateTime
+            .TryParse("2026-06-01T10:00:00+02:00", CultureInfo.InvariantCulture, out DateTime result)
+            .Should()
+            .BeTrue();
+
+        result.Kind.Should().Be(DateTimeKind.Utc);
+        result.Should().Be(new DateTime(2026, 6, 1, 8, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
     public void Leap_second_timestamp_rolls_forward_into_the_next_day()
     {
         // The UTCTimestamp_t spec's own worked example: a declared leap second at year-end rolls into
