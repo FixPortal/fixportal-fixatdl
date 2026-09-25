@@ -48,24 +48,11 @@ jobs:
           # Full fetch of main, not --depth: the tag may name an older main commit, and a
           # shallow fetch leaves merge-base no shared history to walk.
           git fetch --no-tags origin main
-          # PEEL the ref first. For an ANNOTATED or signed tag, GITHUB_SHA is the tag
-          # OBJECT's sha, not a commit, and merge-base then fails with a confusing
-          # message rather than the intended one. `^{commit}` peels a tag object and is
-          # the identity for a plain commit sha, so this is correct either way.
-          tagged_commit="$(git rev-parse "${GITHUB_SHA}^{commit}")"
-          if ! git merge-base --is-ancestor "$tagged_commit" FETCH_HEAD; then
-            echo "::error::Tag '${GITHUB_REF_NAME}' names a commit that is not reachable from main. Only reviewed, merged commits may be released."
-            exit 1
-          fi
-
-          # Reachability alone still permits a tag to select an arbitrary older
-          # main commit. Require GitHub to associate the commit with a merged PR
-          # into main as a second, API-backed review boundary.
-          merged_pr="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${tagged_commit}/pulls" --jq 'any(.[]; .merged_at != null and .base.ref == "main")')"
-          if [ "$merged_pr" != "true" ]; then
-            echo "::error::Tag '${GITHUB_REF_NAME}' names a main commit with no merged pull request into main."
-            exit 1
-          fi
+          # The gate itself lives in scripts/assert-release-eligibility.sh so it can be
+          # exercised for real (eligible + each rejection case) by
+          # scripts/test/verify-release-eligibility.sh rather than only asserted from
+          # this YAML.
+          ./scripts/assert-release-eligibility.sh "$GITHUB_WORKSPACE" "$GITHUB_SHA" FETCH_HEAD
 
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v6
