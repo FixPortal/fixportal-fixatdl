@@ -74,6 +74,14 @@ jobs:
         shell: pwsh
         run: ./scripts/test/verify-coverage-floor.ps1
 
+      # Exercises the release-eligibility gate (scripts/assert-release-eligibility.sh,
+      # invoked by release.yml) against a disposable git history and a stubbed `gh`, so
+      # a weakened ancestry or merged-PR condition fails this step rather than shipping
+      # silently in a tag push.
+      - name: Test the release-eligibility script
+        shell: bash
+        run: ./scripts/test/verify-release-eligibility.sh
+
       - name: Coverage floor
         shell: pwsh
         run: ./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl -MinimumLineRate 70 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
