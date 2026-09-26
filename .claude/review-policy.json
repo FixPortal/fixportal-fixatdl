@@ -70,7 +70,8 @@
     "nuget.config",
     "global.json",
     ".npmrc",
-    "Directory.Build.props"
+    "Directory.Build.props",
+    ".github/workflows/review-tier.yml"
   ],
 
   "low": [
