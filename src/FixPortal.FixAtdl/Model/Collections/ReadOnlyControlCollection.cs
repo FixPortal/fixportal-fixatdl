@@ -313,11 +313,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                 continue;
             }
 
-            bool isValidParameter = parameters.Contains(parameterRef);
-            IParameter parameter = isValidParameter ? parameters[parameterRef] : null!;
-            object parameterValue = isValidParameter ? parameter.GetCurrentValue() : null!;
-
-            if (!isValidParameter)
+            if (!parameters.Contains(parameterRef))
             {
                 throw ThrowHelper.New<ReferencedObjectNotFoundException>(
                     this,
@@ -325,6 +321,9 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                     control.ParameterRef
                 );
             }
+
+            IParameter parameter = parameters[parameterRef];
+            object? parameterValue = parameter.GetCurrentValue();
 
             // An empty parameter clears its bound control rather than leaving stale UI state behind.
             if (parameterValue == null)

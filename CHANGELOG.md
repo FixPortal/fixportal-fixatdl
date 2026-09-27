@@ -37,6 +37,14 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - Null FIX field values are treated as absent by `TryGetValue`, and custom argument exceptions can use a string-only constructor.
 - Registered custom flags attributes accept defined bit combinations and reject undefined bits.
 - Spinner controls now reject a fractional value bound to an integer parameter instead of silently truncating it (1.5 previously went on the wire as 1); fractional values remain supported on float parameters via `DoubleSpinner_t`.
+- Enum parsing rejects bare numeric strings: currency, country and language wire values such as "3" or "036" no longer map to a wrong (but defined) enum member, and the `FixTagValuesCollection` string indexer no longer resolves a numeric name such as "35" to a field — the Try-pattern lookups still accept numeric tags, including user-defined ones.
+- An enum wire value that itself contains a delimiter (e.g. "A,B") now resolves by exact match instead of being split into rejected tokens.
+- `FixDateTime.Parse` throws `FormatException` (previously `InvalidCastException`) for unparseable input; a `:60` seconds field is normalised as a leap second only at 23:59 UTC (a `:60` at any other minute is now rejected rather than silently shifted a minute); time-only values anchor to a deterministic date (0001-01-01, UTC) instead of the host's current date; and exact FIX formats parse culture-invariantly, so a non-invariant caller culture can no longer make a valid timestamp fail.
+- `ThrowHelper.Rethrow` single-argument overloads format through the same guarded path as the params overload: a brace-bearing template surfaces verbatim instead of throwing `FormatException` from the error-reporting path, and when the original exception type cannot be reconstructed the original instance now carries the source and XML line info.
+- Visitor dispatch caches by `Type` identity, so same-named visitor types from different assemblies no longer collide on a name-keyed cache entry.
+- Attribute-processing failures during strategy load now name the element being processed instead of leaving the element-name slot blank.
+- `StrategyParametersGrpEmitter` skips a parameter whose name is null, empty or whitespace instead of emitting a `958=` field this library's own parser rejects.
+- Nullable annotations corrected to describe routinely-absent values: `Edit_t.Field2`/`Id`/`Value`, `Control_t.ToolTip`, `BinaryControlBase.CheckedEnumRef`/`UncheckedEnumRef`, and the `value` parameter of `FixDateTime.TryParse` are now `string?`; `Control_t.TryConvertToInt`/`TryConvertToUint`/`TryConvertToDecimal` documentation no longer promises `false` for input that throws.
 
 ## [1.1.6] — 2026-09-20
 

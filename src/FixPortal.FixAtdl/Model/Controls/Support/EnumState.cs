@@ -455,15 +455,27 @@ public class EnumState
     /// Creates a new EnumState from the supplied set of EnumPairs and input FIX string.
     /// </summary>
     /// <param name="enumPairs">EnumPairs for this parameter.</param>
-    /// <param name="multiValueString">String containing one or more FIX wire values (space-separated).</param>
-    /// <returns></returns>
+    /// <param name="multiValueString">String containing one or more FIX wire values (elements may be separated
+    /// with space, semi-colon or comma). A whole-string match against a single wire value takes precedence over
+    /// multi-value splitting, so a single wire value that itself contains a delimiter is still resolved.</param>
+    /// <returns>An EnumState with the EnumIDs selected that correspond to the supplied wire value(s).</returns>
     public static EnumState FromWireValue(EnumPairCollection enumPairs, string multiValueString)
     {
+        EnumState result = new(enumPairs.EnumIds);
+
+        // Exact whole-string match first: a single wire value may itself contain a delimiter
+        // (';', ' ' or ','), which the split loop below would fragment into unresolvable tokens.
+        // A "{NULL}" match selects the corresponding EnumID exactly as a "{NULL}" token does in
+        // the split loop (ToWireValue omits {NULL} entries on emit, so nothing goes back on the wire).
+        if (enumPairs.TryParseWireValue(multiValueString, out string? exactEnumId))
+        {
+            result[exactEnumId!] = true;
+            return result;
+        }
+
         // Drop empty tokens so a blank, double-delimited or trailing-delimiter input does not yield
         // a "" token that TryParseWireValue would reject.
         string[] inputValues = multiValueString.Split([';', ' ', ','], StringSplitOptions.RemoveEmptyEntries);
-
-        EnumState result = new(enumPairs.EnumIds);
 
         foreach (string inputValue in inputValues)
         {

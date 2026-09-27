@@ -178,9 +178,9 @@ public class FixPrimitivesTests
     }
 
     [Fact]
-    public void FixDateTime_Parse_throws_InvalidCastException_for_invalid_input()
+    public void FixDateTime_Parse_throws_FormatException_for_invalid_input()
     {
         var act = () => FixDateTime.Parse("not-a-date", CultureInfo.InvariantCulture);
-        act.Should().Throw<InvalidCastException>();
+        act.Should().Throw<FormatException>();
     }
 }

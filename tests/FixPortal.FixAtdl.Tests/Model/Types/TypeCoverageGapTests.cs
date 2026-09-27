@@ -121,6 +121,53 @@ public class TypeCoverageGapTests
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+    // EnumState.FromWireValue — exact-match precedence (batch-36 finding F1/X)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    [Theory]
+    [InlineData("A,B")]
+    [InlineData("A;B")]
+    [InlineData("A B")]
+    public void String_t_ToEnumState_resolves_single_wire_value_containing_delimiter(string wireValue)
+    {
+        // NOTE: FromWireValue tries an exact whole-string match before splitting on ';', ' '
+        // and ',', so a single wire value that itself contains a delimiter resolves to its
+        // enum member instead of throwing, and round-trips byte-for-byte.
+        var p = new Parameter_t<String_t>("X") { WireValue = wireValue };
+        var pairs = BuildEnumPairs(("Delimited", wireValue), ("Plain", "PLAIN"));
+        var state = ((IControlConvertible)p.Value).ToEnumState(pairs);
+        state["Delimited"].Should().Be(true);
+        state["Plain"].Should().Be(false);
+        state.ToWireValue(pairs).Should().Be(wireValue);
+    }
+
+    [Fact]
+    public void String_t_ToEnumState_still_splits_genuine_multi_value_wire_string()
+    {
+        // NOTE: Only when no single wire value matches the whole string does FromWireValue
+        // fall back to splitting — a genuine multi-value string still sets every member.
+        var p = new Parameter_t<String_t>("X") { WireValue = "BUY SELL" };
+        var pairs = BuildEnumPairs(("Buy", "BUY"), ("Sell", "SELL"));
+        var state = ((IControlConvertible)p.Value).ToEnumState(pairs);
+        state["Buy"].Should().Be(true);
+        state["Sell"].Should().Be(true);
+        state.ToWireValue(pairs).Should().Be("BUY SELL");
+    }
+
+    [Fact]
+    public void EnumState_FromWireValue_selects_null_pair_for_null_sentinel_wire_value()
+    {
+        // NOTE: The exact-match path treats "{NULL}" exactly as the split loop treats a
+        // "{NULL}" token — the {NULL} pair's EnumID is selected; ToWireValue omits {NULL}
+        // entries, so nothing is emitted back onto the wire.
+        var pairs = BuildEnumPairs(("NullPair", "{NULL}"), ("Buy", "BUY"));
+        var state = EnumState.FromWireValue(pairs, "{NULL}");
+        state["NullPair"].Should().Be(true);
+        state["Buy"].Should().Be(false);
+        state.ToWireValue(pairs).Should().BeNull();
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
     // EnumTypeBase — ToEnumState (lines 69-79 via Country_t)
     // ──────────────────────────────────────────────────────────────────────────
 

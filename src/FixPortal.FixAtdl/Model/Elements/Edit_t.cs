@@ -41,12 +41,12 @@ public class Edit_t
     /// to either the name of a parameter or a standard FIX field name. When referring to a standard FIX tag
     /// then the name must be pre-pended with the string "FIX_", e.g. "FIX_OrderQty".
     /// </summary>
-    public string Field2 { get; set; } = null!;
+    public string? Field2 { get; set; }
 
     /// <summary>
     /// Gets or sets the optional identifier for this edit.
     /// </summary>
-    public string Id { get; set; } = null!;
+    public string? Id { get; set; }
 
     /// <summary>
     /// Gets or sets the comparison operator used by this edit.
@@ -61,7 +61,7 @@ public class Edit_t
     /// <summary>
     /// Gets or sets the optional fixed right-hand-side value for the edit.
     /// </summary>
-    public string Value { get; set; } = null!;
+    public string? Value { get; set; }
 
     /// <summary>
     /// Gets the child edits contained by this edit.
@@ -552,7 +552,9 @@ public class Edit_t<T> : IEdit<T>, IResolvable<Strategy_t, T>
     {
         if (source is BinaryControlBase { HasEnumeratedState: true } binary && value is bool selected)
         {
-            return selected ? binary.CheckedEnumRef : binary.UncheckedEnumRef;
+            // HasEnumeratedState is defined as both enum refs being non-null, which the compiler
+            // cannot see through the property pattern.
+            return selected ? binary.CheckedEnumRef! : binary.UncheckedEnumRef!;
         }
 
         // R03: a text control's comparison type is data-dependent. Take the decimal path only when BOTH

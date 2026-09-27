@@ -407,6 +407,19 @@ public class ValueTypeConversionTests
         p.WireValue.Should().Be("US");
     }
 
+    [Theory]
+    [InlineData("3")]
+    [InlineData("036")]
+    public void Country_t_rejects_numeric_wire_values(string wire)
+    {
+        // A bare numeric string is never an ISO code: Enum.Parse maps "3" to the member with value 3
+        // and "036" to the member with value 36 — silently wrong countries (F1/C). ParseAsEnum now
+        // rejects numeric spellings, and SetWireValue translates that to InvalidFieldValueException.
+        var p = new Parameter_t<Country_t>("Cty");
+        var act = () => p.WireValue = wire;
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Currency_t (IsoCurrencyCode enum-backed)
     // ──────────────────────────────────────────────────────────────────────────
@@ -425,6 +438,20 @@ public class ValueTypeConversionTests
         p.WireValue.Should().Be(wire);
     }
 
+    [Theory]
+    [InlineData("3")]
+    [InlineData("036")]
+    public void Currency_t_rejects_numeric_wire_values(string wire)
+    {
+        // "3" is IsoCurrencyCode.ALL's underlying value and "036" parses to 36: Enum.Parse maps both
+        // to defined members instead of rejecting spellings that are not ISO 4217 alpha codes (F1/C).
+        // ParseAsEnum now rejects numeric spellings, and SetWireValue translates that to
+        // InvalidFieldValueException.
+        var p = new Parameter_t<Currency_t>("Ccy");
+        var act = () => p.WireValue = wire;
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Language_t (IsoLanguageCode enum-backed)
     // ──────────────────────────────────────────────────────────────────────────
@@ -439,6 +466,19 @@ public class ValueTypeConversionTests
     {
         var p = new Parameter_t<Language_t>("Lang") { WireValue = wire };
         p.WireValue.Should().Be(wire.ToLowerInvariant());
+    }
+
+    [Theory]
+    [InlineData("3")]
+    [InlineData("036")]
+    public void Language_t_rejects_numeric_wire_values(string wire)
+    {
+        // As with Currency_t/Country_t: Enum.Parse maps "3" and "036" to defined IsoLanguageCode
+        // members by underlying value. ParseAsEnum now rejects numeric spellings, and SetWireValue
+        // translates that to InvalidFieldValueException.
+        var p = new Parameter_t<Language_t>("Lang");
+        var act = () => p.WireValue = wire;
+        act.Should().Throw<InvalidFieldValueException>();
     }
 
     // ──────────────────────────────────────────────────────────────────────────

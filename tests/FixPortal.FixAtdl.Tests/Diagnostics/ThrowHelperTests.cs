@@ -1,3 +1,4 @@
+using System.Xml;
 using System.Xml.Linq;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
@@ -85,6 +86,60 @@ public class ThrowHelperTests
 
         ex.Message.Should().Be("Could not parse field: inner");
         ex.InnerException.Should().BeSameAs(inner);
+    }
+
+    [Fact]
+    public void Rethrow_single_argument_overload_returns_raw_template_for_brace_bearing_format()
+    {
+        // A template carrying a literal "{NULL}" alongside "{0}" makes string.Format throw
+        // FormatException; the error-reporting path must surface the raw template instead (F1/K).
+        var inner = new InvalidOperationException("inner");
+
+        var ex = ThrowHelper.Rethrow(null, inner, "Could not parse {NULL} field {0}", "tenor");
+
+        ex.Message.Should().Be("Could not parse {NULL} field {0}");
+        ex.InnerException.Should().BeSameAs(inner);
+    }
+
+    [Fact]
+    public void Rethrow_params_overload_returns_raw_template_for_brace_bearing_format()
+    {
+        // The same brace-bearing template through the params overload must likewise return the raw
+        // template rather than throwing FormatException (F1/K).
+        var inner = new InvalidOperationException("inner");
+
+        var ex = ThrowHelper.Rethrow(null, inner, "Could not parse {NULL} field {0}", "tenor", "unused");
+
+        ex.Message.Should().Be("Could not parse {NULL} field {0}");
+        ex.InnerException.Should().BeSameAs(inner);
+    }
+
+    [Fact]
+    public void Rethrow_without_message_inner_constructor_returns_same_instance_with_source_and_line_info()
+    {
+        // StringOnlyArgumentException has only a (string) constructor, so BuildRethrown cannot
+        // rewrap it: the original instance is returned carrying what context can be attached (F4/C).
+        var inner = new StringOnlyArgumentException("inner");
+        var xml = XElement.Parse("<Root/>", LoadOptions.SetLineInfo);
+        var lineInfo = (IXmlLineInfo)xml;
+
+        var ex = ThrowHelper.Rethrow("Parser", inner, xml, "ctx {0}", "x");
+
+        ex.Should().BeSameAs(inner);
+        ex.Source.Should().Be("Parser");
+        ex.Data["LineNumber"].Should().Be(lineInfo.LineNumber);
+        ex.Data["LinePosition"].Should().Be(lineInfo.LinePosition);
+    }
+
+    [Fact]
+    public void Rethrow_without_message_inner_constructor_preserves_existing_source()
+    {
+        var inner = new StringOnlyArgumentException("inner") { Source = "Original" };
+
+        var ex = ThrowHelper.Rethrow("Parser", inner, (XObject?)null, "ctx {0}", "x");
+
+        ex.Should().BeSameAs(inner);
+        ex.Source.Should().Be("Original");
     }
 
     [Fact]
