@@ -156,6 +156,15 @@ public class FixTagValuesCollectionTests
         value.Should().BeNull();
     }
 
+    [Fact]
+    public void TryGetValue_by_string_returns_false_for_a_null_field_name()
+    {
+        FixTagValuesCollection col = [];
+
+        col.TryGetValue(null!, out var value).Should().BeFalse();
+        value.Should().BeNull();
+    }
+
     // ToFix / round-trip ------------------------------------------------------
 
     [Fact]

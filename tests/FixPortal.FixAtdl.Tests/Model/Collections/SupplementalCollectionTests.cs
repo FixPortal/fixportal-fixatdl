@@ -311,8 +311,11 @@ public class SupplementalCollectionTests
         var strategy = new Strategy_t();
         var panel = new StrategyPanel_t(strategy);
         var source = new RadioButton_t("source") { ParameterRef = "P", RadioGroup = "" };
-        var unrelated = new RadioButton_t("unrelated") { ParameterRef = "Q", RadioGroup = "other" };
         var companion = new RadioButton_t("companion") { ParameterRef = "P", RadioGroup = "" };
+        // Same parameter but grouped: excluded by the ungrouped-sibling filter.
+        var groupedSameParam = new RadioButton_t("groupedSameParam") { ParameterRef = "P", RadioGroup = "g" };
+        // Ungrouped but a different parameter: excluded by the same-parameter filter.
+        var ungroupedOtherParam = new RadioButton_t("ungroupedOtherParam") { ParameterRef = "Q", RadioGroup = "" };
         var helper = new CheckBox_t("helper") { ParameterRef = "H" };
         helper.StateRules.Add(
             new StateRule_t
@@ -326,17 +329,23 @@ public class SupplementalCollectionTests
                 },
             }
         );
-        strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
+        // P starts false so the companion assertion cannot pass from the parameter sync alone:
+        // only the helper pass selecting the sole ungrouped same-parameter sibling flips it.
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "N" });
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("Q") { WireValue = "N" });
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("H") { WireValue = "Y" });
         panel.Controls.Add(source);
-        panel.Controls.Add(unrelated);
         panel.Controls.Add(companion);
+        panel.Controls.Add(groupedSameParam);
+        panel.Controls.Add(ungroupedOtherParam);
         panel.Controls.Add(helper);
 
         strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
 
         companion.GetCurrentValue().Should().Be(true);
+        source.GetCurrentValue().Should().Be(false);
+        groupedSameParam.GetCurrentValue().Should().Be(false);
+        ungroupedOtherParam.GetCurrentValue().Should().Be(false);
     }
 
     // -----------------------------------------------------------------------
