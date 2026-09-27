@@ -21,8 +21,28 @@ public static class ThrowHelper
     // Format the message only when arguments are supplied. With zero args, string.Format would still
     // parse the format string for placeholders and throw FormatException on literal braces (e.g.
     // "{NULL}", "Nullable{Int32}", XML payloads), corrupting the error-reporting path (F1c).
-    private static string FormatMessage(string format, object?[] args) =>
-        args?.Length > 0 ? string.Format(CultureInfo.InvariantCulture, format, args) : format;
+    // Even with args the guarded string.Format can still throw FormatException when the template
+    // itself bears literal braces alongside placeholders (e.g. "Could not parse {NULL} field {0}").
+    // The error-reporting path must never throw, so on failure the raw template is returned
+    // verbatim — placeholders and all — rather than masking the real exception with a
+    // FormatException (F1/K).
+    // FP Enhancement: 2026-09-27 — catch FormatException and fall back to the raw template.
+    private static string FormatMessage(string format, object?[] args)
+    {
+        if (args is not { Length: > 0 })
+        {
+            return format;
+        }
+
+        try
+        {
+            return string.Format(CultureInfo.InvariantCulture, format, args);
+        }
+        catch (FormatException)
+        {
+            return format;
+        }
+    }
 
     private static void PopulateXmlLineInfo(Exception exception, XObject? node)
     {
@@ -236,8 +256,12 @@ public static class ThrowHelper
     public static Exception Rethrow(object? source, Exception ex, XObject? xmlNode, string format, object arg)
     {
         // Single-arg convention: the template references the argument as {0} and ex.Message as {1}.
-        // Formatted exactly once here; BuildRethrown does no further formatting.
-        string message = string.Format(CultureInfo.InvariantCulture, format, arg, ex.Message);
+        // Formatted exactly once here; BuildRethrown does no further formatting. All formatting flows
+        // through the guarded FormatMessage so a brace-bearing template (e.g. a literal "{NULL}")
+        // surfaces the raw template instead of throwing FormatException from the error-reporting
+        // path — the defect class the params overload was already hardened against (F1/K).
+        // FP Enhancement: 2026-09-27 — route formatting through FormatMessage.
+        string message = FormatMessage(format, [arg, ex.Message]);
 
         Exception newException = BuildRethrown(source, ex, xmlNode, message);
 
@@ -247,12 +271,19 @@ public static class ThrowHelper
     // Builds a replacement exception of the same runtime type as 'ex' from an ALREADY-FORMATTED
     // message (no further string.Format). If that type has no (string, Exception) constructor the
     // original exception is preserved rather than throwing a NullReferenceException off GetConstructor (F2).
+    // In that fallback the formatted message genuinely cannot be attached: Exception.Message is
+    // get-only, and wrapping 'ex' in a different exception type would break consumers' catch
+    // blocks. What CAN be attached is preserved instead — Source (set only when unset) and any XML
+    // line info land on the original instance (F4/C).
+    // FP Enhancement: 2026-09-27 — no-constructor fallback now carries Source and XML line info.
     private static Exception BuildRethrown(object? source, Exception ex, XObject? xmlNode, string message)
     {
         ConstructorInfo? classConstructor = ex.GetType().GetConstructor([typeof(string), typeof(Exception)]);
 
         if (classConstructor == null)
         {
+            ex.Source ??= source?.ToString();
+            PopulateXmlLineInfo(ex, xmlNode);
             return ex;
         }
 

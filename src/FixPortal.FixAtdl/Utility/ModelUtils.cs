@@ -5,7 +5,6 @@
 //
 #endregion
 
-using System.Globalization;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 
@@ -16,7 +15,10 @@ namespace FixPortal.FixAtdl.Utility;
 /// </summary>
 public static class ModelUtils
 {
-    private static readonly Dictionary<string, MethodInfo?> _methodInfoCache = [];
+    private static readonly Dictionary<
+        (Type DeclaredVisitorType, Type ConcreteVisitorType, Type TargetType),
+        MethodInfo?
+    > _methodInfoCache = [];
 
     /// <summary>
     /// Invokes a matching <c>Visit</c> overload on the supplied visitor for the target object.
@@ -27,32 +29,30 @@ public static class ModelUtils
     /// <returns><see langword="true"/> if a matching <c>Visit</c> method was found and invoked; otherwise, <see langword="false"/>.</returns>
     public static bool VisitHelper(Type visitorType, object visitor, object target)
     {
+        Type concreteVisitorType = visitor.GetType();
         Type targetParamType = target.GetType();
 
-        // Include the CONCRETE visitor type in the key, not just the declared visitorType: two
-        // implementations of the same visitor interface would otherwise collide on one cache entry and
-        // the second would invoke the first's MethodInfo, throwing a TargetException (F3).
-        string searchString = string.Format(
-            CultureInfo.InvariantCulture,
-            "{0}:{1}:{2}",
-            visitorType.FullName,
-            visitor.GetType().FullName,
-            targetParamType.FullName
-        );
+        // Key the cache by Type identity, not Type.FullName strings. Both key parts matter:
+        // the CONCRETE visitor type alongside the declared visitorType, because two implementations
+        // of the same visitor interface would otherwise share one entry (F3); and Type identity
+        // rather than FullName, because same-named types from different assemblies would still
+        // collide on a string key (F1/X). Either collision makes a later call invoke another type's
+        // MethodInfo, throwing a TargetException.
+        var cacheKey = (visitorType, concreteVisitorType, targetParamType);
 
         MethodInfo? methodInfo;
 
         lock (_methodInfoCache)
         {
-            if (!_methodInfoCache.TryGetValue(searchString, out methodInfo))
+            if (!_methodInfoCache.TryGetValue(cacheKey, out methodInfo))
             {
                 Type[] types = [targetParamType];
 
-                methodInfo = visitor.GetType().GetMethod("Visit", types);
+                methodInfo = concreteVisitorType.GetMethod("Visit", types);
 
                 // Cache the miss too (as null), so a permanently-absent Visit overload is only
                 // reflected-over once instead of re-scanning under the lock on every call.
-                _methodInfoCache[searchString] = methodInfo;
+                _methodInfoCache[cacheKey] = methodInfo;
             }
 
             if (methodInfo == null)

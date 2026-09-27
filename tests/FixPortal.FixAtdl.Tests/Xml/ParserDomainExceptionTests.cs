@@ -6,9 +6,9 @@ namespace FixPortal.FixAtdl.Tests.Xml;
 
 /// <summary>
 /// Parser-level exception surface: domain failures inside reflected property setters must reach the
-/// host as the documented exception family rather than a raw TargetInvocationException (R20), and an
+/// host as the documented exception family rather than a raw TargetInvocationException (R20), an
 /// EditRef under a strategy- or strategies-level Edit must fail at load instead of being silently
-/// discarded (R19).
+/// discarded (R19), and an attribute-processing failure must name the element being processed (F3).
 /// </summary>
 public class ParserDomainExceptionTests
 {
@@ -69,5 +69,78 @@ public class ParserDomainExceptionTests
         Action act = () => new StrategiesReader().Load(stream);
 
         act.Should().Throw<InconsistentStrategyException>().WithMessage("*EditRef*");
+    }
+
+    // Audit 2026-09-25 (F3): an attribute-processing failure is rethrown with
+    // GeneralElementProcessingError and must name the element being processed. One case per
+    // ElementFactory.CreateObject overload with that rethrow: plain ElementDefinition (StrategyPanel),
+    // GenericTypeElementDefinition (Parameter), and MultiTypeElementDefinition (Control).
+    public static TheoryData<string, string> MalformedAttributeCases =>
+        new()
+        {
+            {
+                """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+                                xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                strategyIdentifierTag="5001">
+                      <Strategy name="Test" version="1" wireValue="Test" uiRep="Test" providerID="DEMO">
+                        <Parameter name="Price" xsi:type="Float_t" fixTag="notanumber" use="optional"/>
+                        <lay:StrategyLayout>
+                          <lay:StrategyPanel title="Panel" orientation="VERTICAL" collapsible="false" border="Line" />
+                        </lay:StrategyLayout>
+                      </Strategy>
+                    </Strategies>
+                    """,
+                "Parameter"
+            },
+            {
+                """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+                                xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                strategyIdentifierTag="5001">
+                      <Strategy name="Test" version="1" wireValue="Test" uiRep="Test" providerID="DEMO">
+                        <Parameter name="Qty" xsi:type="Int_t" fixTag="38" use="required"/>
+                        <lay:StrategyLayout>
+                          <lay:StrategyPanel title="Panel" orientation="VERTICAL" collapsible="notabool" border="Line" />
+                        </lay:StrategyLayout>
+                      </Strategy>
+                    </Strategies>
+                    """,
+                "StrategyPanel"
+            },
+            {
+                """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+                                xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+                                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                strategyIdentifierTag="5001">
+                      <Strategy name="Test" version="1" wireValue="Test" uiRep="Test" providerID="DEMO">
+                        <Parameter name="Qty" xsi:type="Int_t" fixTag="38" use="required"/>
+                        <lay:StrategyLayout>
+                          <lay:StrategyPanel title="Panel" orientation="VERTICAL" collapsible="false" border="Line">
+                            <lay:Control ID="c_Qty" xsi:type="lay:SingleSpinner_t" parameterRef="Qty" increment="notanumber"/>
+                          </lay:StrategyPanel>
+                        </lay:StrategyLayout>
+                      </Strategy>
+                    </Strategies>
+                    """,
+                "Control"
+            },
+        };
+
+    [Theory]
+    [MemberData(nameof(MalformedAttributeCases))]
+    public void Malformed_attribute_names_the_element_being_processed(string xml, string elementName)
+    {
+        using var stream = StreamOf(xml);
+
+        Action act = () => new StrategiesReader().Load(stream);
+
+        act.Should().Throw<InvalidFieldValueException>().WithMessage($"*processing the element: {elementName}*");
     }
 }

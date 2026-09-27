@@ -139,7 +139,7 @@ public class ElementFactory : INotifyClassDeserialized
                 ex,
                 sourceElement,
                 ErrorMessages.GeneralElementProcessingError,
-                string.Empty
+                sourceElement.Name.LocalName
             );
         }
 
@@ -314,7 +314,7 @@ public class ElementFactory : INotifyClassDeserialized
                 ex,
                 sourceElement,
                 ErrorMessages.GeneralElementProcessingError,
-                string.Empty
+                sourceElement.Name.LocalName
             );
         }
 
@@ -443,7 +443,7 @@ public class ElementFactory : INotifyClassDeserialized
                 ex,
                 sourceElement,
                 ErrorMessages.GeneralElementProcessingError,
-                string.Empty
+                sourceElement.Name.LocalName
             );
         }
 

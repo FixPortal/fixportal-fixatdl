@@ -104,16 +104,16 @@ public class TimestampBoundConformanceTests
     [Fact]
     public void Leap_second_bound_classifies_as_time_of_day_not_date_bearing()
     {
-        // The classifier applies the parse path's leap-second normalisation: "08:00:60" rolls to
-        // 08:01:00 and must become a recurring daily window, not a one-off date-time bound (the
-        // far-future value dates pin date-independence).
-        var p = Param(minText: "08:00:60", maxText: null);
+        // The classifier applies the parse path's leap-second normalisation: "23:59:60" (the only
+        // spec-legal leap-second field) rolls to 00:00:00 and must become a recurring daily window,
+        // not a one-off date-time bound (the far-future value dates pin date-independence).
+        var p = Param(minText: null, maxText: "23:59:60");
 
-        var before = () => p.WireValue = "20990101-08:00:30";
-        before.Should().Throw<InvalidFieldValueException>();
-
-        var at = () => p.WireValue = "20990101-08:01:00";
+        var at = () => p.WireValue = "20990101-00:00:00";
         at.Should().NotThrow();
+
+        var after = () => p.WireValue = "20990101-00:00:01";
+        after.Should().Throw<InvalidFieldValueException>();
     }
 
     [Fact]

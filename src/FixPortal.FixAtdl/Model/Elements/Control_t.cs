@@ -94,7 +94,7 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     public string? ParameterRef { get; set; }
 
     /// <summary>Tool tip text for rendered GUI objects rendered for the parameter.</summary>
-    public string ToolTip { get; set; } = null!;
+    public string? ToolTip { get; set; }
 
     #endregion
 
@@ -255,7 +255,8 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// </summary>
     /// <param name="value">Value to attempt to convert.</param>
     /// <param name="result">Valid int value if the conversion was possible; zero otherwise.</param>
-    /// <returns>True if the value was non-null and of non-zero length and the conversion succeeded; false otherwise.</returns>
+    /// <returns>True if the value was non-null and of non-zero length and the conversion succeeded; false if the value
+    /// is null or empty. A non-empty value that cannot be converted throws <see cref="InvalidCastException"/>.</returns>
     /// <exception cref="InvalidCastException">Thrown if the supplied value was non-null and of non-zero length and the conversion was unsuccessful.</exception>
     protected bool TryConvertToInt(string? value, out int result)
     {
@@ -275,7 +276,8 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// </summary>
     /// <param name="value">Value to attempt to convert.</param>
     /// <param name="result">Valid uint value if the conversion was possible; zero otherwise.</param>
-    /// <returns>True if the value was non-null and of non-zero length and the conversion succeeded; false otherwise.</returns>
+    /// <returns>True if the value was non-null and of non-zero length and the conversion succeeded; false if the value
+    /// is null or empty. A non-empty value that cannot be converted throws <see cref="InvalidCastException"/>.</returns>
     /// <exception cref="InvalidCastException">Thrown if the supplied value was non-null and of non-zero length and the conversion was unsuccessful.</exception>
     protected bool TryConvertToUint(string? value, out uint result)
     {
@@ -295,7 +297,8 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// </summary>
     /// <param name="value">Value to attempt to convert.</param>
     /// <param name="result">Valid decimal value if the conversion was possible; zero otherwise.</param>
-    /// <returns>True if the value was non-null and of non-zero length and the conversion succeeded; false otherwise.</returns>
+    /// <returns>True if the value was non-null and of non-zero length and the conversion succeeded; false if the value
+    /// is null or empty. A non-empty value that cannot be converted throws <see cref="InvalidCastException"/>.</returns>
     /// <exception cref="InvalidCastException">Thrown if the supplied value was non-null and of non-zero length and the conversion was unsuccessful.</exception>
     protected bool TryConvertToDecimal(string? value, out decimal result)
     {
@@ -315,7 +318,8 @@ public abstract class Control_t : IParentable<StrategyPanel_t>, IValueProvider, 
     /// </summary>
     /// <param name="value">Value to attempt to convert.</param>
     /// <param name="result">Valid char value if the conversion was possible; Char.MinValue otherwise.</param>
-    /// <returns>True if the value was non-null and of non-zero length and the conversion succeeded; false otherwise.</returns>
+    /// <returns>True if the value was non-null and of non-zero length and the conversion succeeded; false if the value
+    /// is null or empty. A non-empty value that cannot be converted throws <see cref="InvalidCastException"/>.</returns>
     /// <exception cref="InvalidCastException">Thrown if the supplied value was non-null and of non-zero length and the conversion was unsuccessful.</exception>
     protected bool TryConvertToChar(string? value, out char result)
     {

@@ -82,12 +82,32 @@ public class FixDateTimeTests
         result.Should().Be(new DateTime(1999, 1, 1, 0, 0, 0, 250, DateTimeKind.Utc));
     }
 
-    [Fact]
-    public void Leap_second_time_only_rolls_forward_into_the_next_minute()
+    [Theory]
+    [InlineData("12:00:60")]
+    [InlineData("20260601-12:00:60")]
+    public void Leap_second_at_any_minute_other_than_23_59_is_rejected(string value)
     {
-        FixDateTime.TryParse("12:00:60", CultureInfo.InvariantCulture, out DateTime result).Should().BeTrue();
+        // UTCTimestamp_t permits a declared leap second only as the 60th second of 23:59 UTC. A ":60"
+        // at any other minute is invalid and must fail outright, not be silently normalised and
+        // shifted forward into the next minute.
+        FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out _).Should().BeFalse();
+    }
 
-        result.TimeOfDay.Should().Be(new TimeSpan(12, 1, 0));
+    [Fact]
+    public void Parse_throws_FormatException_for_a_60_seconds_field_outside_23_59()
+    {
+        var act = () => FixDateTime.Parse("12:00:60", CultureInfo.InvariantCulture);
+
+        act.Should().Throw<FormatException>();
+    }
+
+    [Fact]
+    public void Leap_second_time_only_rolls_forward_to_midnight_on_the_pinned_date()
+    {
+        FixDateTime.TryParse("23:59:60", CultureInfo.InvariantCulture, out DateTime result).Should().BeTrue();
+
+        // Anchored to 0001-01-01 before the roll, so the leap second rolls to 00:00:00 on 0001-01-02.
+        result.Should().Be(new DateTime(1, 1, 2, 0, 0, 0, DateTimeKind.Utc));
     }
 
     [Fact]
@@ -113,7 +133,7 @@ public class FixDateTimeTests
     {
         // A null can reach here via a programmatically stored null in FixTagValuesCollection; a Try
         // method must report failure, not throw.
-        FixDateTime.TryParse(value!, CultureInfo.InvariantCulture, out _).Should().BeFalse();
+        FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out _).Should().BeFalse();
     }
 
     [Fact]
@@ -156,5 +176,43 @@ public class FixDateTimeTests
         Func<object> act = () => (string[])FixDateTimeFormat.AllFormats;
 
         act.Should().Throw<InvalidCastException>();
+    }
+
+    [Fact]
+    public void Parse_throws_FormatException_for_unparseable_input()
+    {
+        // FormatException is the conventional parse-failure type, so callers catching it around date
+        // parsing catch this too (previously an InvalidCastException escaped such handlers).
+        var act = () => FixDateTime.Parse("not-a-date", CultureInfo.InvariantCulture);
+
+        act.Should().Throw<FormatException>();
+    }
+
+    [Fact]
+    public void Exact_fix_timestamp_parses_identically_under_a_non_colon_time_separator_culture()
+    {
+        // fi-FI's TimeSeparator is '.'; if the exact-format parse resolved the ':' in the FIX format
+        // strings against the caller's culture, a valid FIX timestamp would fail under it. The FIX wire
+        // format is culture-fixed, so the exact parse must not consult the caller's culture.
+        CultureInfo finnish = CultureInfo.GetCultureInfo("fi-FI");
+
+        FixDateTime.TryParse("20260601-08:00:00", finnish, out DateTime finnishResult).Should().BeTrue();
+        FixDateTime
+            .TryParse("20260601-08:00:00", CultureInfo.InvariantCulture, out DateTime invariantResult)
+            .Should()
+            .BeTrue();
+
+        finnishResult.Should().Be(invariantResult);
+        finnishResult.Kind.Should().Be(DateTimeKind.Utc);
+    }
+
+    [Fact]
+    public void Time_only_value_is_anchored_to_a_fixed_date_with_utc_kind()
+    {
+        // A date-less FIX value must not pick up the host's current date (which would make the result
+        // vary by day and, via AdjustToUniversal, by host timezone); it is pinned to 0001-01-01 Utc.
+        FixDateTime.TryParse("12:00:00", CultureInfo.InvariantCulture, out DateTime result).Should().BeTrue();
+
+        result.Should().Be(new DateTime(1, 1, 1, 12, 0, 0, DateTimeKind.Utc));
     }
 }

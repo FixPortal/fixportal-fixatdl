@@ -38,10 +38,10 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
         : base(id) { }
 
     /// <summary>Output EnumID if checked/selected.  Applicable when xsi:type is CheckBox_t or RadioButton_t.</summary>
-    public string CheckedEnumRef { get; set; } = null!;
+    public string? CheckedEnumRef { get; set; }
 
     /// <summary>Output EnumID if unchecked/not selected.  Applicable when xsi:type is CheckBox_t or RadioButton_t.</summary>
-    public string UncheckedEnumRef { get; set; } = null!;
+    public string? UncheckedEnumRef { get; set; }
 
     #region InitializableControl<T> Overrides
 
@@ -109,7 +109,8 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
             {
                 EnumState state = value.ToEnumState(parameter.EnumPairs);
 
-                _value = (state[CheckedEnumRef], state[UncheckedEnumRef]) switch
+                // HasEnumeratedState (the guard above) is defined as both enum refs being non-null.
+                _value = (state[CheckedEnumRef!], state[UncheckedEnumRef!]) switch
                 {
                     (true, _) => true,
                     (false, true) => false,
@@ -304,9 +305,10 @@ public abstract class BinaryControlBase : InitializableControl<bool?>
     private string GetEnumeratedStateString(IParameter targetParameter)
     {
         EnumPairCollection enumPairs = targetParameter.EnumPairs;
+        // Only reached under HasEnumeratedState, i.e. both enum refs are non-null.
         string value = (bool)_value!
-            ? enumPairs.GetWireValueFromEnumId(CheckedEnumRef)
-            : enumPairs.GetWireValueFromEnumId(UncheckedEnumRef);
+            ? enumPairs.GetWireValueFromEnumId(CheckedEnumRef!)
+            : enumPairs.GetWireValueFromEnumId(UncheckedEnumRef!);
         return value != Atdl.NullValue ? value : null!;
     }
 

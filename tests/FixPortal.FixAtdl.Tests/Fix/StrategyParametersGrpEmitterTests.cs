@@ -80,6 +80,29 @@ public class StrategyParametersGrpEmitterTests
     }
 
     [Theory]
+    // Same policy as an empty WireValue: "958=" would produce a field FixMessage rejects on
+    // re-parse, and nothing upstream constrains broker-supplied names. A valid parameter set
+    // alongside still emits, and the 957 count excludes the skipped tuple.
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Omits_a_parameter_whose_name_is_null_empty_or_whitespace(string? name)
+    {
+        var strategy = Load();
+        strategy.Parameters["Text"].WireValue = "hello";
+        var parameter = Substitute.For<IParameter>();
+        parameter.Name.Returns(name!);
+        parameter.IsSet.Returns(true);
+        parameter.WireValue.Returns("5");
+        strategy.Parameters.Add(parameter);
+
+        StrategyParametersGrpEmitter
+            .Emit(strategy)
+            .Should()
+            .Equal((957, "1"), (958, "Text"), (959, "14"), (960, "hello"));
+    }
+
+    [Theory]
     // Parameter names come from broker-supplied ATDL XML and nothing upstream constrains them the way
     // String_t constrains a value. A name or wire value carrying SOH splits one field into two and injects
     // arbitrary FIX fields once the host joins these tuples onto the wire.

@@ -20,9 +20,11 @@ namespace FixPortal.FixAtdl.Fix;
 ///   960 StrategyParameterValue — the parameter's wire value.
 ///
 /// Parameters that are not set (<see cref="IParameter.IsSet"/> is false, or
-/// <see cref="IParameter.WireValue"/> is null) are silently skipped; the 957 count reflects only
-/// the set parameters. Tag 957 itself is omitted entirely when no parameters are set — an empty
-/// repeating group should not appear on the wire at all.
+/// <see cref="IParameter.WireValue"/> is null or empty), and parameters whose
+/// <see cref="IParameter.Name"/> is null, empty or whitespace, are silently skipped: emitting
+/// "958=" or "960=" would produce a field <see cref="FixMessage"/> rejects on re-parse. The 957
+/// count reflects only the surviving parameters, and tag 957 itself is omitted entirely when none
+/// survive — an empty repeating group should not appear on the wire at all.
 /// </remarks>
 public static class StrategyParametersGrpEmitter
 {
@@ -33,11 +35,16 @@ public static class StrategyParametersGrpEmitter
 
         // Pre-collect in parameter declaration order so the 957 count is known before emission.
         // An empty WireValue is filtered alongside a missing one: emitting "960=" would produce a
-        // field the parser rejects (Low 6).
+        // field the parser rejects (Low 6). A null/empty/whitespace Name is filtered the same way —
+        // emitting "958=" is equally unparseable for a host that joins these tuples onto the wire.
         var filled = new List<IParameter>(strategy.Parameters.Count);
         foreach (var parameter in strategy.Parameters)
         {
-            if (parameter.IsSet && !string.IsNullOrEmpty(parameter.WireValue))
+            if (
+                parameter.IsSet
+                && !string.IsNullOrEmpty(parameter.WireValue)
+                && !string.IsNullOrWhiteSpace(parameter.Name)
+            )
             {
                 filled.Add(parameter);
             }

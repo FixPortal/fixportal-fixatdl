@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Globalization;
 using System.Reflection;
 using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Resources;
@@ -24,6 +25,9 @@ public static class StringExtensions
     /// <typeparam name="T">Type of enum.</typeparam>
     /// <param name="value">Value to convert to the supplied enum type.</param>
     /// <returns>A valid enumerated value if the conversion was possible; an exception is thrown otherwise.</returns>
+    /// <remarks>Bare numeric strings are rejected even when they match a defined member's value
+    /// ("3" would otherwise parse to <c>IsoCurrencyCode.ALL</c>): a name, never a number, is a
+    /// legitimate enum value here.</remarks>
     public static T ParseAsEnum<T>(this string value)
         where T : struct, Enum
     {
@@ -43,6 +47,23 @@ public static class StringExtensions
         // would slip past the IsDefined guard below as a silently different value. For a non-[Flags]
         // enum a comma is never a legitimate single member, so reject it before parsing.
         if (!isFlags && value.Contains(','))
+        {
+            throw ThrowHelper.New<ArgumentException>(
+                ExceptionContext,
+                ErrorMessages.InvalidValueEnumParseFailure,
+                value,
+                typeof(T).Name
+            );
+        }
+
+        // Enum.Parse also accepts a bare numeric value, and "3" IS a defined member's value
+        // (IsoCurrencyCode.ALL), so it slips past the IsDefined guard below as a silently different
+        // currency; "036" parses to 36 and maps to the wrong member outright. A name, never a number,
+        // is a legitimate enum value here — reject numeric strings for every enum, [Flags] or not.
+        // NumberStyles.Integer matches Enum.Parse's numeric surface (optional surrounding whitespace
+        // and a leading sign). An overflowing digit string fails TryParse and falls through to
+        // Enum.Parse, whose OverflowException the catch below already maps to ArgumentException.
+        if (long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
         {
             throw ThrowHelper.New<ArgumentException>(
                 ExceptionContext,

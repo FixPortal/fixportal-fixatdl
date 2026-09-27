@@ -20,9 +20,10 @@ public static partial class FixDateTime
     private static readonly string ExceptionContext = "FixPortal.FixAtdl.Fix.FixDateTime";
 
     // Matches a literal "60" seconds field (a declared UTC leap second, FIX-legal per the UTCTimestamp_t
-    // spec) preceded by "MM:" and not followed by a further digit, so it only ever matches the SS token in
-    // every FixDateTimeFormat variant that carries seconds (never minutes, hours, or a malformed "600").
-    [GeneratedRegex(@"(?<=:\d{2}:)60(?!\d)")]
+    // spec) only when it directly follows "23:59:" and is not followed by a further digit. A leap second
+    // can only ever be declared as the 60th second of 23:59 UTC, so a ":60" at any other minute is left
+    // in place and fails parsing like any other invalid value rather than being silently shifted forward.
+    [GeneratedRegex(@"(?<=23:59:)60(?!\d)")]
     private static partial Regex LeapSecondPattern();
 
     // Matches a fraction field carrying more digits than DateTime can represent (7 tick digits).
@@ -31,11 +32,13 @@ public static partial class FixDateTime
     private static partial Regex ExcessFractionPattern();
 
     /// <summary>
-    /// Normalises a declared UTC leap second (a literal ":60" seconds field - legal per the
-    /// UTCTimestamp_t spec) to ":59" so that a DateTime parse can represent it; the caller rolls
-    /// the parsed value forward by one second. DateTime has no 60th second; DateTime.AddSeconds
-    /// cascades minute/hour/day/month/year rollover on its own, matching the spec's own worked
-    /// example (19981231-23:59:60 -&gt; 19990101-00:00:00).
+    /// Normalises a declared UTC leap second (a literal ":60" seconds field — legal per the
+    /// UTCTimestamp_t spec only as the 60th second of 23:59 UTC) to ":59" so that a DateTime parse can
+    /// represent it; the caller rolls the parsed value forward by one second. DateTime has no 60th
+    /// second; DateTime.AddSeconds cascades minute/hour/day/month/year rollover on its own, matching
+    /// the spec's own worked example (19981231-23:59:60 -&gt; 19990101-00:00:00). A ":60" seconds field
+    /// at any other minute is not a legal leap second and is left untouched, so it fails parsing like
+    /// any other invalid value rather than being silently shifted into the next minute.
     /// </summary>
     internal static string NormaliseLeapSecond(string value, out bool wasLeapSecond)
     {
@@ -81,14 +84,18 @@ public static partial class FixDateTime
     }
 
     /// <summary>
-    /// Attempts to convert the supplied string to a <see cref="DateTime"/> using either the specified
-    /// format provider or any of the valid FIX date/time formats.
+    /// Attempts to convert the supplied string to a <see cref="DateTime"/> using any of the valid FIX
+    /// date/time formats, falling back to a loose parse with the specified format provider.
     /// </summary>
-    /// <param name="value">String value to attempt to convert.</param>
-    /// <param name="provider">Format provider to use.</param>
+    /// <param name="value">String value to attempt to convert; null reports failure rather than throwing.</param>
+    /// <param name="provider">Format provider used by the loose fallback parse only.</param>
     /// <param name="result">If successful, the DateTime equivalent representation of the supplied string; undefined otherwise.</param>
     /// <returns>True if the supplied value could be converted; false otherwise.</returns>
-    public static bool TryParse(string value, IFormatProvider provider, out DateTime result)
+    /// <remarks>The exact FIX-format parse is culture-invariant, because the FIX wire format itself is
+    /// culture-fixed; <paramref name="provider"/> applies only to the loose fallback parse of non-FIX
+    /// input. A date-less (time-of-day-only) input is anchored to 0001-01-01 with Kind=Utc rather than
+    /// to the host's current date, so the result is deterministic and host-timezone-independent.</remarks>
+    public static bool TryParse(string? value, IFormatProvider provider, out DateTime result)
     {
         // Try the exact FIX formats first (with AssumeUniversal so an offset-less value is treated as UTC
         // rather than host-local, plus AdjustToUniversal so the result is canonically Kind=Utc — independent
@@ -116,13 +123,37 @@ public static partial class FixDateTime
         // timestamp is not rejected outright.
         parseValue = TruncateExcessFraction(parseValue);
 
+        // The exact FIX formats are culture-fixed (the wire format's ':' separators and layout do not
+        // vary by locale), so parse them against the invariant culture: resolving the format's ':' as a
+        // culture-sensitive time separator would reject valid FIX timestamps under a culture whose
+        // TimeSeparator is not ':' (e.g. fi-FI uses '.'). The caller's provider remains for the loose
+        // fallback parse, whose purpose is locale input.
         bool parsed =
-            DateTime.TryParseExact(parseValue, FixDateTimeFormat.FormatsArray, provider, styles, out result)
-            || DateTime.TryParse(parseValue, provider, styles, out result);
+            DateTime.TryParseExact(
+                parseValue,
+                FixDateTimeFormat.FormatsArray,
+                CultureInfo.InvariantCulture,
+                styles,
+                out result
+            ) || DateTime.TryParse(parseValue, provider, styles, out result);
 
-        if (!parsed || !wasLeapSecond)
+        if (!parsed)
         {
-            return parsed;
+            return false;
+        }
+
+        // A date-less (time-of-day-only) value otherwise gets its date filled in from the host's clock
+        // (and under AdjustToUniversal can even roll across midnight with the host timezone). Pin it to
+        // 0001-01-01 with Kind=Utc so the result is deterministic. This runs before the leap-second roll
+        // so a time-only "23:59:60" still rolls forward to 00:00:00 on the pinned date.
+        if (IsTimeOnlyText(value))
+        {
+            result = new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(result.TimeOfDay);
+        }
+
+        if (!wasLeapSecond)
+        {
+            return true;
         }
 
         // A leap second at the last representable instant would roll past DateTime.MaxValue; report
@@ -139,12 +170,14 @@ public static partial class FixDateTime
     }
 
     /// <summary>
-    /// Attempts to convert the supplied string to a <see cref="DateTime"/> using either the specified
-    /// format provider or any of the valid FIX date/time formats, throwing an exception if the conversion fails.
+    /// Attempts to convert the supplied string to a <see cref="DateTime"/> using any of the valid FIX
+    /// date/time formats, falling back to a loose parse with the specified format provider, and throwing
+    /// an exception if the conversion fails.
     /// </summary>
     /// <param name="value">String value to attempt to convert.</param>
-    /// <param name="provider">Format provider to use.</param>
+    /// <param name="provider">Format provider used by the loose fallback parse only.</param>
     /// <returns>If successful, the DateTime equivalent representation of the supplied string.</returns>
+    /// <exception cref="FormatException">Thrown when the supplied value cannot be converted to a DateTime.</exception>
     public static DateTime Parse(string value, IFormatProvider provider)
     {
         if (TryParse(value, provider, out DateTime result))
@@ -152,11 +185,6 @@ public static partial class FixDateTime
             return result;
         }
 
-        throw ThrowHelper.New<InvalidCastException>(
-            ExceptionContext,
-            ErrorMessages.DataConversionError1,
-            value,
-            "DateTime"
-        );
+        throw ThrowHelper.New<FormatException>(ExceptionContext, ErrorMessages.DataConversionError1, value, "DateTime");
     }
 }

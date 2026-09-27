@@ -38,7 +38,10 @@ public class EditCollection : KeyedCollection<string, Edit_t>
     /// <returns>The edit identifier.</returns>
     protected override string GetKeyForItem(Edit_t item)
     {
-        return item.Id;
+        // KeyedCollection tolerates a null key by adding the item without keying it, so an Id-less
+        // Edit still loads (matching upstream); it simply can never be referenced by an EditRef —
+        // a dangling reference surfaces separately as an EditRefResolutionFailure.
+        return item.Id!;
     }
 
     /// <summary>
@@ -74,14 +77,19 @@ public class EditCollection : KeyedCollection<string, Edit_t>
         // Carry the source Id across — Clone previously dropped it, producing an anonymous copy (M1).
         // (The non-generic Edit_t source carries no EditRefs — an EditRef under a global Edit is
         // rejected at load time (#R19) — so there are none to copy here.)
+        // The `!` suppressions mark the residual null! lie on the evaluation-side Edit_t<T>:
+        // Field2/Id/Value there are still annotated non-nullable. Making them honest requires
+        // IEdit<T> and EditRef_t<T> to go nullable in lockstep (EditRef_t<T>.Id is genuinely
+        // required, so that change is a design decision of its own) — scheduled as a follow-up
+        // to the 2026-09-27 batch-36 pass, which fixed the non-generic XML model only.
         Edit_t<T> target = new()
         {
-            Id = source.Id,
+            Id = source.Id!,
             Field = source.Field,
-            Field2 = source.Field2,
+            Field2 = source.Field2!,
             LogicOperator = source.LogicOperator,
             Operator = source.Operator,
-            Value = source.Value,
+            Value = source.Value!,
         };
 
         foreach (Edit_t child in source.Edits)
