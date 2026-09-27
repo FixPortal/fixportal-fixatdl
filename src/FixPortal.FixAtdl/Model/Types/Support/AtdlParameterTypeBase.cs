@@ -48,6 +48,14 @@ file static class SharedMessageFormats
 public abstract class AtdlParameterTypeBase<TStorage> : IParameterType
 {
     /// <summary>
+    /// Restricts derivation to the two in-assembly pivots, <see cref="AtdlValueType{T}"/> and
+    /// <see cref="AtdlReferenceType{T}"/> (per the remarks above: this base is their shared
+    /// implementation, not a third kind of parameter). Consumers deriving from the pivots are
+    /// unaffected.
+    /// </summary>
+    private protected AtdlParameterTypeBase() { }
+
+    /// <summary>
     /// Storage for the value of this parameter; null (no value) when not set.
     /// </summary>
     protected TStorage? _value;
