@@ -61,6 +61,31 @@ public class RealWorldSpecConformanceTests
     }
 
     [Fact]
+    public void TzClock_strategy_reset_keeps_empty_start_time_checkbox_unchecked()
+    {
+        var vwap = Load(TzClockFixture)["VWAP"];
+        vwap.Controls.LoadDefaults(FixFieldValueProvider.Empty);
+
+        vwap.Reset();
+
+        vwap.Controls["EnableStartTime"].GetCurrentValue().Should().NotBe(true);
+        vwap.Controls["i_StartTime"].GetCurrentValue().Should().BeNull();
+    }
+
+    [Fact]
+    public void TzClock_amend_with_absent_start_time_keeps_checkbox_unchecked_and_disables_clock()
+    {
+        var vwap = Load(TzClockFixture)["VWAP"];
+        vwap.Controls.LoadDefaults(FixFieldValueProvider.Empty);
+
+        vwap.UpdateControlValuesFromParameters();
+        vwap.RunAllStateRules();
+
+        vwap.Controls["EnableStartTime"].GetCurrentValue().Should().Be(false);
+        vwap.Controls["i_StartTime"].StateRules.Single().CurrentState.Should().BeTrue();
+    }
+
+    [Fact]
     public void RegionsEnums_first_strategy_exposes_region_and_char_enum()
     {
         var dark = Load(RegionsEnumsFixture)["DARK_NA"];

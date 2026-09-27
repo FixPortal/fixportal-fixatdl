@@ -308,12 +308,16 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     {
         foreach (Control_t control in this)
         {
-            bool hasParameterRef = control.ParameterRef != null;
-            bool isValidParameter = hasParameterRef && parameters.Contains(control.ParameterRef!);
-            IParameter parameter = isValidParameter ? parameters[control.ParameterRef!] : null!;
+            if (control.ParameterRef is not { } parameterRef)
+            {
+                continue;
+            }
+
+            bool isValidParameter = parameters.Contains(parameterRef);
+            IParameter parameter = isValidParameter ? parameters[parameterRef] : null!;
             object parameterValue = isValidParameter ? parameter.GetCurrentValue() : null!;
 
-            if (hasParameterRef && !isValidParameter)
+            if (!isValidParameter)
             {
                 throw ThrowHelper.New<ReferencedObjectNotFoundException>(
                     this,
@@ -326,7 +330,6 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             if (parameterValue == null)
             {
                 control.Reset();
-                UpdateRelatedHelperControls(control);
                 continue;
             }
 
@@ -344,14 +347,14 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
                     this,
                     ex,
                     ErrorMessages.UnsuccessfulSetParameterOperation,
-                    control.ParameterRef!,
+                    parameterRef,
                     control.Id,
                     ex.Message
                 );
             }
-
-            UpdateRelatedHelperControls(control);
         }
+
+        UpdateRelatedHelperControlsFromParameters(parameters);
     }
 
     /// <summary>
@@ -417,6 +420,17 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         }
     }
 
+    private void UpdateRelatedHelperControlsFromParameters(ParameterCollection parameters)
+    {
+        foreach (Control_t control in this)
+        {
+            if (control.ParameterRef is { } parameterRef && parameters[parameterRef].GetCurrentValue() != null)
+            {
+                UpdateRelatedHelperControls(control);
+            }
+        }
+    }
+
     private void ApplyHelperControlToggle(Control_t sourceControl, bool result)
     {
         // Radio buttons can only be set directly; un-setting is done via the companion control.
@@ -443,7 +457,13 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             ? _controls
                 .Values.OfType<RadioButton_t>()
                 .Where(c => c.Id != radioButton.Id && c.RadioGroup == radioButton.RadioGroup)
-            : radioButton.OwningStrategyPanel?.Controls.OfType<RadioButton_t>().Where(c => c.Id != radioButton.Id)
+            : radioButton
+                .OwningStrategyPanel?.Controls.OfType<RadioButton_t>()
+                .Where(c =>
+                    c.Id != radioButton.Id
+                    && string.IsNullOrEmpty(c.RadioGroup)
+                    && c.ParameterRef == radioButton.ParameterRef
+                )
                 ?? Enumerable.Empty<RadioButton_t>();
 
         // The query is lazy; Count() + First() would enumerate it twice. Materialise once

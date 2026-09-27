@@ -11,6 +11,14 @@ namespace FixPortal.FixAtdl.Tests.Diagnostics;
 public class ThrowHelperTests
 {
     [Fact]
+    public void New_falls_back_to_string_constructor_for_argument_exception_subclasses()
+    {
+        var exception = ThrowHelper.New<StringOnlyArgumentException>(null, "invalid");
+
+        exception.Message.Should().Be("invalid");
+    }
+
+    [Fact]
     public void NewWithParamName_threads_supplied_param_name()
     {
         // The two-string constructor of ArgumentException-family types takes the parameter name
@@ -89,3 +97,5 @@ public class ThrowHelperTests
         act.Should().Throw<InternalErrorException>().Which.Should().BeAssignableTo<FixAtdlException>();
     }
 }
+
+internal sealed class StringOnlyArgumentException(string message) : ArgumentException(message) { }

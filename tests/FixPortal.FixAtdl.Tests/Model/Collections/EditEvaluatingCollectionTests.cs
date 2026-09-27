@@ -43,6 +43,10 @@ public class EditEvaluatingCollectionTests
     [Fact]
     public void LoadTwap_reads_the_expected_fixture()
     {
+        FixtureFiles
+            .GetPath("Fixtures/twap.xml")
+            .Should()
+            .Be(Path.Combine(AppContext.BaseDirectory, "Fixtures", "twap.xml"));
         LoadTwap().Name.Should().Be("TWAP");
     }
 

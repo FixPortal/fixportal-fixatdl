@@ -17,7 +17,7 @@ internal static class FixtureFiles
         return File.OpenRead(GetPath(relativePath));
     }
 
-    private static string GetPath(string relativePath)
+    internal static string GetPath(string relativePath)
     {
         string normalizedPath = relativePath.Replace('/', Path.DirectorySeparatorChar);
 

@@ -20,6 +20,18 @@ public class TestVendorAmountType : Int_t
     public string? VendorTag { get; set; }
 }
 
+[Flags]
+public enum TestVendorMask
+{
+    First = 1,
+    Second = 2,
+}
+
+public class TestVendorFlagsType : Int_t
+{
+    public TestVendorMask VendorFlags { get; set; }
+}
+
 /// <summary>Implements <see cref="IParameterType"/> but deliberately has no parameterless constructor,
 /// for <see cref="CustomParameterTypeTests.ClrType_with_no_public_parameterless_constructor_is_rejected_eagerly"/>.</summary>
 public class NoParameterlessCtorType : Int_t
@@ -75,6 +87,47 @@ public class CustomParameterTypeTests
 
         var parameter = (Parameter_t<TestVendorAmountType>)strategies["Test"].Parameters["X"];
         parameter.Value.VendorTag.Should().Be("ABC");
+    }
+
+    [Fact]
+    public void Registered_custom_flags_attribute_accepts_a_combination_without_a_named_member()
+    {
+        using var stream = StreamOf(StrategyXml("TestVendorFlagsType", "vendorFlags=\"First,Second\""));
+        var reader = new StrategiesReader(
+            customParameterTypes:
+            [
+                new CustomParameterType(
+                    "TestVendorFlagsType",
+                    typeof(TestVendorFlagsType),
+                    [new("vendorFlags", "Value.VendorFlags", typeof(TestVendorMask), Required.Optional)]
+                ),
+            ]
+        );
+
+        var strategies = reader.Load(stream);
+        var parameter = (Parameter_t<TestVendorFlagsType>)strategies["Test"].Parameters["X"];
+
+        parameter.Value.VendorFlags.Should().Be(TestVendorMask.First | TestVendorMask.Second);
+    }
+
+    [Fact]
+    public void Registered_custom_flags_attribute_rejects_undefined_bits()
+    {
+        using var stream = StreamOf(StrategyXml("TestVendorFlagsType", "vendorFlags=\"8\""));
+        var reader = new StrategiesReader(
+            customParameterTypes:
+            [
+                new CustomParameterType(
+                    "TestVendorFlagsType",
+                    typeof(TestVendorFlagsType),
+                    [new("vendorFlags", "Value.VendorFlags", typeof(TestVendorMask), Required.Optional)]
+                ),
+            ]
+        );
+
+        var act = () => reader.Load(stream);
+
+        act.Should().Throw<InvalidFieldValueException>();
     }
 
     [Fact]

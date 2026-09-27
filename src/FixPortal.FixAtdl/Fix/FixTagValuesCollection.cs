@@ -127,7 +127,7 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     // numeric tag ("5000") for user-defined fields, matching the wire grammar and the numeric indexer.
     private static bool TryResolveField(string fixField, out FixField field)
     {
-        if (Enum.TryParse(fixField, ignoreCase: true, out field) && Enum.IsDefined(field))
+        if (!fixField.Contains(',') && Enum.TryParse(fixField, ignoreCase: true, out field) && Enum.IsDefined(field))
         {
             return true;
         }

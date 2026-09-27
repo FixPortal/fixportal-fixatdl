@@ -945,15 +945,16 @@ public class ElementFactory : INotifyClassDeserialized
         // NB Most simple enums are dealt with in the other overload of ReadAttribute.
         if (type.IsEnum)
         {
+            bool isFlags = type.IsDefined(typeof(FlagsAttribute), inherit: false);
             try
             {
-                if (attribute.Value.Contains(',') && !type.IsDefined(typeof(FlagsAttribute), inherit: false))
+                if (attribute.Value.Contains(',') && !isFlags)
                 {
                     throw new ArgumentException("Comma-separated values are only valid for flags enums.");
                 }
 
                 object result = Enum.Parse(type, attribute.Value);
-                if (!Enum.IsDefined(type, result))
+                if (!IsValidEnumValue(type, result))
                 {
                     throw new ArgumentException("Parsed enum value is not defined in the enum type.");
                 }
@@ -1021,6 +1022,32 @@ public class ElementFactory : INotifyClassDeserialized
         }
 
         return Enum.ToObject(enumType, enumValue);
+    }
+
+    private static bool IsValidEnumValue(Type enumType, object value)
+    {
+        return enumType.IsDefined(typeof(FlagsAttribute), inherit: false)
+            ? IsValidFlagsCombination(enumType, value)
+            : Enum.IsDefined(enumType, value);
+    }
+
+    private static bool IsValidFlagsCombination(Type enumType, object value)
+    {
+        TypeCode underlyingType = Type.GetTypeCode(Enum.GetUnderlyingType(enumType));
+        bool isUnsigned = underlyingType is TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 or TypeCode.UInt64;
+        ulong allowedBits = 0;
+
+        foreach (object member in Enum.GetValues(enumType))
+        {
+            allowedBits |= GetBits(member);
+        }
+
+        return (GetBits(value) & ~allowedBits) == 0;
+
+        ulong GetBits(object enumValue) =>
+            isUnsigned
+                ? Convert.ToUInt64(enumValue, CultureInfo.InvariantCulture)
+                : unchecked((ulong)Convert.ToInt64(enumValue, CultureInfo.InvariantCulture));
     }
 
     private void SetPropertyValue(PropertyInfo property, object target, object value)

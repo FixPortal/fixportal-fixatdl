@@ -276,7 +276,10 @@ public static class ThrowHelper
             return CreateWithArguments([paramName, message]);
         }
 
-        if (typeof(ArgumentException).IsAssignableFrom(classType))
+        if (
+            typeof(ArgumentException).IsAssignableFrom(classType)
+            && classType.GetConstructor([typeof(string), typeof(string)]) != null
+        )
         {
             return CreateWithArguments([message, paramName]);
         }

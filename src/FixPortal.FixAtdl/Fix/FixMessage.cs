@@ -5,6 +5,7 @@
 //
 #endregion
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
@@ -154,7 +155,17 @@ public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
     public bool ContainsKey(FixField key) => _fields.ContainsKey(key);
 
     /// <summary>Attempts to get the value for a parsed field.</summary>
-    public bool TryGetValue(FixField key, out string value) => _fields.TryGetValue(key, out value!);
+    public bool TryGetValue(FixField key, [NotNullWhen(true)] out string? value)
+    {
+        if (_fields.TryGetValue(key, out string? candidate) && candidate is not null)
+        {
+            value = candidate;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
 
     /// <summary>
     /// Adds a value while a mutable <see cref="FixTagValuesCollection"/> is being built.
