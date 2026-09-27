@@ -263,4 +263,35 @@ public class FixTagValuesCollectionTests
 
         col.TryGetValue(fixField, out _).Should().BeFalse();
     }
+
+    // GetValues (repeated tags) -----------------------------------------------
+
+    [Fact]
+    public void GetValues_by_tag_returns_every_occurrence_in_wire_order()
+    {
+        var col = new FixTagValuesCollection(
+            $"448{FixMessage.Separator}A{FixMessage.SOH}448{FixMessage.Separator}B{FixMessage.SOH}"
+        );
+
+        col.GetValues((FixTag)448).Should().Equal("A", "B");
+    }
+
+    [Fact]
+    public void GetValues_by_string_resolves_a_field_name()
+    {
+        var col = new FixTagValuesCollection(
+            $"35{FixMessage.Separator}D{FixMessage.SOH}35{FixMessage.Separator}8{FixMessage.SOH}"
+        );
+
+        col.GetValues("FIX_MsgType").Should().Equal("D", "8");
+    }
+
+    [Fact]
+    public void GetValues_returns_empty_for_an_absent_tag_or_unresolvable_name()
+    {
+        FixTagValuesCollection col = [];
+
+        col.GetValues((FixTag)448).Should().BeEmpty();
+        col.GetValues("NotAFixField").Should().BeEmpty();
+    }
 }

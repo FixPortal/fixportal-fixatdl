@@ -19,6 +19,12 @@ namespace FixPortal.FixAtdl.Fix;
 /// </summary>
 public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
 {
+    // Every tag-value occurrence in wire order, including repeats of the same tag (repeating-group
+    // members). This is the source of truth for enumeration and ToFix.
+    private readonly List<KeyValuePair<FixField, string>> _entries;
+
+    // First occurrence per tag, backing the scalar members (indexer get, TryGetValue, ContainsKey,
+    // Count, Keys, Values, FixFields). Every mutation path keeps it in sync with _entries.
     private readonly Dictionary<FixField, string> _fields;
 
     /// <summary>Field separator.</summary>
@@ -32,12 +38,14 @@ public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
     /// </summary>
     internal FixMessage()
     {
+        _entries = [];
         _fields = [];
     }
 
     internal FixMessage(FixMessage source)
     {
         ArgumentNullException.ThrowIfNull(source);
+        _entries = [.. source._entries];
         _fields = new(source._fields);
     }
 
@@ -45,9 +53,15 @@ public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
     /// Initializes a new instance of <see cref="FixMessage"/> using the supplied FIX message.
     /// </summary>
     /// <param name="rawMessage">The FIX message to parse.</param>
-    /// <remarks>The current implementation of this class does NOT support repeating blocks.</remarks>
+    /// <remarks>Repeated tags (repeating-group members) are tolerated: every occurrence is preserved
+    /// in wire order for enumeration and <see cref="ToFix"/>, while the scalar members (indexer,
+    /// <see cref="TryGetValue"/>, <see cref="ContainsKey"/>, <see cref="Count"/>, <see cref="Keys"/>,
+    /// <see cref="Values"/>, <see cref="FixFields"/>) resolve to the first occurrence. Use
+    /// <see cref="GetValues"/> to read every occurrence of a tag. Group semantics — NoXXX count
+    /// fields and entry boundaries — are not interpreted; that is left to the host.</remarks>
     public FixMessage(string rawMessage)
     {
+        _entries = [];
         _fields = [];
 
         if (string.IsNullOrEmpty(rawMessage))
@@ -61,15 +75,8 @@ public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
         string trimmedMessage = rawMessage.EndsWith(SOH) ? rawMessage[..^1] : rawMessage;
         string[] nameValuePairs = trimmedMessage.Split(SOH);
 
-        if (nameValuePairs.Length == 0)
-        {
-            throw ThrowHelper.New<FixParseException>(
-                this,
-                ErrorMessages.UnableToParseFixMessageInvalidContent,
-                rawMessage
-            );
-        }
-
+        // Split always yields at least one element for a non-null input; a message that is only a
+        // SOH trims to "" and splits to [""], which the separator check below rejects.
         string tagText = string.Empty;
         string valueText = string.Empty;
 
@@ -106,14 +113,11 @@ public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
                     );
                 }
 
-                if (!_fields.TryAdd((FixField)tag, valueText))
-                {
-                    throw ThrowHelper.New<FixParseException>(
-                        this,
-                        ErrorMessages.UnableToParseFixMessageInvalidContent,
-                        nameValuePair
-                    );
-                }
+                // Repeated tags (repeating-group members) are preserved in wire order instead of
+                // being rejected; the first-occurrence lookup keeps the scalar members stable.
+                var field = (FixField)tag;
+                _entries.Add(new(field, valueText));
+                _fields.TryAdd(field, valueText);
             }
         }
         catch (Exception ex) when (ex is FormatException or OverflowException)
@@ -130,31 +134,46 @@ public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
     }
 
     /// <summary>
-    /// Gets the complete set of fix fields for this message.
+    /// Gets the complete set of distinct fix fields for this message.
     /// </summary>
     /// <value>The fix fields.</value>
     public IReadOnlyCollection<FixField> FixFields => _fields.Keys;
 
-    /// <summary>Gets the number of fields in the message.</summary>
+    /// <summary>Gets the number of distinct fields in the message (a repeated tag counts once).</summary>
     public int Count => _fields.Count;
 
-    /// <summary>Gets the message's field keys.</summary>
+    /// <summary>Gets the message's distinct field keys.</summary>
     public IEnumerable<FixField> Keys => _fields.Keys;
 
-    /// <summary>Gets the message's field values.</summary>
+    /// <summary>Gets the message's field values (first occurrence per field).</summary>
     public IEnumerable<string> Values => _fields.Values;
 
-    /// <summary>Gets the value for a parsed field.</summary>
+    /// <summary>Gets the first occurrence's value for a parsed field.</summary>
     public string this[FixField key]
     {
         get => _fields[key];
-        internal set => _fields[key] = value;
+        internal set
+        {
+            // Upsert: rewrite the first wire entry in place so a repeated tag keeps its wire order
+            // and its later occurrences; append when the tag is new.
+            int firstIndex = _entries.FindIndex(pair => pair.Key == key);
+            if (firstIndex >= 0)
+            {
+                _entries[firstIndex] = new(key, value);
+            }
+            else
+            {
+                _entries.Add(new(key, value));
+            }
+
+            _fields[key] = value;
+        }
     }
 
     /// <summary>Returns whether the message contains the specified field.</summary>
     public bool ContainsKey(FixField key) => _fields.ContainsKey(key);
 
-    /// <summary>Attempts to get the value for a parsed field.</summary>
+    /// <summary>Attempts to get the first occurrence's value for a parsed field.</summary>
     public bool TryGetValue(FixField key, [NotNullWhen(true)] out string? value)
     {
         if (_fields.TryGetValue(key, out string? candidate) && candidate is not null)
@@ -168,21 +187,58 @@ public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
     }
 
     /// <summary>
+    /// Gets every value for the specified field, in wire order.
+    /// </summary>
+    /// <param name="key">The FIX field to read.</param>
+    /// <returns>All occurrences of the field in wire order; an empty list when the field is absent.</returns>
+    /// <remarks>Repeating-group members share tags across group entries, so a group-aware host reads
+    /// every occurrence here while the scalar members resolve to the first occurrence. Group
+    /// boundaries (NoXXX count fields) are not interpreted.</remarks>
+    public IReadOnlyList<string> GetValues(FixField key)
+    {
+        if (!_fields.ContainsKey(key))
+        {
+            return [];
+        }
+
+        var values = new List<string>();
+        foreach (KeyValuePair<FixField, string> entry in _entries)
+        {
+            if (entry.Key == key)
+            {
+                values.Add(entry.Value);
+            }
+        }
+
+        return values;
+    }
+
+    /// <summary>
     /// Adds a value while a mutable <see cref="FixTagValuesCollection"/> is being built.
     /// </summary>
-    internal bool TryAdd(FixField key, string value) => _fields.TryAdd(key, value);
+    internal bool TryAdd(FixField key, string value)
+    {
+        if (!_fields.TryAdd(key, value))
+        {
+            return false;
+        }
+
+        _entries.Add(new(key, value));
+        return true;
+    }
 
     /// <summary>
     /// Provides the string representation of this FixMessage.
     /// </summary>
     /// <returns>String representation of this message.</returns>
-    /// <remarks>Emits the fields in the dictionary's enumeration order; FIX-spec ordering (header/trailer
-    /// positions, repeating groups) is the responsibility of the host FIX engine.</remarks>
+    /// <remarks>Emits every occurrence in wire order, so a parsed message — repeated tags included —
+    /// round-trips byte-for-byte. FIX-spec field layout (header/trailer positions, group structure)
+    /// remains the responsibility of the host FIX engine.</remarks>
     public string ToFix()
     {
         StringBuilder sb = new();
 
-        foreach (KeyValuePair<FixField, string> item in _fields)
+        foreach (KeyValuePair<FixField, string> item in _entries)
         {
             // Guard at the serialization chokepoint so malformed values supplied by the mutable
             // FixTagValuesCollection cannot be emitted and silently corrupted on the wire.
@@ -222,7 +278,7 @@ public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
     }
 
     /// <inheritdoc />
-    public IEnumerator<KeyValuePair<FixField, string>> GetEnumerator() => _fields.GetEnumerator();
+    public IEnumerator<KeyValuePair<FixField, string>> GetEnumerator() => _entries.GetEnumerator();
 
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 }

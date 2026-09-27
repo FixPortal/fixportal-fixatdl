@@ -147,4 +147,26 @@ public class StrategyParametersGrpEmitterTests
     {
         FixStrategyParameterTypeCodes.Resolve(typeName).Should().Be(14);
     }
+
+    [Fact]
+    public void Emitted_group_re_parses_with_every_occurrence_preserved()
+    {
+        // The whole point of Stage 1: a host joining these tuples onto the wire produces repeated
+        // 958/959/960 tags, and FixMessage must parse them back without rejecting the repeats.
+        var strategy = Load();
+        strategy.Parameters["Text"].WireValue = "hello";
+        strategy.Parameters["Amount"].WireValue = "5";
+
+        string wire = string.Concat(
+            StrategyParametersGrpEmitter
+                .Emit(strategy)
+                .Select(t => $"{t.Tag}{FixMessage.Separator}{t.Value}{FixMessage.SOH}")
+        );
+
+        var msg = new FixMessage(wire);
+
+        msg.GetValues((FixField)957).Should().Equal("2");
+        msg.GetValues((FixField)958).Should().Equal("Text", "Amount");
+        msg.ToFix().Should().Be(wire);
+    }
 }

@@ -90,11 +90,69 @@ public class FixMessageTests
         act.Should().Throw<FixParseException>();
     }
 
+    // Repeated tags (repeating-group members) ---------------------------------
+
     [Fact]
-    public void String_constructor_throws_FixParseException_for_duplicate_tag()
+    public void String_constructor_preserves_every_occurrence_of_a_repeated_tag()
     {
-        var act = () => new FixMessage($"35{Sep}D{Soh}35{Sep}8{Soh}");
-        act.Should().Throw<FixParseException>();
+        var msg = new FixMessage($"448{Sep}SENDER1{Soh}452{Sep}1{Soh}448{Sep}SENDER2{Soh}452{Sep}2{Soh}");
+
+        msg.GetValues((FixField)448).Should().Equal("SENDER1", "SENDER2");
+        msg.GetValues((FixField)452).Should().Equal("1", "2");
+    }
+
+    [Fact]
+    public void Scalar_members_resolve_to_the_first_occurrence_of_a_repeated_tag()
+    {
+        var msg = new FixMessage($"448{Sep}SENDER1{Soh}448{Sep}SENDER2{Soh}");
+
+        msg[(FixField)448].Should().Be("SENDER1");
+        msg.TryGetValue((FixField)448, out var value).Should().BeTrue();
+        value.Should().Be("SENDER1");
+        msg.Count.Should().Be(1);
+    }
+
+    [Fact]
+    public void Enumeration_yields_every_occurrence_in_wire_order()
+    {
+        var msg = new FixMessage($"35{Sep}D{Soh}448{Sep}SENDER1{Soh}448{Sep}SENDER2{Soh}");
+
+        msg.Select(pair => (int)pair.Key).Should().Equal(35, 448, 448);
+    }
+
+    [Fact]
+    public void ToFix_reemits_every_occurrence_so_a_parsed_message_round_trips_byte_for_byte()
+    {
+        string wire = $"448{Sep}SENDER1{Soh}452{Sep}1{Soh}448{Sep}SENDER2{Soh}452{Sep}2{Soh}";
+
+        new FixMessage(wire).ToFix().Should().Be(wire);
+    }
+
+    [Fact]
+    public void GetValues_returns_empty_for_an_absent_tag()
+    {
+        var msg = new FixMessage($"35{Sep}D{Soh}");
+
+        msg.GetValues((FixField)448).Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Copy_through_FixTagValuesCollection_preserves_repeated_tags_in_wire_order()
+    {
+        string wire = $"448{Sep}SENDER1{Soh}448{Sep}SENDER2{Soh}";
+        var copy = new FixTagValuesCollection(new FixMessage(wire));
+
+        copy.ToFix().Should().Be(wire);
+    }
+
+    [Fact]
+    public void Indexer_set_rewrites_the_first_occurrence_and_keeps_later_ones()
+    {
+        string wire = $"448{Sep}SENDER1{Soh}448{Sep}SENDER2{Soh}";
+        var col = new FixTagValuesCollection(wire) { [(FixField)448] = "REPLACED" };
+
+        col.GetValues((FixTag)448).Should().Equal("REPLACED", "SENDER2");
+        col.ToFix().Should().Be($"448{Sep}REPLACED{Soh}448{Sep}SENDER2{Soh}");
     }
 
     // FixMessage FixFields property ------------------------------------------
