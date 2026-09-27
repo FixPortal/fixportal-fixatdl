@@ -18,6 +18,11 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
 ### Changed
 
+- `AtdlValueType<T>` and `AtdlReferenceType<T>` now derive from a new public abstract base
+  `AtdlParameterTypeBase<TStorage>` (in `Model.Types.Support`), which carries the value/wire/conversion
+  machinery the two pivots previously duplicated. Source- and behaviour-compatible for consumers:
+  every member keeps its existing signature and semantics. Compiled consumers that call members
+  inherited from the pivots must be recompiled, as the declaring type of those members has moved.
 - `FixMessage` wire parsing no longer rejects a repeated tag: every occurrence
   is preserved in wire order, enumeration and `ToFix()` cover them all (a
   parsed message round-trips byte-for-byte), and the scalar members — indexer,
@@ -26,6 +31,10 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   entry boundaries) are not interpreted; that stays with the host.
   `FixTagValuesCollection.Add` still rejects a duplicate tag: an outbound
   repeated scalar is a modeling error, not a group.
+- `ThrowHelper.Rethrow` and the `ValidationResult` constructor now take
+  `params object?[]` instead of `params object[]` — a nullable-annotation
+  correction only; binary-compatible, so existing compiled callers are
+  unaffected.
 
 ### Fixed
 
@@ -138,8 +147,8 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - Enum wire parsing rejects a comma-bearing value for a non-`[Flags]` enum
   instead of silently OR-ing the members into a different defined value.
 - Package metadata URLs (`PackageProjectUrl`/`RepositoryUrl`) now name the real
-  `FixPortal/fixportal-fixatdl` repository. The project is now at version 1.1.4;
-  releases 1.1.3 and 1.1.4 are tagged.
+  `FixPortal/fixportal-fixatdl` repository. The project is now at version 1.1.3;
+  release 1.1.3 is tagged.
 
 ### Fixed
 
@@ -365,7 +374,9 @@ First stable release of the modernised fork.
 First packaged fork of [Atdl4net](https://github.com/atdl4net/atdl4net),
 pre-release.
 
-[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.4...HEAD
+[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.6...HEAD
+[1.1.6]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.5...v1.1.6
+[1.1.5]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.1...v1.1.2

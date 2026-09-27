@@ -5,10 +5,8 @@
 //
 #endregion
 
-using FixPortal.FixAtdl.Diagnostics;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
-using FixPortal.FixAtdl.Resources;
 
 namespace FixPortal.FixAtdl.Model.Types.Support;
 
@@ -26,12 +24,7 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible
     /// <returns>One of true, false or null which is equivalent to the value of this instance.</returns>
     public bool? ToBoolean()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            ConstValue ?? _value,
-            "Boolean"
-        );
+        throw UnsupportedConversion(ConstValue ?? _value, "Boolean");
     }
 
     /// <summary>
@@ -52,12 +45,7 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            ConstValue ?? _value,
-            "Decimal"
-        );
+        throw UnsupportedConversion(ConstValue ?? _value, "Decimal");
     }
 
     /// <summary>
@@ -66,12 +54,7 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            ConstValue ?? _value,
-            "DateTime"
-        );
+        throw UnsupportedConversion(ConstValue ?? _value, "DateTime");
     }
 
     /// <summary>

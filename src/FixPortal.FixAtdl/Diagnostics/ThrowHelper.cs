@@ -213,7 +213,8 @@ public static class ThrowHelper
     /// <param name="format">The format.</param>
     /// <param name="args">An array of zero or more arguments.</param>
     /// <returns>A new exception of the same type as the supplied exception.</returns>
-    public static Exception Rethrow(object? source, Exception ex, string format, params object[] args)
+    // FP Enhancement: 2026-09-27 — params object[] args -> params object?[] args to support nullable callers.
+    public static Exception Rethrow(object? source, Exception ex, string format, params object?[] args)
     {
         // Format ONCE. Callers of this params overload supply every argument the template needs
         // (including ex.Message where it is referenced). Routing the formatted result through another

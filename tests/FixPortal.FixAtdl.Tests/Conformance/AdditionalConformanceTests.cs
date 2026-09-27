@@ -20,7 +20,7 @@ public class AdditionalConformanceTests
     }
 
     [Fact]
-    public void Numeric_slider_initializes_and_round_trips_numeric_parameter()
+    public void Numeric_slider_initializes_from_its_init_value()
     {
         var strategy = LoadControls();
         var slider = strategy.Controls["NumericSlider"];
@@ -30,13 +30,34 @@ public class AdditionalConformanceTests
         slider.GetCurrentValue().Should().Be(12.5m);
         ((Slider_t)slider).Increment.Should().Be(0.25m);
         slider.HasEnumeratedState.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Numeric_slider_round_trips_between_control_and_parameter()
+    {
+        var strategy = LoadControls();
+        var slider = strategy.Controls["NumericSlider"];
+        slider.LoadInitValue(FixFieldValueProvider.Empty);
+
         strategy.Parameters["Number"].SetValueFromControl(slider).IsValid.Should().BeTrue();
         strategy.Parameters["Number"].WireValue.Should().Be("12.5");
+
         strategy.Parameters["Number"].WireValue = "20.75";
         slider.SetValueFromParameter(strategy.Parameters["Number"]);
+
         slider.GetCurrentValue().Should().Be(20.75m);
+    }
+
+    [Fact]
+    public void Numeric_slider_reset_clears_the_parameter_wire_value()
+    {
+        var strategy = LoadControls();
+        var slider = strategy.Controls["NumericSlider"];
+        slider.LoadInitValue(FixFieldValueProvider.Empty);
+
         slider.Reset();
         strategy.Parameters["Number"].SetValueFromControl(slider).IsValid.Should().BeTrue();
+
         strategy.Parameters["Number"].WireValue.Should().BeNull();
     }
 

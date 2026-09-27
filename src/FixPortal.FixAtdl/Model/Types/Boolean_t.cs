@@ -187,12 +187,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
-            "Decimal"
-        );
+        throw UnsupportedConversion(_value, "Decimal");
     }
 
     /// <summary>
@@ -201,12 +196,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
-            "DateTime"
-        );
+        throw UnsupportedConversion(_value, "DateTime");
     }
 
     /// <summary>
@@ -215,12 +205,7 @@ public class Boolean_t : AtdlValueType<bool>, IControlConvertible
     /// <returns>A valid EnumState, assuming the source value can be correctly converted.</returns>
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
-            "Enumerated Type"
-        );
+        throw UnsupportedConversion(_value, "Enumerated Type");
     }
 
     #endregion

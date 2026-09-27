@@ -50,15 +50,6 @@ public class Country_t : EnumTypeBase<IsoCountryCode>
     /// <returns>Value converted from a string.</returns>
     protected override IsoCountryCode? ConvertFromWireValueFormat(string value)
     {
-        if (value == "None")
-        {
-            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(
-                this,
-                Resources.ErrorMessages.InvalidValueEnumParseFailure,
-                value,
-                nameof(IsoCountryCode)
-            );
-        }
         IsoCountryCode parsed = value.ParseAsEnum<IsoCountryCode>();
         if (parsed == IsoCountryCode.None)
         {

@@ -11,7 +11,6 @@ using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Types.Support;
 using FixPortal.FixAtdl.Resources;
 using FixPortal.FixAtdl.Validation;
-using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
 
 namespace FixPortal.FixAtdl.Model.Types;
 
@@ -140,12 +139,7 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <returns>One of true, false or null which is equivalent to the value of this instance.</returns>
     public bool? ToBoolean()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
-            "Boolean"
-        );
+        throw UnsupportedConversion(_value, "Boolean");
     }
 
     /// <summary>
@@ -166,12 +160,7 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
-            "Decimal"
-        );
+        throw UnsupportedConversion(_value, "Decimal");
     }
 
     /// <summary>
@@ -180,12 +169,7 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
-            "DateTime"
-        );
+        throw UnsupportedConversion(_value, "DateTime");
     }
 
     /// <summary>
@@ -197,12 +181,7 @@ public class Data_t : AtdlReferenceType<char[]>, IControlConvertible
     /// very large enumerations.</remarks>
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
-            "Enumerated Type"
-        );
+        throw UnsupportedConversion(_value, "Enumerated Type");
     }
 
     #endregion

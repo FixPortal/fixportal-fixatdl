@@ -22,7 +22,9 @@
     The package (assembly) name to gate on, as it appears in the report.
 
 .PARAMETER MinimumLineRate
-    The floor, as a percentage.
+    The floor, as a percentage. Must be finite and within [0,100]; anything else fails
+    before the report is read, because a non-finite floor compares false against every
+    rate and would pass anything.
 #>
 [CmdletBinding()]
 param(
@@ -41,6 +43,19 @@ $ErrorActionPreference = 'Stop'
 function Fail([string] $Message) {
     Write-Error $Message -ErrorAction Continue
     exit 1
+}
+
+# The floor parameter gets the same treatment as the report's rates (see ConvertTo-Rate
+# below), and for the same reason: the comparison fails OPEN on a non-finite value. A NaN
+# floor makes `$lineRate -lt $MinimumLineRate` $false for every possible rate, so the gate
+# would pass anything -- including a zero-coverage report -- while looking like it was
+# enforcing something. The floor is the thing being enforced, so it is checked before any
+# file work: a gate that cannot fail is reported broken before the report is even read.
+if (-not [double]::IsFinite($MinimumLineRate)) {
+    Fail "MinimumLineRate of '$MinimumLineRate' is not finite: a non-finite floor compares false against every rate, so the gate would pass any report -- this is a failure, not a pass."
+}
+if ($MinimumLineRate -lt 0 -or $MinimumLineRate -gt 100) {
+    Fail "MinimumLineRate of '$MinimumLineRate' is outside [0,100]: the floor is a percentage. A negative floor passes everything and a floor above 100 passes nothing, so neither can be the intended gate."
 }
 
 if (-not (Test-Path -LiteralPath $ReportPath -PathType Leaf)) {

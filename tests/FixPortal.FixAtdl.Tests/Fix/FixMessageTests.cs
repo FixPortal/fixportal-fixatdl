@@ -343,8 +343,6 @@ public class FixMessageTests
         act.Should().Throw<InvalidOperationException>();
     }
 
-    // FixFieldValueProvider percentage init-value scaling (H3) ----------------
-
     // FixFieldValueProvider Boolean_t declared-wire-mapping translation (R12) ------------------
 
     [Theory]
@@ -353,7 +351,7 @@ public class FixMessageTests
     public void FixFieldValueProvider_decodes_declared_boolean_wire_mapping(string wireValue, string expected)
     {
         FixTagValuesCollection fixValues = [];
-        fixValues.Add(35, wireValue);
+        fixValues.Add(636, wireValue);
 
         var initialProvider = Substitute.For<IInitialFixValueProvider>();
         initialProvider.InputFixValues.Returns(fixValues);
@@ -366,7 +364,7 @@ public class FixMessageTests
 
         var provider = new FixFieldValueProvider(initialProvider, parameters);
 
-        provider.TryGetValue("FIX_MsgType", "Flag", out var value).Should().BeTrue();
+        provider.TryGetValue("FIX_WorkingIndicator", "Flag", out var value).Should().BeTrue();
         value.Should().Be(expected);
     }
 
@@ -374,7 +372,7 @@ public class FixMessageTests
     public void FixFieldValueProvider_reports_failure_for_an_unrecognised_boolean_wire_value()
     {
         FixTagValuesCollection fixValues = [];
-        fixValues.Add(35, "X");
+        fixValues.Add(636, "X");
 
         var initialProvider = Substitute.For<IInitialFixValueProvider>();
         initialProvider.InputFixValues.Returns(fixValues);
@@ -387,7 +385,7 @@ public class FixMessageTests
 
         var provider = new FixFieldValueProvider(initialProvider, parameters);
 
-        provider.TryGetValue("FIX_MsgType", "Flag", out _).Should().BeFalse();
+        provider.TryGetValue("FIX_WorkingIndicator", "Flag", out _).Should().BeFalse();
     }
 
     // FixMessage tag alphabet (R21) --------------------------------------------
@@ -412,7 +410,7 @@ public class FixMessageTests
     public void FixFieldValueProvider_reports_failure_for_unscalable_percentage_wire_values(string wireValue)
     {
         FixTagValuesCollection fixValues = [];
-        fixValues.Add(35, wireValue);
+        fixValues.Add(849, wireValue);
 
         var initialProvider = Substitute.For<IInitialFixValueProvider>();
         initialProvider.InputFixValues.Returns(fixValues);
@@ -421,7 +419,7 @@ public class FixMessageTests
 
         var provider = new FixFieldValueProvider(initialProvider, parameters);
 
-        provider.TryGetValue("FIX_MsgType", "Pct", out _).Should().BeFalse();
+        provider.TryGetValue("FIX_ParticipationRate", "Pct", out _).Should().BeFalse();
     }
 
     [Theory]
@@ -432,7 +430,7 @@ public class FixMessageTests
     {
         // The parameter's own Precision governs rounding on the way back out, not this lookup (R28).
         FixTagValuesCollection fixValues = [];
-        fixValues.Add(35, wireValue);
+        fixValues.Add(849, wireValue);
 
         var initialProvider = Substitute.For<IInitialFixValueProvider>();
         initialProvider.InputFixValues.Returns(fixValues);
@@ -441,7 +439,7 @@ public class FixMessageTests
 
         var provider = new FixFieldValueProvider(initialProvider, parameters);
 
-        provider.TryGetValue("FIX_MsgType", "Pct", out var value).Should().BeTrue();
+        provider.TryGetValue("FIX_ParticipationRate", "Pct", out var value).Should().BeTrue();
         value.Should().Be(expected);
     }
 }

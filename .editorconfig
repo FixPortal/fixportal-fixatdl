@@ -86,11 +86,6 @@ dotnet_diagnostic.S2094.severity = none
 [src/FixPortal.FixAtdl/Model/Types/*.cs]
 dotnet_diagnostic.S2094.severity = none
 
-# These caches intentionally belong to each closed generic value type.
-[src/FixPortal.FixAtdl/Model/Types/Support/{AtdlReferenceType,AtdlValueType}.cs]
-dotnet_diagnostic.S2743.severity = none
-resharper_static_member_in_generic_type_highlighting = none
-
 # The published upstream API is populated and consumed by XML reflection and by
 # downstream callers, so solution-local liveness/visibility analysis is incomplete.
 [src/FixPortal.FixAtdl/Model/Controls/{Clock_t,RadioButton_t}.cs]

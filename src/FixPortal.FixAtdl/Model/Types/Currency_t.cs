@@ -50,15 +50,6 @@ public class Currency_t : EnumTypeBase<IsoCurrencyCode>
     /// <returns>Value converted from a string.</returns>
     protected override IsoCurrencyCode? ConvertFromWireValueFormat(string value)
     {
-        if (value == "None")
-        {
-            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(
-                this,
-                Resources.ErrorMessages.InvalidValueEnumParseFailure,
-                value,
-                nameof(IsoCurrencyCode)
-            );
-        }
         IsoCurrencyCode parsed = value.ParseAsEnum<IsoCurrencyCode>();
         if (parsed == IsoCurrencyCode.None)
         {

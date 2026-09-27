@@ -1096,7 +1096,7 @@ public class ElementFactory : INotifyClassDeserialized
                 InternalErrors.UnableToSetPropertyValueOnObject,
                 property.Name,
                 value,
-                target.GetType().FullName!
+                target.GetType().FullName
             );
         }
         catch (ArgumentException ex)
