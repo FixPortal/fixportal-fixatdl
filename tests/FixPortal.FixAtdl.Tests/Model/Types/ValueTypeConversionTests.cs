@@ -583,7 +583,7 @@ public class ValueTypeConversionTests
     // ──────────────────────────────────────────────────────────────────────────
 
     [Fact]
-    public void String_t_rejects_clearing_a_required_parameter_and_retains_the_old_value()
+    public void String_t_rejects_clearing_a_required_parameter_and_unsets_the_old_value()
     {
         var p = new Parameter_t<String_t>("Text") { Use = Use_t.Required, WireValue = "abc" };
         var controlValue = Substitute.For<IParameterConvertible>();
@@ -592,7 +592,8 @@ public class ValueTypeConversionTests
         ValidationResult result = p.Value.SetValueFromControl(p, controlValue);
 
         result.IsMissing.Should().BeTrue();
-        p.WireValue.Should().Be("abc");
+        var act = () => p.WireValue;
+        act.Should().Throw<MissingMandatoryValueException>();
     }
 
     [Fact]
@@ -607,7 +608,7 @@ public class ValueTypeConversionTests
     }
 
     [Fact]
-    public void Data_t_rejects_clearing_a_required_parameter_and_retains_the_old_value()
+    public void Data_t_rejects_clearing_a_required_parameter_and_unsets_the_old_value()
     {
         var p = new Parameter_t<Data_t>("Raw") { Use = Use_t.Required, WireValue = "abc" };
         var controlValue = Substitute.For<IParameterConvertible>();
@@ -616,7 +617,8 @@ public class ValueTypeConversionTests
         ValidationResult result = p.Value.SetValueFromControl(p, controlValue);
 
         result.IsMissing.Should().BeTrue();
-        p.WireValue.Should().Be("abc");
+        var act = () => p.WireValue;
+        act.Should().Throw<MissingMandatoryValueException>();
     }
 
     [Fact]

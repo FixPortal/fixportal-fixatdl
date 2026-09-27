@@ -305,6 +305,40 @@ public class SupplementalCollectionTests
         strategy.Controls.GetParameterValueSource(radioA).Should().BeSameAs(radioB);
     }
 
+    [Fact]
+    public void Helper_radio_toggle_uses_only_ungrouped_siblings_for_the_same_parameter()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var source = new RadioButton_t("source") { ParameterRef = "P", RadioGroup = "" };
+        var unrelated = new RadioButton_t("unrelated") { ParameterRef = "Q", RadioGroup = "other" };
+        var companion = new RadioButton_t("companion") { ParameterRef = "P", RadioGroup = "" };
+        var helper = new CheckBox_t("helper") { ParameterRef = "H" };
+        helper.StateRules.Add(
+            new StateRule_t
+            {
+                Value = Atdl.NullValue,
+                Edit = new Edit_t<Control_t>
+                {
+                    Field = "source",
+                    Operator = Operator_t.Equal,
+                    Value = "true",
+                },
+            }
+        );
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("Q") { WireValue = "N" });
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("H") { WireValue = "Y" });
+        panel.Controls.Add(source);
+        panel.Controls.Add(unrelated);
+        panel.Controls.Add(companion);
+        panel.Controls.Add(helper);
+
+        strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
+
+        companion.GetCurrentValue().Should().Be(true);
+    }
+
     // -----------------------------------------------------------------------
     // ReadOnlyControlCollection — Reset removes only the sender's controls (R23)
     // -----------------------------------------------------------------------
@@ -619,6 +653,46 @@ public class SupplementalCollectionTests
         strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
         source.SetValue(true);
         strategy.Parameters["P"].Reset();
+        strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
+
+        source.GetCurrentValue().Should().Be(true);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void UpdateValuesFromParameters_applies_helper_controls_independent_of_declaration_order(bool sourceFirst)
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var source = new CheckBox_t("source") { ParameterRef = "S" };
+        var helper = new CheckBox_t("helper") { ParameterRef = "P" };
+        helper.StateRules.Add(
+            new StateRule_t
+            {
+                Value = Atdl.NullValue,
+                Edit = new Edit_t<Control_t>
+                {
+                    Field = "source",
+                    Operator = Operator_t.Equal,
+                    Value = "true",
+                },
+            }
+        );
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("S") { WireValue = "Y" });
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
+
+        if (sourceFirst)
+        {
+            panel.Controls.Add(source);
+            panel.Controls.Add(helper);
+        }
+        else
+        {
+            panel.Controls.Add(helper);
+            panel.Controls.Add(source);
+        }
+
         strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
 
         source.GetCurrentValue().Should().Be(false);

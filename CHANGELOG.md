@@ -10,6 +10,16 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
 ## [Unreleased]
 
+### Fixed
+
+- Empty parameter refreshes reset only bound controls and no longer infer helper checkbox state; unbound controls keep their current value.
+- Required reference parameters now clear stale values when their controls are emptied, and populated helper rules apply after all bound controls sync.
+- String-based FIX field lookups reject comma-joined names instead of resolving them as enum combinations.
+- NuGet package author and repository metadata now inherit the fork attribution from `Directory.Build.props`.
+- Helper rules now select ungrouped radio companions only when they share the same parameter.
+- Null FIX field values are treated as absent by `TryGetValue`, and custom argument exceptions can use a string-only constructor.
+- Registered custom flags attributes accept defined bit combinations and reject undefined bits.
+
 ## [1.1.6] — 2026-09-20
 
 ### Changed

@@ -130,13 +130,14 @@ public class FixDateTimeTests
     }
 
     [Theory]
-    [InlineData("20260601-09:30:00.1234")]
-    [InlineData("20260601-09:30:00.1234567")]
-    public void Offsetless_fractional_timestamp_with_four_to_seven_digits_parses_exactly(string value)
+    [InlineData("20260601-09:30:00.1234", 1234000L)]
+    [InlineData("20260601-09:30:00.1234567", 1234567L)]
+    public void Offsetless_fractional_timestamp_with_four_to_seven_digits_parses_exactly(string value, long ticks)
     {
         FixDateTime.TryParse(value, CultureInfo.InvariantCulture, out DateTime result).Should().BeTrue();
 
         result.Kind.Should().Be(DateTimeKind.Utc);
+        result.Should().Be(new DateTime(2026, 6, 1, 9, 30, 0, DateTimeKind.Utc).AddTicks(ticks));
     }
 
     [Fact]

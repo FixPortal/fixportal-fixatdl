@@ -137,6 +137,25 @@ public class FixTagValuesCollectionTests
         col.TryGetValue("FIX_EffectiveTime", out _).Should().BeFalse();
     }
 
+    [Fact]
+    public void TryGetValue_by_string_rejects_comma_joined_field_names()
+    {
+        FixTagValuesCollection col = [];
+        col.Add(11, "order-1");
+
+        col.TryGetValue("FIX_Account,FIX_ClOrdID", out _).Should().BeFalse();
+    }
+
+    [Fact]
+    public void TryGetValue_by_string_returns_false_for_a_null_value()
+    {
+        FixTagValuesCollection col = [];
+        col["FIX_MsgType"] = null!;
+
+        col.TryGetValue("FIX_MsgType", out var value).Should().BeFalse();
+        value.Should().BeNull();
+    }
+
     // ToFix / round-trip ------------------------------------------------------
 
     [Fact]

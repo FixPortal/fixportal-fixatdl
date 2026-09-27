@@ -92,16 +92,16 @@ public abstract class AtdlReferenceType<T> : IParameterType
         {
             T? candidate = ConvertToNativeType(hostParameter, value);
 
-            if (candidate is string { Length: 0 })
+            if (candidate is string { Length: 0 } or char[] { Length: 0 })
             {
                 candidate = null;
             }
 
             ValidationResult result = ValidateValue(candidate, hostParameter.Use == Use_t.Required);
 
-            // A rejected candidate must not replace the last valid value. Optional clears still
-            // commit because ValidateValue returns Valid for null when the parameter is optional.
-            if (result.IsValid)
+            // Preserve rejected non-null values, but always commit a clear so required parameters
+            // cannot keep emitting a stale value after the control is emptied.
+            if (result.IsValid || candidate == null)
             {
                 _value = candidate;
             }

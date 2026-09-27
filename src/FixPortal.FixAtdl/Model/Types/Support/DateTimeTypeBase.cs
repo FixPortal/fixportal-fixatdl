@@ -86,10 +86,9 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
     /// </summary>
     internal virtual bool IsTimeOnlyType => false;
 
-    /// <summary>Deserialization-only round-trip of the raw <c>maxValue</c> attribute text; parsed with
-    /// time-only awareness on set (C2). The getter returns the last raw text set (or null), even after
-    /// <see cref="MaxValue"/> is assigned directly. Not intended for programmatic use; set
-    /// <see cref="MaxValue"/> directly for a full date+time bound.</summary>
+    /// <summary>Deserialization-only round-trip of the raw <c>maxValue</c> attribute text, parsed with
+    /// time-only awareness on set (C2). Assigning <see cref="MaxValue"/> directly clears this raw text.
+    /// Not intended for programmatic use; set <see cref="MaxValue"/> directly for a full date+time bound.</summary>
     public string? MaxValueText
     {
         get => _maxValueText;
@@ -106,10 +105,9 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
         }
     }
 
-    /// <summary>Deserialization-only round-trip of the raw <c>minValue</c> attribute text; parsed with
-    /// time-only awareness on set (C2). The getter returns the last raw text set (or null), even after
-    /// <see cref="MinValue"/> is assigned directly. Not intended for programmatic use; set
-    /// <see cref="MinValue"/> directly for a full date+time bound.</summary>
+    /// <summary>Deserialization-only round-trip of the raw <c>minValue</c> attribute text, parsed with
+    /// time-only awareness on set (C2). Assigning <see cref="MinValue"/> directly clears this raw text.
+    /// Not intended for programmatic use; set <see cref="MinValue"/> directly for a full date+time bound.</summary>
     public string? MinValueText
     {
         get => _minValueText;
