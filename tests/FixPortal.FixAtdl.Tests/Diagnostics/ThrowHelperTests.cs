@@ -93,11 +93,14 @@ public class ThrowHelperTests
     {
         // A template carrying a literal "{NULL}" alongside "{0}" makes string.Format throw
         // FormatException; the error-reporting path must surface the raw template instead (F1/K).
+        // The brace pair is built via char array (the file's existing idiom) so the deliberately
+        // invalid fixture does not trip static format-string analysis.
         var inner = new InvalidOperationException("inner");
+        string template = "Could not parse " + new string(['{', 'N', 'U', 'L', 'L', '}']) + " field {0}";
 
-        var ex = ThrowHelper.Rethrow(null, inner, "Could not parse {NULL} field {0}", "tenor");
+        var ex = ThrowHelper.Rethrow(null, inner, template, "tenor");
 
-        ex.Message.Should().Be("Could not parse {NULL} field {0}");
+        ex.Message.Should().Be(template);
         ex.InnerException.Should().BeSameAs(inner);
     }
 
@@ -107,10 +110,11 @@ public class ThrowHelperTests
         // The same brace-bearing template through the params overload must likewise return the raw
         // template rather than throwing FormatException (F1/K).
         var inner = new InvalidOperationException("inner");
+        string template = "Could not parse " + new string(['{', 'N', 'U', 'L', 'L', '}']) + " field {0}";
 
-        var ex = ThrowHelper.Rethrow(null, inner, "Could not parse {NULL} field {0}", "tenor", "unused");
+        var ex = ThrowHelper.Rethrow(null, inner, template, "tenor", "unused");
 
-        ex.Message.Should().Be("Could not parse {NULL} field {0}");
+        ex.Message.Should().Be(template);
         ex.InnerException.Should().BeSameAs(inner);
     }
 
