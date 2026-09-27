@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Exercises assert-release-eligibility.sh against a real, disposable git history for
-# every eligibility outcome. The fake GitHub CLI applies the gate's actual jq filter to
-# canned responses, so weakening the merged-PR condition is caught here.
+# every eligibility outcome. The fake GitHub CLI serves canned paged responses and the
+# gate applies its own jq filter to them, so weakening the merged-PR condition is caught
+# here.
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -34,7 +35,8 @@ export GH_RESPONSE_MAP="$root/gh-response-map"
 cat > "$fake_gh_dir/gh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
-if [ "$1" != "api" ] || [ "$3" != "--paginate" ] || [ "$4" != "--slurp" ] || [ "$5" != "--jq" ]; then
+# The real gh rejects --slurp combined with --jq; the gate fetches here and pipes to jq itself.
+if [ "$1" != "api" ] || [ "$3" != "--paginate" ] || [ "$4" != "--slurp" ] || [ $# -ne 4 ]; then
   echo "fake gh: unexpected arguments: $*" >&2
   exit 1
 fi
@@ -44,7 +46,7 @@ if [ -z "$fixture" ]; then
   echo "fake gh: no canned answer for $sha" >&2
   exit 1
 fi
-printf '%s\n' "$fixture" | jq -r "$6" | tr -d '\r'
+printf '%s\n' "$fixture"
 EOF
 chmod +x "$fake_gh_dir/gh"
 export PATH="$fake_gh_dir:$PATH"

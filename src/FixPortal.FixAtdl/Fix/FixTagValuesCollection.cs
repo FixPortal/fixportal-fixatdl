@@ -127,6 +127,14 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     // numeric tag ("5000") for user-defined fields, matching the wire grammar and the numeric indexer.
     private static bool TryResolveField(string fixField, out FixField field)
     {
+        // A Try-pattern method must not throw on a runtime null name: Enum.TryParse alone tolerated
+        // it, but the comma guard below does not.
+        if (fixField is null)
+        {
+            field = default;
+            return false;
+        }
+
         if (!fixField.Contains(',') && Enum.TryParse(fixField, ignoreCase: true, out field) && Enum.IsDefined(field))
         {
             return true;

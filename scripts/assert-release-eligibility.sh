@@ -30,7 +30,8 @@ fi
 
 # Reachability alone includes main commits with no merged PR. Require GitHub to
 # associate the commit with a merged PR into main as a second, API-backed review boundary.
-merged_pr="$(gh api "repos/${repository}/commits/${tagged_commit}/pulls" --paginate --slurp --jq 'any(.[][]; .merged_at != null and .base.ref == "main")')"
+# gh rejects --slurp combined with --jq, so the fetch is piped to jq instead.
+merged_pr="$(gh api "repos/${repository}/commits/${tagged_commit}/pulls" --paginate --slurp | jq 'any(.[][]; .merged_at != null and .base.ref == "main")')"
 if [ "$merged_pr" != "true" ]; then
   echo "::error::Commit ${tagged_commit} names a main commit with no merged pull request into main."
   exit 1
