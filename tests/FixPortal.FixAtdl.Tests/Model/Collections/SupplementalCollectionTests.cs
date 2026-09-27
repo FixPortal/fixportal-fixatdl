@@ -142,19 +142,27 @@ public class SupplementalCollectionTests
     }
 
     [Fact]
-    public void StrategyEditCollection_EvaluateAll_with_resolved_edits_does_not_throw()
+    public void StrategyEditCollection_EvaluateAll_with_a_resolved_edit_returns_true_when_the_edit_passes()
     {
         // Load and resolve from the TWAP fixture so StrategyEdit_t.Evaluate() works.
         var twap = LoadTwap();
         twap.Parameters["Participation"].WireValue = "50";
 
-        // ResolveAll wires up the StrategyEdits already present on the loaded strategy.
+        // twap.xml carries no StrategyEdits, so add one in code (matching the pattern of the
+        // failing-path tests below) and let ResolveAll wire it to the Participation parameter.
+        var edit = new Edit_t<IParameter>
+        {
+            Field = "Participation",
+            Operator = Operator_t.Equal,
+            Value = "50", // Participation is "50", so this edit passes
+        };
+        var strategyEdit = new StrategyEdit_t { Edit = edit, ErrorMessage = "err" };
+        twap.StrategyEdits.Add(strategyEdit);
+
         twap.StrategyEdits.ResolveAll(twap);
 
-        // The pass/fail outcome is fixture-dependent; the value of this test is that the
-        // EvaluateAll code path runs to completion without throwing on resolved edits.
-        var act = () => twap.StrategyEdits.EvaluateAll(FixFieldValueProvider.Empty, shortCircuit: false);
-        act.Should().NotThrow();
+        twap.StrategyEdits.EvaluateAll(FixFieldValueProvider.Empty, shortCircuit: false).Should().BeTrue();
+        strategyEdit.CurrentState.Should().BeTrue();
     }
 
     [Fact]

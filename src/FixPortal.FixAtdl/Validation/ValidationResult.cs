@@ -59,7 +59,8 @@ public class ValidationResult
     /// <param name="resultType"></param>
     /// <param name="format">Format string.</param>
     /// <param name="args">Optional array of arguments to apply to format string.</param>
-    public ValidationResult(ResultType resultType, string format, params object[] args)
+    // FP Enhancement: 2026-09-27 — params object[] args -> params object?[] args to support nullable callers.
+    public ValidationResult(ResultType resultType, string format, params object?[] args)
     {
         _validityType = resultType;
         ErrorText = args is { Length: > 0 } ? string.Format(CultureInfo.InvariantCulture, format, args) : format;

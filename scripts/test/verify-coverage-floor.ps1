@@ -9,7 +9,8 @@
 
     The NaN case is why this file exists: `[double]'NaN' -lt 70` evaluates to $false in
     PowerShell, so before the guard was added a report carrying a NaN rate sailed past
-    the floor and printed a pass.
+    the floor and printed a pass. The floor parameter is guarded for the same reason: a
+    NaN floor compares false against every rate, so it would pass any report at all.
 #>
 $ErrorActionPreference = 'Stop'
 
@@ -51,6 +52,20 @@ try {
     if ($pass.Output -match '84\.0%') { throw "the summary must not report the flattered whole-report rate:`n$($pass.Output)" }
 
     Assert-Fails (Invoke-Floor $healthy 'Lib' 99) 'below the' 'a rate under the floor'
+
+    # The floor parameter must fail closed too: a NaN floor compares false against every
+    # rate, so before the guard existed it accepted ANY report -- including a
+    # zero-coverage one -- and exited 0.
+    Assert-Fails (Invoke-Floor $healthy 'Lib' ([double]::NaN)) 'not finite' 'a NaN floor'
+    Assert-Fails (Invoke-Floor $healthy 'Lib' ([double]::PositiveInfinity)) 'not finite' 'an infinite floor'
+    Assert-Fails (Invoke-Floor $healthy 'Lib' -1) 'outside \[0,100\]' 'a negative floor'
+    Assert-Fails (Invoke-Floor $healthy 'Lib' 101) 'outside \[0,100\]' 'a floor above 100'
+    # The bounds are inclusive: 0 and 100 are valid floors.
+    $floorZero = Invoke-Floor $healthy 'Lib' 0
+    if ($floorZero.Code -ne 0) { throw "a floor of 0 is valid and must pass:`n$($floorZero.Output)" }
+    $floorHundred = Invoke-Floor (New-Report '<coverage><packages><package name="Lib" line-rate="1" branch-rate="1" /></packages></coverage>') 'Lib' 100
+    if ($floorHundred.Code -ne 0) { throw "a floor of 100 is valid and must pass a fully-covered report:`n$($floorHundred.Output)" }
+
     Assert-Fails (Invoke-Floor $healthy 'Absent') 'no package named' 'a package that is not in the report'
     Assert-Fails (Invoke-Floor (Join-Path $root 'nope.xml')) 'not found' 'a missing report'
 
@@ -77,7 +92,7 @@ try {
     $one = Invoke-Floor $single
     if ($one.Code -ne 0) { throw "a report with exactly one package must pass:`n$($one.Output)" }
 
-    'assert-coverage-floor.ps1 OK - library-not-total, floor breach, missing/duplicate package, and every unreadable-rate path fails closed'
+    'assert-coverage-floor.ps1 OK - library-not-total, floor breach, invalid floor parameters, missing/duplicate package, and every unreadable-rate path fails closed'
 }
 finally {
     if ($root.StartsWith([IO.Path]::GetTempPath(), [StringComparison]::OrdinalIgnoreCase)) {

@@ -394,12 +394,7 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
     /// <returns>One of true, false or null which is equivalent to the value of this instance.</returns>
     public bool? ToBoolean()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            ConstValue ?? _value,
-            "Boolean"
-        );
+        throw UnsupportedConversion(ConstValue ?? _value, "Boolean");
     }
 
     /// <summary>
@@ -420,12 +415,7 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
     /// <returns>A nullable decimal equivalent to the value of this instance.</returns>
     public decimal? ToDecimal()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            ConstValue ?? _value,
-            "Decimal"
-        );
+        throw UnsupportedConversion(ConstValue ?? _value, "Decimal");
     }
 
     /// <summary>
@@ -446,12 +436,7 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
     /// very large enumerations.</remarks>
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            ConstValue ?? _value,
-            "Enumerated Type"
-        );
+        throw UnsupportedConversion(ConstValue ?? _value, "Enumerated Type");
     }
 
     #endregion

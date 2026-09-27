@@ -50,15 +50,6 @@ public class Language_t : EnumTypeBase<IsoLanguageCode>
     /// <returns>Value converted from a string.</returns>
     protected override IsoLanguageCode? ConvertFromWireValueFormat(string value)
     {
-        if (value == "None")
-        {
-            throw Diagnostics.ThrowHelper.New<System.ArgumentException>(
-                this,
-                Resources.ErrorMessages.InvalidValueEnumParseFailure,
-                value,
-                nameof(IsoLanguageCode)
-            );
-        }
         IsoLanguageCode parsed = value.ParseAsEnum<IsoLanguageCode>();
         if (parsed == IsoLanguageCode.None)
         {

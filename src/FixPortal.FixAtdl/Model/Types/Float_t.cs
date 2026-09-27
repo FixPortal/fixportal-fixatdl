@@ -235,12 +235,7 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <returns>One of true, false or null which is equivalent to the value of this instance.</returns>
     public bool? ToBoolean()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
-            "Boolean"
-        );
+        throw UnsupportedConversion(_value, "Boolean");
     }
 
     /// <summary>
@@ -270,12 +265,7 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <returns>A nullable DateTime equivalent to the value of this instance.</returns>
     public DateTime? ToDateTime()
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
-            "DateTime"
-        );
+        throw UnsupportedConversion(_value, "DateTime");
     }
 
     /// <summary>
@@ -284,12 +274,7 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     /// <returns>A valid EnumState, assuming the source value can be correctly converted.</returns>
     public EnumState ToEnumState(EnumPairCollection enumPairs)
     {
-        throw ThrowHelper.New<InvalidCastException>(
-            this,
-            ErrorMessages.UnsupportedParameterValueConversion,
-            _value,
-            "EnumState"
-        );
+        throw UnsupportedConversion(_value, "EnumState");
     }
 
     #endregion

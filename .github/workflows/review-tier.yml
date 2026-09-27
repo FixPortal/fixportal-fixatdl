@@ -194,7 +194,21 @@ jobs:
               exit 1
             else
               labelled=$(grep -cx 'review-high' <<< "$labels" || true)
-              if [ "$labelled" -gt 0 ]; then
+              manual=$(grep -cx 'review-high-manual' <<< "$labels" || true)
+              if [ "$manual" -gt 0 ]; then
+                # The manual override's only configured CodeRabbit trigger IS the
+                # review-high label (auto_review.labels: ["review-high"]), so removing
+                # it here would silently strip the override's reviewer. Keep it, and
+                # re-apply when absent so an override set after a non-HIGH tiering
+                # still fires CodeRabbit.
+                if [ "$labelled" -eq 0 ]; then
+                  gh label create review-high --repo "$GITHUB_REPOSITORY" --force --description "HIGH review tier: CodeRabbit review required" >/dev/null
+                  gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label review-high
+                  echo "review-high-manual is set; applied review-high so the manual override keeps its CodeRabbit trigger."
+                else
+                  echo "review-high-manual is set; keeping review-high."
+                fi
+              elif [ "$labelled" -gt 0 ]; then
                 gh pr edit "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label review-high
                 echo "Removed the review-high label."
               fi

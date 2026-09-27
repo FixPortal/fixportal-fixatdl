@@ -85,14 +85,17 @@ public class InvertedListConformanceTests
     }
 
     [Theory]
-    [InlineData(false, "bb cc", true, false)]
-    [InlineData(true, "B C", true, false)]
-    [InlineData(false, "aa bb cc", false, false)]
-    [InlineData(true, "A B C", false, false)]
-    [InlineData(false, "unknown", false, true)]
+    [InlineData(false, "bb cc", "bb cc", true, false)]
+    [InlineData(true, "B C", "B C", true, false)]
+    [InlineData(false, "aa bb cc", "aa bb cc", false, false)]
+    [InlineData(true, "A B C", "A B C", false, false)]
+    // A wire value matching no EnumPair fails the FIX-field lookup, so init falls back to
+    // InitValue ("b" selected); with InvertOnWire that selection emits everything but b.
+    [InlineData(false, "unknown", "aa cc", false, true)]
     public void Init_fix_field_decodes_multiple_wire_values_and_inversion(
         bool chars,
         string wire,
+        string expectedWire,
         bool selectedA,
         bool selectedB
     )
@@ -112,10 +115,7 @@ public class InvertedListConformanceTests
         selected["a"].Should().Be(selectedA);
         selected["b"].Should().Be(selectedB);
         parameter.SetValueFromControl(control).IsValid.Should().BeTrue();
-        if (wire != "unknown")
-        {
-            parameter.WireValue.Should().Be(wire);
-        }
+        parameter.WireValue.Should().Be(expectedWire);
     }
 
     [Theory]

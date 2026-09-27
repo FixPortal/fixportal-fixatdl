@@ -81,43 +81,26 @@ public class TZTimeOnly_t : DateTimeTypeBase
     {
         DateTime? parsed = base.ConvertFromWireValueFormat(value);
 
-        if (parsed == null)
+        // Time-only values anchor to a stable sentinel date (0001-01-01) so the stored value and
+        // the round-trip comparison stay host-date-independent; the date component carries no
+        // meaning for this type.
+        DateTime? anchored = null;
+        if (parsed != null)
         {
-            _originalWireValue = null;
-            _parsedUtcValue = null;
-            return null;
+            DateTime result = parsed.Value;
+            anchored = new DateTime(
+                1,
+                1,
+                1,
+                result.Hour,
+                result.Minute,
+                result.Second,
+                result.Millisecond,
+                result.Kind
+            ).AddTicks(result.Ticks % TimeSpan.TicksPerMillisecond);
         }
 
-        DateTime result = parsed.Value;
-        DateTime anchored = new DateTime(
-            1,
-            1,
-            1,
-            result.Hour,
-            result.Minute,
-            result.Second,
-            result.Millisecond,
-            result.Kind
-        ).AddTicks(result.Ticks % TimeSpan.TicksPerMillisecond);
-
-        if (
-            DateTimeOffset.TryParseExact(
-                value,
-                _formatStrings,
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None,
-                out _
-            )
-        )
-        {
-            _originalWireValue = value;
-            _parsedUtcValue = anchored;
-        }
-        else
-        {
-            _originalWireValue = null;
-            _parsedUtcValue = null;
-        }
+        WireValueRoundTrip.Capture(value, _formatStrings, anchored, out _originalWireValue, out _parsedUtcValue);
 
         return anchored;
     }
@@ -129,32 +112,12 @@ public class TZTimeOnly_t : DateTimeTypeBase
     /// <returns>The FIX wire representation, or null.</returns>
     protected override string? ConvertToWireValueFormat(DateTime? value)
     {
-        if (value == null)
-        {
-            return null;
-        }
-
-        DateTime adjustedValue = value.Value.Kind switch
-        {
-            DateTimeKind.Utc => value.Value,
-            DateTimeKind.Local => value.Value.ToUniversalTime(),
-            _ => DateTime.SpecifyKind(value.Value, DateTimeKind.Utc),
-        };
-
-        // Round-trip the exact original wire string only when the instant is unchanged from
-        // what was parsed. For any other instant emit canonical UTC ('Z'): the parsed offset
-        // belongs to the parsed instant alone and must not be re-applied to a value set
-        // programmatically (control/SetWireValue) after the parse, which previously emitted
-        // the wrong offset.
-        if (_originalWireValue != null && _parsedUtcValue != null && adjustedValue.Equals(_parsedUtcValue.Value))
-        {
-            return _originalWireValue;
-        }
-
-        string format =
-            adjustedValue.Ticks % TimeSpan.TicksPerSecond == 0
-                ? FixDateTimeFormat.FixTimeOnlyWithTz
-                : FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset;
-        return adjustedValue.ToString(format, CultureInfo.InvariantCulture);
+        return WireValueRoundTrip.Emit(
+            value,
+            _originalWireValue,
+            _parsedUtcValue,
+            FixDateTimeFormat.FixTimeOnlyWithTz,
+            FixDateTimeFormat.FixTimeOnlyFractionalWithMinuteOffset
+        );
     }
 }
