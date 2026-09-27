@@ -189,9 +189,26 @@ public class NumericControlBase : InitializableControl<decimal?>
             return null;
         }
 
+        decimal value = (decimal)_value;
+
+        // decimal.ToInt32 truncates toward zero, so a fractional control value bound to an
+        // integer parameter went on the wire as a different number and reported valid
+        // (audit 2026-09-25 F1/C). Fractional values are legitimate only on the float path
+        // (DoubleSpinner_t -> ToDecimal); reject them here as the text path does.
+        if (value % 1 != 0)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(
+                this,
+                ErrorMessages.UnsupportedControlValueConversion,
+                _value,
+                "Int32",
+                Id
+            );
+        }
+
         try
         {
-            return decimal.ToInt32((decimal)_value);
+            return decimal.ToInt32(value);
         }
         catch (OverflowException ex)
         {
@@ -220,9 +237,24 @@ public class NumericControlBase : InitializableControl<decimal?>
             return null;
         }
 
+        decimal value = (decimal)_value;
+
+        // Same truncation guard as ToInt32 (audit 2026-09-25 F2/C): Length_t, NumInGroup_t,
+        // SeqNum_t and TagNum_t all reach this path.
+        if (value % 1 != 0)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(
+                this,
+                ErrorMessages.UnsupportedControlValueConversion,
+                _value,
+                "UInt32",
+                Id
+            );
+        }
+
         try
         {
-            return decimal.ToUInt32((decimal)_value);
+            return decimal.ToUInt32(value);
         }
         catch (OverflowException ex)
         {
