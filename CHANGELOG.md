@@ -19,6 +19,7 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - Helper rules now select ungrouped radio companions only when they share the same parameter.
 - Null FIX field values are treated as absent by `TryGetValue`, and custom argument exceptions can use a string-only constructor.
 - Registered custom flags attributes accept defined bit combinations and reject undefined bits.
+- Spinner controls now reject a fractional value bound to an integer parameter instead of silently truncating it (1.5 previously went on the wire as 1); fractional values remain supported on float parameters via `DoubleSpinner_t`.
 
 ## [1.1.6] — 2026-09-20
 

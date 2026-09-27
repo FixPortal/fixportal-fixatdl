@@ -1,9 +1,11 @@
+using System.Globalization;
 using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Controls.Support;
 using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Enumerations;
 using NodaTime;
 using NodaTime.Testing;
@@ -253,6 +255,57 @@ public class NumericControlTests
 
         control.SetValue("12.5");
         control.GetCurrentValue().Should().Be(12.5m);
+    }
+
+    [Fact]
+    public void Spinner_fractional_value_into_int_parameter_is_rejected()
+    {
+        // decimal.ToInt32 truncates toward zero, so 1.5 bound to an Int_t parameter went on the
+        // wire as 1 and reported valid (audit 2026-09-25 F1/C). Rejection matches the text path.
+        var control = new SingleSpinner_t("ss");
+        control.LoadInitValue(FixFieldValueProvider.Empty);
+        control.SetValue(1.5m);
+
+        var act = () => control.ToInt32(Substitute.For<IParameter>(), CultureInfo.InvariantCulture);
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Spinner_fractional_value_into_uint_parameter_is_rejected()
+    {
+        // Same truncation on the uint path (audit 2026-09-25 F2/C), which Length_t, NumInGroup_t,
+        // SeqNum_t and TagNum_t parameters all reach.
+        var control = new SingleSpinner_t("ss");
+        control.LoadInitValue(FixFieldValueProvider.Empty);
+        control.SetValue(1.5m);
+
+        var act = () => control.ToUInt32(Substitute.For<IParameter>(), CultureInfo.InvariantCulture);
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Spinner_whole_value_into_int_parameter_still_converts()
+    {
+        var control = new SingleSpinner_t("ss");
+        control.LoadInitValue(FixFieldValueProvider.Empty);
+        control.SetValue(2m);
+
+        control.ToInt32(Substitute.For<IParameter>(), CultureInfo.InvariantCulture).Should().Be(2);
+        control.ToUInt32(Substitute.For<IParameter>(), CultureInfo.InvariantCulture).Should().Be(2u);
+    }
+
+    [Fact]
+    public void DoubleSpinner_fractional_value_into_float_parameter_is_unaffected()
+    {
+        // Fractional values are the DoubleSpinner_t -> Float_t path's whole purpose; ToDecimal
+        // never truncates.
+        var control = new DoubleSpinner_t("ds");
+        control.LoadInitValue(FixFieldValueProvider.Empty);
+        control.SetValue(1.5m);
+
+        control.ToDecimal(Substitute.For<IParameter>(), CultureInfo.InvariantCulture).Should().Be(1.5m);
     }
 
     [Fact]
