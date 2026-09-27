@@ -151,14 +151,39 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     }
 
     /// <summary>
+    /// Gets every value for the specified FIX field name, in wire order.
+    /// </summary>
+    /// <param name="fixField">The FIX field name.</param>
+    /// <returns>All occurrences in wire order; an empty list when the field is absent or the name
+    /// does not resolve.</returns>
+    public IReadOnlyList<string> GetValues(string fixField)
+    {
+        return TryResolveField(fixField, out FixField field) ? _message.GetValues(field) : [];
+    }
+
+    /// <summary>
+    /// Gets every value for the specified FIX tag, in wire order.
+    /// </summary>
+    /// <param name="tag">The FIX tag to look up.</param>
+    /// <returns>All occurrences in wire order; an empty list when the tag is absent.</returns>
+    /// <remarks>Repeating-group members share tags across group entries; a group-aware host reads
+    /// every occurrence here while the indexers and TryGetValue resolve to the first occurrence.</remarks>
+    public IReadOnlyList<string> GetValues(FixTag tag)
+    {
+        return _message.GetValues(tag);
+    }
+
+    /// <summary>
     /// Adds a FIX tag value to the collection.
     /// </summary>
     /// <param name="tag">The FIX tag to add.</param>
     /// <param name="value">The tag value.</param>
     public void Add(FixTag tag, string value)
     {
-        // Use TryAdd so a duplicate tag surfaces as a domain FixParseException, consistent with the
-        // FixMessage(string) parse path, rather than a raw Dictionary ArgumentException.
+        // Builder-side duplicates stay rejected even though wire parsing tolerates repeats: an Add
+        // that repeats a tag produces an ambiguous outbound scalar, not a group — build outbound
+        // groups from StrategyParametersGrpEmitter tuples instead. TryAdd also keeps the failure a
+        // domain FixParseException rather than a raw Dictionary ArgumentException.
         if (!_message.TryAdd(tag, value))
         {
             throw ThrowHelper.New<FixParseException>(

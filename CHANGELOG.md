@@ -10,6 +10,23 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
 ## [Unreleased]
 
+### Added
+
+- `FixMessage.GetValues` and `FixTagValuesCollection.GetValues` return every
+  occurrence of a repeated tag in wire order, for hosts reading
+  repeating-group members.
+
+### Changed
+
+- `FixMessage` wire parsing no longer rejects a repeated tag: every occurrence
+  is preserved in wire order, enumeration and `ToFix()` cover them all (a
+  parsed message round-trips byte-for-byte), and the scalar members — indexer,
+  `TryGetValue`, `ContainsKey`, `Count`, `Keys`, `Values`, `FixFields` —
+  resolve to the first occurrence. Group semantics (`NoXXX` count fields and
+  entry boundaries) are not interpreted; that stays with the host.
+  `FixTagValuesCollection.Add` still rejects a duplicate tag: an outbound
+  repeated scalar is a modeling error, not a group.
+
 ### Fixed
 
 - Empty parameter refreshes reset only bound controls and no longer infer helper checkbox state; unbound controls keep their current value.
