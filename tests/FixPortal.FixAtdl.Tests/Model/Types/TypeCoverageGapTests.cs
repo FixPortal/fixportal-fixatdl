@@ -80,7 +80,7 @@ public class TypeCoverageGapTests
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // String_t — SOH delimiter rejection (lines 62-63 in String_t.ValidateValue)
+    // String_t — SOH delimiter rejection
     // ──────────────────────────────────────────────────────────────────────────
 
     [Fact]
@@ -95,7 +95,7 @@ public class TypeCoverageGapTests
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // String_t — ToEnumState (lines 161-172 in String_t / AtdlReferenceType)
+    // String_t — ToEnumState
     // ──────────────────────────────────────────────────────────────────────────
 
     [Fact]
@@ -121,7 +121,7 @@ public class TypeCoverageGapTests
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // EnumState.FromWireValue — exact-match precedence (batch-36 finding F1/X)
+    // EnumState.FromWireValue — exact-match precedence
     // ──────────────────────────────────────────────────────────────────────────
 
     [Theory]

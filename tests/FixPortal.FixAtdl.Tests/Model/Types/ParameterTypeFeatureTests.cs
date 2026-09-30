@@ -182,7 +182,7 @@ public class ParameterTypeFeatureTests
     }
 
     // Pins MidpointRounding.AwayFromZero on Precision output: 2.5 -> 3 (not banker's 2),
-    // -2.5 -> -3, 2.345 @2dp -> 2.35. Characterization for batch 5 M4 / S2325.
+    // -2.5 -> -3, 2.345 @2dp -> 2.35.
     [Theory]
     [InlineData("2.5", 0, "3")]
     [InlineData("-2.5", 0, "-3")]

@@ -391,7 +391,7 @@ public class Clock_t : InitializableControl<InitValueClock?>
         DateTime utc = _value.Value.ToDateTimeUtc();
 
         // Emit milliseconds only when present, so whole-second values keep the compact seconds form
-        // while sub-second precision is no longer silently dropped (batch 5, Phase-A follow-up).
+        // while sub-second precision is preserved.
         string format = utc.Millisecond == 0 ? FixDateTimeFormat.FixDateTime : FixDateTimeFormat.FixDateTimeMs;
 
         return utc.ToString(format, CultureInfo.InvariantCulture);

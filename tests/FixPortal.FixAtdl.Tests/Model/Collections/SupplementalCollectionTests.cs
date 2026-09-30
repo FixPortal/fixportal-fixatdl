@@ -118,16 +118,16 @@ public class SupplementalCollectionTests
     }
 
     [Fact]
-    public void EditRefCollection_ctor_with_evaluating_collection_succeeds()
+    public void EditRefCollection_registers_added_items_with_evaluating_collection()
     {
-        // NOTE: EditRef_t.Sources throws InternalErrorException before Resolve is called,
-        // so we can only test the no-evaluating-collection path when constructing unresolved items.
-        // Verify the EditRefCollection ctor accepting an evaluating collection does not throw on creation.
         var evaluating = new EditEvaluatingCollection<IParameter> { LogicOperator = LogicOperator_t.Or };
-
-        // Verify construction with an evaluating collection argument succeeds (non-null path covered).
         EditRefCollection<IParameter> refs = new(evaluating);
-        refs.Count.Should().Be(0);
+        var reference = new EditRef_t<IParameter>("editA");
+
+        refs.Add(reference);
+
+        refs.Should().Contain(reference);
+        evaluating.Should().Contain(reference);
     }
 
     // -----------------------------------------------------------------------
@@ -503,8 +503,8 @@ public class SupplementalCollectionTests
     [Fact]
     public void Clear_detaches_every_control_before_the_reset_notification()
     {
-        // Clear raises a Reset notification with no OldItems, so the detach must already have run in
-        // ClearItems when handlers observe the event (Gitar follow-up on CR13).
+        // Clear raises a Reset notification with no OldItems, so detaching must happen in ClearItems
+        // before handlers observe the event.
         var strategy = new Strategy_t();
         var panel = new StrategyPanel_t(strategy);
         var first = new TextField_t("c_First");

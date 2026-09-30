@@ -20,7 +20,7 @@ public class ValueConverterTests
     {
         var result = ValueConverter.ConvertTo<MonthYear>("202401");
 
-        result.Should().Be(MonthYear.Parse("202401"));
+        result.ToString().Should().Be("202401");
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public class ValueConverterTests
     {
         var result = ValueConverter.ConvertTo<Tenor>("M3");
 
-        result.Should().Be(Tenor.Parse("M3"));
+        result.ToString().Should().Be("M3");
     }
 
     [Fact]
