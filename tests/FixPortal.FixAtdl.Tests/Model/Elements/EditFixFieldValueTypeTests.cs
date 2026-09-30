@@ -120,9 +120,7 @@ public class EditFixFieldValueTypeTests
         var initial = Substitute.For<IInitialFixValueProvider>();
         initial.InputFixValues.Returns([]);
 
-        // "FIX_" plus a name that isn't a defined FixField member: TryGetValue already returns
-        // false for this before any type classification runs, so the comparison finds no value on
-        // either side and the edit does not evaluate true - unchanged from before this change.
+        // An unknown FIX field name yields no value, so the comparison cannot pass.
         var edit = MakeFixFieldEdit(strategy, "FIX_NotARealFixField", "1");
         edit.Evaluate(new FixFieldValueProvider(initial, strategy.Parameters));
 

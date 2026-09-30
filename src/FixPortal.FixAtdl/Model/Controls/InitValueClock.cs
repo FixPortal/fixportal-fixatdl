@@ -1,4 +1,4 @@
-// FP Enhancement: 2026-05-31 — NodaTime-backed holder for Clock_t initValue (batch 5, C1/C2).
+// FP Enhancement: 2026-05-31 — NodaTime-backed holder for Clock_t initValue.
 #region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..

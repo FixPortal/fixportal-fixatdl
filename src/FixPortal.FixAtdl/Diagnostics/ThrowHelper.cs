@@ -216,11 +216,8 @@ public static class ThrowHelper
     // FP Enhancement: 2026-09-27 — params object[] args -> params object?[] args to support nullable callers.
     public static Exception Rethrow(object? source, Exception ex, string format, params object?[] args)
     {
-        // Format ONCE. Callers of this params overload supply every argument the template needs
-        // (including ex.Message where it is referenced). Routing the formatted result through another
-        // formatting overload — as the previous implementation did — string.Formats it a SECOND time,
-        // which throws FormatException on literal braces ({NULL}, XML) or silently substitutes a stray
-        // {0}/{1} (F1a / F1b). The no-args case skips formatting so a brace-bearing literal is safe (F1c).
+        // Format once so braces in the resulting message remain literal instead of being interpreted
+        // as another format template.
         string message = FormatMessage(format, args);
 
         Exception newException = BuildRethrown(source, ex, null, message);

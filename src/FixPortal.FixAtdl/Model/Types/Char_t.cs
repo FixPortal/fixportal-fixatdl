@@ -70,8 +70,7 @@ public class Char_t : AtdlValueType<char>, IControlConvertible
             throw ThrowHelper.New<ArgumentException>(this, ErrorMessages.InvalidNullOrEmptyStringValue);
         }
 
-        // A Char value is exactly one character. Previously only null/empty was rejected, so a
-        // multi-character wire value such as "AB" was silently truncated to its first character.
+        // A Char value is exactly one character.
         if (value.Length != 1)
         {
             throw ThrowHelper.New<ArgumentException>(

@@ -8,7 +8,7 @@
 
 **Tech Stack:** xUnit v3 (`[Fact]`/`[Theory]`/`[InlineData]`), AwesomeAssertions (`.Should()`), NSubstitute (for `IParameter`/`IControlConvertible` seams only where a real object is impractical), `Microsoft.Extensions.TimeProvider.Testing` (`FakeTimeProvider`, already referenced), coverlet.collector + ReportGenerator (wired in Phase 0), dotnet-stryker 4.14.2.
 
-**Roadmap:** `docs/superpowers/plans/2026-05-30-fixatdl-1.0-roadmap.md` (this is Phase 1; gate per roadmap = Phase 0 merged ✅).
+**Roadmap:** `docs/superpowers/plans/2026-05-30-fixatdl-1.0-roadmap.md` (this is Phase 1; gate per roadmap = Phase 0 merged).
 
 **Baseline:** `docs/coverage-baseline.md` — overall 32% line / 19% branch at the start of this phase.
 

@@ -212,8 +212,7 @@ public class Percentage_t : Float_t
 
         // The control always works in whole-percent units (75 for 75%); MultiplyBy100 affects only
         // the wire representation, not the control. The native value is always the fraction (0.75),
-        // so scale up by 100 in both cases. (Previously the MultiplyBy100==true branch returned the
-        // raw fraction, so a load/edit/save cycle shrank the displayed value 100x.)
+        // so scale up by 100 in both cases.
         return value != null ? RemoveTrailingZeroes(value * 100) : null;
     }
 
