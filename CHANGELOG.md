@@ -8,7 +8,13 @@ Dates are the release-tag date, in UTC. Entries are consumer-facing: build,
 CI, and test-infrastructure commits are omitted unless they change what a
 consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
+The repository history starts at the 1.2.0 release. Earlier versions remain
+installable from NuGet.org; their notes are kept below, but their tags were
+retired with the pre-release history.
+
 ## [Unreleased]
+
+## [1.2.0] — 2026-10-03
 
 ### Added
 
@@ -55,13 +61,13 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - `StrategyParametersGrpEmitter` skips a parameter whose name is null, empty or whitespace instead of emitting a `958=` field this library's own parser rejects.
 - Nullable annotations corrected to describe routinely-absent values: `Edit_t.Field2`/`Id`/`Value`, `Control_t.ToolTip`, `BinaryControlBase.CheckedEnumRef`/`UncheckedEnumRef`, and the `value` parameter of `FixDateTime.TryParse` are now `string?`; `Control_t.TryConvertToInt`/`TryConvertToUint`/`TryConvertToDecimal` documentation no longer promises `false` for input that throws.
 
-## [1.1.6] — 2026-09-20
+## 1.1.6 — 2026-09-20
 
 ### Changed
 
 - Corrected the FIXatdl Inspector link in the package README.
 
-## [1.1.5] — 2026-09-20
+## 1.1.5 — 2026-09-20
 
 ### Fixed
 
@@ -96,7 +102,7 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 - README hero and GitHub social preview drop the angel wings from the XML
   card. The markdown image URL is unchanged.
 
-## [1.1.4] — 2026-09-17
+## 1.1.4 — 2026-09-17
 
 ### Fixed
 
@@ -110,7 +116,7 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   path every UI time picker uses, so 1.1.3 is not safe for a host that edits a
   zoned `Clock_t`.
 
-## [1.1.3] — 2026-09-17
+## 1.1.3 — 2026-09-17
 
 ### Added
 
@@ -278,20 +284,20 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   from the strategy's control index; emptied sender-tracking entries are
   dropped.
 
-## [1.1.2] — 2026-09-12
+## 1.1.2 — 2026-09-12
 
 ### Fixed
 
 - Release pipeline uses the NuGet policy creator for OIDC login. Packaging only;
   no library change.
 
-## [1.1.1] — 2026-09-12
+## 1.1.1 — 2026-09-12
 
 ### Changed
 
 - Packages publish to NuGet.org under the FixPortal organization.
 
-## [1.1.0] — 2026-09-12
+## 1.1.0 — 2026-09-12
 
 ### Added
 
@@ -314,7 +320,7 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   error instead of failing later.
 - A caller-supplied `XmlSchemaSet` is compiled eagerly, avoiding a race.
 
-## [1.0.6] — 2026-09-12
+## 1.0.6 — 2026-09-12
 
 ### Added
 
@@ -322,7 +328,7 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   (tags 957–960) from core, for hosts using `Tag957Support` transport instead of
   or alongside direct per-parameter FIX tags.
 
-## [1.0.5] — 2026-09-12
+## 1.0.5 — 2026-09-12
 
 ### Added
 
@@ -341,13 +347,13 @@ consumer sees. No `1.0.2`–`1.0.4` release was tagged.
   tracking files (2026-07-04). The public surface is no longer guarded by a
   build-breaking analyzer; semantic versioning is the contract.
 
-## [1.0.1] — 2026-06-03
+## 1.0.1 — 2026-06-03
 
 ### Changed
 
 - Cleared IDE and style warnings; CA1062 and CA2007 policy locked.
 
-## [1.0.0] — 2026-06-03
+## 1.0.0 — 2026-06-03
 
 First stable release of the modernised fork.
 
@@ -369,21 +375,10 @@ First stable release of the modernised fork.
   [WPF](https://github.com/FixPortal/fixportal-fixatdl-wpf) and
   [React](https://github.com/FixPortal/fixportal-fixatdl-react) adapters.
 
-## [0.1.0] — 2026-05-24
+## 0.1.0 — 2026-05-24
 
 First packaged fork of [Atdl4net](https://github.com/atdl4net/atdl4net),
 pre-release.
 
-[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.6...HEAD
-[1.1.6]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.5...v1.1.6
-[1.1.5]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.4...v1.1.5
-[1.1.4]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.3...v1.1.4
-[1.1.3]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.2...v1.1.3
-[1.1.2]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.1...v1.1.2
-[1.1.1]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.1.0...v1.1.1
-[1.1.0]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.0.6...v1.1.0
-[1.0.6]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.0.5...v1.0.6
-[1.0.5]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.0.1...v1.0.5
-[1.0.1]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/FixPortal/fixportal-fixatdl/compare/v0.1.0...v1.0.0
-[0.1.0]: https://github.com/FixPortal/fixportal-fixatdl/releases/tag/v0.1.0
+[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/FixPortal/fixportal-fixatdl/releases/tag/v1.2.0
