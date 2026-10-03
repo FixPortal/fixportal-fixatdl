@@ -1,0 +1,199 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Collections;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Utility;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
+
+namespace FixPortal.FixAtdl.Validation;
+
+// IDisposable is not needed: this type holds only Edit_t/EditRef_t references (no unmanaged resources,
+// no event subscriptions). The disposal contract existed for the removed Notification assembly (Task A8).
+/// <summary>
+/// Provides shared edit-evaluation behavior for state rules and strategy edits.
+/// </summary>
+public abstract class EditEvaluator<T> : IResolvable<Strategy_t, T>
+    where T : class, IValueProvider
+{
+    /// <summary>
+    /// Gets the set of field sources referenced by the active edit or edit reference.
+    /// </summary>
+    public HashSet<string> Sources
+    {
+        get
+        {
+            if (Edit != null)
+            {
+                return Edit.Sources;
+            }
+
+            if (EditRef != null)
+            {
+                return EditRef.Sources;
+            }
+
+            throw ThrowHelper.New<InvalidOperationException>(
+                this,
+                ErrorMessages.NeitherEditNorEditRefSetOnObject,
+                GetType().Name
+            );
+        }
+    }
+
+    /// <summary>
+    /// Gets the current evaluation state of the active edit or edit reference.
+    /// </summary>
+    public bool CurrentState
+    {
+        get
+        {
+            if (Edit != null)
+            {
+                return Edit.CurrentState;
+            }
+
+            if (EditRef != null)
+            {
+                return EditRef.CurrentState;
+            }
+
+            throw ThrowHelper.New<InvalidOperationException>(
+                this,
+                ErrorMessages.NeitherEditNorEditRefSetOnObject,
+                GetType().Name
+            );
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the referenced edit wrapper.
+    /// </summary>
+    public EditRef_t<T> EditRef
+    {
+        get;
+        set
+        {
+            // Guard on value too: assigning null to an already-clear property must be a no-op, not a
+            // false "both set" error (#R25). Null stays representable here (the default is already a
+            // suppressed null); the non-nullable declaration is the compatibility surface.
+            if (value != null && Edit != null)
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    this,
+                    ErrorMessages.BothEditAndEditRefSetOnObject,
+                    GetType().Name
+                );
+            }
+
+            field = value!;
+        }
+    } = null!;
+
+    /// <summary>
+    /// Gets or sets the direct edit definition.
+    /// </summary>
+    public Edit_t<T> Edit
+    {
+        get;
+        set
+        {
+            // Mirror of the EditRef guard: assigning null to an already-clear property is a no-op (#R25).
+            if (value != null && EditRef != null)
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    this,
+                    ErrorMessages.BothEditAndEditRefSetOnObject,
+                    GetType().Name
+                );
+            }
+
+            field = value!;
+        }
+    } = null!;
+
+    /// <summary>
+    /// Evaluates based on the current field values and any additional FIX field values that this EditEvaluator
+    /// references.  Used for evaluating Edits in the context of StrategyEdits.
+    /// </summary>
+    /// <param name="additionalValues">Any additional FIX field values that may be required in the Edit evaluation.</param>
+    public void Evaluate(FixFieldValueProvider additionalValues)
+    {
+        if (Edit != null)
+        {
+            Edit.Evaluate(additionalValues);
+        }
+        else if (EditRef != null)
+        {
+            EditRef.Evaluate(additionalValues);
+        }
+        else
+        {
+            throw ThrowHelper.New<InvalidOperationException>(
+                this,
+                ErrorMessages.NeitherEditNorEditRefSetOnObject,
+                GetType().Name
+            );
+        }
+    }
+
+    /// <summary>
+    /// Evaluates based on the current field values.  Used for evaluating Edits in the context of StateRules.
+    /// </summary>
+    public void Evaluate()
+    {
+        if (Edit != null)
+        {
+            Edit.Evaluate();
+        }
+        else if (EditRef != null)
+        {
+            EditRef.Evaluate();
+        }
+        else
+        {
+            throw ThrowHelper.New<InvalidOperationException>(
+                this,
+                ErrorMessages.NeitherEditNorEditRefSetOnObject,
+                GetType().Name
+            );
+        }
+    }
+
+    #region IResolvable<Strategy_t> Members
+
+    /// <summary>
+    /// Resolves all interdependencies e.g. edits to edit refs, control values to edits, etc.  Called once
+    /// all strategies have been loaded as there may be dependencies on EditRefs at the global level.
+    /// </summary>
+    /// <param name="strategy">The strategy providing resolution context.</param>
+    /// <param name="sourceCollection">The value source collection used to resolve field references.</param>
+    void IResolvable<Strategy_t, T>.Resolve(Strategy_t strategy, ISimpleDictionary<T> sourceCollection)
+    {
+        if (Edit == null && EditRef == null)
+        {
+            throw ThrowHelper.New<InvalidOperationException>(
+                this,
+                ErrorMessages.NeitherEditNorEditRefSetOnObject,
+                GetType().Name
+            );
+        }
+
+        if (Edit != null)
+        {
+            ((IResolvable<Strategy_t, T>)Edit).Resolve(strategy, sourceCollection);
+        }
+        else
+        {
+            ((IResolvable<Strategy_t, T>)EditRef).Resolve(strategy, sourceCollection);
+        }
+    }
+
+    #endregion IResolvable<Strategy_t> Members
+}

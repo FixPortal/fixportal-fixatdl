@@ -1,0 +1,23 @@
+{
+  "stryker-config": {
+    "project": "FixPortal.FixAtdl.csproj",
+    "reporters": [
+      "progress",
+      "html",
+      "json"
+    ],
+    "report-file-name": "mutation-report",
+    "mutation-level": "Standard",
+    "coverage-analysis": "off",
+    "test-runner": "mtp",
+    "concurrency": 4,
+    "thresholds": {
+      "high": 80,
+      "low": 70,
+      "break": 30
+    },
+    "mutate": [
+      "**/*.cs"
+    ]
+  }
+}

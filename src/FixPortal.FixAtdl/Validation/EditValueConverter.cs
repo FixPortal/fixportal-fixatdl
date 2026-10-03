@@ -1,0 +1,177 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using System.Globalization;
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model;
+using FixPortal.FixAtdl.Model.Reference;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
+using FixPortal.FixAtdl.Utility;
+
+namespace FixPortal.FixAtdl.Validation;
+
+/// <summary>
+/// Provides value conversion for <see cref="FixPortal.FixAtdl.Model.Elements.Edit_t"/> evaluation.
+/// </summary>
+public static class EditValueConverter
+{
+    private static readonly string ExceptionContext = typeof(EditValueConverter).FullName!;
+
+    /// <summary>
+    /// Attempts to convert the second parameter value to a comparable type of the first parameter.
+    /// </summary>
+    /// <param name="typeInstanceToMatch">Instance of a the target comparable type.</param>
+    /// <param name="value">Value to convert.</param>
+    /// <returns>Converted value as an <see cref="IComparable"/>.</returns>
+    /// <exception cref="InvalidCastException">Thrown if the value cannot be converted to the target type.</exception>
+    /// <exception cref="FormatException">Thrown if the value cannot be converted into a valid numeric type.</exception>
+    /// <exception cref="Diagnostics.Exceptions.InvalidFieldValueException">Thrown if <paramref name="value"/> is null (a missing operand), or if a conversion fails for the matched type.</exception>
+    public static IComparable ConvertToComparableType(object typeInstanceToMatch, string value)
+    {
+        // A null operand is a missing Edit value, not a zero. The numeric Convert.To* paths would
+        // silently coerce null to 0 (masking a missing right-hand side and making comparisons pass
+        // spuriously) while the enum/MonthYear/Tenor paths would NRE. Reject it consistently with a
+        // domain exception, matching ConvertToBool's null handling (O-G2). This guard sits before the
+        // typeInstanceToMatch early return so a (null, null) call still throws rather than returning a
+        // null IComparable.
+        if (value == null)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
+        }
+
+        // If we don't have a valid type to convert to, then best leave the value alone.
+        if (typeInstanceToMatch == null)
+        {
+            return value;
+        }
+
+        // Data_t (char[]) has no meaningful comparison target. Without this check the switch below
+        // falls to its default arm and raises InvalidCastException — a raw data-conversion error —
+        // instead of the InvalidOperationException/"unsupported comparison" error that
+        // Edit_t.CheckForUnsupportedComparisons raises for the same scenario elsewhere.
+        if (typeInstanceToMatch is char[] lhsChars)
+        {
+            throw ThrowHelper.New<InvalidOperationException>(
+                ExceptionContext,
+                ErrorMessages.UnsupportedComparisonOperation,
+                value,
+                new string(lhsChars)
+            );
+        }
+
+        string? type = typeInstanceToMatch.GetType().FullName;
+
+        try
+        {
+            return type switch
+            {
+                // decimal.Parse with the FIX decimal styles rather than Convert.ToDecimal, which parses with
+                // NumberStyles.Number and so read a thousands-separated operand as a different number.
+                "System.Decimal" => decimal.Parse(value, Atdl.FixDecimalStyles, CultureInfo.InvariantCulture),
+                "System.Boolean" => ConvertToBool(value),
+                "System.Int32" => Convert.ToInt32(value, CultureInfo.InvariantCulture),
+                "System.UInt32" => Convert.ToUInt32(value, CultureInfo.InvariantCulture),
+                "System.Char" => Convert.ToChar(value),
+                "System.DateTime" => ConvertToDateTime(typeInstanceToMatch, value),
+                "System.String" => value,
+                "FixPortal.FixAtdl.Model.Reference.IsoCountryCode" => value.ParseAsEnum<IsoCountryCode>(),
+                "FixPortal.FixAtdl.Model.Reference.IsoCurrencyCode" => value.ParseAsEnum<IsoCurrencyCode>(),
+                "FixPortal.FixAtdl.Model.Reference.IsoLanguageCode" => value.ParseAsEnum<IsoLanguageCode>(),
+                "FixPortal.FixAtdl.Model.Types.Support.MonthYear" => MonthYear.Parse(value),
+                "FixPortal.FixAtdl.Model.Types.Support.Tenor" => Tenor.Parse(value),
+                "FixPortal.FixAtdl.Model.Controls.Support.EnumState" => value,
+                _ => throw ThrowHelper.New<InvalidCastException>(
+                    ExceptionContext,
+                    ErrorMessages.DataConversionError1,
+                    value,
+                    type
+                ),
+            };
+        }
+        catch (Exception ex) when (ex is FormatException or OverflowException or ArgumentException)
+        {
+            // Translate raw Convert.* conversion failures into a domain InvalidFieldValueException,
+            // matching the boundary established elsewhere rather than leaking a raw BCL exception (M4).
+            throw ThrowHelper.New<InvalidFieldValueException>(
+                ExceptionContext,
+                ex,
+                ErrorMessages.DataConversionError1,
+                value,
+                type
+            );
+        }
+    }
+
+    private static bool ConvertToBool(string value)
+    {
+        if (value == null)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(ExceptionContext, ErrorMessages.IllegalUseOfNullError);
+        }
+
+        return value.ToUpperInvariant() switch
+        {
+            "N" => false,
+            "Y" => true,
+            // Guard the bool.Parse so an unparseable value raises a domain error instead of a raw
+            // FormatException (and use the invariant upper-case above for culture safety).
+            _ => bool.TryParse(value, out bool result)
+                ? result
+                : throw ThrowHelper.New<InvalidFieldValueException>(
+                    ExceptionContext,
+                    ErrorMessages.DataConversionError1,
+                    value,
+                    "System.Boolean"
+                ),
+        };
+    }
+
+    private static DateTime ConvertToDateTime(object typeInstanceToMatch, string value)
+    {
+        DateTime lhsDt = (DateTime)typeInstanceToMatch;
+        DateTime parsed = FixDateTime.Parse(value, CultureInfo.InvariantCulture);
+        // Normalise to UTC matching the canonical Kind=Utc contract
+        DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
+
+        if (lhsDt.Year == 1)
+        {
+            // LHS is time-only (anchored to 0001-01-01). Anchor RHS to 0001-01-01 too so
+            // the comparison compares times of day.
+            normalised = new DateTime(
+                1,
+                1,
+                1,
+                normalised.Hour,
+                normalised.Minute,
+                normalised.Second,
+                normalised.Millisecond,
+                normalised.Kind
+            ).AddTicks(normalised.Ticks % TimeSpan.TicksPerMillisecond);
+        }
+        else if (FixDateTime.IsTimeOnlyText(value))
+        {
+            // LHS is datetime, but RHS is time-only.
+            // If RHS is date-less, it represents a time-of-day comparison on the same date as LHS.
+            // So we copy LHS's date component to RHS.
+            normalised = new DateTime(
+                lhsDt.Year,
+                lhsDt.Month,
+                lhsDt.Day,
+                normalised.Hour,
+                normalised.Minute,
+                normalised.Second,
+                normalised.Millisecond,
+                normalised.Kind
+            ).AddTicks(normalised.Ticks % TimeSpan.TicksPerMillisecond);
+        }
+
+        return normalised;
+    }
+}

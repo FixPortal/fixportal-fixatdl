@@ -1,0 +1,272 @@
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Reference;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Validation;
+
+namespace FixPortal.FixAtdl.Tests.Validation;
+
+/// <summary>
+/// Tests for <see cref="EditValueConverter.ConvertToComparableType"/> covering each type branch.
+/// </summary>
+public class EditValueConverterTests
+{
+    // ── Null prototype ───────────────────────────────────────────────────────
+
+    [Fact]
+    public void Null_prototype_returns_value_unchanged()
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(null!, "hello");
+        result.Should().Be("hello");
+    }
+
+    [Fact]
+    public void Null_value_throws_even_when_the_prototype_is_also_null()
+    {
+        // The null-operand guard sits before the null-prototype early return, so a (null, null) call
+        // surfaces the documented IllegalUseOfNullError instead of returning a null IComparable.
+        var act = () => EditValueConverter.ConvertToComparableType(null!, null!);
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    // ── Null value (O-G2): a missing operand must fail fast, not coerce to 0 ──
+    // Numeric types previously coerced null silently to zero; parsed-struct types
+    // previously threw NullReferenceException inside their Parse. Both must now
+    // surface InvalidFieldValueException, so they share one assertion path.
+
+    [Theory]
+    [InlineData(typeof(decimal))] // was: Convert.ToDecimal(null) => 0m  (silent)
+    [InlineData(typeof(int))] // was: Convert.ToInt32(null)   => 0   (silent)
+    [InlineData(typeof(uint))] // was: Convert.ToUInt32(null)  => 0u  (silent)
+    [InlineData(typeof(MonthYear))] // was: NRE inside MonthYear.Parse(null)
+    [InlineData(typeof(Tenor))] // was: NRE inside Tenor.Parse(null)
+    public void Null_value_throws_InvalidFieldValueException(Type prototypeType)
+    {
+        object prototype = Activator.CreateInstance(prototypeType)!;
+        var act = () => EditValueConverter.ConvertToComparableType(prototype, null!);
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    // ── Decimal ─────────────────────────────────────────────────────────────
+
+    [Theory]
+    [InlineData("1.5", 1.5)]
+    [InlineData("0", 0.0)]
+    [InlineData("-99.99", -99.99)]
+    public void Converts_decimal_string(string input, double expected)
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(0m, input);
+        result.Should().Be((decimal)expected);
+    }
+
+    [Fact]
+    public void Throws_InvalidFieldValueException_for_bad_decimal()
+    {
+        var act = () => EditValueConverter.ConvertToComparableType(0m, "not-a-decimal");
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    // ── Int32 ────────────────────────────────────────────────────────────────
+
+    [Theory]
+    [InlineData("42", 42)]
+    [InlineData("-1", -1)]
+    [InlineData("0", 0)]
+    public void Converts_int32_string(string input, int expected)
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(0, input);
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Throws_InvalidFieldValueException_for_bad_int32()
+    {
+        var act = () => EditValueConverter.ConvertToComparableType(0, "not-a-number");
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Throws_InvalidFieldValueException_for_int32_overflow()
+    {
+        var act = () => EditValueConverter.ConvertToComparableType(0, "99999999999999999");
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    // ── UInt32 ───────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Converts_uint32_string()
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(0u, "100");
+        result.Should().Be(100u);
+    }
+
+    [Fact]
+    public void Throws_InvalidFieldValueException_for_bad_uint32()
+    {
+        var act = () => EditValueConverter.ConvertToComparableType(0u, "xyz");
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    // ── Char ─────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Converts_char_string()
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType('A', "B");
+        result.Should().Be('B');
+    }
+
+    [Fact]
+    public void Rejects_data_values_as_unsupported_comparison_operands()
+    {
+        char[] dataValue = ['A'];
+        var act = () => EditValueConverter.ConvertToComparableType(dataValue, "B");
+
+        act.Should().Throw<InvalidOperationException>();
+    }
+
+    // ── Boolean ─────────────────────────────────────────────────────────────
+
+    [Theory]
+    [InlineData("Y", true)]
+    [InlineData("N", false)]
+    [InlineData("True", true)]
+    [InlineData("False", false)]
+    [InlineData("true", true)]
+    [InlineData("false", false)]
+    public void Converts_bool_string(string input, bool expected)
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(false, input);
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Throws_InvalidFieldValueException_for_bad_bool()
+    {
+        var act = () => EditValueConverter.ConvertToComparableType(false, "maybe");
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Throws_InvalidFieldValueException_for_null_bool()
+    {
+        var act = () => EditValueConverter.ConvertToComparableType(false, null!);
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    // ── String ───────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Converts_string_returns_same_value()
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType("prototype", "actual");
+        result.Should().Be("actual");
+    }
+
+    // ── DateTime ─────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Converts_datetime_string()
+    {
+        // FIX UTCTimestamp format: YYYYMMDD-HH:MM:SS
+        IComparable result = EditValueConverter.ConvertToComparableType(
+            new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            "20240101-09:30:00"
+        );
+        result.Should().Be(new DateTime(2024, 1, 1, 9, 30, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void Converts_full_datetime_to_time_only_prototype_date()
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(
+            new DateTime(1, 1, 1, 8, 0, 0, DateTimeKind.Utc),
+            "20260101-09:30:00"
+        );
+
+        result.Should().Be(new DateTime(1, 1, 1, 9, 30, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void Converts_time_only_value_to_datetime_prototype_date()
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(
+            new DateTime(2026, 1, 15, 8, 0, 0, DateTimeKind.Utc),
+            "09:30:00"
+        );
+
+        result.Should().Be(new DateTime(2026, 1, 15, 9, 30, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void Converts_iso8601_value_without_discarding_its_date()
+    {
+        // R04: the eight-digit heuristic misclassified an ISO-8601 RHS as date-less, so its date
+        // was overwritten with the LHS date and the comparison silently flipped.
+        IComparable result = EditValueConverter.ConvertToComparableType(
+            new DateTime(2025, 12, 31, 10, 0, 0, DateTimeKind.Utc),
+            "2026-01-01T00:00:00Z"
+        );
+
+        result.Should().Be(new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+    }
+
+    // ── Enum codes ───────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Converts_iso_country_code()
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(default(IsoCountryCode), "US");
+        result.Should().Be(IsoCountryCode.US);
+    }
+
+    [Fact]
+    public void Converts_iso_currency_code()
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(default(IsoCurrencyCode), "USD");
+        result.Should().Be(IsoCurrencyCode.USD);
+    }
+
+    [Fact]
+    public void Converts_iso_language_code()
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(default(IsoLanguageCode), "en");
+        result.Should().Be(IsoLanguageCode.EN);
+    }
+
+    // ── MonthYear / Tenor ────────────────────────────────────────────────────
+
+    [Fact]
+    public void Converts_month_year()
+    {
+        IComparable result = EditValueConverter.ConvertToComparableType(default(MonthYear), "202401");
+        result.Should().Be(MonthYear.Parse("202401"));
+    }
+
+    [Fact]
+    public void Wraps_invalid_month_year_values_in_InvalidFieldValueException()
+    {
+        var act = () => EditValueConverter.ConvertToComparableType(default(MonthYear), "not-a-month-year");
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Wraps_invalid_tenor_values_in_InvalidFieldValueException()
+    {
+        var act = () => EditValueConverter.ConvertToComparableType(default(Tenor), "not-a-tenor");
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    // ── Unknown type → InvalidCastException ──────────────────────────────────
+
+    [Fact]
+    public void Throws_InvalidCastException_for_unknown_type()
+    {
+        // Pass an instance of an unsupported type as the prototype.
+        var act = () => EditValueConverter.ConvertToComparableType(new List<int>(), "value");
+        act.Should().Throw<InvalidCastException>();
+    }
+}

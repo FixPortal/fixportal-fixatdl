@@ -1,0 +1,1291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Synthetic FIXatdl 1.1 conformance fixture. Structurally derived from a real-world production broker spec, with all firm-, product-, and identity-bearing content removed (provider, brand/product names, comments). Retained solely to exercise the parser and model against real-world construct combinations. -->
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow" xmlns:tz="http://www.fixprotocol.org/FIXatdl-1-1/Timezones" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core fixatdl-core-1-1.xsd" strategyIdentifierTag="6061" changeStrategyOnCxlRpl="true">
+  <Strategy providerID="DEMO" name="DARK_NA" uiRep="DARK" wireValue="DARK" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="Urgency" xsi:type="Char_t" fixTag="6065" use="required" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="0" />
+      <EnumPair enumID="o2" index="1" wireValue="1" />
+      <EnumPair enumID="o3" index="2" wireValue="2" />
+      <EnumPair enumID="o4" index="3" wireValue="3" />
+      <EnumPair enumID="o5" index="4" wireValue="4" />
+      <EnumPair enumID="o6" index="5" wireValue="B" />
+    </Parameter>
+    <Parameter name="GetItDonePrice" xsi:type="Price_t" fixTag="7927" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.0001" />
+    <Parameter name="MaxPctVol" xsi:type="Int_t" fixTag="6064" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="MinDarkQty" xsi:type="Qty_t" fixTag="7933" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:DropDownList_t" ID="Urgency" parameterRef="Urgency" label="Urgency:*" initValue="o4">
+                <lay:ListItem uiRep="Blocks" enumID="o6" />
+                <lay:ListItem uiRep="Dark" enumID="o1" />
+                <lay:ListItem uiRep="Low" enumID="o2" />
+                <lay:ListItem uiRep="Medium" enumID="o3" />
+                <lay:ListItem uiRep="High" enumID="o4" />
+                <lay:ListItem uiRep="GetDone" enumID="o5" />
+              </lay:Control>
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MaxPctVol" parameterRef="MaxPctVol" label="Max % Vol:" />
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+                <lay:Control xsi:type="lay:TextField_t" ID="GetItDonePrice" parameterRef="GetItDonePrice" label="Would Price:" />
+                <lay:Control xsi:type="lay:TextField_t" ID="MinDarkQty" parameterRef="MinDarkQty" label="Min Dark Fill Size:" />
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start Time must be less than End Time">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="StartTime" operator="NX" />
+        <val:Edit field="EndTime" operator="NX" />
+        <val:Edit field="StartTime" operator="LT" field2="EndTime" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="SOR_NA" uiRep="SOR" wireValue="SOR" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="OrdType" xsi:type="Char_t" fixTag="40" use="optional" mutableOnCxlRpl="true" definedByFIX="true">
+      <EnumPair enumID="o1" index="0" wireValue="1" />
+      <EnumPair enumID="o2" index="1" wireValue="2" />
+      <EnumPair enumID="o3" index="3" wireValue="5" />
+      <EnumPair enumID="o4" index="4" wireValue="B" />
+    </Parameter>
+    <Parameter name="TimeInForce" xsi:type="Int_t" fixTag="59" use="optional" mutableOnCxlRpl="true" definedByFIX="true">
+      <EnumPair enumID="o1" index="0" wireValue="0" />
+      <EnumPair enumID="o2" index="1" wireValue="2" />
+      <EnumPair enumID="o3" index="2" wireValue="3" />
+    </Parameter>
+    <Parameter name="DisplaySize" xsi:type="Qty_t" fixTag="6066" use="optional" mutableOnCxlRpl="true" minValue="100" />
+    <Parameter name="SORPref" xsi:type="String_t" fixTag="6068" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="Post" />
+      <EnumPair enumID="o2" index="1" wireValue="PASSIVE" />
+      <EnumPair enumID="o3" index="2" wireValue="Custom" />
+    </Parameter>
+    <Parameter name="SessionPref" xsi:type="Int_t" fixTag="6071" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="2" />
+      <EnumPair enumID="o3" index="2" wireValue="4" />
+      <EnumPair enumID="o4" index="3" wireValue="5" />
+    </Parameter>
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <Parameter name="OrderQty" xsi:type="Int_t" fixTag="38" definedByFIX="true" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel border="Line" collapsible="false" orientation="HORIZONTAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+            <lay:Control xsi:type="lay:DropDownList_t" ID="OrdType" parameterRef="OrdType" label="Order Type:" initValue="o1">
+              <lay:ListItem uiRep="Market" enumID="o1" />
+              <lay:ListItem uiRep="Limit" enumID="o2" />
+              <lay:ListItem uiRep="MOC" enumID="o3" />
+              <lay:ListItem uiRep="Limit On Close" enumID="o4" />
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+            <lay:Control xsi:type="lay:DropDownList_t" ID="TimeInForce" parameterRef="TimeInForce" label="Time in Force:">
+              <lay:ListItem uiRep="Day" enumID="o1" />
+              <lay:ListItem uiRep="At the Open" enumID="o2" />
+              <lay:ListItem uiRep="IOC" enumID="o3" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:DropDownList_t" ID="SORPref" parameterRef="SORPref" label="SOR Preference:" initValue="o1">
+                <lay:ListItem uiRep="Post" enumID="o1" />
+                <lay:ListItem uiRep="PASSIVE" enumID="o2" />
+                <lay:ListItem uiRep="Custom" enumID="o3" />
+              </lay:Control>
+              <lay:Control xsi:type="lay:TextField_t" ID="DisplaySize" parameterRef="DisplaySize" label="Display Size:">
+                <flow:StateRule enabled="true">
+                  <val:Edit logicOperator="OR">
+                    <val:Edit field="SORPref" operator="EQ" value="o1" />
+                    <val:Edit field="SORPref" operator="EQ" value="o3" />
+                  </val:Edit>
+                </flow:StateRule>
+                <flow:StateRule value="{NULL}">
+                  <val:Edit logicOperator="OR">
+                    <val:Edit field="SORPref" operator="EQ" value="o2" />
+                  </val:Edit>
+                </flow:StateRule>
+              </lay:Control>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:DropDownList_t" ID="SessionPref" parameterRef="SessionPref" label="Session Preference:" initValue="o1">
+                <lay:ListItem uiRep="" enumID="o1" />
+                <lay:ListItem uiRep="Pre-Open" enumID="o2" />
+                <lay:ListItem uiRep="All" enumID="o3" />
+                <lay:ListItem uiRep="Regular" enumID="o4" />
+              </lay:Control>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Display Size must be less than or equal to Order Quantity">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="DisplaySize" operator="NX" />
+        <val:Edit field="DisplaySize" operator="LE" field2="FIX_OrderQty" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="IS_NA" uiRep="IS" wireValue="IS" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="Urgency" xsi:type="Int_t" fixTag="6065" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="1" />
+      <EnumPair enumID="o2" index="1" wireValue="2" />
+      <EnumPair enumID="o3" index="2" wireValue="3" />
+    </Parameter>
+    <Parameter name="GetItDonePrice" xsi:type="Price_t" fixTag="7927" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.01" />
+    <Parameter name="MinPctVol" xsi:type="Int_t" fixTag="6067" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="MaxPctVol" xsi:type="Int_t" fixTag="6064" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="WouldDarkPrice" xsi:type="Price_t" fixTag="6271" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.01" />
+    <Parameter name="WouldDarkPct" xsi:type="Int_t" fixTag="6270" use="optional" mutableOnCxlRpl="true" minValue="0" maxValue="100" />
+    <Parameter name="PartOnOpen" xsi:type="Char_t" fixTag="7903" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Y" />
+      <EnumPair enumID="o3" index="2" wireValue="N" />
+    </Parameter>
+    <Parameter name="Benchmark" xsi:type="String_t" fixTag="7911" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="Arrival" />
+      <EnumPair enumID="o2" index="1" wireValue="Open" />
+      <EnumPair enumID="o3" index="2" wireValue="PrevClose" />
+      <EnumPair enumID="o4" index="3" wireValue="UserStrike" />
+    </Parameter>
+    <Parameter name="StrikePrice" xsi:type="Price_t" fixTag="7900" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.01" />
+    <Parameter name="PriceAdapt" xsi:type="String_t" fixTag="7995" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="None" />
+      <EnumPair enumID="o2" index="1" wireValue="AIM" />
+      <EnumPair enumID="o3" index="2" wireValue="PIM" />
+    </Parameter>
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:DropDownList_t" ID="Urgency" parameterRef="Urgency" label="Urgency:" initValue="o2">
+                <lay:ListItem uiRep="Low" enumID="o1" />
+                <lay:ListItem uiRep="Medium" enumID="o2" />
+                <lay:ListItem uiRep="High" enumID="o3" />
+              </lay:Control>
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MinPctVol" parameterRef="MinPctVol" label="Min % Vol:" />
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MaxPctVol" parameterRef="MaxPctVol" label="Max % Vol:" />
+              <lay:Control xsi:type="lay:DropDownList_t" ID="Benchmark" parameterRef="Benchmark" label="Benchmark:" initValue="o1">
+                <lay:ListItem uiRep="Arrival" enumID="o1" />
+                <lay:ListItem uiRep="Open" enumID="o2" />
+                <lay:ListItem uiRep="PrevClose" enumID="o3" />
+                <lay:ListItem uiRep="UserStrike" enumID="o4" />
+              </lay:Control>
+              <lay:Control xsi:type="lay:TextField_t" ID="StrikePrice" parameterRef="StrikePrice" label="StrikePrice:">
+                <flow:StateRule enabled="true">
+                  <val:Edit logicOperator="OR">
+                    <val:Edit field="Benchmark" operator="EQ" value="o4" />
+                  </val:Edit>
+                </flow:StateRule>
+                <flow:StateRule value="{NULL}">
+                  <val:Edit logicOperator="OR">
+                    <val:Edit field="Benchmark" operator="NE" value="o4" />
+                  </val:Edit>
+                </flow:StateRule>
+              </lay:Control>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:DropDownList_t" ID="PriceAdapt" parameterRef="PriceAdapt" label="Price Adaptation:" initValue="o1">
+                <lay:ListItem uiRep="None" enumID="o1" />
+                <lay:ListItem uiRep="AIM" enumID="o2" />
+                <lay:ListItem uiRep="PIM" enumID="o3" />
+              </lay:Control>
+              <lay:Control xsi:type="lay:TextField_t" ID="GetItDonePrice" parameterRef="GetItDonePrice" label="Would Price:" />
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="WouldDarkPct" parameterRef="WouldDarkPct" label="Would Dark %:" />
+              <lay:Control xsi:type="lay:TextField_t" ID="WouldDarkPrice" parameterRef="WouldDarkPrice" label="Would Dark Price:" />
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="PartOnOpen" parameterRef="PartOnOpen" label="Participate on Open:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Yes" enumID="o2" />
+                  <lay:ListItem uiRep="No" enumID="o3" />
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start Time must be less than End Time">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="StartTime" operator="NX" />
+        <val:Edit field="EndTime" operator="NX" />
+        <val:Edit field="StartTime" operator="LT" field2="EndTime" />
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Min % Vol must be less than or equal to Max % Vol">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="MinPctVol" operator="NX" />
+        <val:Edit field="MaxPctVol" operator="NX" />
+        <val:Edit field="MinPctVol" operator="LE" field2="MaxPctVol" />
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Strike Price is required">
+      <val:Edit logicOperator="XOR">
+        <val:Edit logicOperator="AND">
+          <val:Edit field="StrikePrice" operator="EX" />
+          <val:Edit field="Benchmark" operator="EQ" value="UserStrike" />
+        </val:Edit>
+        <val:Edit logicOperator="OR">
+          <val:Edit field="Benchmark" operator="EQ" value="Arrival" />
+          <val:Edit field="Benchmark" operator="EQ" value="Open" />
+          <val:Edit field="Benchmark" operator="EQ" value="PrevClose" />
+        </val:Edit>
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="POV_NA" uiRep="POV" wireValue="POV" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="GetItDonePrice" xsi:type="Price_t" fixTag="7927" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.0001" />
+    <Parameter name="PctOfVol" xsi:type="Int_t" fixTag="9110" use="required" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="WouldDarkPrice" xsi:type="Price_t" fixTag="6271" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.0001" />
+    <Parameter name="WouldDarkPct" xsi:type="Int_t" fixTag="6270" use="optional" mutableOnCxlRpl="true" minValue="0" maxValue="100" />
+    <Parameter name="PartOnOpen" xsi:type="Char_t" fixTag="7903" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Y" />
+      <EnumPair enumID="o3" index="2" wireValue="N" />
+    </Parameter>
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="PctOfVol" parameterRef="PctOfVol" label="Percent of Volume:*" />
+              <lay:Control xsi:type="lay:TextField_t" ID="GetItDonePrice" parameterRef="GetItDonePrice" label="Would Price:" />
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="WouldDarkPct" parameterRef="WouldDarkPct" label="Would Dark %:" />
+              <lay:Control xsi:type="lay:TextField_t" ID="WouldDarkPrice" parameterRef="WouldDarkPrice" label="Would Dark Price:" />
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="PartOnOpen" parameterRef="PartOnOpen" label="Participate on Open:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Yes" enumID="o2" />
+                  <lay:ListItem uiRep="No" enumID="o3" />
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start Time must be less than End Time">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="StartTime" operator="NX" />
+        <val:Edit field="EndTime" operator="NX" />
+        <val:Edit field="StartTime" operator="LT" field2="EndTime" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="TWAP_NA" uiRep="TWAP" wireValue="TWAP" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="GetItDonePrice" xsi:type="Price_t" fixTag="7927" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.01" />
+    <Parameter name="MaxPctVol" xsi:type="Int_t" fixTag="6064" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="WouldDarkPrice" xsi:type="Price_t" fixTag="6271" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.01" />
+    <Parameter name="WouldDarkPct" xsi:type="Int_t" fixTag="6270" use="optional" mutableOnCxlRpl="true" minValue="0" maxValue="100" />
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MaxPctVol" parameterRef="MaxPctVol" label="Max % Vol:" />
+              <lay:Control xsi:type="lay:TextField_t" ID="GetItDonePrice" parameterRef="GetItDonePrice" label="Would Price:" />
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="WouldDarkPct" parameterRef="WouldDarkPct" label="Would Dark %:" />
+              <lay:Control xsi:type="lay:TextField_t" ID="WouldDarkPrice" parameterRef="WouldDarkPrice" label="Would Dark Price:" />
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start Time must be less than End Time">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="StartTime" operator="NX" />
+        <val:Edit field="EndTime" operator="NX" />
+        <val:Edit field="StartTime" operator="LT" field2="EndTime" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="VWAP_NA" uiRep="VWAP" wireValue="VWAP" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="GetItDonePrice" xsi:type="Price_t" fixTag="7927" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.01" />
+    <Parameter name="MaxPctVol" xsi:type="Int_t" fixTag="6064" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="PartOnOpen" xsi:type="Char_t" fixTag="7903" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Y" />
+      <EnumPair enumID="o3" index="2" wireValue="N" />
+    </Parameter>
+    <Parameter name="PartOnClose" xsi:type="Char_t" fixTag="7901" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Y" />
+      <EnumPair enumID="o3" index="2" wireValue="N" />
+    </Parameter>
+    <Parameter name="WouldDarkPrice" xsi:type="Price_t" fixTag="6271" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.01" />
+    <Parameter name="WouldDarkPct" xsi:type="Int_t" fixTag="6270" use="optional" mutableOnCxlRpl="true" minValue="0" maxValue="100" />
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MaxPctVol" parameterRef="MaxPctVol" label="Max % Vol:" />
+              <lay:Control xsi:type="lay:TextField_t" ID="GetItDonePrice" parameterRef="GetItDonePrice" label="Would Price:" />
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="WouldDarkPct" parameterRef="WouldDarkPct" label="Would Dark %:" />
+              <lay:Control xsi:type="lay:TextField_t" ID="WouldDarkPrice" parameterRef="WouldDarkPrice" label="Would Dark Price:" />
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="PartOnOpen" parameterRef="PartOnOpen" label="Participate on Open:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Yes" enumID="o2" />
+                  <lay:ListItem uiRep="No" enumID="o3" />
+                </lay:Control>
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="PartOnClose" parameterRef="PartOnClose" label="Participate on Close:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Yes" enumID="o2" />
+                  <lay:ListItem uiRep="No" enumID="o3" />
+                </lay:Control>
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start Time must be less than End Time">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="StartTime" operator="NX" />
+        <val:Edit field="EndTime" operator="NX" />
+        <val:Edit field="StartTime" operator="LT" field2="EndTime" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="CROSS_NA" uiRep="CROSS" wireValue="CROSS" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="TimeInForce" xsi:type="Int_t" fixTag="59" use="optional" mutableOnCxlRpl="true" definedByFIX="true">
+      <EnumPair enumID="o1" index="0" wireValue="0" />
+      <EnumPair enumID="o2" index="1" wireValue="3" />
+    </Parameter>
+    <Parameter name="OrdType" xsi:type="Char_t" fixTag="40" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="1" />
+      <EnumPair enumID="o2" index="1" wireValue="2" />
+    </Parameter>
+    <Parameter name="PegInst" xsi:type="Char_t" fixTag="6388" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="R" />
+      <EnumPair enumID="o3" index="2" wireValue="M" />
+      <EnumPair enumID="o4" index="3" wireValue="P" />
+    </Parameter>
+    <Parameter name="MinDarkFillSize" xsi:type="Qty_t" fixTag="7933" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <Parameter name="OrderQty" xsi:type="Int_t" fixTag="38" definedByFIX="true" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel border="Line" collapsible="false" orientation="HORIZONTAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+            <lay:Control xsi:type="lay:DropDownList_t" ID="OrdType" parameterRef="OrdType" label="Order Type:" initValue="o1">
+              <lay:ListItem uiRep="Market" enumID="o1" />
+              <lay:ListItem uiRep="Limit" enumID="o2" />
+            </lay:Control>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+            <lay:Control xsi:type="lay:DropDownList_t" ID="TimeInForce" parameterRef="TimeInForce" label="Time in Force:">
+              <lay:ListItem uiRep="Day" enumID="o1" />
+              <lay:ListItem uiRep="IOC" enumID="o2" />
+            </lay:Control>
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:DropDownList_t" ID="PegInst" parameterRef="PegInst" label="Peg Instruction:" initValue="o1">
+                <lay:ListItem uiRep="" enumID="o1" />
+                <lay:ListItem uiRep="Primary Peg" enumID="o2" />
+                <lay:ListItem uiRep="Mid Peg" enumID="o3" />
+                <lay:ListItem uiRep="Market Peg" enumID="o4" />
+              </lay:Control>
+              <lay:Control xsi:type="lay:TextField_t" ID="MinDarkFillSize" parameterRef="MinDarkFillSize" label="Min Dark Fill Size:" />
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Min Dark Fill Size must be less than or equal to Order Quantity">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="MinDarkFillSize" operator="NX" />
+        <val:Edit field="MinDarkFillSize" operator="LE" field2="FIX_OrderQty" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="CLOSE_NA" uiRep="CLOSE" wireValue="CLOSE" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="Urgency" xsi:type="Int_t" fixTag="6065" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="1" />
+      <EnumPair enumID="o2" index="1" wireValue="2" />
+      <EnumPair enumID="o3" index="2" wireValue="3" />
+    </Parameter>
+    <Parameter name="MaxPctVol" xsi:type="Int_t" fixTag="6064" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="MaxAuctPctVol" xsi:type="Int_t" fixTag="10066" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="75" />
+    <Parameter name="CloseShares" xsi:type="Qty_t" fixTag="6810" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="OnlyTradeAtClose" xsi:type="Char_t" fixTag="10067" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="1" wireValue="Y" />
+      <EnumPair enumID="o2" index="2" wireValue="N" />
+    </Parameter>
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <Parameter name="OrderQty" xsi:type="Int_t" fixTag="38" definedByFIX="true" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:DropDownList_t" ID="Urgency" parameterRef="Urgency" label="Urgency:" initValue="o2">
+                <lay:ListItem uiRep="Low" enumID="o1" />
+                <lay:ListItem uiRep="Medium" enumID="o2" />
+                <lay:ListItem uiRep="High" enumID="o3" />
+              </lay:Control>
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MaxPctVol" parameterRef="MaxPctVol" label="Max % Vol:">
+                <flow:StateRule enabled="true">
+                  <val:Edit field="OnlyTradeAtClose" operator="EQ" value="o2" />
+                </flow:StateRule>
+                <flow:StateRule value="{NULL}">
+                  <val:Edit field="OnlyTradeAtClose" operator="NE" value="o2" />
+                </flow:StateRule>
+              </lay:Control>
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MaxAuctPctVol" parameterRef="MaxAuctPctVol" label="Max Auction % Vol:" />
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:TextField_t" ID="CloseShares" parameterRef="CloseShares" label="Close Shares:" />
+              <lay:Control xsi:type="lay:DropDownList_t" ID="OnlyTradeAtClose" parameterRef="OnlyTradeAtClose" label="Only Trade at Close:" initValue="o2">
+                <lay:ListItem uiRep="Yes" enumID="o1" />
+                <lay:ListItem uiRep="No" enumID="o2" />
+              </lay:Control>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="">
+                  <flow:StateRule enabled="false">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Close Shares must be less than or equal to Order Quantity">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="CloseShares" operator="NX" />
+        <val:Edit field="CloseShares" operator="LE" field2="FIX_OrderQty" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="LADDER_NA" uiRep="LADDER" wireValue="LADDER" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="GetItDonePrice" xsi:type="Price_t" fixTag="7927" mutableOnCxlRpl="true" use="optional" minValue="0.0001" precision="2" />
+    <Parameter name="FirstStepRate" xsi:type="Int_t" fixTag="7934" use="required" minValue="1" maxValue="100" mutableOnCxlRpl="true" />
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="SecondStepPrice" xsi:type="Price_t" fixTag="7935" mutableOnCxlRpl="true" use="optional" minValue=".0001" precision="2" />
+    <Parameter name="SecondStepRate" xsi:type="Int_t" fixTag="7936" mutableOnCxlRpl="true" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="ThirdStepPrice" xsi:type="Price_t" fixTag="7937" mutableOnCxlRpl="true" use="optional" minValue=".0001" precision="2" />
+    <Parameter name="ThirdStepRate" xsi:type="Int_t" fixTag="7938" mutableOnCxlRpl="true" use="optional" minValue="1" maxValue="100" />
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <Parameter name="Side" xsi:type="Int_t" fixTag="54" definedByFIX="true" />
+    <Parameter name="OrdType" xsi:type="Int_t" fixTag="40" definedByFIX="true" />
+    <Parameter name="Price" xsi:type="Price_t" fixTag="44" definedByFIX="true" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="FirstStepRate" parameterRef="FirstStepRate" label="Base Rate:*" />
+              <lay:Control xsi:type="lay:TextField_t" ID="SecondStepPrice" parameterRef="SecondStepPrice" label="Second Step Price:" />
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="SecondStepRate" parameterRef="SecondStepRate" label="Second Step Rate:" />
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:TextField_t" ID="ThirdStepPrice" parameterRef="ThirdStepPrice" label="Third Step Price:">
+                <flow:StateRule enabled="false">
+                  <val:Edit logicOperator="OR">
+                    <val:Edit field="SecondStepRate" operator="NX" />
+                    <val:Edit field="SecondStepPrice" operator="NX" />
+                  </val:Edit>
+                </flow:StateRule>
+              </lay:Control>
+              <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="ThirdStepRate" parameterRef="ThirdStepRate" label="Third Step Rate:">
+                <flow:StateRule enabled="false">
+                  <val:Edit logicOperator="OR">
+                    <val:Edit field="SecondStepRate" operator="NX" />
+                    <val:Edit field="SecondStepPrice" operator="NX" />
+                  </val:Edit>
+                </flow:StateRule>
+              </lay:Control>
+              <lay:Control xsi:type="lay:TextField_t" ID="GetItDonePrice" parameterRef="GetItDonePrice" label="Would Price:" />
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start Time must be less than End Time">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="StartTime" operator="NX" />
+        <val:Edit field="EndTime" operator="NX" />
+        <val:Edit field="StartTime" operator="LT" field2="EndTime" />
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Second Step Price must be less than or equal to Limit Price for a Buy Order">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="FIX_Side" operator="EQ" value="2" />
+        <val:Edit field="FIX_OrdType" operator="NE" value="2" />
+        <val:Edit field="SecondStepPrice" operator="NX" />
+        <val:Edit field="SecondStepPrice" operator="LE" field2="FIX_Price" />
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Second Step Price must be greater than or equal to Limit Price for a Sell Order">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="FIX_Side" operator="EQ" value="1" />
+        <val:Edit field="FIX_OrdType" operator="NE" value="2" />
+        <val:Edit field="SecondStepPrice" operator="NX" />
+        <val:Edit field="SecondStepPrice" operator="GE" field2="FIX_Price" />
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Third Step Price must be less than or equal to Limit Price for a Buy Order">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="FIX_Side" operator="EQ" value="2" />
+        <val:Edit field="FIX_OrdType" operator="NE" value="2" />
+        <val:Edit field="ThirdStepPrice" operator="NX" />
+        <val:Edit field="ThirdStepPrice" operator="LE" field2="FIX_Price" />
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Third Step Price must be greater than or equal to Limit Price for a Sell Order">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="FIX_Side" operator="EQ" value="1" />
+        <val:Edit field="FIX_OrdType" operator="NE" value="2" />
+        <val:Edit field="ThirdStepPrice" operator="NX" />
+        <val:Edit field="ThirdStepPrice" operator="GE" field2="FIX_Price" />
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Second Step parameters are both required">
+      <val:Edit logicOperator="XOR">
+        <val:Edit logicOperator="AND">
+          <val:Edit field="SecondStepPrice" operator="EX" />
+          <val:Edit field="SecondStepRate" operator="EX" />
+        </val:Edit>
+        <val:Edit logicOperator="AND">
+          <val:Edit field="SecondStepPrice" operator="NX" />
+          <val:Edit field="SecondStepRate" operator="NX" />
+        </val:Edit>
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Third Step parameters are both required">
+      <val:Edit logicOperator="XOR">
+        <val:Edit logicOperator="AND">
+          <val:Edit field="ThirdStepPrice" operator="EX" />
+          <val:Edit field="ThirdStepRate" operator="EX" />
+        </val:Edit>
+        <val:Edit logicOperator="AND">
+          <val:Edit field="ThirdStepPrice" operator="NX" />
+          <val:Edit field="ThirdStepRate" operator="NX" />
+        </val:Edit>
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="PEG_NA" uiRep="PEG" wireValue="PEG" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="Urgency" xsi:type="Int_t" fixTag="6065" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="1" />
+      <EnumPair enumID="o2" index="1" wireValue="2" />
+      <EnumPair enumID="o3" index="2" wireValue="3" />
+    </Parameter>
+    <Parameter name="GetItDonePrice" xsi:type="Price_t" fixTag="7927" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.001" />
+    <Parameter name="DisplaySize" xsi:type="Qty_t" fixTag="6066" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <Parameter name="OrderQty" xsi:type="Int_t" fixTag="38" definedByFIX="true" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:DropDownList_t" ID="Urgency" parameterRef="Urgency" label="Urgency:" initValue="o1">
+                <lay:ListItem uiRep="Low" enumID="o1" />
+                <lay:ListItem uiRep="Medium" enumID="o2" />
+                <lay:ListItem uiRep="High" enumID="o3" />
+              </lay:Control>
+              <lay:Control xsi:type="lay:TextField_t" ID="DisplaySize" parameterRef="DisplaySize" label="Display Size:" />
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:Control xsi:type="lay:TextField_t" ID="GetItDonePrice" parameterRef="GetItDonePrice" label="Would Price" />
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start Time must be less than End Time">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="StartTime" operator="NX" />
+        <val:Edit field="EndTime" operator="NX" />
+        <val:Edit field="StartTime" operator="LT" field2="EndTime" />
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Display Size must be less than or equal to Order Quantity">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="DisplaySize" operator="NX" />
+        <val:Edit field="DisplaySize" operator="LE" field2="FIX_OrderQty" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="CUSTOM1_NA" uiRep="CUSTOM1" wireValue="CUSTOM1" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="Urgency" xsi:type="Int_t" fixTag="6065" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="1" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="2" wireValue="0" />
+      <EnumPair enumID="o3" index="3" wireValue="1" />
+      <EnumPair enumID="o4" index="4" wireValue="2" />
+      <EnumPair enumID="o5" index="5" wireValue="3" />
+      <EnumPair enumID="o6" index="6" wireValue="4" />
+    </Parameter>
+    <Parameter name="GetItDonePrice" xsi:type="Price_t" fixTag="7927" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.001" />
+    <Parameter name="CustomPrice" xsi:type="Price_t" fixTag="8038" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.001" />
+    <Parameter name="CustomPercent" xsi:type="Int_t" fixTag="8039" use="optional" mutableOnCxlRpl="true" minValue="0" maxValue="100" />
+    <Parameter name="CustomQuantity" xsi:type="Qty_t" fixTag="8040" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="MinPctVol" xsi:type="Int_t" fixTag="6067" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="MaxPctVol" xsi:type="Int_t" fixTag="6064" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="Benchmark" xsi:type="String_t" fixTag="7911" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Custom" />
+      <EnumPair enumID="o3" index="2" wireValue="Arrival" />
+      <EnumPair enumID="o4" index="3" wireValue="Open" />
+      <EnumPair enumID="o5" index="4" wireValue="PrevClose" />
+      <EnumPair enumID="o6" index="5" wireValue="UserStrike" />
+    </Parameter>
+    <Parameter name="PartOnOpen" xsi:type="Char_t" fixTag="7903" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Y" />
+      <EnumPair enumID="o3" index="2" wireValue="N" />
+    </Parameter>
+    <Parameter name="PartOnClose" xsi:type="Char_t" fixTag="7901" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Y" />
+      <EnumPair enumID="o3" index="2" wireValue="N" />
+    </Parameter>
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="Urgency" parameterRef="Urgency" label="Urgency:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Dark" enumID="o2" />
+                  <lay:ListItem uiRep="Low" enumID="o3" />
+                  <lay:ListItem uiRep="Medium" enumID="o4" />
+                  <lay:ListItem uiRep="High" enumID="o5" />
+                  <lay:ListItem uiRep="GetDone" enumID="o6" />
+                </lay:Control>
+                <lay:Control xsi:type="lay:TextField_t" ID="CustomPrice" parameterRef="CustomPrice" label="Custom Price:" />
+                <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="CustomPercent" parameterRef="CustomPercent" label="Custom %:" />
+                <lay:Control xsi:type="lay:TextField_t" ID="CustomQuantity" parameterRef="CustomQuantity" label="Custom Quantity:" />
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+                <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MinPctVol" parameterRef="MinPctVol" label="Min % Vol:" />
+                <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MaxPctVol" parameterRef="MaxPctVol" label="Max % Vol:" />
+                <lay:Control xsi:type="lay:DropDownList_t" ID="Benchmark" parameterRef="Benchmark" label="Benchmark:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Custom" enumID="o2" />
+                  <lay:ListItem uiRep="Arrival" enumID="o3" />
+                  <lay:ListItem uiRep="Open" enumID="o4" />
+                  <lay:ListItem uiRep="PrevClose" enumID="o5" />
+                  <lay:ListItem uiRep="UserStrike" enumID="o6" />
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:TextField_t" ID="GetItDonePrice" parameterRef="GetItDonePrice" label="Would Price:" />
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="PartOnOpen" parameterRef="PartOnOpen" label="Participate on Open:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Yes" enumID="o2" />
+                  <lay:ListItem uiRep="No" enumID="o3" />
+                </lay:Control>
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="PartOnClose" parameterRef="PartOnClose" label="Participate on Close:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Yes" enumID="o2" />
+                  <lay:ListItem uiRep="No" enumID="o3" />
+                </lay:Control>
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start Time must be less than End Time">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="StartTime" operator="NX" />
+        <val:Edit field="EndTime" operator="NX" />
+        <val:Edit field="StartTime" operator="LT" field2="EndTime" />
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Min % Vol must be less than Max % Vol">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="MinPctVol" operator="NX" />
+        <val:Edit field="MaxPctVol" operator="NX" />
+        <val:Edit field="MinPctVol" operator="LT" field2="MaxPctVol" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="CUSTOM2_NA" uiRep="CUSTOM2" wireValue="CUSTOM2" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="Urgency" xsi:type="Int_t" fixTag="6065" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="1" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="2" wireValue="0" />
+      <EnumPair enumID="o3" index="3" wireValue="1" />
+      <EnumPair enumID="o4" index="4" wireValue="2" />
+      <EnumPair enumID="o5" index="5" wireValue="3" />
+      <EnumPair enumID="o6" index="6" wireValue="4" />
+    </Parameter>
+    <Parameter name="GetItDonePrice" xsi:type="Price_t" fixTag="7927" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.001" />
+    <Parameter name="CustomPrice" xsi:type="Price_t" fixTag="8038" use="optional" mutableOnCxlRpl="true" precision="2" minValue="0.001" />
+    <Parameter name="CustomPercent" xsi:type="Int_t" fixTag="8039" use="optional" mutableOnCxlRpl="true" minValue="0" maxValue="100" />
+    <Parameter name="CustomQuantity" xsi:type="Qty_t" fixTag="8040" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="MinPctVol" xsi:type="Int_t" fixTag="6067" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="MaxPctVol" xsi:type="Int_t" fixTag="6064" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="Benchmark" xsi:type="String_t" fixTag="7911" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Custom" />
+      <EnumPair enumID="o3" index="2" wireValue="Arrival" />
+      <EnumPair enumID="o4" index="3" wireValue="Open" />
+      <EnumPair enumID="o5" index="4" wireValue="PrevClose" />
+      <EnumPair enumID="o6" index="5" wireValue="UserStrike" />
+    </Parameter>
+    <Parameter name="PartOnOpen" xsi:type="Char_t" fixTag="7903" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Y" />
+      <EnumPair enumID="o3" index="2" wireValue="N" />
+    </Parameter>
+    <Parameter name="PartOnClose" xsi:type="Char_t" fixTag="7901" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Y" />
+      <EnumPair enumID="o3" index="2" wireValue="N" />
+    </Parameter>
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="Urgency" parameterRef="Urgency" label="Urgency:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Dark" enumID="o2" />
+                  <lay:ListItem uiRep="Low" enumID="o3" />
+                  <lay:ListItem uiRep="Medium" enumID="o4" />
+                  <lay:ListItem uiRep="High" enumID="o5" />
+                  <lay:ListItem uiRep="GetDone" enumID="o6" />
+                </lay:Control>
+                <lay:Control xsi:type="lay:TextField_t" ID="CustomPrice" parameterRef="CustomPrice" label="Custom Price:" />
+                <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="CustomPercent" parameterRef="CustomPercent" label="Custom %:" />
+                <lay:Control xsi:type="lay:TextField_t" ID="CustomQuantity" parameterRef="CustomQuantity" label="Custom Quantity:" />
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+                <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MinPctVol" parameterRef="MinPctVol" label="Min % Vol:" />
+                <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MaxPctVol" parameterRef="MaxPctVol" label="Max % Vol:" />
+                <lay:Control xsi:type="lay:DropDownList_t" ID="Benchmark" parameterRef="Benchmark" label="Benchmark:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Custom" enumID="o2" />
+                  <lay:ListItem uiRep="Arrival" enumID="o3" />
+                  <lay:ListItem uiRep="Open" enumID="o4" />
+                  <lay:ListItem uiRep="PrevClose" enumID="o5" />
+                  <lay:ListItem uiRep="UserStrike" enumID="o6" />
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:TextField_t" ID="GetItDonePrice" parameterRef="GetItDonePrice" label="Would Price:" />
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="PartOnOpen" parameterRef="PartOnOpen" label="Participate on Open:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Yes" enumID="o2" />
+                  <lay:ListItem uiRep="No" enumID="o3" />
+                </lay:Control>
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="PartOnClose" parameterRef="PartOnClose" label="Participate on Close:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Yes" enumID="o2" />
+                  <lay:ListItem uiRep="No" enumID="o3" />
+                </lay:Control>
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start Time must be less than End Time">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="StartTime" operator="NX" />
+        <val:Edit field="EndTime" operator="NX" />
+        <val:Edit field="StartTime" operator="LT" field2="EndTime" />
+      </val:Edit>
+    </val:StrategyEdit>
+    <val:StrategyEdit errorMessage="Min % Vol must be less than Max % Vol">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="MinPctVol" operator="NX" />
+        <val:Edit field="MaxPctVol" operator="NX" />
+        <val:Edit field="MinPctVol" operator="LT" field2="MaxPctVol" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+  <Strategy providerID="DEMO" name="PORTFOLIODARK_NA" uiRep="PORTFOLIODARK" wireValue="PORTFOLIODARK" version="11.4">
+    <Regions>
+      <Region name="TheAmericas" inclusion="Include" />
+    </Regions>
+    <Parameter name="StartTime" xsi:type="UTCTimestamp_t" fixTag="6062" />
+    <Parameter name="EndTime" xsi:type="UTCTimestamp_t" fixTag="6063" />
+    <Parameter name="Urgency" xsi:type="Int_t" fixTag="6065" use="required" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="1" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="2" wireValue="1" />
+      <EnumPair enumID="o3" index="3" wireValue="2" />
+      <EnumPair enumID="o4" index="4" wireValue="3" />
+    </Parameter>
+    <Parameter name="DollarNeutrality" xsi:type="Char_t" fixTag="6249" use="required" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Y" />
+      <EnumPair enumID="o3" index="2" wireValue="N" />
+    </Parameter>
+    <Parameter name="MaxPctVol" xsi:type="Int_t" fixTag="6064" use="optional" mutableOnCxlRpl="true" minValue="1" maxValue="100" />
+    <Parameter name="Instructions" xsi:type="String_t" fixTag="6732" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="DollarToleranceType" xsi:type="String_t" fixTag="6252" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Notional" />
+      <EnumPair enumID="o3" index="2" wireValue="Percent" />
+    </Parameter>
+    <Parameter name="DollarTolerance" xsi:type="Price_t" fixTag="6253" use="optional" mutableOnCxlRpl="true" />
+    <Parameter name="DecayDelta" xsi:type="String_t" fixTag="6254" use="optional" mutableOnCxlRpl="true">
+      <EnumPair enumID="o1" index="0" wireValue="{NULL}" />
+      <EnumPair enumID="o2" index="1" wireValue="Immediately" />
+      <EnumPair enumID="o3" index="2" wireValue="Proportional" />
+    </Parameter>
+    <Parameter name="ProductVersion" xsi:type="String_t" fixTag="9682" constValue="11.4" />
+    <Parameter name="EMSName" xsi:type="String_t" fixTag="9207" constValue="YOUR_OMS_NAME" />
+    <Parameter name="EMSVersion" xsi:type="String_t" fixTag="9681" constValue="YOUR_OMS_VERSION_NUMBER" />
+    <lay:StrategyLayout>
+      <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+        <lay:StrategyPanel title="Control Parameters" collapsible="false" orientation="VERTICAL">
+          <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+                <lay:Control xsi:type="lay:DropDownList_t" ID="Urgency" parameterRef="Urgency" label="Urgency:*" initValue="o3">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Low" enumID="o2" />
+                  <lay:ListItem uiRep="Medium" enumID="o3" />
+                  <lay:ListItem uiRep="High" enumID="o4" />
+                </lay:Control>
+                <lay:Control xsi:type="lay:DropDownList_t" ID="DollarNeutrality" parameterRef="DollarNeutrality" label="Dollar Neutrality:*" initValue="o3">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Y" enumID="o2" />
+                  <lay:ListItem uiRep="N" enumID="o3" />
+                </lay:Control>
+                <lay:Control xsi:type="lay:SingleSpinner_t" ID="DollarTolerance" parameterRef="DollarTolerance" label="Dollar Tolerance:" />
+              </lay:StrategyPanel>
+              <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+                <lay:Control xsi:type="lay:SingleSpinner_t" increment="1" ID="MaxPctVol" parameterRef="MaxPctVol" label="Max % Vol:" />
+                <lay:Control xsi:type="lay:DropDownList_t" ID="DollarToleranceType" parameterRef="DollarToleranceType" label="Dollar Tolerance Type:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Notional" enumID="o2" />
+                  <lay:ListItem uiRep="Percent" enumID="o3" />
+                </lay:Control>
+                <lay:Control xsi:type="lay:DropDownList_t" ID="DecayDelta" parameterRef="DecayDelta" label="Decay Delta:" initValue="o1">
+                  <lay:ListItem uiRep="" enumID="o1" />
+                  <lay:ListItem uiRep="Immediately" enumID="o2" />
+                  <lay:ListItem uiRep="Proportional" enumID="o3" />
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseStartTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="StartTime" label="Start Time:" parameterRef="StartTime" initValueMode="1">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseStartTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+            <lay:StrategyPanel border="None" collapsible="false" orientation="VERTICAL">
+              <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+                <lay:Control xsi:type="lay:CheckBox_t" ID="UseEndTime" label="" />
+                <lay:Control xsi:type="lay:Clock_t" ID="EndTime" label="End Time:" parameterRef="EndTime">
+                  <flow:StateRule enabled="false" value="{NULL}">
+                    <val:Edit field="UseEndTime" operator="EQ" value="false" />
+                  </flow:StateRule>
+                </lay:Control>
+              </lay:StrategyPanel>
+            </lay:StrategyPanel>
+          </lay:StrategyPanel>
+          <lay:StrategyPanel border="None" collapsible="false" orientation="HORIZONTAL">
+            <lay:Control xsi:type="lay:TextField_t" ID="Instructions" parameterRef="Instructions" label="Strategy Instruction:" />
+          </lay:StrategyPanel>
+        </lay:StrategyPanel>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+    <val:StrategyEdit errorMessage="Start Time must be less than End Time">
+      <val:Edit logicOperator="OR">
+        <val:Edit field="StartTime" operator="NX" />
+        <val:Edit field="EndTime" operator="NX" />
+        <val:Edit field="StartTime" operator="LT" field2="EndTime" />
+      </val:Edit>
+    </val:StrategyEdit>
+  </Strategy>
+</Strategies>

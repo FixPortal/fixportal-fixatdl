@@ -1,0 +1,138 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Utility;
+
+namespace FixPortal.FixAtdl.Model.Collections;
+
+/// <summary>
+/// Collection for storing instances of Control_t.  This class is used at the StrategyPanel level.
+/// </summary>
+/// <remarks>This class maintains an index on each of the Control_t instances that are added to it.  This index is
+/// used when laying out controls on StrategyPanels</remarks>
+public class ControlCollection : ObservableCollection<Control_t>
+{
+    private readonly StrategyPanel_t _owner;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ControlCollection"/> class.
+    /// </summary>
+    /// <param name="owner">The owner.</param>
+    public ControlCollection(StrategyPanel_t owner)
+    {
+        _owner = owner;
+    }
+
+    /// <summary>
+    /// Inserts an item, guarding against duplicate Ids and parenting it to the owning panel before the
+    /// change is applied. Implemented as overrides of the ObservableCollection virtual hooks (rather
+    /// than <c>new Add</c>/<c>new Remove</c>) so the parent-wiring and index maintenance cannot be
+    /// bypassed by base-typed access, an initializer or AddRange. Index refresh and removal detachment
+    /// happen in <see cref="OnCollectionChanged"/> so both are final before observers see the event.
+    /// </summary>
+    /// <param name="index">The insertion index.</param>
+    /// <param name="item">The item.</param>
+    protected override void InsertItem(int index, Control_t item)
+    {
+        if (_owner.OwningStrategy != null && _owner.OwningStrategy.Controls.Contains(item.Id))
+        {
+            throw Diagnostics.ThrowHelper.New<Diagnostics.Exceptions.DuplicateKeyException>(
+                this,
+                Resources.ErrorMessages.AttemptToAddDuplicateKey,
+                item.Id,
+                "Controls"
+            );
+        }
+
+        ((IParentable<StrategyPanel_t>)item).Parent = _owner;
+
+        base.InsertItem(index, item);
+    }
+
+    /// <inheritdoc />
+    protected override void SetItem(int index, Control_t item)
+    {
+        if (_owner.OwningStrategy != null)
+        {
+            Control_t oldItem = Items[index];
+            if (item.Id != oldItem.Id && _owner.OwningStrategy.Controls.Contains(item.Id))
+            {
+                throw Diagnostics.ThrowHelper.New<Diagnostics.Exceptions.DuplicateKeyException>(
+                    this,
+                    Resources.ErrorMessages.AttemptToAddDuplicateKey,
+                    item.Id,
+                    "Controls"
+                );
+            }
+        }
+
+        ((IParentable<StrategyPanel_t>)item).Parent = _owner;
+
+        base.SetItem(index, item);
+    }
+
+    /// <summary>
+    /// Detaches every control before the list is cleared. ObservableCollection raises the Reset
+    /// notification for a clear with no OldItems, so <see cref="OnCollectionChanged"/> never sees the
+    /// removed controls — the detach must happen here to keep the same before-the-notification
+    /// ordering as Insert/Remove.
+    /// </summary>
+    protected override void ClearItems()
+    {
+        foreach (Control_t control in Items)
+        {
+            ((IParentable<StrategyPanel_t>)control).Parent = null!;
+        }
+
+        base.ClearItems();
+    }
+
+    /// <summary>
+    /// Finalizes the collection's invariants before the change notification reaches observers: controls
+    /// that left the collection are detached from this panel (a same-instance replace or move keeps its
+    /// parent; a clear detaches in <see cref="ClearItems"/>) and layout indexes are refreshed.
+    /// ObservableCollection raises the notification from inside its mutation methods, so doing this work
+    /// after the base call would let handlers observe stale indexes and a removed control still reporting
+    /// a panel that no longer holds it.
+    /// </summary>
+    /// <param name="e">The change being notified.</param>
+    protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (Control_t removed in e.OldItems)
+            {
+                if (e.NewItems == null || !e.NewItems.Contains(removed))
+                {
+                    ((IParentable<StrategyPanel_t>)removed).Parent = null!;
+                }
+            }
+        }
+
+        RefreshIndexes();
+
+        base.OnCollectionChanged(e);
+    }
+
+    /// <summary>
+    /// Refreshes the indexes.
+    /// </summary>
+    public void RefreshIndexes()
+    {
+        int n = 0;
+
+        foreach (Control_t control in Items)
+        {
+            control.Index = n;
+
+            n++;
+        }
+    }
+}

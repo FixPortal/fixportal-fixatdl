@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The parse-to-emit pipeline</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f7f8fa;
+      --color-ink:     #1f2937;
+      --color-muted:   #5b6b85;
+      --color-accent:  #0f766e;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1200px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 900px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Architecture · FixPortal.FixAtdl</p>
+    <h1>The parse-to-emit pipeline</h1>
+
+    <svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pipeline-title pipeline-desc">
+      <title id="pipeline-title">The parse-to-emit pipeline</title>
+      <desc id="pipeline-desc">A FIXatdl XML stream is read by StrategiesReader, deserialized by the reflective ElementFactory into a Strategy_t object tree, cross-referenced by ResolveAll, then filled in by the host and emitted either as direct per-parameter FIX tags or as the 957 to 960 StrategyParametersGrp.</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#5b6b85"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#0f766e"/></marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f7f8fa"/>
+
+      <!-- ===== ZONE (painted before arrows and nodes) ===== -->
+      <rect x="376" y="280" width="288" height="208" rx="8" fill="rgba(31,41,55,0.02)" stroke="rgba(31,41,55,0.10)" stroke-width="0.8"/>
+      <rect x="464" y="284" width="112" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="520" y="293" fill="rgba(31,41,55,0.40)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">FIX EMISSION</text>
+
+      <!-- ===== ARROWS (before boxes) ===== -->
+      <!-- N1 -> N2 -->
+      <line x1="188" y1="148" x2="236" y2="148" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="194" y="122" width="36" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="212" y="131" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">LOAD</text>
+
+      <!-- N2 -> N3 -->
+      <line x1="412" y1="148" x2="460" y2="148" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="418" y="122" width="36" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="436" y="131" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">PARSE</text>
+
+      <!-- N3 -> N4 -->
+      <line x1="648" y1="148" x2="696" y2="148" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="654" y="122" width="36" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="672" y="131" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">BUILD</text>
+
+      <!-- N4 -> N5 : the snake turn, second construction phase -->
+      <path d="M 784,180 V 256 Q 784,264 776,264 H 164 Q 156,264 156,272 V 364" fill="none" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="432" y="238" width="80" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="472" y="247" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">RESOLVEALL()</text>
+
+      <!-- N5 -> N6 : direct per-parameter tags -->
+      <path d="M 264,380 H 322 Q 330,380 330,372 V 348 Q 330,340 338,340 H 396" fill="none" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="264" y="310" width="72" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="300" y="319" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">DIRECT TAGS</text>
+
+      <!-- N5 -> N7 : the 957 group -->
+      <path d="M 264,412 H 322 Q 330,412 330,420 V 432 Q 330,440 338,440 H 396" fill="none" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="260" y="462" width="80" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="300" y="471" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">TAGS 957-960</text>
+
+      <!-- ===== NODES ===== -->
+      <!-- N1 File / Stream (input) -->
+      <rect x="48" y="116" width="140" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="48" y="116" width="140" height="64" rx="6" fill="rgba(91,107,133,0.10)" stroke="#6b7280" stroke-width="1"/>
+      <rect x="56" y="124" width="32" height="12" rx="2" fill="transparent" stroke="rgba(107,114,128,0.40)" stroke-width="0.8"/>
+      <text x="72" y="133" fill="rgba(107,114,128,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">XML</text>
+      <text x="118" y="154" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">File / Stream</text>
+      <text x="118" y="170" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">broker ATDL</text>
+
+      <!-- N2 StrategiesReader -->
+      <rect x="236" y="116" width="176" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="236" y="116" width="176" height="64" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <rect x="244" y="124" width="32" height="12" rx="2" fill="transparent" stroke="rgba(31,41,55,0.40)" stroke-width="0.8"/>
+      <text x="260" y="133" fill="rgba(31,41,55,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">API</text>
+      <text x="324" y="154" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">StrategiesReader</text>
+      <text x="324" y="170" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">XXE-hardened</text>
+
+      <!-- N3 ElementFactory (FOCAL) -->
+      <rect x="460" y="116" width="188" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="460" y="116" width="188" height="64" rx="6" fill="rgba(15,118,110,0.08)" stroke="#0f766e" stroke-width="1"/>
+      <rect x="468" y="124" width="36" height="12" rx="2" fill="transparent" stroke="rgba(15,118,110,0.40)" stroke-width="0.8"/>
+      <text x="486" y="133" fill="rgba(15,118,110,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SEAM</text>
+      <text x="554" y="154" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">ElementFactory</text>
+      <text x="554" y="170" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">SchemaDefinitions</text>
+
+      <!-- N4 Strategy_t (state) -->
+      <rect x="696" y="116" width="176" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="696" y="116" width="176" height="64" rx="6" fill="rgba(31,41,55,0.05)" stroke="#5b6b85" stroke-width="1"/>
+      <rect x="704" y="124" width="40" height="12" rx="2" fill="transparent" stroke="rgba(91,107,133,0.40)" stroke-width="0.8"/>
+      <text x="724" y="133" fill="rgba(91,107,133,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">MODEL</text>
+      <text x="784" y="154" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Strategies_t / Strategy_t</text>
+      <text x="784" y="170" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">aggregate root</text>
+
+      <!-- N5 host sets WireValue (input) -->
+      <rect x="48" y="364" width="216" height="64" rx="6" fill="#f7f8fa"/>
+      <rect x="48" y="364" width="216" height="64" rx="6" fill="rgba(91,107,133,0.10)" stroke="#6b7280" stroke-width="1"/>
+      <rect x="56" y="372" width="36" height="12" rx="2" fill="transparent" stroke="rgba(107,114,128,0.40)" stroke-width="0.8"/>
+      <text x="74" y="381" fill="rgba(107,114,128,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">HOST</text>
+      <text x="156" y="402" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Parameter_t.WireValue</text>
+      <text x="156" y="418" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">set by host / adapter</text>
+
+      <!-- N6 FixTagValuesCollection -->
+      <rect x="396" y="312" width="248" height="56" rx="6" fill="#f7f8fa"/>
+      <rect x="396" y="312" width="248" height="56" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <rect x="404" y="320" width="28" height="12" rx="2" fill="transparent" stroke="rgba(31,41,55,0.40)" stroke-width="0.8"/>
+      <text x="418" y="329" fill="rgba(31,41,55,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">FIX</text>
+      <text x="520" y="346" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">FixTagValuesCollection</text>
+      <text x="520" y="360" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">GetOutputValues()</text>
+
+      <!-- N7 StrategyParametersGrpEmitter -->
+      <rect x="396" y="412" width="248" height="56" rx="6" fill="#f7f8fa"/>
+      <rect x="396" y="412" width="248" height="56" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <rect x="404" y="420" width="28" height="12" rx="2" fill="transparent" stroke="rgba(31,41,55,0.40)" stroke-width="0.8"/>
+      <text x="418" y="429" fill="rgba(31,41,55,0.80)" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">FIX</text>
+      <text x="520" y="446" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">StrategyParametersGrpEmitter</text>
+      <text x="520" y="460" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Tag957Support</text>
+
+      <!-- ===== LEGEND ===== -->
+      <line x1="48" y1="532" x2="912" y2="532" stroke="rgba(31,41,55,0.10)" stroke-width="0.8"/>
+      <text x="48" y="552" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEGEND</text>
+
+      <rect x="132" y="543" width="12" height="10" rx="2" fill="rgba(15,118,110,0.08)" stroke="#0f766e" stroke-width="1"/>
+      <text x="152" y="552" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">LOAD-BEARING SEAM</text>
+
+      <rect x="300" y="543" width="12" height="10" rx="2" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="320" y="552" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">LIBRARY TYPE</text>
+
+      <rect x="444" y="543" width="12" height="10" rx="2" fill="rgba(31,41,55,0.05)" stroke="#5b6b85" stroke-width="1"/>
+      <text x="464" y="552" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">PARSED STATE</text>
+
+      <rect x="592" y="543" width="12" height="10" rx="2" fill="rgba(91,107,133,0.10)" stroke="#6b7280" stroke-width="1"/>
+      <text x="612" y="552" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">HOST-SUPPLIED</text>
+    </svg>
+  </div>
+</body>
+</html>

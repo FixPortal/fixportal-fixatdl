@@ -1,0 +1,98 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Fix;
+using FixPortal.FixAtdl.Model.Types.Support;
+using FixPortal.FixAtdl.Resources;
+using NodaTime;
+
+namespace FixPortal.FixAtdl.Model.Types;
+
+/// <summary>
+/// 'string field representing Time/date combination represented in UTC (Universal Time Coordinated, also known as "GMT")
+/// in either YYYYMMDD-HH:MM:SS (whole seconds) or YYYYMMDD-HH:MM:SS.sss (milliseconds) format, colons, dash, and period required.
+/// Valid values:
+/// * YYYY = 0000-9999, MM = 01-12, DD = 01-31, HH = 00-23, MM = 00-59, SS = 00-60 (60 only if UTC leap second) (without milliseconds).
+/// * YYYY = 0000-9999, MM = 01-12, DD = 01-31, HH = 00-23, MM = 00-59, SS = 00-60 (60 only if UTC leap second), sss=000-999 (indicating
+/// milliseconds).
+/// Leap Seconds: Note that UTC includes corrections for leap seconds, which are inserted to account for slowing of the rotation of the
+/// earth. Leap second insertion is declared by the International Earth Rotation Service (IERS) and has, since 1972, only occurred on the
+/// night of Dec. 31 or Jun 30. The IERS considers March 31 and September 30 as secondary dates for leap second insertion, but has never
+/// utilized these dates. During a leap second insertion, a UTCTimestamp field may read "19981231-23:59:59", "19981231-23:59:60",
+/// "19990101-00:00:00". (see http://tycho.usno.navy.mil/leapsec.html)'
+/// </summary>
+public class UTCTimestamp_t : UTCDateTimeTypeBase
+{
+    /// <summary>Gets or sets the local market timezone.<br/>
+    /// Describes the time zone without indicating whether daylight savings is in effect. Valid values are taken from
+    /// names in the Olson time zone database. All are of the form Area/Location, where Area is the name of a continent
+    /// or ocean, and Location is the name of a specific location within that region. E.g. America/Chicago.
+    /// Applicable when xsi:type is UTCTimestamp_t.</summary>
+    /// <value>The local market timezone; null when not supplied in the ATDL.</value>
+    /// <exception cref="InvalidFieldValueException">Thrown on assignment of a value that is not a recognised
+    /// TZDB zone id. Validated eagerly here — at the assignment/deserialization boundary — because an
+    /// unrecognised zone otherwise surfaced only on the first time-of-day bound check, bricking every
+    /// read/write of the parameter (R08).</exception>
+    public string? LocalMktTz
+    {
+        get;
+        set
+        {
+            if (!string.IsNullOrEmpty(value) && DateTimeZoneProviders.Tzdb.GetZoneOrNull(value) is null)
+            {
+                throw ThrowHelper.New<InvalidFieldValueException>(this, "Unrecognised localMktTz '{0}'.", value);
+            }
+            field = value;
+        }
+    }
+
+    internal override TimeOnly GetTimeOfDayForBounds(DateTime utcValue)
+    {
+        if (string.IsNullOrEmpty(LocalMktTz))
+        {
+            return base.GetTimeOfDayForBounds(utcValue);
+        }
+
+        DateTimeZone zone =
+            DateTimeZoneProviders.Tzdb.GetZoneOrNull(LocalMktTz)
+            ?? throw ThrowHelper.New<InvalidFieldValueException>(this, "Unrecognised localMktTz '{0}'.", LocalMktTz);
+        // Use the order timestamp's date, so daily market bounds follow its DST offset.
+        return TimeOnly.FromDateTime(Instant.FromDateTimeUtc(utcValue).InZone(zone).ToDateTimeUnspecified());
+    }
+
+    // The fractional entry is parse-only: it lets a truncated high-precision wire value in, while
+    // emission keeps using the seconds/ms pair above (UTCDataTimeTypeBase selects [0] or [1]).
+    private static readonly string[] _formatStrings =
+    [
+        FixDateTimeFormat.FixDateTime,
+        FixDateTimeFormat.FixDateTimeMs,
+        FixDateTimeFormat.FixDateTimeFractional,
+    ];
+
+    /// <summary>
+    /// Gets the DateTime format strings to use when converting this date/time to a FIX string and vice versa.
+    /// </summary>
+    /// <returns>Format strings suitable when calling DateTime.ToString().</returns>
+    /// <remarks>When converting from DateTime to string, the first member of the returned array is used.  When
+    /// converting from string to DateTime, the member of the array that has the same length as the string
+    /// value is used.</remarks>
+    protected override string[] GetDateTimeFormatStrings()
+    {
+        return _formatStrings;
+    }
+
+    /// <summary>
+    /// Gets the human-readable type name for use in error messages shown to the user.
+    /// </summary>
+    /// <returns>Human-readable type name.</returns>
+    protected override string GetHumanReadableTypeName()
+    {
+        return HumanReadableTypeNames.TimestampType;
+    }
+}

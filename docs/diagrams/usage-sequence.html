@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One strategy, end to end</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f7f8fa;
+      --color-ink:     #1f2937;
+      --color-muted:   #5b6b85;
+      --color-accent:  #0f766e;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1200px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 900px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Sequence · FixPortal.FixAtdl</p>
+    <h1>One strategy, end to end</h1>
+
+    <svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="usageseq-title usageseq-desc">
+      <title id="usageseq-title">One strategy, end to end</title>
+      <desc id="usageseq-desc">The host loads a document through StrategiesReader, seeds control values, sets and validates entered values, pushes them into parameters, runs strategy edits, and finally reads the 957 to 960 tag sequence back from the group emitter.</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#5b6b85"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#0f766e"/></marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2563eb"/></marker>
+        <marker id="arrow-rev" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#5b6b85"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f7f8fa"/>
+
+      <!-- ===== LIFELINES ===== -->
+      <line x1="100" y1="96" x2="100" y2="500" stroke="rgba(31,41,55,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="300" y1="96" x2="300" y2="500" stroke="rgba(31,41,55,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="500" y1="96" x2="500" y2="500" stroke="rgba(31,41,55,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="680" y1="96" x2="680" y2="500" stroke="rgba(31,41,55,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="860" y1="96" x2="860" y2="500" stroke="rgba(31,41,55,0.20)" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <!-- ===== ACTIVATION BARS ===== -->
+      <rect x="296" y="140" width="8" height="64" fill="rgba(31,41,55,0.06)" stroke="#5b6b85" stroke-width="0.8"/>
+      <rect x="676" y="268" width="8" height="32" fill="rgba(31,41,55,0.06)" stroke="#5b6b85" stroke-width="0.8"/>
+      <rect x="496" y="364" width="8" height="32" fill="rgba(31,41,55,0.06)" stroke="#5b6b85" stroke-width="0.8"/>
+      <rect x="856" y="428" width="8" height="32" fill="rgba(31,41,55,0.06)" stroke="#5b6b85" stroke-width="0.8"/>
+
+      <!-- ===== MESSAGES ===== -->
+      <!-- 1 Host -> Reader -->
+      <line x1="100" y1="140" x2="292" y2="140" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="162" y="120" width="76" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="200" y="129" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Load(stream)</text>
+
+      <!-- 2 Reader -> Strategy_t -->
+      <line x1="308" y1="172" x2="500" y2="172" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="332" y="152" width="136" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="400" y="161" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">deserialize + ResolveAll</text>
+
+      <!-- 3 Reader --> Host (return) -->
+      <line x1="292" y1="204" x2="100" y2="204" stroke="#5b6b85" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <rect x="148" y="184" width="104" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="200" y="193" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Strategies_t</text>
+
+      <!-- 4 Host -> Strategy_t -->
+      <line x1="100" y1="236" x2="500" y2="236" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="332" y="216" width="136" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="400" y="225" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">LoadInitialControlValues</text>
+
+      <!-- 5 Host -> Controls -->
+      <line x1="100" y1="268" x2="672" y2="268" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="364" y="248" width="72" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="400" y="257" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">SetValue(v)</text>
+
+      <!-- 6 Controls --> Host (return) -->
+      <line x1="672" y1="300" x2="100" y2="300" stroke="#5b6b85" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <rect x="542" y="280" width="96" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="590" y="289" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">ValidationResult</text>
+
+      <!-- 7 Host -> Strategy_t -->
+      <line x1="100" y1="332" x2="500" y2="332" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="132" y="312" width="136" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="200" y="321" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">TryUpdateParameters</text>
+
+      <!-- 8 Host -> Strategy_t -->
+      <line x1="100" y1="364" x2="492" y2="364" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="332" y="344" width="136" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="400" y="353" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">EvaluateAllStrategyEdits</text>
+
+      <!-- 9 Strategy_t --> Host (return) -->
+      <line x1="492" y1="396" x2="100" y2="396" stroke="#5b6b85" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <rect x="176" y="376" width="48" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="200" y="385" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">bool</text>
+
+      <!-- 10 Host -> Emitter -->
+      <line x1="100" y1="428" x2="852" y2="428" stroke="#5b6b85" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <rect x="548" y="408" width="84" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="590" y="417" fill="#6b7280" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Emit(strategy)</text>
+
+      <!-- 11 Emitter --> Host : headline success (accent, solid) -->
+      <line x1="852" y1="460" x2="100" y2="460" stroke="#0f766e" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+      <rect x="732" y="440" width="76" height="12" rx="2" fill="#f7f8fa"/>
+      <text x="770" y="449" fill="#0f766e" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">tags 957-960</text>
+
+      <!-- ===== ACTORS ===== -->
+      <rect x="40" y="48" width="120" height="48" rx="6" fill="#f7f8fa"/>
+      <rect x="40" y="48" width="120" height="48" rx="6" fill="rgba(91,107,133,0.10)" stroke="#6b7280" stroke-width="1"/>
+      <text x="100" y="72" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Your host</text>
+      <text x="100" y="86" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">app code</text>
+
+      <rect x="212" y="48" width="176" height="48" rx="6" fill="#f7f8fa"/>
+      <rect x="212" y="48" width="176" height="48" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="300" y="72" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">StrategiesReader</text>
+      <text x="300" y="86" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Xml</text>
+
+      <rect x="424" y="48" width="152" height="48" rx="6" fill="#f7f8fa"/>
+      <rect x="424" y="48" width="152" height="48" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="500" y="72" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Strategy_t</text>
+      <text x="500" y="86" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Model.Elements</text>
+
+      <rect x="604" y="48" width="152" height="48" rx="6" fill="#f7f8fa"/>
+      <rect x="604" y="48" width="152" height="48" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="680" y="72" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Control_t</text>
+      <text x="680" y="86" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">+ Parameter_t</text>
+
+      <rect x="788" y="48" width="144" height="48" rx="6" fill="#f7f8fa"/>
+      <rect x="788" y="48" width="144" height="48" rx="6" fill="#ffffff" stroke="#1f2937" stroke-width="1"/>
+      <text x="860" y="72" fill="#1f2937" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Grp emitter</text>
+      <text x="860" y="86" fill="#5b6b85" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Fix</text>
+
+      <!-- ===== LEGEND ===== -->
+      <line x1="40" y1="536" x2="920" y2="536" stroke="rgba(31,41,55,0.10)" stroke-width="0.8"/>
+      <text x="40" y="556" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEGEND</text>
+
+      <line x1="124" y1="552" x2="156" y2="552" stroke="#5b6b85" stroke-width="1.2"/>
+      <text x="164" y="556" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">CALL</text>
+
+      <line x1="228" y1="552" x2="260" y2="552" stroke="#5b6b85" stroke-width="1" stroke-dasharray="5,4"/>
+      <text x="268" y="556" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">RETURN</text>
+
+      <line x1="348" y1="552" x2="380" y2="552" stroke="#0f766e" stroke-width="1.2"/>
+      <text x="388" y="556" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">THE OUTPUT YOU CAME FOR</text>
+
+      <rect x="596" y="547" width="8" height="10" fill="rgba(31,41,55,0.06)" stroke="#5b6b85" stroke-width="0.8"/>
+      <text x="612" y="556" fill="#5b6b85" font-size="8" font-family="'Geist Mono', monospace">HOLDS CONTROL</text>
+    </svg>
+  </div>
+</body>
+</html>

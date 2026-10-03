@@ -1,0 +1,284 @@
+// FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
+#region Copyright (c) 2010-2011, Steve Wilkinson (author)
+//
+//   This software is released under the MIT License..
+//
+#endregion
+
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Text;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Resources;
+using ThrowHelper = FixPortal.FixAtdl.Diagnostics.ThrowHelper;
+
+namespace FixPortal.FixAtdl.Fix;
+
+/// <summary>
+/// Represents a FIX message.
+/// </summary>
+public sealed class FixMessage : IEnumerable<KeyValuePair<FixField, string>>
+{
+    // Every tag-value occurrence in wire order, including repeats of the same tag (repeating-group
+    // members). This is the source of truth for enumeration and ToFix.
+    private readonly List<KeyValuePair<FixField, string>> _entries;
+
+    // First occurrence per tag, backing the scalar members (indexer get, TryGetValue, ContainsKey,
+    // Count, Keys, Values, FixFields). Every mutation path keeps it in sync with _entries.
+    private readonly Dictionary<FixField, string> _fields;
+
+    /// <summary>Field separator.</summary>
+    public const char SOH = '\x01';
+
+    /// <summary>Field/value separator.</summary>
+    public const char Separator = '=';
+
+    /// <summary>
+    /// Initializes an empty message for use by <see cref="FixTagValuesCollection"/>.
+    /// </summary>
+    internal FixMessage()
+    {
+        _entries = [];
+        _fields = [];
+    }
+
+    internal FixMessage(FixMessage source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        _entries = [.. source._entries];
+        _fields = new(source._fields);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="FixMessage"/> using the supplied FIX message.
+    /// </summary>
+    /// <param name="rawMessage">The FIX message to parse.</param>
+    /// <remarks>Repeated tags (repeating-group members) are tolerated: every occurrence is preserved
+    /// in wire order for enumeration and <see cref="ToFix"/>, while the scalar members (indexer,
+    /// <see cref="TryGetValue"/>, <see cref="ContainsKey"/>, <see cref="Count"/>, <see cref="Keys"/>,
+    /// <see cref="Values"/>, <see cref="FixFields"/>) resolve to the first occurrence. Use
+    /// <see cref="GetValues"/> to read every occurrence of a tag. Group semantics — NoXXX count
+    /// fields and entry boundaries — are not interpreted; that is left to the host.</remarks>
+    public FixMessage(string rawMessage)
+    {
+        _entries = [];
+        _fields = [];
+
+        if (string.IsNullOrEmpty(rawMessage))
+        {
+            throw ThrowHelper.New<FixParseException>(this, ErrorMessages.UnableToParseFixMessageEmpty);
+        }
+
+        // Split without RemoveEmptyEntries so a doubled SOH surfaces as an empty field and is rejected
+        // by the separator check below, rather than being silently skipped (Low 5). The single
+        // trailing SOH every FIX message carries is trimmed first.
+        string trimmedMessage = rawMessage.EndsWith(SOH) ? rawMessage[..^1] : rawMessage;
+        string[] nameValuePairs = trimmedMessage.Split(SOH);
+
+        // Split always yields at least one element for a non-null input; a message that is only a
+        // SOH trims to "" and splits to [""], which the separator check below rejects.
+        string tagText = string.Empty;
+        string valueText = string.Empty;
+
+        try
+        {
+            foreach (string nameValuePair in nameValuePairs)
+            {
+                int separatorIndex = nameValuePair.IndexOf(Separator);
+
+                if (separatorIndex <= 0 || separatorIndex == nameValuePair.Length - 1)
+                {
+                    throw ThrowHelper.New<FixParseException>(
+                        this,
+                        ErrorMessages.UnableToParseFixMessageInvalidContent,
+                        nameValuePair
+                    );
+                }
+
+                tagText = nameValuePair[..separatorIndex];
+                valueText = nameValuePair[(separatorIndex + 1)..];
+
+                // Digits only: a FIX tag carries no sign or whitespace, so "+35" and " 35" are
+                // rejected here just as the guard below rejects non-positive tags (R21).
+                int tag = int.Parse(tagText, NumberStyles.None, CultureInfo.InvariantCulture);
+
+                // FIX tags are positive. Reject non-positive tags here so a negative tag cannot be
+                // admitted and then corrupted by the (uint) cast in ToFix (e.g. -1 -> 4294967295).
+                if (tag <= 0)
+                {
+                    throw ThrowHelper.New<FixParseException>(
+                        this,
+                        ErrorMessages.UnableToParseFixMessageInvalidContent,
+                        nameValuePair
+                    );
+                }
+
+                // Repeated tags (repeating-group members) are preserved in wire order instead of
+                // being rejected; the first-occurrence lookup keeps the scalar members stable.
+                var field = (FixField)tag;
+                _entries.Add(new(field, valueText));
+                _fields.TryAdd(field, valueText);
+            }
+        }
+        catch (Exception ex) when (ex is FormatException or OverflowException)
+        {
+            throw ThrowHelper.New<FixParseException>(
+                this,
+                ex,
+                ErrorMessages.UnableToParseFixMessageInvalidFormat,
+                tagText,
+                valueText,
+                ex.Message
+            );
+        }
+    }
+
+    /// <summary>
+    /// Gets the complete set of distinct fix fields for this message.
+    /// </summary>
+    /// <value>The fix fields.</value>
+    public IReadOnlyCollection<FixField> FixFields => _fields.Keys;
+
+    /// <summary>Gets the number of distinct fields in the message (a repeated tag counts once).</summary>
+    public int Count => _fields.Count;
+
+    /// <summary>Gets the message's distinct field keys.</summary>
+    public IEnumerable<FixField> Keys => _fields.Keys;
+
+    /// <summary>Gets the message's field values (first occurrence per field).</summary>
+    public IEnumerable<string> Values => _fields.Values;
+
+    /// <summary>Gets the first occurrence's value for a parsed field.</summary>
+    public string this[FixField key]
+    {
+        get => _fields[key];
+        internal set
+        {
+            // Upsert: rewrite the first wire entry in place so a repeated tag keeps its wire order
+            // and its later occurrences; append when the tag is new.
+            int firstIndex = _entries.FindIndex(pair => pair.Key == key);
+            if (firstIndex >= 0)
+            {
+                _entries[firstIndex] = new(key, value);
+            }
+            else
+            {
+                _entries.Add(new(key, value));
+            }
+
+            _fields[key] = value;
+        }
+    }
+
+    /// <summary>Returns whether the message contains the specified field.</summary>
+    public bool ContainsKey(FixField key) => _fields.ContainsKey(key);
+
+    /// <summary>Attempts to get the first occurrence's value for a parsed field.</summary>
+    public bool TryGetValue(FixField key, [NotNullWhen(true)] out string? value)
+    {
+        if (_fields.TryGetValue(key, out string? candidate) && candidate is not null)
+        {
+            value = candidate;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Gets every value for the specified field, in wire order.
+    /// </summary>
+    /// <param name="key">The FIX field to read.</param>
+    /// <returns>All occurrences of the field in wire order; an empty list when the field is absent.</returns>
+    /// <remarks>Repeating-group members share tags across group entries, so a group-aware host reads
+    /// every occurrence here while the scalar members resolve to the first occurrence. Group
+    /// boundaries (NoXXX count fields) are not interpreted.</remarks>
+    public IReadOnlyList<string> GetValues(FixField key)
+    {
+        if (!_fields.ContainsKey(key))
+        {
+            return [];
+        }
+
+        var values = new List<string>();
+        foreach (KeyValuePair<FixField, string> entry in _entries)
+        {
+            if (entry.Key == key)
+            {
+                values.Add(entry.Value);
+            }
+        }
+
+        return values;
+    }
+
+    /// <summary>
+    /// Adds a value while a mutable <see cref="FixTagValuesCollection"/> is being built.
+    /// </summary>
+    internal bool TryAdd(FixField key, string value)
+    {
+        if (!_fields.TryAdd(key, value))
+        {
+            return false;
+        }
+
+        _entries.Add(new(key, value));
+        return true;
+    }
+
+    /// <summary>
+    /// Provides the string representation of this FixMessage.
+    /// </summary>
+    /// <returns>String representation of this message.</returns>
+    /// <remarks>Emits every occurrence in wire order, so a parsed message — repeated tags included —
+    /// round-trips byte-for-byte. FIX-spec field layout (header/trailer positions, group structure)
+    /// remains the responsibility of the host FIX engine.</remarks>
+    public string ToFix()
+    {
+        StringBuilder sb = new();
+
+        foreach (KeyValuePair<FixField, string> item in _entries)
+        {
+            // Guard at the serialization chokepoint so malformed values supplied by the mutable
+            // FixTagValuesCollection cannot be emitted and silently corrupted on the wire.
+            if ((int)item.Key <= 0)
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    this,
+                    ErrorMessages.InvalidFixTagForSerialization,
+                    ((int)item.Key).ToString(CultureInfo.InvariantCulture)
+                );
+            }
+
+            // A null or empty value would emit "tag=" + SOH, which this class's own parse constructor
+            // then rejects (separatorIndex == length - 1). A value containing SOH would split one field
+            // into two on the wire. Guard all three at this single serialization chokepoint, mirroring
+            // the tag guard above.
+            if (string.IsNullOrEmpty(item.Value) || item.Value.Contains(SOH))
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    this,
+                    ErrorMessages.InvalidFixValueForSerialization,
+                    ((uint)item.Key).ToString(CultureInfo.InvariantCulture)
+                );
+            }
+
+            sb.AppendFormat(
+                CultureInfo.InvariantCulture,
+                "{0}{1}{2}{3}",
+                ((uint)item.Key).ToString(CultureInfo.InvariantCulture),
+                Separator,
+                item.Value,
+                SOH
+            );
+        }
+
+        return sb.ToString();
+    }
+
+    /// <inheritdoc />
+    public IEnumerator<KeyValuePair<FixField, string>> GetEnumerator() => _entries.GetEnumerator();
+
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+}

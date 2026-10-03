@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core">
+  <Strategy name="BROKEN" wireValue="BROKEN" uiRep="Broken" providerID="DEMO">
+    <StrategyLayout>
+      <UnclosedTag>
+    </StrategyLayout>
+  </Strategy>
+</Strategies>

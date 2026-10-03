@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Deliberately invalid fixture: the <Strategy> element is missing the required
+  "name" attribute, which SchemaDefinitions.Strategy_t declares as Mandatory.
+  Everything else matches the valid fixture structure so the deserializer reaches
+  the attribute-validation step and throws MissingMandatoryValueException for the
+  right reason (not for an XML-namespace or structural problem).
+-->
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            strategyIdentifierTag="5001">
+  <Strategy version="1" wireValue="MISSING_NAME" uiRep="Missing Name" providerID="DEMO">
+    <lay:StrategyLayout>
+      <lay:StrategyPanel title="Empty" orientation="VERTICAL">
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+</Strategies>
