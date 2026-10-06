@@ -86,3 +86,15 @@ This package is headless. Rendered, editable forms:
   consumes `Strategy_t` directly.
 - [`@fix-portal/fixatdl-react`](https://github.com/FixPortal/fixportal-fixatdl-react)
   consumes a JSON `AtdlStrategyDto` your backend maps from `Strategy_t`.
+
+## FixPortal.FixAtdl.Contracts
+
+Second package in this repo, released in lockstep with `FixPortal.FixAtdl`.
+It maps a parsed `Strategies_t` into the JSON `@fix-portal/fixatdl-react` renders.
+
+Public types: `AtdlDtoMapper` (`Map`), `AtdlContractJson` (`Options`), the DTO
+records (`AtdlStrategiesDto` and the strategy, parameter, panel, control, and
+state-rule records), `StateRuleAstBuilder`, `StateRuleEvaluator`,
+`FixValueFormatter`, `AtdlParseException`, and `AtdlParseExceptionCode`.
+
+[Package README](https://github.com/FixPortal/fixportal-fixatdl/blob/main/src/FixPortal.FixAtdl.Contracts/README.md).

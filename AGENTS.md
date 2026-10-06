@@ -6,10 +6,15 @@ nowhere else.
 
 ## What this repo is
 
-A modernised fork of [atdl4net/atdl4net](https://github.com/atdl4net/atdl4net),
-published as the `FixPortal.FixAtdl` NuGet package. Headless FIXatdl v1.1
-parser / model / validator / FIX-tag emitter; `net10.0` only; no UI layer
-(upstream's WPF controls were removed on purpose — do not reintroduce one).
+A modernised fork of [atdl4net/atdl4net](https://github.com/atdl4net/atdl4net).
+The repo publishes two NuGet packages, released in lockstep from one tag:
+`FixPortal.FixAtdl` (headless FIXatdl v1.1 parser / model / validator / FIX-tag
+emitter) and `FixPortal.FixAtdl.Contracts` (the JSON contract consumed by
+`@fix-portal/fixatdl-react`). `net10.0` only; no UI layer (upstream's WPF
+controls were removed on purpose — do not reintroduce one). The Contracts
+goldens under `tests/FixPortal.FixAtdl.Contracts.Tests/Golden/` are never
+regenerated. `contracts/state-rule-cases.json` is the canonical corpus that
+`@fix-portal/fixatdl-react` copies.
 
 ## Fork discipline
 

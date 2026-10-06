@@ -75,6 +75,7 @@ jobs:
         run: |
           VERSION=${REF_NAME#v}
           dotnet pack src/FixPortal.FixAtdl/FixPortal.FixAtdl.csproj -c Release --no-build -o artifacts /p:Version="${VERSION}"
+          dotnet pack src/FixPortal.FixAtdl.Contracts/FixPortal.FixAtdl.Contracts.csproj -c Release --no-build -o artifacts /p:Version="${VERSION}"
 
       - name: Upload nupkg artefact
         uses: actions/upload-artifact@v7

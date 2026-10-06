@@ -24,9 +24,10 @@ implementations, not samples.
 |---|---|---|
 | [`FixPortal.FixAtdl.Wpf`](https://www.nuget.org/packages/FixPortal.FixAtdl.Wpf/) · [repo](https://github.com/FixPortal/fixportal-fixatdl-wpf) | .NET 10 desktop. All 15 FIXatdl control types, nested panel layouts, editable dropdowns, state rules, parameter and strategy validation. Templates load automatically. | `dotnet add package FixPortal.FixAtdl.Wpf` |
 | [`@fix-portal/fixatdl-react`](https://www.npmjs.com/package/@fix-portal/fixatdl-react) · [repo](https://github.com/FixPortal/fixportal-fixatdl-react) | React 19 in the browser. Recursive panels, native controls, form state, validation, state-rule evaluation and explanation, StrategyParametersGrp preview. | `npm install @fix-portal/fixatdl-react` |
+| [`FixPortal.FixAtdl.Contracts`](https://github.com/FixPortal/fixportal-fixatdl/blob/main/src/FixPortal.FixAtdl.Contracts/README.md) | .NET 10. The JSON contract `@fix-portal/fixatdl-react` renders, mapped from a parsed `Strategies_t`. | `dotnet add package FixPortal.FixAtdl.Contracts` |
 
-The WPF adapter consumes this package directly. The React adapter takes a parsed
-strategy DTO from your backend, which is where this package runs.
+The WPF adapter consumes this package directly. The React adapter takes the JSON
+that `FixPortal.FixAtdl.Contracts` maps from a parsed document.
 
 ## What it is *not*
 
