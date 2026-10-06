@@ -42,7 +42,8 @@ public class GoldenContractTests
     // Loads the document the way the goldens were captured at 7a287c2: once with whitespace
     // preserved, then feeds the re-serialised document to StrategiesReader and slices each
     // Strategy element's XML out of the same XDocument. The golden sourceXml values were
-    // produced this way.
+    // produced this way. XElement.ToString writes Environment.NewLine, so the slice is
+    // normalised to "\n": the simulator serves from a Linux container, and that is the wire.
     private static (Strategies_t Strategies, IReadOnlyDictionary<string, string> SourceXml) ParseLikeTheSimulator(
         string xml
     )
@@ -80,7 +81,7 @@ public class GoldenContractTests
         foreach (var strategy in strategies)
         {
             slices[strategy.Name] = elements.TryGetValue(strategy.Name, out var element)
-                ? element.ToString(SaveOptions.None)
+                ? element.ToString(SaveOptions.None).ReplaceLineEndings("\n")
                 : string.Empty;
         }
 
