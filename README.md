@@ -146,12 +146,6 @@ full Stryker output and compact summaries:
 - `mutation-summary.json`
 - `mutation-summary.md`
 
-## Troubleshooting
-
-| Symptom | Cause | Fix |
-|---|---|---|
-| `dotnet restore` fails with NU1301 ("Unable to find package FixPortal.CodeStyle") or 401 Unauthorized on the `github-fixportal` feed | The build consumes `FixPortal.CodeStyle` from the private FixPortal GitHub Packages feed, and `nuget.config` reads its credentials from the `GITHUB_PACKAGES_TOKEN` environment variable. Without it, the feed rejects the restore anonymously. | For a local restore, set `$env:GITHUB_PACKAGES_TOKEN = "<token>"` (Windows PowerShell) or `export GITHUB_PACKAGES_TOKEN=...` (bash), then restore again. Locally the token must be a **personal access token (classic)** with the `read:packages` scope on the FixPortal org — the GitHub Packages NuGet registry does not accept fine-grained tokens, which fail with the same 401. In GitHub Actions no PAT is needed: the workflows supply `GITHUB_PACKAGES_TOKEN` from `secrets.GITHUB_TOKEN`. |
-
 ## Licence
 
 MIT, inherited from upstream. See `LICENSE`. Attribution preserved in `NOTICE`.

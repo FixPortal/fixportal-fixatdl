@@ -7,15 +7,8 @@ modernised .NET 10 surface are all in scope. Reintroducing a UI layer is not.
 
 ## Getting set up
 
-The build consumes `FixPortal.CodeStyle` from the private FixPortal GitHub
-Packages feed, so restore needs a token with `read:packages` on the `FixPortal`
-org exported first:
-
-```powershell
-$env:GITHUB_PACKAGES_TOKEN = "<token with read:packages>"
-```
-
-Then the standard loop:
+Every dependency restores from nuget.org; no credentials are needed. The
+standard loop:
 
 ```powershell
 dotnet tool restore

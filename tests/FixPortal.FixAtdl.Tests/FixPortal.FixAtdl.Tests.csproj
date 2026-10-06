@@ -12,7 +12,6 @@
     <PackageReference Include="AwesomeAssertions" />
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="NodaTime.Testing" />
-    <PackageReference Include="FixPortal.CodeStyle.ArchRules" />
     <PackageReference Include="TngTech.ArchUnitNET.xUnitV3" />
   </ItemGroup>
   <ItemGroup>
