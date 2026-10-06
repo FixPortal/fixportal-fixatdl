@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="AwesomeAssertions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FixPortal.FixAtdl.Contracts\FixPortal.FixAtdl.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Fixtures\*.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Golden\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\FixPortal.FixAtdl.Tests\Fixtures\pov.xml" Link="CoreFixtures\pov.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\FixPortal.FixAtdl.Tests\Fixtures\RealWorld\tz-clock.xml" Link="CoreFixtures\tz-clock.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\FixPortal.FixAtdl.Tests\Fixtures\RealWorld\regions-enums.xml" Link="CoreFixtures\regions-enums.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\contracts\state-rule-cases.json" Link="contracts\state-rule-cases.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>FixPortal.FixAtdl.Contracts</RootNamespace>
+    <AssemblyName>FixPortal.FixAtdl.Contracts</AssemblyName>
+    <PackageId>FixPortal.FixAtdl.Contracts</PackageId>
+    <!-- Lockstep with core: release.yml overrides this with the tag version for both packages. -->
+    <Version>1.2.0</Version>
+    <Description>JSON contract for @fix-portal/fixatdl-react: DTO records, a mapper from the parsed FixPortal.FixAtdl model, and the FIXatdl state-rule AST builder and evaluator. Headless. Maintained by FixPortal.</Description>
+    <!-- FixPortal-authored package: no Atdl4net code, so neither upstream author nor upstream copyright applies. -->
+    <Authors>FixPortal contributors</Authors>
+    <Copyright>Copyright (c) 2026 FixPortal contributors. MIT.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>FIX;FIXatdl;algorithmic-trading;react;json;FixPortal</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FixPortal.FixAtdl\FixPortal.FixAtdl.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>
