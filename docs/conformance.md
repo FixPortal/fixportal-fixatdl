@@ -20,15 +20,14 @@ including `publication/FIXatdl-1 1-Specification_with_Errata_20101221.pdf`.
 | Time | Daily timestamp bounds use the timestamp's market date and timezone. WPF and React preserve an untouched loaded instant during a DST overlap; edited wall times use the core's lenient timezone policy. |
 | Validation/read-back | Required values, inclusive bounds, enum mappings, and strategy edits are tested at model and adapter boundaries. Invalid values or non-converging state rules block adapter validation. |
 | Amendments | Adapters accept explicit amendment context, retain loaded values, and prevent changes to immutable parameters and conflicting radio-group selections. |
-| Simulator contract | The simulator mapper reads constraints from parameter value types and carries strategy edits, both edit operands, initialization policy, enum/radio mappings, increments, and clock metadata to React. The backend owns the copied expression corpus and DTO snapshots. |
+| React JSON contract | `FixPortal.FixAtdl.Contracts` reads constraints from parameter value types and carries strategy edits, both edit operands, initialization policy, enum/radio mappings, increments, and clock metadata to React. This repo owns the shared state-rule corpus (`contracts/state-rule-cases.json`) and the golden contract snapshots. |
 
 ## Core verification
 
 The figures in this section are the record of the September 2026 pass and are not
-updated as the suite grows. Current state: **1261 passing tests** against package
-**1.1.3**.
+updated as the suite grows; CI runs the full suite on every pull request.
 
-The starting core revision was `bd0e35b` with 731 passing tests. The September
+The pass started from 731 passing tests. The September
 2026 pass ends with **1261 passing tests**, no failures or skips. CSharpier checks
 219 files. The coverage command below reports **76.1% library line coverage**,
 above the existing 70% floor. WPF's corresponding local integration run has
@@ -107,5 +106,5 @@ was replaced merely to agree with a browser implementation.
 - Full schema semantics and every possible interaction among rules have not
   been exhaustively assessed.
 
-Consumer release order is core, WPF/React, then simulator dependencies. EMS
-integration is the separate fifth programme goal.
+Consumer release order is core and Contracts (released together), then the WPF
+and React adapters.

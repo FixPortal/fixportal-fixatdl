@@ -1,6 +1,6 @@
 # API reference — `FixPortal.FixAtdl`
 
-> Consumer-facing public surface of package 1.1.x. Walkthroughs stay in
+> Consumer-facing public surface of the current release. Walkthroughs stay in
 > [usage.md](usage.md); this page is the list of types a host actually
 > calls. XML comments on the packed assembly are the per-member contract.
 
@@ -85,7 +85,8 @@ This package is headless. Rendered, editable forms:
 - [`FixPortal.FixAtdl.Wpf`](https://github.com/FixPortal/fixportal-fixatdl-wpf)
   consumes `Strategy_t` directly.
 - [`@fix-portal/fixatdl-react`](https://github.com/FixPortal/fixportal-fixatdl-react)
-  consumes a JSON `AtdlStrategyDto` your backend maps from `Strategy_t`.
+  consumes the JSON that `FixPortal.FixAtdl.Contracts` (below) maps from a
+  parsed `Strategies_t`.
 
 ## FixPortal.FixAtdl.Contracts
 

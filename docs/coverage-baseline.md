@@ -5,7 +5,8 @@
 > figures below are the *starting* point of that work and have long since been
 > superseded: CI now enforces a 70% line floor on `FixPortal.FixAtdl` via
 > `scripts/assert-coverage-floor.ps1`. Kept as the record of where Phase 1
-> started; do not read it as today's coverage.
+> started; do not read it as today's coverage. Commit hashes cited here predate
+> the repository's October 2026 history reset and do not resolve in it.
 
 ## Overall
 - Line coverage: 32%
@@ -42,7 +43,7 @@ _The table covers the core namespaces only (~4,004 of ~5,072 coverable lines); t
 
 ## Finalized coverage bar
 
-> Roadmap deliverable **D2** (see `docs/superpowers/plans/2026-05-30-fixatdl-1.0-roadmap.md`).
+> Roadmap deliverable **D2** of the 1.0 roadmap (an internal planning document, not published).
 
 The provisional ≥80% line / ≥70% branch target is **not achievable** against the current baseline (32% line / 19% branch overall; worst core namespaces are at 0–6% line). Setting that bar as a Phase 1 exit gate would require the entire codebase to be written green from scratch.
 
@@ -121,4 +122,4 @@ The floor is on the **library package specifically, not the report's top-level `
 
 The script fails — rather than passes — when the report is missing, unparsable, empty of packages, or contains no package by that name. A renamed assembly would otherwise end coverage enforcement silently, which is the same class of defect as the one this section records.
 
-Current measured figures, 729 tests all passing: library **73.3% line, 64.7% branch**.
+Figures when the floor was reinstated (2026-08-24), 729 tests all passing: library **73.3% line, 64.7% branch**. The floor in `ci.yml` is the live gate; it also covers `FixPortal.FixAtdl.Contracts` at 70% line.
