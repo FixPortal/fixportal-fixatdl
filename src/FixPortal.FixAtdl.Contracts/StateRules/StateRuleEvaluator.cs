@@ -416,7 +416,7 @@ public sealed class StateRuleEvaluator
             result = Convert.ToDecimal(value, System.Globalization.CultureInfo.InvariantCulture);
             return true;
         }
-        catch
+        catch (Exception ex) when (ex is InvalidCastException or FormatException or OverflowException)
         {
             result = 0;
             return false;

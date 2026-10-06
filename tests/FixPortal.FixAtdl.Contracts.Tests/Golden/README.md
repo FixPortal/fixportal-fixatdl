@@ -18,3 +18,9 @@ Sources:
 | `tz-clock`, `regions-enums` | `tests/FixPortal.FixAtdl.Tests/Fixtures/RealWorld/*.xml` |
 
 Each file is one compact JSON document followed by a single `\n`.
+
+Line endings inside `sourceXml`: the capture ran on Windows, where
+`XElement.ToString` writes `\r\n`. The simulator serves from a Linux container,
+so its real wire output has `\n`. The files were corrected once, mechanically
+(`\r\n` to `\n` inside `sourceXml` only; nothing else in them contained a CR),
+and the golden test normalises its own slices to `\n` so it passes on every OS.
