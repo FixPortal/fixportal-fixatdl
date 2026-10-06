@@ -1,19 +1,8 @@
 version: 2
 
-# Dependabot cannot read Actions secrets or NuGet credentials from nuget.config.
-# The FIXPORTAL_PACKAGES_TOKEN secret is wired under Settings → Secrets → Dependabot.
-registries:
-  fixportal-github-packages:
-    type: nuget-feed
-    url: https://nuget.pkg.github.com/FixPortal/index.json
-    username: FixPortal
-    password: ${{secrets.FIXPORTAL_PACKAGES_TOKEN}}
-
 updates:
   - package-ecosystem: nuget
     directory: /
-    registries:
-      - fixportal-github-packages
     schedule:
       interval: weekly
       day: monday

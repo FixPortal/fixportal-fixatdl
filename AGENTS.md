@@ -49,12 +49,11 @@ parser / model / validator / FIX-tag emitter; `net10.0` only; no UI layer
   defined in `ci.yml`, not in `docs/coverage-baseline.md` — that document is the
   historical 2026-05-30 starting baseline (32% line) and is not current state.
 
-## Private feed restore
+## Restore
 
-`FixPortal.CodeStyle` comes from the private `github-fixportal` feed
-(`nuget.config`). A restore without `GITHUB_PACKAGES_TOKEN` set fails with
-NU1301/401 — see the README Troubleshooting section before concluding the
-build is broken.
+Every package, including `FixPortal.CodeStyle`, restores from nuget.org with no
+credentials. Do not reintroduce a private feed: it locks outside contributors
+out of the build.
 
 ## Review workflow
 

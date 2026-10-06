@@ -17,16 +17,12 @@ concurrency:
 
 permissions:
   contents: read
-  packages: read
 
 jobs:
   build-and-test:
     name: Build and test
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      # Restoring the private FixPortal.CodeStyle package needs read:packages.
-      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v7
         with:

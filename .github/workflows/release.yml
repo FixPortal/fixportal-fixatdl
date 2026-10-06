@@ -19,9 +19,6 @@ jobs:
       packages: write
       id-token: write
       pull-requests: read
-    env:
-      # Restoring the private FixPortal.CodeStyle package needs read:packages.
-      GITHUB_PACKAGES_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
         with:
