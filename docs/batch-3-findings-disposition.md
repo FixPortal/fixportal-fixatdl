@@ -3,12 +3,13 @@
 > **Historical record — a point-in-time disposition, closed in 2026-06.** Kept
 > because the rationale behind each closed finding is still load-bearing (some
 > are pinned by characterization tests). It describes the code as it stood then,
-> not as it stands now.
+> not as it stands now. Commit hashes cited here predate the repository's
+> October 2026 history reset and do not resolve in it.
 
 > Resolves the Phase 2 acceptance gate of the 1.0 roadmap: every in-`src/` TODO and every deferred
 > batch-3 adversarial-review finding is fixed, closed with rationale, or recorded as deferred work.
-> Audit source: the batch-3 adversarial audit at
-> `…/Adversarial Review/fixportal-fixatdl/full-audit-20260528T211015Z/`.
+> The audit itself (run 2026-05-28) is held by the maintainers; this document carries every
+> finding and its disposition.
 
 ## Fixed
 - **O-G2** — `EditValueConverter.ConvertToComparableType` now rejects a null operand with

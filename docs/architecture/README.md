@@ -1,12 +1,12 @@
 # FixPortal.FixAtdl — Architecture
 
-A navigable map of the library, derived from two whole-repo graph passes
-that are **generated locally and gitignored** (`graphify-out/`,
-`.understand-anything/`). Rebuild with `/graphify` and `/understand` after
-a clone; do not expect those directories in a fresh checkout.
+A navigable map of the library. It is self-contained: everything below can be
+checked against the source.
 
-This document is the prose synthesis of both. For "where is X / what calls Y"
-on a machine that has rebuilt the graphs, query them rather than grepping.
+The maintainers derived it from two whole-repo code-graph passes, made with
+[graphify](https://github.com/Graphify-Labs/graphify) and
+[Understand-Anything](https://github.com/Egonex-AI/Understand-Anything). Their outputs (`graphify-out/`, `.understand-anything/`) are gitignored
+and are not needed to use or contribute to the library.
 
 ## What this library is
 
@@ -137,16 +137,13 @@ Preserve this when touching XML ingestion.
 
 ## How to navigate further
 
-| Question | Tool |
-|---|---|
-| "Where is X / what calls Y / what inherits Z" | After rebuilding locally: `graphify query "..."` or `graphify explain "X"` |
-| Visual walk of the architecture | `/understand-dashboard` then the guided tour (after `/understand`) |
-| Deep-dive one file | `/understand-explain <path>` |
-| God nodes / bridges / cohesion | `graphify-out/GRAPH_REPORT.md` (generated, not in git) |
+Start from the load-bearing components above and the
+[API reference](https://github.com/FixPortal/fixportal-fixatdl/blob/main/docs/api.md).
+If you have either graph tool installed, you can build the graphs yourself for
+"where is X / what calls Y" queries; neither is required.
 
-Both graphs are whole-repo and rebuildable: `graphify --update` (agent graph)
-and `/understand` (human graph) after code changes. Keep this doc in sync when a
-layer boundary or load-bearing seam actually moves — not on every commit.
+Keep this doc in sync when a layer boundary or load-bearing seam actually
+moves — not on every commit.
 
 Rendered, editable forms live in the sibling adapter repos, not here. The WPF
 adapter consumes `Strategy_t` directly and delegates 957–960 read-back to the

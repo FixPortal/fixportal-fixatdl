@@ -66,6 +66,7 @@ var strategies = reader.Load(stream);
 
 var twap = strategies.Strategies[0];
 twap.Parameters["StartTime"].WireValue = "20260101-09:30:00";
+twap.Parameters["EndTime"].WireValue = "20260101-16:00:00";
 
 foreach (var tag in twap.Parameters.GetOutputValues())
     Console.WriteLine($"{tag.Key}={tag.Value}");
