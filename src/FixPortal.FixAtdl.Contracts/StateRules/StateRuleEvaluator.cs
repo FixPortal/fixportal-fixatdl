@@ -71,7 +71,7 @@ public sealed class StateRuleEvaluator
     // Combinators
     // -------------------------------------------------------------------------
 
-    // All() on an empty sequence returns true — vacuous truth, per spec.
+    // All() on an empty sequence returns true (vacuous truth). An empty conjunction is satisfied.
     private bool EvaluateAnd(StateRuleAstNodeDto node, IReadOnlyDictionary<string, object?> state, int depth) =>
         (node.Children ?? []).All(c => Evaluate(c, state, depth + 1));
 
