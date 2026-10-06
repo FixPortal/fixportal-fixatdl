@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Canonical TWAP fixture for SIMULATOR ATDL Examiner tests.
+  One strategy with:
+    - Duration  (Int_t,  FIX tag 7001)
+    - Urgency   (Char_t, FIX tag 7002) with three enum values: LOW / MEDIUM / HIGH
+  Layout: one StrategyPanel containing a TextField (Duration) and a DropDownList (Urgency).
+-->
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            strategyIdentifierTag="5001"
+            versionIdentifierTag="5002">
+
+  <Strategy name="TWAP" version="1" wireValue="TWAP" uiRep="TWAP" providerID="SIMULATOR">
+    <Parameter name="Duration" xsi:type="Int_t"  fixTag="7001" use="required"/>
+    <Parameter name="Urgency"  xsi:type="Char_t" fixTag="7002" use="optional">
+      <EnumPair enumID="LOW"    wireValue="L"/>
+      <EnumPair enumID="MEDIUM" wireValue="M"/>
+      <EnumPair enumID="HIGH"   wireValue="H"/>
+    </Parameter>
+
+    <lay:StrategyLayout>
+      <lay:StrategyPanel title="TWAP Parameters" orientation="VERTICAL" collapsible="false" border="Line">
+        <lay:Control ID="c_Duration" xsi:type="lay:TextField_t"   parameterRef="Duration" label="Duration (mins)"/>
+        <lay:Control ID="c_Urgency"  xsi:type="lay:DropDownList_t" parameterRef="Urgency"  label="Urgency">
+          <lay:ListItem uiRep="Low"    enumID="LOW"/>
+          <lay:ListItem uiRep="Medium" enumID="MEDIUM"/>
+          <lay:ListItem uiRep="High"   enumID="HIGH"/>
+        </lay:Control>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+
+</Strategies>

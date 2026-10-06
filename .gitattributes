@@ -2,3 +2,4 @@
 *.png binary
 *.cs text eol=crlf
 *.sh text eol=lf
+tests/FixPortal.FixAtdl.Contracts.Tests/Golden/*.json -text

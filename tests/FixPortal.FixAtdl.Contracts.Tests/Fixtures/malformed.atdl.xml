@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Malformed fixture for SIMULATOR ATDL Examiner tests.
+  Well-formed XML at the document level, but the Strategy element is missing the
+  required <lay:StrategyLayout> child — the FixAtdl deserialiser will leave
+  strategy.StrategyLayout null (no parse-time exception is raised here because
+  StrategyLayout is not validated as Mandatory by SchemaDefinitions.Strategy_t).
+
+  This fixture is intentionally incomplete to test schema-level validation
+  (T4 AtdlSchemaValidator).  AtdlParser itself will successfully return the
+  strategy with a null StrategyLayout; tests for T3 treat this as a valid
+  parse result.
+-->
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            strategyIdentifierTag="5001">
+
+  <Strategy name="BROKEN" version="1" wireValue="BROKEN" uiRep="Broken" providerID="SIMULATOR">
+    <Parameter name="Duration" xsi:type="Int_t" fixTag="7001" use="optional"/>
+    <!-- StrategyLayout deliberately omitted -->
+  </Strategy>
+
+</Strategies>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Multi-strategy fixture for SIMULATOR ATDL Examiner tests.
+  Contains two strategies (TWAP and VWAP) in a single file — used to verify
+  that AtdlParser returns both strategies and produces independent source slices.
+-->
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core"
+            xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation"
+            xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout"
+            xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            strategyIdentifierTag="5001"
+            versionIdentifierTag="5002">
+
+  <Strategy name="TWAP" version="1" wireValue="TWAP" uiRep="TWAP" providerID="SIMULATOR">
+    <Parameter name="Duration" xsi:type="Int_t" fixTag="7001" use="required"/>
+
+    <lay:StrategyLayout>
+      <lay:StrategyPanel title="TWAP Parameters" orientation="VERTICAL" collapsible="false">
+        <lay:Control ID="c_Duration" xsi:type="lay:TextField_t" parameterRef="Duration" label="Duration (mins)"/>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+
+  <Strategy name="VWAP" version="1" wireValue="VWAP" uiRep="VWAP" providerID="SIMULATOR">
+    <Parameter name="Duration" xsi:type="Int_t" fixTag="7001" use="required"/>
+
+    <lay:StrategyLayout>
+      <lay:StrategyPanel title="VWAP Parameters" orientation="VERTICAL" collapsible="false">
+        <lay:Control ID="c_Duration" xsi:type="lay:TextField_t" parameterRef="Duration" label="Duration (mins)"/>
+      </lay:StrategyPanel>
+    </lay:StrategyLayout>
+  </Strategy>
+
+</Strategies>
