@@ -1,6 +1,7 @@
 # Changelog
 
-Notable changes to `FixPortal.FixAtdl`. Format follows
+Notable changes to `FixPortal.FixAtdl` and, from 1.3.0, `FixPortal.FixAtdl.Contracts`
+(released together at the same version). Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -13,6 +14,8 @@ installable from NuGet.org; their notes are kept below, but their tags were
 retired with the pre-release history.
 
 ## [Unreleased]
+
+## [1.3.0] — 2026-10-06
 
 ### Added
 
@@ -384,5 +387,6 @@ First stable release of the modernised fork.
 First packaged fork of [Atdl4net](https://github.com/atdl4net/atdl4net),
 pre-release.
 
-[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/FixPortal/fixportal-fixatdl/releases/tag/v1.2.0
