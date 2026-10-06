@@ -80,7 +80,9 @@ jobs:
 
       - name: Coverage floor
         shell: pwsh
-        run: ./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl -MinimumLineRate 70 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+        run: |
+          ./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl -MinimumLineRate 70 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          ./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl.Contracts -MinimumLineRate 70 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
 
       - name: Upload test results
         if: always()
