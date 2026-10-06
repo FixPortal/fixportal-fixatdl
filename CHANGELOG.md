@@ -14,6 +14,10 @@ retired with the pre-release history.
 
 ## [Unreleased]
 
+### Added
+
+- New package `FixPortal.FixAtdl.Contracts`: the JSON contract consumed by `@fix-portal/fixatdl-react` (DTO records, `AtdlDtoMapper.Map`, the state-rule AST builder and evaluator, `AtdlContractJson.Options`). Released in lockstep with `FixPortal.FixAtdl`. The shared state-rule corpus now lives in `contracts/state-rule-cases.json`.
+
 ## [1.2.0] — 2026-10-03
 
 ### Added
