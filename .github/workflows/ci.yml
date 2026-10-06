@@ -82,7 +82,11 @@ jobs:
         shell: pwsh
         run: |
           ./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl -MinimumLineRate 70 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          $core = $LASTEXITCODE
           ./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl.Contracts -MinimumLineRate 70 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          $contracts = $LASTEXITCODE
+          if ($core -ne 0) { exit $core }
+          exit $contracts
 
       - name: Upload test results
         if: always()
