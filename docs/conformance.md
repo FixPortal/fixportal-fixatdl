@@ -69,9 +69,12 @@ was replaced merely to agree with a browser implementation.
 - `DateTime` cannot represent year 0000; this is rejected as a deliberate omission -
   a year-0000 wire value has no legitimate use and no downstream consumer
   (QuickFIX/n, broker feeds) can act on one either. A declared UTC leap second
-  (literal `:60` seconds field) is normalised: `FixDateTime` rolls it forward by
-  one second, cascading minute/hour/day/month/year via `DateTime` arithmetic,
-  matching the `UTCTimestamp_t` spec's own worked example.
+  (a literal `:60` seconds field directly after `23:59:`) is normalised:
+  `FixDateTime` rolls it forward by one second, cascading
+  minute/hour/day/month/year via `DateTime` arithmetic, matching the
+  `UTCTimestamp_t` spec's own worked example. A `:60` seconds field at any other
+  minute is not a legal leap second; it is left untouched and fails parsing like any
+  other invalid value.
   A Clock `initValue` carrying its own explicit UTC offset (the base XML Schema
   `time` type's `hh:mm[:ss]{+,-}hh:mm` form) now resolves directly from that
   offset, taking precedence over `localMktTz`-based zone resolution; `localMktTz`

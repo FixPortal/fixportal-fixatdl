@@ -9,7 +9,7 @@ Dates are the release-tag date, in UTC. Entries are consumer-facing: build,
 CI, and test-infrastructure commits are omitted unless they change what a
 consumer sees. No `1.0.2`–`1.0.4` release was tagged.
 
-The repository history starts at the 1.2.0 release. Earlier versions remain
+The repository history starts at the 1.2.0 release. Versions from 1.1.2 remain
 installable from NuGet.org; their notes are kept below, but their tags were
 retired with the pre-release history.
 

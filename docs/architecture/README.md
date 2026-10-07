@@ -80,6 +80,10 @@ common mistake, so they are documented side by side.
 
 ![Parameter value type hierarchy: IParameterType splits into a struct-backed AtdlValueType branch holding the enum, date-time and float bases, and a class-backed AtdlReferenceType branch holding String_t and Data_t](../images/parameter-types.png)
 
+Both branches derive from the shared `AtdlParameterTypeBase<TStorage>` (the
+value/wire/conversion machinery), which implements `IParameterType`; `AtdlValueType<T>`
+and `AtdlReferenceType<T>` are the two pivots over it.
+
 god nodes here: `AtdlValueType` (root, degree 24), `DateTimeTypeBase` (23),
 `Float_t` (21). Thin leaf types (`Amt_t`, `Price_t`…) are one-liners that only fix
 the base type's generic parameter.
@@ -113,9 +117,12 @@ Verified against the graph (degree from graphify, role confirmed via
   a runtime rule evaluator. The validation layer's core. AND/OR/XOR/NOT grammar
   lives in `EditEvaluatingCollection`, shared by both `StateRule_t` (UI state) and
   `StrategyEdit_t` (business rules).
-- **`ThrowHelper`** (`Diagnostics/`) — the sole exception factory. Callers never
-  `new` an exception directly; `ThrowHelper` constructs the right `FixAtdlException`
-  subclass reflectively with a localized message from `ErrorMessages.resx`.
+- **`ThrowHelper`** (`Diagnostics/`) — the main factory for `FixAtdlException`
+  subclasses: it constructs the right one reflectively with a localized message from
+  `ErrorMessages.resx`. It is not the only route: `StrategiesReader` raises
+  `SchemaValidationException` directly, the serialization layer and the Contracts
+  package throw BCL argument/state exceptions directly, and argument guards use BCL
+  types throughout.
 
 ## The NodaTime boundary
 
@@ -147,10 +154,12 @@ moves — not on every commit.
 
 Rendered, editable forms live in the sibling adapter repos, not here. The WPF
 adapter consumes `Strategy_t` directly and delegates 957–960 read-back to the
-core emitter. The React adapter consumes a JSON DTO **your host maps** — it
-never sees this NuGet package, and its group emitter is a browser-side preview,
+core emitter. The React adapter consumes a JSON DTO that, since 1.3.0, the
+`FixPortal.FixAtdl.Contracts` package maps (`AtdlDtoMapper` / `AtdlContractJson` in
+`src/FixPortal.FixAtdl.Contracts`); it never sees the core NuGet package, and its group emitter is a browser-side preview,
 not the authoritative wire. Core also exposes direct per-parameter tag values;
-the host assembles the complete FIX order.
+the host still owns the endpoint that serves the DTO, authentication, and the final
+order validation and assembly.
 
 ![The three-pack: broker XML parsed by the headless core, which emits direct parameter tag values and the authoritative 957–960 group; WPF reads back through the core emitter, React emits 957–960 tag tuples through a host-mapped DTO, and the host validates and assembles the final FIX wire](../images/three-pack.png)
 
