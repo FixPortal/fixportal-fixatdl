@@ -15,6 +15,16 @@ retired with the pre-release history.
 
 ## [Unreleased]
 
+## [1.3.1] — 2026-10-07
+
+### Fixed
+
+- The package README on NuGet.org: the quick start prints numeric FIX tags instead of
+  `FixField` names, the status table names `@fix-portal/fixatdl-react` 0.4.0 and WPF 1.0.6, and the
+  three-pack diagram text shows `FixPortal.FixAtdl.Contracts` doing the DTO mapping.
+  No code changes; `FixPortal.FixAtdl.Contracts` is released at 1.3.1 to keep the two
+  packages at the same version.
+
 ## [1.3.0] — 2026-10-06
 
 ### Added
@@ -387,6 +397,7 @@ First stable release of the modernised fork.
 First packaged fork of [Atdl4net](https://github.com/atdl4net/atdl4net),
 pre-release.
 
-[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/FixPortal/fixportal-fixatdl/releases/tag/v1.2.0
