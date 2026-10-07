@@ -33,18 +33,7 @@ public class ControlCollectionGuardTests
         var panel = new StrategyPanel_t(strategy);
         var source = new CheckBox_t("source");
         var helper = new CheckBox_t("helper") { ParameterRef = "P" };
-        helper.StateRules.Add(
-            new StateRule_t
-            {
-                Value = Atdl.NullValue,
-                Edit = new Edit_t<Control_t>
-                {
-                    Field = "source",
-                    Operator = Operator_t.Equal,
-                    Value = "true",
-                },
-            }
-        );
+        helper.StateRules.Add(SourceEqualsTrue());
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
         panel.Controls.Add(source);
         panel.Controls.Add(helper);
@@ -62,18 +51,7 @@ public class ControlCollectionGuardTests
         var spinner = new SingleSpinner_t("spinner") { ParameterRef = "Bad" };
         var source = new CheckBox_t("source");
         var helper = new CheckBox_t("helper") { ParameterRef = "P" };
-        helper.StateRules.Add(
-            new StateRule_t
-            {
-                Value = Atdl.NullValue,
-                Edit = new Edit_t<Control_t>
-                {
-                    Field = "source",
-                    Operator = Operator_t.Equal,
-                    Value = "true",
-                },
-            }
-        );
+        helper.StateRules.Add(SourceEqualsTrue());
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("Bad") { WireValue = "Y" });
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
         panel.Controls.Add(spinner);
@@ -93,8 +71,7 @@ public class ControlCollectionGuardTests
     {
         var strategy = new Strategy_t();
         var panel = new StrategyPanel_t(strategy);
-        var first = new TextField_t("c_First");
-        var second = new TextField_t("c_Second");
+        var (first, second) = (new TextField_t("c_First"), new TextField_t("c_Second"));
         panel.Controls.Add(first);
         panel.Controls.Add(second);
 
@@ -130,4 +107,16 @@ public class ControlCollectionGuardTests
             intruder.OwningStrategyPanel.Should().BeNull();
         }
     }
+
+    internal static StateRule_t SourceEqualsTrue() =>
+        new()
+        {
+            Value = Atdl.NullValue,
+            Edit = new Edit_t<Control_t>
+            {
+                Field = "source",
+                Operator = Operator_t.Equal,
+                Value = "true",
+            },
+        };
 }
