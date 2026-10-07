@@ -109,6 +109,38 @@ public class ParameterTypeFeatureTests
         act.Should().Throw<InvalidOperationException>();
     }
 
+    [Fact]
+    public void String_t_empty_ConstValue_is_normalised_to_unset()
+    {
+        var p = new Parameter_t<String_t>("Text");
+        p.Value.ConstValue = "";
+
+        p.Value.ConstValue.Should().BeNull();
+        p.IsSet.Should().BeFalse();
+        p.WireValue.Should().BeNull();
+
+        p.WireValue = "hello";
+        p.WireValue.Should().Be("hello");
+    }
+
+    [Fact]
+    public void Zero_and_false_ConstValue_stay_set()
+    {
+        var quantity = new Parameter_t<Int_t>("Qty");
+        quantity.Value.ConstValue = 0;
+        quantity.IsSet.Should().BeTrue();
+        quantity.WireValue.Should().Be("0");
+        var changeQuantity = () => quantity.WireValue = "1";
+        changeQuantity.Should().Throw<InvalidOperationException>();
+
+        var flag = new Parameter_t<Boolean_t>("Flag");
+        flag.Value.ConstValue = false;
+        flag.IsSet.Should().BeTrue();
+        flag.WireValue.Should().Be("N");
+        var changeFlag = () => flag.WireValue = "Y";
+        changeFlag.Should().Throw<InvalidOperationException>();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Int_t MinValue / MaxValue validation
     // ──────────────────────────────────────────────────────────────────────────
@@ -147,6 +179,57 @@ public class ParameterTypeFeatureTests
         p.Value.MinValue = 5;
         var act = () => p.WireValue = "5";
         act.Should().NotThrow();
+    }
+
+    // FIX int is an optional leading sign and digits. Integer-style parsing used to accept
+    // surrounding whitespace; thousands, decimals and exponents are not in the alphabet either.
+    [Theory]
+    [InlineData(" 12")]
+    [InlineData("12 ")]
+    [InlineData("\t12")]
+    [InlineData("12\t")]
+    [InlineData("1,000")]
+    [InlineData("1.5")]
+    [InlineData("1e2")]
+    [InlineData("1E2")]
+    [InlineData("+")]
+    public void Int_t_rejects_non_fix_integer_spellings(string wire)
+    {
+        var p = new Parameter_t<Int_t>("Qty");
+        var act = () => p.WireValue = wire;
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void Int_t_accepts_explicit_leading_sign()
+    {
+        var p = new Parameter_t<Int_t>("Qty") { WireValue = "+12" };
+        p.GetCurrentValue().Should().Be(12);
+        p.WireValue.Should().Be("12");
+    }
+
+    [Theory]
+    [InlineData(" 2")]
+    [InlineData("2 ")]
+    [InlineData("\t2")]
+    [InlineData("1,000")]
+    [InlineData("1.5")]
+    [InlineData("1e2")]
+    [InlineData("-1")]
+    [InlineData("+")]
+    public void SeqNum_t_rejects_non_fix_integer_spellings(string wire)
+    {
+        var p = new Parameter_t<SeqNum_t>("Seq");
+        var act = () => p.WireValue = wire;
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Fact]
+    public void SeqNum_t_accepts_leading_plus()
+    {
+        var p = new Parameter_t<SeqNum_t>("Seq") { WireValue = "+2" };
+        p.GetCurrentValue().Should().Be(2u);
+        p.WireValue.Should().Be("2");
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -198,25 +281,26 @@ public class ParameterTypeFeatureTests
     }
 
     [Fact]
-    public void Float_t_rejects_emission_when_precision_rounding_exceeds_a_validated_bound()
+    public void Float_t_rejects_wire_value_when_precision_rounding_exceeds_a_validated_bound()
     {
-        // R11: validation compares the raw stored value while rounding to Precision happens only on
-        // emission, so the wire value can land outside the validated bounds (0.16 validates against
-        // MaxValue 0.16, then rounds to 0.2). The rounded output is re-validated and refused.
+        // 0.16 at precision 1 rounds to 0.2, outside MaxValue 0.16. The setter rejects it.
+        // An accepted value is what a later read is allowed to emit.
         var p = new Parameter_t<Float_t>("X");
         p.Value.MaxValue = 0.16m;
         p.Value.Precision = 1;
-        p.WireValue = "0.16";
 
-        var act = () => p.WireValue;
+        var act = () => p.WireValue = "0.16";
 
         act.Should().Throw<InvalidFieldValueException>();
+        p.IsSet.Should().BeFalse();
+        p.WireValue.Should().BeNull();
     }
 
     [Fact]
     public void Float_t_emits_rounded_value_when_rounding_stays_within_bounds()
     {
-        // Companion to the R11 guard: a rounding that lands exactly on the bound must still emit.
+        // Companion: a rounding that lands exactly on the bound must still emit, and reading it
+        // must not throw.
         var p = new Parameter_t<Float_t>("X");
         p.Value.MaxValue = 0.2m;
         p.Value.Precision = 1;
@@ -226,19 +310,110 @@ public class ParameterTypeFeatureTests
     }
 
     [Fact]
-    public void Percentage_t_rejects_emission_when_precision_rounding_exceeds_a_validated_bound()
+    public void Float_t_rejects_wire_value_when_precision_rounding_misses_MinValue()
     {
-        // R11 on the Percentage_t override: MaxValue 15.95% (0.1595 native); wire "15.95" with
-        // multiplyBy100 stores 0.1595 (valid) but rounds to 16 (0.16 native) on emission.
+        var p = new Parameter_t<Float_t>("X");
+        p.Value.MinValue = 0.15m;
+        p.Value.Precision = 1;
+
+        var act = () => p.WireValue = "0.14";
+
+        act.Should().Throw<InvalidFieldValueException>();
+        p.IsSet.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Percentage_t_rejects_wire_value_when_precision_rounding_exceeds_a_validated_bound()
+    {
+        // MaxValue 15.95% (0.1595 native). Wire "15.95" with multiplyBy100 is 0.1595 native,
+        // which rounds to 16 (0.16 native) and is rejected by the setter.
         var p = new Parameter_t<Percentage_t>("Pct");
         p.Value.MaxValue = 0.1595m;
         p.Value.MultiplyBy100 = true;
         p.Value.Precision = 1;
-        p.WireValue = "15.95";
 
-        var act = () => p.WireValue;
+        var act = () => p.WireValue = "15.95";
 
         act.Should().Throw<InvalidFieldValueException>();
+        p.IsSet.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Percentage_t_emits_rounded_value_when_rounding_stays_within_bounds()
+    {
+        // 15.94% rounds to 15.9 at precision 1 (native 0.159), inside MaxValue 16%.
+        var p = new Parameter_t<Percentage_t>("Pct");
+        p.Value.MaxValue = 0.16m;
+        p.Value.MultiplyBy100 = true;
+        p.Value.Precision = 1;
+        p.WireValue = "15.94";
+
+        p.WireValue.Should().Be("15.9");
+    }
+
+    [Fact]
+    public void Float_t_ConstValue_that_rounds_outside_bounds_is_not_stored()
+    {
+        var rejected = new Parameter_t<Float_t>("X");
+        rejected.Value.MaxValue = 0.16m;
+        rejected.Value.Precision = 1;
+
+        var assign = () => rejected.Value.ConstValue = 0.16m;
+
+        assign.Should().Throw<InvalidFieldValueException>();
+        rejected.Value.ConstValue.Should().BeNull();
+        rejected.IsSet.Should().BeFalse();
+
+        // A constant that rounds and stays inside the bound is stored. A different wire value
+        // then fails as an attempt to change a constant, not as an out-of-range rounding.
+        var accepted = new Parameter_t<Float_t>("Y");
+        accepted.Value.MaxValue = 0.2m;
+        accepted.Value.Precision = 1;
+        accepted.Value.ConstValue = 0.16m;
+        accepted.WireValue.Should().Be("0.2");
+
+        var change = () => accepted.WireValue = "0.16";
+        change.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void Float_t_setting_precision_after_a_constant_rejects_a_rounded_bound_breach()
+    {
+        var p = new Parameter_t<Float_t>("X");
+        p.Value.MaxValue = 0.16m;
+        p.Value.ConstValue = 0.16m;
+
+        var act = () => p.Value.Precision = 1;
+
+        act.Should().Throw<InvalidFieldValueException>();
+        p.Value.Precision.Should().BeNull();
+        p.Value.ConstValue.Should().Be(0.16m);
+        p.WireValue.Should().Be("0.16");
+    }
+
+    [Fact]
+    public void Percentage_t_ConstValue_that_rounds_outside_bounds_is_not_stored()
+    {
+        var rejected = new Parameter_t<Percentage_t>("Pct");
+        rejected.Value.MaxValue = 0.1595m;
+        rejected.Value.MultiplyBy100 = true;
+        rejected.Value.Precision = 1;
+
+        var assign = () => rejected.Value.ConstValue = 0.1595m;
+
+        assign.Should().Throw<InvalidFieldValueException>();
+        rejected.Value.ConstValue.Should().BeNull();
+        rejected.IsSet.Should().BeFalse();
+
+        var accepted = new Parameter_t<Percentage_t>("Ok");
+        accepted.Value.MaxValue = 0.16m;
+        accepted.Value.MultiplyBy100 = true;
+        accepted.Value.Precision = 1;
+        accepted.Value.ConstValue = 0.1594m;
+        accepted.WireValue.Should().Be("15.9");
+
+        var change = () => accepted.WireValue = "1";
+        change.Should().Throw<InvalidOperationException>();
     }
 
     // ──────────────────────────────────────────────────────────────────────────

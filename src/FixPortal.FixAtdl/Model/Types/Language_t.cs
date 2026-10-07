@@ -5,7 +5,9 @@
 //
 #endregion
 
+using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
+using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
 using FixPortal.FixAtdl.Model.Reference;
 using FixPortal.FixAtdl.Model.Types.Support;
@@ -87,6 +89,41 @@ public class Language_t : EnumTypeBase<IsoLanguageCode>
     public override string? ToString(IFormatProvider? provider)
     {
         return base.ToString(provider)?.ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// Converts the value of this instance to an equivalent <see cref="EnumState"/>, matching enum-pair
+    /// wire values case-insensitively. Emission stays lower-case ISO 639-1, but a strategy may declare
+    /// <c>wireValue="EN"</c>; an ordinal lookup against that declaration would clear the control and
+    /// raise no diagnostic.
+    /// </summary>
+    /// <param name="enumPairs">Enum pairs declared for the bound parameter.</param>
+    /// <returns>A valid <see cref="EnumState"/>, with the matching pair selected when one exists.</returns>
+    public override EnumState ToEnumState(EnumPairCollection enumPairs)
+    {
+        EnumState state = new(enumPairs.EnumIds);
+
+        IsoLanguageCode? val = ConstValue ?? _value;
+        if (val == null)
+        {
+            return state;
+        }
+
+        string? wireValue = ConvertToWireValueFormat(val);
+        if (wireValue == null)
+        {
+            return state;
+        }
+
+        EnumPair_t? match = enumPairs.FirstOrDefault(pair =>
+            string.Equals(pair.WireValue, wireValue, StringComparison.OrdinalIgnoreCase)
+        );
+        if (match != null)
+        {
+            state[match.EnumId] = true;
+        }
+
+        return state;
     }
 
     /// <summary>

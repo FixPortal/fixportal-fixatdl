@@ -1,5 +1,10 @@
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
+using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Elements;
+using FixPortal.FixAtdl.Model.Elements.Support;
+using FixPortal.FixAtdl.Model.Enumerations;
 using FixPortal.FixAtdl.Model.Types;
+using FixPortal.FixAtdl.Utility;
 
 namespace FixPortal.FixAtdl.Tests.Model.Types;
 
@@ -33,17 +38,83 @@ public class DateTimeTypeTests
     }
 
     [Fact]
-    public void UTCTimestamp_t_truncates_excess_fraction_digits_like_the_parse_path()
+    public void UTCTimestamp_t_truncates_fraction_to_emission_milliseconds_on_entry()
     {
-        // The parameter conversion path applies the same excess-fraction normalisation as
-        // FixDateTime.TryParse: valid digits beyond tick precision truncate rather than reject.
-        // Wire emission stays at the FIX 4.4 millisecond grammar.
+        // Entry keeps the precision emission can round-trip (.fff). Tick-precision storage emitted
+        // .123, which the same minimum would then reject.
         var p = new Parameter_t<UTCTimestamp_t>("Ts") { WireValue = "20260601-09:30:00.123456789" };
 
         var value = p.GetCurrentValue().Should().BeOfType<DateTime>().Which;
-        value.Ticks.Should().Be(new DateTime(2026, 6, 1, 9, 30, 0, DateTimeKind.Utc).AddTicks(1_234_567).Ticks);
+        value.Should().Be(new DateTime(2026, 6, 1, 9, 30, 0, 123, DateTimeKind.Utc));
         value.Kind.Should().Be(DateTimeKind.Utc);
         p.WireValue.Should().Be("20260601-09:30:00.123");
+    }
+
+    [Fact]
+    public void UTCTimestamp_t_rejects_a_sub_millisecond_input_that_emits_below_its_minimum()
+    {
+        var p = new Parameter_t<UTCTimestamp_t>("Ts");
+        p.Value.MinValueText = "08:00:00.123456789";
+
+        var act = () => p.WireValue = "20260601-08:00:00.1234568";
+
+        act.Should().Throw<InvalidFieldValueException>();
+        p.IsSet.Should().BeFalse();
+    }
+
+    [Fact]
+    public void UTCTimestamp_t_control_entry_truncates_to_milliseconds()
+    {
+        var p = new Parameter_t<UTCTimestamp_t>("Ts");
+        var control = new TextField_t("c_Ts");
+        control.SetValue("20260601-09:30:00.123456789");
+
+        p.SetValueFromControl(control).IsValid.Should().BeTrue();
+
+        p.GetCurrentValue().Should().Be(new DateTime(2026, 6, 1, 9, 30, 0, 123, DateTimeKind.Utc));
+        p.WireValue.Should().Be("20260601-09:30:00.123");
+    }
+
+    [Fact]
+    public void UTCTimeOnly_t_wire_and_control_entry_truncate_to_milliseconds()
+    {
+        var wired = new Parameter_t<UTCTimeOnly_t>("Wired") { WireValue = "09:30:00.1234568" };
+        wired.GetCurrentValue().Should().Be(new DateTime(1, 1, 1, 9, 30, 0, 123, DateTimeKind.Utc));
+        wired.WireValue.Should().Be("09:30:00.123");
+
+        var fromControl = new Parameter_t<UTCTimeOnly_t>("FromControl");
+        var control = new TextField_t("c_Time");
+        control.SetValue("09:30:00.1234568");
+        fromControl.SetValueFromControl(control).IsValid.Should().BeTrue();
+
+        fromControl.GetCurrentValue().Should().Be(wired.GetCurrentValue());
+        fromControl.WireValue.Should().Be("09:30:00.123");
+    }
+
+    [Fact]
+    public void Leap_second_midnight_set_through_a_control_equals_wire_midnight()
+    {
+        var strategy = new Strategy_t();
+        var fromControl = new Parameter_t<UTCTimeOnly_t>("FromControl");
+        var fromWire = new Parameter_t<UTCTimeOnly_t>("FromWire") { WireValue = "00:00:00" };
+        strategy.Parameters.Add(fromControl);
+        strategy.Parameters.Add(fromWire);
+        var control = new TextField_t("c_Leap");
+        control.SetValue("23:59:60");
+        fromControl.SetValueFromControl(control).IsValid.Should().BeTrue();
+
+        var edit = new Edit_t<IParameter>
+        {
+            Field = "FromControl",
+            Field2 = "FromWire",
+            Operator = Operator_t.Equal,
+        };
+        ((IResolvable<Strategy_t, IParameter>)edit).Resolve(strategy, strategy.Parameters);
+
+        edit.Evaluate();
+
+        edit.CurrentState.Should().BeTrue();
+        fromControl.GetCurrentValue().Should().Be(fromWire.GetCurrentValue());
     }
 
     [Fact]

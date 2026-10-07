@@ -102,17 +102,42 @@ public class TimestampBoundConformanceTests
     }
 
     [Fact]
-    public void Leap_second_bound_classifies_as_time_of_day_not_date_bearing()
+    public void Leap_second_is_rejected_as_a_daily_bound()
     {
-        // The classifier applies the parse path's leap-second normalisation: "23:59:60" (the only
-        // spec-legal leap-second field) rolls to 00:00:00 and must become a recurring daily window,
-        // not a one-off date-time bound (the far-future value dates pin date-independence).
-        var p = Param(minText: null, maxText: "23:59:60");
+        // 23:59:60 rolls to the next midnight. TimeOnly then drops the day, so the maximum becomes
+        // 00:00 and rejects the rest of the day. A leap second is not a valid daily bound.
+        var act = () => Param(minText: null, maxText: "23:59:60");
 
-        var at = () => p.WireValue = "20990101-00:00:00";
-        at.Should().NotThrow();
+        act.Should().Throw<InvalidFieldValueException>();
+    }
 
-        var after = () => p.WireValue = "20990101-00:00:01";
+    [Fact]
+    public void End_of_day_maximum_still_accepts_the_whole_day()
+    {
+        var p = Param(minText: null, maxText: "23:59:59");
+
+        var midnight = () => p.WireValue = "20990101-00:00:01";
+        midnight.Should().NotThrow();
+
+        var noon = () => p.WireValue = "20990101-12:00:00";
+        noon.Should().NotThrow();
+
+        var end = () => p.WireValue = "20990101-23:59:59";
+        end.Should().NotThrow();
+    }
+
+    [Fact]
+    public void Leap_second_datetime_bound_remains_an_absolute_instant()
+    {
+        var p = Param(minText: null, maxText: "19981231-23:59:60");
+
+        var before = () => p.WireValue = "19981231-23:59:59";
+        before.Should().NotThrow();
+
+        var onTheRolledInstant = () => p.WireValue = "19990101-00:00:00";
+        onTheRolledInstant.Should().NotThrow();
+
+        var after = () => p.WireValue = "19990101-00:00:01";
         after.Should().Throw<InvalidFieldValueException>();
     }
 
@@ -247,7 +272,19 @@ public class TimestampBoundConformanceTests
     // ──────────────────────────────────────────────────────────────────────────
 
     [Theory]
-    [InlineData("2026-06-01T12:00:00Z")] // ISO-8601
+    [InlineData("1:00 PM")]
+    [InlineData("2026-06-01T12:00:00Z")]
+    [InlineData("2026-06-01")]
+    public void Non_fix_bound_is_rejected(string maxText)
+    {
+        // Bounds accept exact FIX formats only. A loose spelling such as "1:00 PM" would otherwise
+        // become an absolute timestamp on the host's current date.
+        var act = () => Param(minText: null, maxText: maxText);
+
+        act.Should().Throw<InvalidFieldValueException>();
+    }
+
+    [Theory]
     [InlineData(" 20260601-12:00:00")] // leading-space FIX timestamp
     public void Date_bearing_max_bound_is_not_degraded_to_a_daily_window(string maxText)
     {
@@ -266,7 +303,7 @@ public class TimestampBoundConformanceTests
     [Fact]
     public void Date_only_max_bound_is_not_erased()
     {
-        var p = Param(minText: null, maxText: "2026-06-01");
+        var p = Param(minText: null, maxText: "20260601");
 
         // Before the bound date: within.
         var earlyAct = () => p.WireValue = "20250531-23:59:59";

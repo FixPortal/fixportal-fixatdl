@@ -41,6 +41,8 @@ public class ControlCollection : ObservableCollection<Control_t>
     /// <param name="item">The item.</param>
     protected override void InsertItem(int index, Control_t item)
     {
+        CheckReentrancy();
+
         if (_owner.OwningStrategy != null && _owner.OwningStrategy.Controls.Contains(item.Id))
         {
             throw Diagnostics.ThrowHelper.New<Diagnostics.Exceptions.DuplicateKeyException>(
@@ -59,6 +61,8 @@ public class ControlCollection : ObservableCollection<Control_t>
     /// <inheritdoc />
     protected override void SetItem(int index, Control_t item)
     {
+        CheckReentrancy();
+
         if (_owner.OwningStrategy != null)
         {
             Control_t oldItem = Items[index];
@@ -86,6 +90,8 @@ public class ControlCollection : ObservableCollection<Control_t>
     /// </summary>
     protected override void ClearItems()
     {
+        CheckReentrancy();
+
         foreach (Control_t control in Items)
         {
             ((IParentable<StrategyPanel_t>)control).Parent = null!;

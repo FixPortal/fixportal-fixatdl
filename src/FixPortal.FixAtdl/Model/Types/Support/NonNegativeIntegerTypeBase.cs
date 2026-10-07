@@ -50,8 +50,9 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
     protected override uint? ConvertFromWireValueFormat(string value)
     {
         // 'value' is non-nullable (an empty FIX field is invalid); the dead null branch is removed.
-        // Convert.ToUInt32 FormatException/OverflowException are translated at the SetWireValue boundary.
-        return Convert.ToUInt32(value, CultureInfo.InvariantCulture);
+        // Same explicit styles as Int_t: optional leading sign and digits only. A minus sign still
+        // overflows. FormatException/OverflowException are translated at the SetWireValue boundary.
+        return uint.Parse(value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
     }
 
     /// <summary>

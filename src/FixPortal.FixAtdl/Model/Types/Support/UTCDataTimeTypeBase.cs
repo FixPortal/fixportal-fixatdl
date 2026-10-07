@@ -83,4 +83,25 @@ public abstract class UTCDateTimeTypeBase : DateTimeTypeBase
             _ => DateTime.SpecifyKind(dateTime, DateTimeKind.Utc),
         };
     }
+
+    /// <inheritdoc />
+    protected override DateTime? ConvertFromWireValueFormat(string value)
+    {
+        DateTime? parsed = base.ConvertFromWireValueFormat(value);
+        return parsed is null ? null : TruncateToEmissionPrecision(parsed.Value);
+    }
+
+    /// <inheritdoc />
+    protected override DateTime? NormalizeControlCandidate(DateTime? candidate)
+    {
+        return candidate is null ? null : TruncateToEmissionPrecision(candidate.Value);
+    }
+
+    // Emission uses .fff. Keeping sub-millisecond ticks lets a value pass a bound and then emit a
+    // coarser value the same bound would reject. Truncate on entry; do not throw at emission.
+    private static DateTime TruncateToEmissionPrecision(DateTime value)
+    {
+        long ticks = value.Ticks - value.Ticks % TimeSpan.TicksPerMillisecond;
+        return new DateTime(ticks, value.Kind);
+    }
 }

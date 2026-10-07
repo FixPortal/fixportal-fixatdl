@@ -58,7 +58,28 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
                     "Precision must be between 0 and 28."
                 );
             }
+
+            // A document can set constValue before precision. Re-check the stored constant
+            // against the precision that will actually be emitted, and leave both unchanged
+            // when the rounded constant falls outside MinValue or MaxValue.
+            int? previous = field;
             field = value;
+            if (ConstValue is not decimal constant)
+            {
+                return;
+            }
+
+            ValidationResult validity = ValidateValue(constant, isRequired: false);
+            if (validity.IsValid)
+            {
+                return;
+            }
+
+            field = previous;
+            throw ThrowHelper.New<Diagnostics.Exceptions.InvalidFieldValueException>(
+                this,
+                validity.ErrorText ?? "Rounded value falls outside the validated bounds."
+            );
         }
     }
 
@@ -74,22 +95,30 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
     {
         if (value != null)
         {
-            if (MaxValue != null && (decimal)value > MaxValue)
+            // Compare the value as it will be emitted. 0.16 at precision 1 becomes 0.2 and must
+            // fail MaxValue 0.16 on the way in. Precision null keeps the raw comparison.
+            decimal comparable = (decimal)value;
+            if (Precision != null)
+            {
+                comparable = Round(comparable, Precision.Value)!.Value;
+            }
+
+            if (MaxValue != null && comparable > MaxValue)
             {
                 return new ValidationResult(
                     ValidationResult.ResultType.Invalid,
                     ErrorMessages.MaxValueExceeded,
-                    value,
+                    comparable,
                     MaxValue
                 );
             }
 
-            if (MinValue != null && (decimal)value < MinValue)
+            if (MinValue != null && comparable < MinValue)
             {
                 return new ValidationResult(
                     ValidationResult.ResultType.Invalid,
                     ErrorMessages.MinValueNotMet,
-                    value,
+                    comparable,
                     MinValue
                 );
             }
@@ -103,6 +132,33 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
         }
 
         return ValidationResult.ValidResult;
+    }
+
+    /// <summary>
+    /// Rejects a constant whose emitted (rounded) value falls outside <see cref="MinValue"/> or
+    /// <see cref="MaxValue"/>. When <see cref="Precision"/> is null the constant is stored unchanged.
+    /// A rejected constant is not stored, so a later wire assignment is not reported as an attempt
+    /// to change a constant.
+    /// </summary>
+    /// <param name="value">Constant supplied by the caller, may be null.</param>
+    /// <returns>The constant to store.</returns>
+    protected override decimal? NormalizeAssignedConstValue(decimal? value)
+    {
+        if (value is null || Precision is null)
+        {
+            return value;
+        }
+
+        ValidationResult validity = ValidateValue(value, isRequired: false);
+        if (validity.IsValid)
+        {
+            return value;
+        }
+
+        throw ThrowHelper.New<Diagnostics.Exceptions.InvalidFieldValueException>(
+            this,
+            validity.ErrorText ?? "Rounded value falls outside the validated bounds."
+        );
     }
 
     /// <summary>
@@ -151,10 +207,8 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
 
         decimal rounded = Round(value, Precision.Value)!.Value;
 
-        // Rounding is applied only here, on emission, after the stored value was validated - so it
-        // can push the wire value outside the validated bounds (MaxValue 0.16, Precision 1: "0.16"
-        // validates, then rounds to "0.2"). Re-validate the rounded output and refuse to emit out
-        // of bounds (R11).
+        // Backstop for a value that bypassed the setter (a bound or Precision changed after it was
+        // stored). The setter already rejects a rounded value outside Min/Max (R11).
         ValidationResult validity = ValidateValue(rounded, isRequired: false);
         if (!validity.IsValid)
         {

@@ -102,12 +102,21 @@ public class FixDateTimeTests
     }
 
     [Fact]
-    public void Leap_second_time_only_rolls_forward_to_midnight_on_the_pinned_date()
+    public void Leap_second_time_only_rolls_forward_then_reanchors_to_0001_01_01()
     {
+        // Roll the leap second first, then re-anchor. Pinning first landed midnight on 0001-01-02,
+        // which no longer matched a wire UTCTimeOnly of 00:00:00.
         FixDateTime.TryParse("23:59:60", CultureInfo.InvariantCulture, out DateTime result).Should().BeTrue();
 
-        // Anchored to 0001-01-01 before the roll, so the leap second rolls to 00:00:00 on 0001-01-02.
-        result.Should().Be(new DateTime(1, 1, 2, 0, 0, 0, DateTimeKind.Utc));
+        result.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public void Leap_second_time_only_with_milliseconds_reanchors_after_the_roll()
+    {
+        FixDateTime.TryParse("23:59:60.250", CultureInfo.InvariantCulture, out DateTime result).Should().BeTrue();
+
+        result.Should().Be(new DateTime(1, 1, 1, 0, 0, 0, 250, DateTimeKind.Utc));
     }
 
     [Fact]

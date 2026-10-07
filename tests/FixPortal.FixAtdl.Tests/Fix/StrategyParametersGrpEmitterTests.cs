@@ -79,19 +79,15 @@ public class StrategyParametersGrpEmitterTests
         StrategyParametersGrpEmitter.Emit(strategy).Should().BeEmpty();
     }
 
-    [Theory]
-    // Same policy as an empty WireValue: "958=" would produce a field FixMessage rejects on
-    // re-parse, and nothing upstream constrains broker-supplied names. A valid parameter set
-    // alongside still emits, and the 957 count excludes the skipped tuple.
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Omits_a_parameter_whose_name_is_null_empty_or_whitespace(string? name)
+    [Fact]
+    // A null name stays omitted: emitting nothing is the existing dissent, distinct from a blank name.
+    // A valid parameter set alongside still emits, and the 957 count excludes the skipped tuple.
+    public void Omits_a_parameter_whose_name_is_null()
     {
         var strategy = Load();
         strategy.Parameters["Text"].WireValue = "hello";
         var parameter = Substitute.For<IParameter>();
-        parameter.Name.Returns(name!);
+        parameter.Name.Returns(default(string));
         parameter.IsSet.Returns(true);
         parameter.WireValue.Returns("5");
         strategy.Parameters.Add(parameter);
@@ -100,6 +96,24 @@ public class StrategyParametersGrpEmitterTests
             .Emit(strategy)
             .Should()
             .Equal((957, "1"), (958, "Text"), (959, "14"), (960, "hello"));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Rejects_a_set_parameter_whose_name_is_blank(string name)
+    {
+        var strategy = Load();
+        strategy.Parameters["Text"].WireValue = "hello";
+        var parameter = Substitute.For<IParameter>();
+        parameter.Name.Returns(name);
+        parameter.IsSet.Returns(true);
+        parameter.WireValue.Returns("5");
+        strategy.Parameters.Add(parameter);
+
+        var act = () => StrategyParametersGrpEmitter.Emit(strategy);
+
+        act.Should().Throw<InvalidOperationException>().WithMessage("*tag 958*");
     }
 
     [Theory]

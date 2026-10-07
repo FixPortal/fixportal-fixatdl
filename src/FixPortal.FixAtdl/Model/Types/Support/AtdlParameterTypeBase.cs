@@ -64,7 +64,11 @@ public abstract class AtdlParameterTypeBase<TStorage> : IParameterType
     /// Gets/sets an optional constant value for this parameter.
     /// </summary>
     /// <value>The const value.</value>
-    public TStorage? ConstValue { get; set; }
+    public TStorage? ConstValue
+    {
+        get;
+        set => field = NormalizeAssignedConstValue(value);
+    }
 
     #region IParameterType Members
 
@@ -277,6 +281,19 @@ public abstract class AtdlParameterTypeBase<TStorage> : IParameterType
     }
 
     #endregion
+
+    /// <summary>
+    /// Normalises a constant at assignment, before it is stored. An empty string is not a value
+    /// (it counts as set while the wire form reports nothing) and becomes null. Numeric zeroes and
+    /// <c>false</c> are real values and are left unchanged. Subclasses may reject a constant that
+    /// cannot be emitted.
+    /// </summary>
+    /// <param name="value">Constant supplied by the caller, may be null.</param>
+    /// <returns>The constant to store.</returns>
+    protected virtual TStorage? NormalizeAssignedConstValue(TStorage? value)
+    {
+        return value is string { Length: 0 } ? default : value;
+    }
 
     /// <summary>
     /// Hook that lets a storage class normalise a control-supplied candidate before validation. The

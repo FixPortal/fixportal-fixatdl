@@ -8,6 +8,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using FixPortal.FixAtdl.Diagnostics;
+using FixPortal.FixAtdl.Diagnostics.Exceptions;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls.Support;
@@ -126,11 +127,26 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
 
     private void SetBound(string text, bool isMax)
     {
+        // Bounds accept exact FIX formats only. The loose fallback (used when a user types a time)
+        // would turn "1:00 PM" into an absolute timestamp on the host's current date.
+        FixDateTime.NormaliseLeapSecond(text, out bool wasLeapSecond);
+        if (!FixDateTime.TryParseExactFix(text, out DateTime parsed))
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InvalidDateOrTimeValue, text);
+        }
+
         bool isTimeOnly = IsTimeOnlyType || FixDateTime.IsTimeOnlyText(text);
+
+        // A leap second rolls to the next midnight. As a daily bound, TimeOnly.FromDateTime then drops
+        // the day and the maximum collapses to 00:00. That is not a valid daily bound.
+        if (isTimeOnly && wasLeapSecond)
+        {
+            throw ThrowHelper.New<InvalidFieldValueException>(this, ErrorMessages.InvalidDateOrTimeValue, text);
+        }
+
+        DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
         if (isTimeOnly)
         {
-            DateTime parsed = FixDateTime.Parse(text, CultureInfo.InvariantCulture);
-            DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
             TimeOnly timeOfDay = TimeOnly.FromDateTime(normalised);
             bool isOffsetAnchored = TrailingOffsetPattern().IsMatch(text.Trim());
             if (isMax)
@@ -148,13 +164,6 @@ public abstract partial class DateTimeTypeBase : AtdlValueType<DateTime>, IContr
         }
         else
         {
-            // FixDateTime.Parse normalises FIX-format input to canonical Kind=Utc (AdjustToUniversal), so
-            // the exact-format path already yields a UTC wall-clock. The Local-kind branch is a defensive
-            // guard for the loose-locale fallback parse, which may still return Kind=Local; normalise it to
-            // UTC so a full-datetime bound's wall-clock matches the canonically-UTC value it is compared
-            // against, keeping the comparison host-timezone-independent.
-            DateTime parsed = FixDateTime.Parse(text, CultureInfo.InvariantCulture);
-            DateTime normalised = parsed.Kind == DateTimeKind.Local ? parsed.ToUniversalTime() : parsed;
             if (isMax)
             {
                 MaxValue = normalised;

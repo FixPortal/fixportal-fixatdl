@@ -178,6 +178,27 @@ public class ControlParameterRoundTripTests
         instance["b"].Should().BeFalse();
     }
 
+    [Fact]
+    public void Language_refresh_keeps_a_selection_when_the_enum_pair_wire_value_is_upper_case()
+    {
+        var parameter = new Parameter_t<Language_t>("Lang");
+        parameter.EnumPairs.Add(new EnumPair_t { EnumId = "en", WireValue = "EN" });
+        parameter.WireValue = "EN";
+        parameter.WireValue.Should().Be("en");
+        var control = new DropDownList_t("lang") { ParameterRef = "Lang" };
+        control.ListItems.Add(new ListItem_t { EnumId = "en", UiRep = "English" });
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        strategy.Parameters.Add(parameter);
+        panel.Controls.Add(control);
+
+        var act = () => strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
+
+        act.Should().NotThrow();
+        var state = (EnumState)control.GetCurrentValue();
+        state["en"].Should().BeTrue();
+    }
+
     private static (Parameter_t<String_t> Parameter, EditableDropDownList_t Control) CreateEditable()
     {
         var parameter = new Parameter_t<String_t>("TextParam");

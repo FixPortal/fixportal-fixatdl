@@ -291,7 +291,10 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
         // group with their panel siblings (mirroring SetCompanionRadioButton), so the selected sibling
         // must be resolved there - otherwise the last enumerated unselected radio nulls the value (#R22).
         IEnumerable<RadioButton_t> candidates = string.IsNullOrEmpty(radio.RadioGroup)
-            ? radio.OwningStrategyPanel?.Controls.OfType<RadioButton_t>() ?? []
+            ? radio
+                .OwningStrategyPanel?.Controls.OfType<RadioButton_t>()
+                .Where(candidate => string.IsNullOrEmpty(candidate.RadioGroup))
+                ?? []
             : this.OfType<RadioButton_t>().Where(candidate => candidate.RadioGroup == radio.RadioGroup);
 
         // ponytail: linear scan per radio, index groups if layouts grow beyond ordinary forms.
@@ -306,54 +309,59 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     /// <param name="parameters">Parameter collection.</param>
     public void UpdateValuesFromParameters(ParameterCollection parameters)
     {
-        foreach (Control_t control in this)
+        try
         {
-            if (control.ParameterRef is not { } parameterRef)
+            foreach (Control_t control in this)
             {
-                continue;
-            }
+                if (control.ParameterRef is not { } parameterRef)
+                {
+                    continue;
+                }
 
-            if (!parameters.Contains(parameterRef))
-            {
-                throw ThrowHelper.New<ReferencedObjectNotFoundException>(
-                    this,
-                    ErrorMessages.UnresolvedParameterRefError,
-                    control.ParameterRef
-                );
-            }
+                if (!parameters.Contains(parameterRef))
+                {
+                    throw ThrowHelper.New<ReferencedObjectNotFoundException>(
+                        this,
+                        ErrorMessages.UnresolvedParameterRefError,
+                        control.ParameterRef
+                    );
+                }
 
-            IParameter parameter = parameters[parameterRef];
-            object? parameterValue = parameter.GetCurrentValue();
+                IParameter parameter = parameters[parameterRef];
+                object? parameterValue = parameter.GetCurrentValue();
 
-            // An empty parameter clears its bound control rather than leaving stale UI state behind.
-            if (parameterValue == null)
-            {
-                control.Reset();
-                continue;
-            }
+                // An empty parameter clears its bound control rather than leaving stale UI state behind.
+                if (parameterValue == null)
+                {
+                    control.Reset();
+                    continue;
+                }
 
-            try
-            {
-                control.SetValueFromParameter(parameter);
-            }
-            catch (Exception ex)
-                when (ex is ArgumentException or FormatException or InvalidCastException or OverflowException)
-            {
-                // Defense in depth: a value/type-conversion failure while pushing a parameter value into
-                // its bound control (e.g. an unresolvable date/time Kind) must not propagate as a raw,
-                // uncaught exception (D-F8) - wrap it with control/parameter context instead.
-                throw ThrowHelper.Rethrow(
-                    this,
-                    ex,
-                    ErrorMessages.UnsuccessfulSetParameterOperation,
-                    parameterRef,
-                    control.Id,
-                    ex.Message
-                );
+                try
+                {
+                    control.SetValueFromParameter(parameter);
+                }
+                catch (Exception ex)
+                    when (ex is ArgumentException or FormatException or InvalidCastException or OverflowException)
+                {
+                    // Defense in depth: a value/type-conversion failure while pushing a parameter value into
+                    // its bound control (e.g. an unresolvable date/time Kind) must not propagate as a raw,
+                    // uncaught exception (D-F8) - wrap it with control/parameter context instead.
+                    throw ThrowHelper.Rethrow(
+                        this,
+                        ex,
+                        ErrorMessages.UnsuccessfulSetParameterOperation,
+                        parameterRef,
+                        control.Id,
+                        ex.Message
+                    );
+                }
             }
         }
-
-        UpdateRelatedHelperControlsFromParameters(parameters);
+        finally
+        {
+            UpdateRelatedHelperControlsFromParameters(parameters);
+        }
     }
 
     /// <summary>
@@ -410,6 +418,7 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
             if (
                 IsValidControlId(sourceControlId)
                 && this[sourceControlId] is { } sourceControl
+                && sourceControl.ParameterRef == null
                 && sourceControl.IsToggleable
                 && bool.TryParse(edit.Value, out bool result)
             )
@@ -423,7 +432,11 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
     {
         foreach (Control_t control in this)
         {
-            if (control.ParameterRef is { } parameterRef && parameters[parameterRef].GetCurrentValue() != null)
+            if (
+                control.ParameterRef is { } parameterRef
+                && parameters.Contains(parameterRef)
+                && parameters[parameterRef].GetCurrentValue() != null
+            )
             {
                 UpdateRelatedHelperControls(control);
             }

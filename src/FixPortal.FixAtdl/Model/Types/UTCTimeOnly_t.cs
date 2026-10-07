@@ -69,15 +69,6 @@ public class UTCTimeOnly_t : UTCDateTimeTypeBase
         }
 
         DateTime result = parsed.Value;
-        return new DateTime(
-            1,
-            1,
-            1,
-            result.Hour,
-            result.Minute,
-            result.Second,
-            result.Millisecond,
-            result.Kind
-        ).AddTicks(result.Ticks % TimeSpan.TicksPerMillisecond);
+        return new DateTime(1, 1, 1, result.Hour, result.Minute, result.Second, result.Millisecond, result.Kind);
     }
 }
