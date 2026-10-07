@@ -181,8 +181,8 @@ public class ParameterTypeFeatureTests
         act.Should().NotThrow();
     }
 
-    // FIX int is an optional leading sign and digits. Integer-style parsing used to accept
-    // surrounding whitespace; thousands, decimals and exponents are not in the alphabet either.
+    // FIX int is an optional leading sign and digits. Whitespace, a thousands separator,
+    // a decimal point, and an exponent are outside that alphabet.
     [Theory]
     [InlineData(" 12")]
     [InlineData("12 ")]

@@ -364,7 +364,7 @@ public sealed class StateRuleEvaluator
 
     private static DateTime ParseWireDate(object value, string type)
     {
-        var text = UnwrapToString(value) ?? string.Empty;
+        var text = UnwrapToString(value)!;
         return type switch
         {
             "UTCDateOnly_t" => ParseWireDate<UTCDateOnly_t>(text),

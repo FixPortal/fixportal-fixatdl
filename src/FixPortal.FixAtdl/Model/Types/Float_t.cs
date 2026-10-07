@@ -207,8 +207,8 @@ public class Float_t : AtdlValueType<decimal>, IControlConvertible
 
         decimal rounded = Round(value, Precision.Value)!.Value;
 
-        // Backstop for a value that bypassed the setter (a bound or Precision changed after it was
-        // stored). The setter already rejects a rounded value outside Min/Max (R11).
+        // Emission rounds again. A bound or Precision change made after the value was stored
+        // is checked here.
         ValidationResult validity = ValidateValue(rounded, isRequired: false);
         if (!validity.IsValid)
         {
