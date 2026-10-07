@@ -18,6 +18,7 @@ The rest of this page walks that sequence call by call. For a rendered form see 
 ## Loading a document
 
 ```csharp
+using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Xml;
 
 var reader = new StrategiesReader();
@@ -119,12 +120,16 @@ bool ok = twap.Controls.TryUpdateParameterValues(
 To seed controls from an existing order, implement `IInitialFixValueProvider`:
 
 ```csharp
+using FixPortal.FixAtdl.Fix;
+
+// FixTagValuesCollection inbound = ...; the tag/value pairs of the existing order
+twap.LoadInitialControlValues(new FixFieldValueProvider(new OrderValues(inbound), twap.Parameters));
+
+// Type declarations follow top-level statements.
 sealed class OrderValues(FixTagValuesCollection values) : IInitialFixValueProvider
 {
     public FixTagValuesCollection InputFixValues { get; } = values;
 }
-
-twap.LoadInitialControlValues(new FixFieldValueProvider(new OrderValues(inbound), twap.Parameters));
 ```
 
 ## Validation
@@ -214,7 +219,12 @@ surface as the programming errors they indicate.
 Time-only `initValue`s anchor to "now", so inject a clock rather than letting the
 test drift:
 
-```csharp
+```FakeClock` comes from the `NodaTime.Testing` package.
+
+`csharp
+using NodaTime;
+using NodaTime.Testing;
+
 var clock = new FakeClock(Instant.FromUtc(2026, 1, 1, 9, 30));
 var reader = new StrategiesReader(clock: clock);
 ```

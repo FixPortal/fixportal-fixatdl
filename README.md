@@ -69,7 +69,7 @@ twap.Parameters["StartTime"].WireValue = "20260101-09:30:00";
 twap.Parameters["EndTime"].WireValue = "20260101-16:00:00";
 
 foreach (var tag in twap.Parameters.GetOutputValues())
-    Console.WriteLine($"{tag.Key}={tag.Value}");
+    Console.WriteLine($"{(int)tag.Key}={tag.Value}");
 ```
 
 ## Differences from upstream Atdl4net
