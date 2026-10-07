@@ -135,8 +135,8 @@ public class Percentage_t : Float_t
         int effectivePrecision = Math.Min(28, MultiplyBy100 == true ? Precision.Value : Precision.Value + 2);
         decimal rounded = Round(adjustedValue, effectivePrecision)!.Value;
 
-        // Backstop for a value that bypassed the setter. The setter already rejects a rounded
-        // native value outside Min/Max; re-check the rounded output before emission (R11).
+        // Emission rounds the whole-percent value, then checks that native amount against
+        // MinValue and MaxValue.
         decimal roundedNative = MultiplyBy100 == true ? rounded / 100 : rounded;
         ValidationResult validity = ValidateValue(roundedNative, isRequired: false);
         if (!validity.IsValid)

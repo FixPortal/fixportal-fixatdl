@@ -26,9 +26,8 @@ public static class FixValueFormatter
         // through to the type-based formatting below so the raw string is emitted.
         value = Unwrap(value);
 
-        if (enumValues is { Count: > 0 })
+        if (enumValues is { Count: > 0 } && Convert.ToString(value, CultureInfo.InvariantCulture) is string strValue)
         {
-            var strValue = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
             var match = enumValues.FirstOrDefault(pair =>
                 string.Equals(pair.EnumId, strValue, StringComparison.Ordinal)
             );

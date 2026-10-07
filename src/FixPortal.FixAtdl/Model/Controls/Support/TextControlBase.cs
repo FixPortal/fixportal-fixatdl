@@ -124,12 +124,9 @@ public abstract class TextControlBase : InitializableControl<string>
             return null;
         }
 
-        // A Boolean_t parameter's declared wire mapping (trueWireValue/falseWireValue, defaulting to
-        // Y/N) is what parameter-to-control conversion wrote here; decode back through the same
-        // mapping so the value the library itself stored round-trips. The BCL spellings "true" and
-        // "false" are not accepted on this path. That is the compatibility boundary: relaxing it
-        // would need an explicit contract decision, because a host-supplied true/false no longer
-        // means the parameter's declared wire value.
+        // A Boolean_t parameter decodes through its declared wire mapping
+        // (trueWireValue/falseWireValue, default Y/N). The BCL spellings "true" and "false"
+        // are not accepted on this path.
         if (targetParameter is Elements.Parameter_t<Types.Boolean_t> booleanParameter)
         {
             return booleanParameter.Value.ParseWireValue(_value);
