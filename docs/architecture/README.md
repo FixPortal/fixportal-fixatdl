@@ -161,7 +161,7 @@ not the authoritative wire. Core also exposes direct per-parameter tag values;
 the host still owns the endpoint that serves the DTO, authentication, and the final
 order validation and assembly.
 
-![The three-pack: broker XML parsed by the headless core, which emits direct parameter tag values and the authoritative 957–960 group; WPF reads back through the core emitter, React emits 957–960 tag tuples through a host-mapped DTO, and the host validates and assembles the final FIX wire](../images/three-pack.png)
+![The three-pack: broker XML parsed by the headless core, which emits direct parameter tag values and the authoritative 957–960 group; WPF reads back through the core emitter, React emits 957–960 tag tuples from the JSON DTO that FixPortal.FixAtdl.Contracts maps, and the host validates and assembles the final FIX wire](../images/three-pack.png)
 
 ---
 
