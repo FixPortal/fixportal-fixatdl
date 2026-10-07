@@ -84,8 +84,9 @@ was replaced merely to agree with a browser implementation.
   frame, not in UTC, because the two calendar days differ for part of every
   day. `localMktTz` remains a required attribute regardless, per the spec's
   attribute table. A text control bound to `Boolean_t` decodes only that
-  parameter's `trueWireValue` / `falseWireValue` (default `Y` / `N`); the
-  spellings `true` and `false` are not accepted on that path.
+  parameter's `trueWireValue` / `falseWireValue` (default `Y` / `N`). With
+  that default, the spellings `true` and `false` are rejected. Either
+  spelling is accepted when the parameter configures it as a wire token.
 - Core DateTime wire formatting and the WPF clock's minute-level edit UI retain
   their existing precision policies. Preserving an untouched loaded value is
   tested separately from editing it.

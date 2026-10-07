@@ -50,8 +50,14 @@ public abstract class NonNegativeIntegerTypeBase : AtdlValueType<uint>, IControl
     protected override uint? ConvertFromWireValueFormat(string value)
     {
         // 'value' is non-nullable (an empty FIX field is invalid); the dead null branch is removed.
-        // Same explicit styles as Int_t: optional leading sign and digits only. A minus sign still
-        // overflows. FormatException/OverflowException are translated at the SetWireValue boundary.
+        // Same explicit styles as Int_t: optional leading sign and digits only. uint.Parse maps
+        // "-0" to zero, so a leading minus is rejected before the parse. FormatException and
+        // OverflowException are translated at the SetWireValue boundary.
+        if (value.StartsWith('-'))
+        {
+            throw new FormatException("A non-negative FIX integer cannot have a leading minus.");
+        }
+
         return uint.Parse(value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
     }
 

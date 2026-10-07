@@ -283,16 +283,16 @@ public abstract class AtdlParameterTypeBase<TStorage> : IParameterType
     #endregion
 
     /// <summary>
-    /// Normalises a constant at assignment, before it is stored. An empty string is not a value
-    /// (it counts as set while the wire form reports nothing) and becomes null. Numeric zeroes and
-    /// <c>false</c> are real values and are left unchanged. Subclasses may reject a constant that
-    /// cannot be emitted.
+    /// Normalises a constant at assignment, before it is stored. An empty string or an empty
+    /// char array is not a value (it counts as set while the wire form reports nothing) and becomes
+    /// null. Numeric zeroes and <c>false</c> are real values and are left unchanged. Subclasses may
+    /// reject a constant that cannot be emitted.
     /// </summary>
     /// <param name="value">Constant supplied by the caller, may be null.</param>
     /// <returns>The constant to store.</returns>
     protected virtual TStorage? NormalizeAssignedConstValue(TStorage? value)
     {
-        return value is string { Length: 0 } ? default : value;
+        return value is string { Length: 0 } or char[] { Length: 0 } ? default : value;
     }
 
     /// <summary>

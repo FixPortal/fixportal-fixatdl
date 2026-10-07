@@ -116,6 +116,16 @@ public class MapEdgeCaseTests
     }
 
     [Fact]
+    public void Whole_decimal_outside_int64_is_rejected_for_integer_types()
+    {
+        using var wide = JsonDocument.Parse("9223372036854775808");
+        var jsonAct = () => FixValueFormatter.Format(wide.RootElement, "Int_t", null);
+        var decimalAct = () => FixValueFormatter.Format(9223372036854775808m, "Int_t", null);
+        jsonAct.Should().Throw<ArgumentOutOfRangeException>();
+        decimalAct.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
     public void Json_numbers_keep_decimal_digits_on_float_types()
     {
         using var fraction = JsonDocument.Parse("1.5");

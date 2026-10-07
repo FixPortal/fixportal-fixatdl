@@ -1,4 +1,5 @@
 // FP Enhancement: 2026-10-07 — wire constants, named FIX tags, and FIX/boolean edits.
+using System.Globalization;
 using FixPortal.FixAtdl.Contracts.StateRules;
 using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
@@ -499,9 +500,16 @@ public sealed class AtdlDtoMapper
             return null;
         }
 
-        if (int.TryParse(name, out var tag))
+        if (int.TryParse(name, NumberStyles.None, CultureInfo.InvariantCulture, out var tag))
         {
-            return tag;
+            return tag > 0 ? tag : null;
+        }
+
+        // Enum.TryParse accepts "+44" and " 44 " as FIX_Price. A token that parses as an
+        // integer is a tag spelling, so a sign, a zero, or surrounding whitespace stays omitted.
+        if (int.TryParse(name, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
+        {
+            return null;
         }
 
         if (!name.Contains(',') && Enum.TryParse(name, ignoreCase: true, out FixField field) && Enum.IsDefined(field))
