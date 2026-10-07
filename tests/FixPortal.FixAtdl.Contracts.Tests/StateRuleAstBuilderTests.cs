@@ -387,4 +387,75 @@ public class StateRuleAstBuilderTests
 
         act.Should().Throw<AtdlParseException>().Which.Code.Should().Be(AtdlParseExceptionCode.MaxDepthExceeded);
     }
+
+    [Fact]
+    public void Value_and_field2_together_are_rejected()
+    {
+        var edit = new Edit_t
+        {
+            Field = "c_X",
+            Operator = Operator_t.Equal,
+            Value = "1",
+            Field2 = "c_Y",
+        };
+
+        var act = () => Builder().Build(edit);
+
+        act.Should().Throw<AtdlParseException>().Which.Code.Should().Be(AtdlParseExceptionCode.InvalidEditValue);
+    }
+
+    [Fact]
+    public void Bound_value_and_field2_together_are_rejected()
+    {
+        var edit = new Edit_t<Control_t>
+        {
+            Field = "c_X",
+            Operator = Operator_t.Equal,
+            Value = "1",
+            Field2 = "c_Y",
+        };
+
+        var act = () => Builder().Build(edit);
+
+        act.Should().Throw<AtdlParseException>().Which.Code.Should().Be(AtdlParseExceptionCode.InvalidEditValue);
+    }
+
+    [Fact]
+    public void Comparison_operator_with_logic_operator_is_rejected()
+    {
+        var edit = new Edit_t
+        {
+            Field = "c_X",
+            Operator = Operator_t.Equal,
+            Value = "1",
+            LogicOperator = LogicOperator_t.Not,
+        };
+        edit.Edits.Add(CompareEdit("c_Y", Operator_t.Equal, "2"));
+
+        var act = () => Builder().Build(edit);
+
+        act.Should().Throw<AtdlParseException>().Which.Code.Should().Be(AtdlParseExceptionCode.InvalidEditValue);
+    }
+
+    [Fact]
+    public void Comparison_operator_with_child_edits_is_rejected()
+    {
+        var edit = CompareEdit("c_X", Operator_t.Equal, "1");
+        edit.Edits.Add(CompareEdit("c_Y", Operator_t.Equal, "2"));
+
+        var act = () => Builder().Build(edit);
+
+        act.Should().Throw<AtdlParseException>().Which.Code.Should().Be(AtdlParseExceptionCode.InvalidEditValue);
+    }
+
+    [Theory]
+    [InlineData(LogicOperator_t.And)]
+    [InlineData(LogicOperator_t.Or)]
+    [InlineData(LogicOperator_t.Xor)]
+    public void Empty_logic_children_are_rejected(LogicOperator_t logic)
+    {
+        var act = () => Builder().Build(new Edit_t { LogicOperator = logic });
+
+        act.Should().Throw<AtdlParseException>().Which.Code.Should().Be(AtdlParseExceptionCode.InvalidEditValue);
+    }
 }

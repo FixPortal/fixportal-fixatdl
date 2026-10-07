@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using AwesomeAssertions;
 using FixPortal.FixAtdl.Contracts;
@@ -18,6 +19,8 @@ public class StateRuleEvaluatorTests
             .Load(Path.Join(AppContext.BaseDirectory, "contracts/state-rule-cases.json"))
             .Select(c => new object[] { c.Name, c.Ast, c.FormState, c.Expected });
 
+    // and_short_circuit_skips_invalid_data_operand and or_short_circuit_skips_invalid_data_operand
+    // pin the C# short-circuit result. React currently returns null for the same cases.
     [Theory, MemberData(nameof(Cases))]
     public void Evaluator_matches_corpus(
         string name,
@@ -121,6 +124,83 @@ public class StateRuleEvaluatorTests
         var act = () => sut.Evaluate(current, new Dictionary<string, object?> { ["c_Leaf"] = "1" });
 
         act.Should().Throw<AtdlParseException>().Which.Code.Should().Be(AtdlParseExceptionCode.MaxDepthExceeded);
+    }
+
+    [Theory]
+    [InlineData("1,000", "1000")]
+    [InlineData("1000+", "1000")]
+    [InlineData("1000-", "-1000")]
+    [InlineData("1E2", "100")]
+    public void Untyped_text_rejects_non_fix_decimal_spellings(string field, string literal)
+    {
+        Evaluate("==", field, literal).Should().BeFalse();
+    }
+
+    [Fact]
+    public void Numeric_text_orders_against_non_numeric_text()
+    {
+        Evaluate("<", "123", "NONE").Should().BeTrue();
+        Evaluate("==", "123", "NONE").Should().BeFalse();
+        Evaluate(">", "10", "9").Should().BeTrue();
+    }
+
+    [Fact]
+    public void Clock_accepts_minute_precision_that_utc_date_rejects()
+    {
+        Evaluate("==", "09:30", "09:30:00", "Clock_t").Should().BeTrue();
+        Reject("==", "00:00:00", "20200102", "UTCDateOnly_t");
+        Reject("!=", "bad-date", "20200102", "UTCDateOnly_t");
+    }
+
+    [Theory]
+    [InlineData("UTCDateOnly_t", "==", "00:00:00", "20200102")]
+    [InlineData("UTCDateOnly_t", "!=", "bad-date", "20200102")]
+    [InlineData("LocalMktDate_t", "!=", "bad-date", "20200102")]
+    [InlineData("UTCTimestamp_t", "==", "00:00:00", "20200102-00:00:00")]
+    [InlineData("UTCTimeOnly_t", "!=", "20200102", "00:00:00")]
+    public void Strict_temporal_operands_reject_the_wrong_wire_shape(
+        string type,
+        string op,
+        string field,
+        string literal
+    )
+    {
+        Reject(op, field, literal, type);
+    }
+
+    [Fact]
+    public void Utc_date_orders_valid_wire_values() =>
+        Evaluate("<", "20200102", "20200103", "UTCDateOnly_t").Should().BeTrue();
+
+    [Fact]
+    public void String_comparison_uses_invariant_text()
+    {
+        var previous = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+            Evaluate("==", 1.5d, "1.5", "String_t").Should().BeTrue();
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previous;
+        }
+    }
+
+    [Fact]
+    public void Text_ordering_does_not_compare_selection_arrays() =>
+        Evaluate("<", new object?[] { "B" }, "T", "String_t").Should().BeFalse();
+
+    private static bool Evaluate(string op, object? field, object? literal, string? comparisonType = null) =>
+        new StateRuleEvaluator().Evaluate(
+            new StateRuleAstNodeDto("compare", op, "a", literal, null, ComparisonType: comparisonType),
+            new Dictionary<string, object?> { ["a"] = field }
+        );
+
+    private static void Reject(string op, object? field, object? literal, string comparisonType)
+    {
+        var act = () => Evaluate(op, field, literal, comparisonType);
+        act.Should().Throw<AtdlParseException>().Which.Code.Should().Be(AtdlParseExceptionCode.InvalidEditValue);
     }
 }
 

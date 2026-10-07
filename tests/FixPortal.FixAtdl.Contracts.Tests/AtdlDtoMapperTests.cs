@@ -1,6 +1,8 @@
+using System.Globalization;
 using AwesomeAssertions;
 using FixPortal.FixAtdl.Contracts;
 using FixPortal.FixAtdl.Contracts.StateRules;
+using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Enumerations;
@@ -589,4 +591,167 @@ public class AtdlDtoMapperTests
         srDto.Expression.Should().NotBeNull();
         srDto.Expression.Field.Should().Be("c_Side");
     }
+
+    [Fact]
+    public void Typed_constants_use_parameter_wire_text()
+    {
+        var (strategy, _) = MakeStrategy("WireConstants");
+        var data = new Parameter_t<FixAtdl.Model.Types.Data_t>("Raw");
+        data.Value.ConstValue = "SOH".ToCharArray();
+        var when = new Parameter_t<FixAtdl.Model.Types.TZTimestamp_t>("When");
+        when.Value.ConstValue = new DateTime(2026, 7, 15, 7, 39, 0, DateTimeKind.Utc);
+        strategy.Parameters.Add(data);
+        strategy.Parameters.Add(when);
+        var previous = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+            var parsed = SingleStrategyResult(strategy);
+            var parameters = Mapper().Map(parsed.Strategies, parsed.SourceXml).Strategies[0].Parameters;
+            parameters[0].ConstValue.Should().Be("SOH");
+            parameters[1].ConstValue.Should().Be("20260715-07:39:00Z");
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previous;
+        }
+    }
+
+    [Fact]
+    public void Named_init_fix_fields_resolve_to_tags()
+    {
+        var (strategy, panel) = MakeStrategy("NamedTags");
+        panel.Controls.Add(new TextField_t("qty") { InitFixField = "FIX_OrderQty" });
+        panel.Controls.Add(new TextField_t("px") { InitFixField = "44" });
+        panel.Controls.Add(new TextField_t("bad") { InitFixField = "NotAField" });
+        var parsed = SingleStrategyResult(strategy);
+        var controls = Mapper()
+            .Map(parsed.Strategies, parsed.SourceXml)
+            .Strategies[0]
+            .Panel.Children.Cast<AtdlControlDto>()
+            .ToList();
+        controls[0].InitFixField.Should().Be((int)FixField.FIX_OrderQty);
+        controls[1].InitFixField.Should().Be(44);
+        controls[2].InitFixField.Should().BeNull();
+    }
+
+    [Fact]
+    public void Fix_field_edits_take_their_comparison_type_from_the_field_dictionary()
+    {
+        var (strategy, _) = MakeStrategy("FixEdits");
+        AddParameterEdit(strategy, "FIX_ClOrdID", "1");
+        AddParameterEdit(strategy, "FIX_OrderQty", "100");
+        AddParameterEdit(strategy, "fix_OrderQty", "100");
+        AddParameterEdit(strategy, "FIX_NoUsernames", "1");
+        AddParameterEdit(strategy, "FIX_NotAField", "1");
+        var parsed = SingleStrategyResult(strategy);
+        var edits = Mapper().Map(parsed.Strategies, parsed.SourceXml).Strategies[0].StrategyEdits!;
+        var evaluator = new StateRuleEvaluator();
+
+        edits[0].Expression.ComparisonType.Should().Be("String_t");
+        evaluator.Evaluate(edits[0].Expression, State("FIX_ClOrdID", "0001")).Should().BeFalse();
+        edits[1].Expression.ComparisonType.Should().BeNull();
+        evaluator.Evaluate(edits[1].Expression, State("FIX_OrderQty", "0100.0")).Should().BeTrue();
+        evaluator.Evaluate(edits[1].Expression, State("FIX_OrderQty", "1E2")).Should().BeFalse();
+        edits[2].Expression.ComparisonType.Should().BeNull();
+        edits[3].Expression.ComparisonType.Should().Be("String_t");
+        edits[4].Expression.ComparisonType.Should().Be("String_t");
+    }
+
+    [Fact]
+    public void Boolean_fix_field_compare_keeps_the_parameter_wire_mapping()
+    {
+        var (strategy, _) = MakeStrategy("BooleanFix");
+        var flag = new Parameter_t<FixAtdl.Model.Types.Boolean_t>("Flag");
+        flag.Value.TrueWireValue = "1";
+        flag.Value.FalseWireValue = "0";
+        strategy.Parameters.Add(flag);
+        strategy.StrategyEdits.Add(
+            new StrategyEdit_t
+            {
+                Edit = new Edit_t<FixAtdl.Model.Elements.Support.IParameter>
+                {
+                    Field = "Flag",
+                    Field2 = "FIX_PossResend",
+                    Operator = Operator_t.Equal,
+                },
+            }
+        );
+        var parsed = SingleStrategyResult(strategy);
+        var expression = Mapper()
+            .Map(parsed.Strategies, parsed.SourceXml)
+            .Strategies[0]
+            .StrategyEdits!.Single()
+            .Expression;
+        var evaluator = new StateRuleEvaluator();
+
+        expression.TrueWireValue.Should().Be("1");
+        expression.FalseWireValue.Should().Be("0");
+        evaluator
+            .Evaluate(expression, new Dictionary<string, object?> { ["Flag"] = true, ["FIX_PossResend"] = "1" })
+            .Should()
+            .BeTrue();
+        var act = () =>
+            evaluator.Evaluate(
+                expression,
+                new Dictionary<string, object?> { ["Flag"] = true, ["FIX_PossResend"] = "True" }
+            );
+        act.Should().Throw<AtdlParseException>().Which.Code.Should().Be(AtdlParseExceptionCode.InvalidEditValue);
+    }
+
+    [Fact]
+    public void Boolean_literals_match_wire_tokens_ordinally()
+    {
+        var (strategy, _) = MakeStrategy("OrdinalBoolean");
+        var mixed = new Parameter_t<FixAtdl.Model.Types.Boolean_t>("Mixed");
+        mixed.Value.TrueWireValue = "a";
+        mixed.Value.FalseWireValue = "A";
+        var loweredFalse = new Parameter_t<FixAtdl.Model.Types.Boolean_t>("LoweredFalse");
+        loweredFalse.Value.FalseWireValue = "y";
+        strategy.Parameters.Add(mixed);
+        strategy.Parameters.Add(loweredFalse);
+        AddParameterEdit(strategy, "Mixed", "A");
+        AddParameterEdit(strategy, "LoweredFalse", "Y");
+        var parsed = SingleStrategyResult(strategy);
+        var edits = Mapper().Map(parsed.Strategies, parsed.SourceXml).Strategies[0].StrategyEdits!;
+
+        edits[0].Expression.Value.Should().Be(false);
+        edits[1].Expression.Value.Should().Be(true);
+    }
+
+    [Fact]
+    public void State_rule_without_an_edit_reports_parse_failure()
+    {
+        var (strategy, panel) = MakeStrategy("MissingStateRule");
+        var target = new TextField_t("target");
+        target.StateRules.Add(new StateRule_t { Enabled = false });
+        panel.Controls.Add(target);
+        var parsed = SingleStrategyResult(strategy);
+        var act = () => Mapper().Map(parsed.Strategies, parsed.SourceXml);
+
+        act.Should()
+            .Throw<AtdlParseException>()
+            .Which.Should()
+            .Match<AtdlParseException>(ex =>
+                ex.Code == AtdlParseExceptionCode.ParseFailed
+                && ex.Message.Contains("StateRule", StringComparison.Ordinal)
+            );
+    }
+
+    private static void AddParameterEdit(Strategy_t strategy, string field, string value)
+    {
+        strategy.StrategyEdits.Add(
+            new StrategyEdit_t
+            {
+                Edit = new Edit_t<FixAtdl.Model.Elements.Support.IParameter>
+                {
+                    Field = field,
+                    Operator = Operator_t.Equal,
+                    Value = value,
+                },
+            }
+        );
+    }
+
+    private static Dictionary<string, object?> State(string field, string value) => new() { [field] = value };
 }

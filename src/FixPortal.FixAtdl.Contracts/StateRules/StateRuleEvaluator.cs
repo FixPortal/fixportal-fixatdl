@@ -1,3 +1,4 @@
+// FP Enhancement: 2026-10-07 — match core decimal, date, text, and boolean compares.
 using System.Globalization;
 using System.Text.Json;
 using FixPortal.FixAtdl.Contracts;
@@ -21,6 +22,13 @@ public sealed class StateRuleEvaluator
     // Guards against unbounded recursion on a maliciously or accidentally deeply-nested AST
     // (uncaught stack overflow crashes the process and cannot be caught by a try/catch).
     private const int MaxAstDepth = 64;
+
+    // Same alphabet as Atdl.FixDecimalStyles, which is internal to FixPortal.FixAtdl.
+    private const NumberStyles FixDecimalStyles =
+        NumberStyles.AllowLeadingWhite
+        | NumberStyles.AllowTrailingWhite
+        | NumberStyles.AllowLeadingSign
+        | NumberStyles.AllowDecimalPoint;
 
     /// <summary>
     /// Evaluates the AST against the given form state.
@@ -136,8 +144,8 @@ public sealed class StateRuleEvaluator
         {
             return @operator switch
             {
-                StateRuleOperator.Eq => CompareEqual(fieldValue, astValue, node.ComparisonType),
-                StateRuleOperator.Neq => !CompareEqual(fieldValue, astValue, node.ComparisonType),
+                StateRuleOperator.Eq => CompareEqual(fieldValue, astValue, node),
+                StateRuleOperator.Neq => !CompareEqual(fieldValue, astValue, node),
                 StateRuleOperator.Gt => CompareOrder(fieldValue, astValue, node.ComparisonType) is > 0,
                 StateRuleOperator.Lt => CompareOrder(fieldValue, astValue, node.ComparisonType) is < 0,
                 StateRuleOperator.Ge => CompareOrder(fieldValue, astValue, node.ComparisonType) is >= 0,
@@ -177,8 +185,9 @@ public sealed class StateRuleEvaluator
     /// compares numerically (so "5" == 5.0 is true).  Falls back to ordinal string
     /// comparison when either side cannot be converted.
     /// </summary>
-    private static bool CompareEqual(object? a, object? b, string? comparisonType)
+    private static bool CompareEqual(object? a, object? b, StateRuleAstNodeDto node)
     {
+        var comparisonType = node.ComparisonType;
         a = Unwrap(a);
         b = Unwrap(b);
         if (a is null || b is null)
@@ -188,6 +197,10 @@ public sealed class StateRuleEvaluator
         if (TryCompareSelections(a, b, out var selectionEqual))
         {
             return selectionEqual;
+        }
+        if (TryEqualConfiguredBoolean(a, b, node, out var configuredEqual))
+        {
+            return configuredEqual;
         }
         if (TryCompareBoolText(a, b, out var boolEqual))
         {
@@ -229,6 +242,58 @@ public sealed class StateRuleEvaluator
             return true;
         }
         equal = false;
+        return false;
+    }
+
+    private static bool TryEqualConfiguredBoolean(object a, object b, StateRuleAstNodeDto node, out bool equal)
+    {
+        if (node.ComparisonType != "Boolean_t" || node.TrueWireValue is null && node.FalseWireValue is null)
+        {
+            equal = false;
+            return false;
+        }
+
+        equal = EqualBooleanWire(a, b, node);
+        return true;
+    }
+
+    private static bool EqualBooleanWire(object a, object b, StateRuleAstNodeDto node)
+    {
+        if (!TryBooleanWire(a, node, out var left) || !TryBooleanWire(b, node, out var right))
+        {
+            throw new AtdlParseException(
+                AtdlParseExceptionCode.InvalidEditValue,
+                "Boolean Edit value does not match the parameter wire values."
+            );
+        }
+
+        return left == right;
+    }
+
+    private static bool TryBooleanWire(object value, StateRuleAstNodeDto node, out bool result)
+    {
+        if (value is bool flag)
+        {
+            result = flag;
+            return true;
+        }
+
+        if (value is string text)
+        {
+            if (text == node.TrueWireValue)
+            {
+                result = true;
+                return true;
+            }
+
+            if (text == node.FalseWireValue)
+            {
+                result = false;
+                return true;
+            }
+        }
+
+        result = false;
         return false;
     }
 
@@ -274,15 +339,50 @@ public sealed class StateRuleEvaluator
         {
             return ParseZonedTime(a, comparisonType).CompareTo(ParseZonedTime(b, comparisonType));
         }
-        if (IsTemporalComparison(comparisonType))
+        if (comparisonType is "Clock_t")
         {
             return CompareTemporalOrder(a, b);
         }
+        if (IsStrictTemporal(comparisonType))
+        {
+            return ParseWireDate(a, comparisonType!).CompareTo(ParseWireDate(b, comparisonType!));
+        }
         if (IsTextComparison(comparisonType))
         {
+            if (a is object?[] || b is object?[])
+            {
+                return null;
+            }
+
             return string.Compare(UnwrapToString(a), UnwrapToString(b), StringComparison.Ordinal);
         }
         return CompareNumericOrder(a, b);
+    }
+
+    private static bool IsStrictTemporal(string? type) =>
+        type is "UTCTimeOnly_t" or "UTCTimestamp_t" or "UTCDateOnly_t" or "LocalMktDate_t";
+
+    private static DateTime ParseWireDate(object value, string type)
+    {
+        var text = UnwrapToString(value) ?? string.Empty;
+        return type switch
+        {
+            "UTCDateOnly_t" => ParseWireDate<UTCDateOnly_t>(text),
+            "LocalMktDate_t" => ParseWireDate<LocalMktDate_t>(text),
+            "UTCTimeOnly_t" => ParseWireDate<UTCTimeOnly_t>(text),
+            "UTCTimestamp_t" => ParseWireDate<UTCTimestamp_t>(text),
+            _ => throw new AtdlParseException(
+                AtdlParseExceptionCode.InvalidEditValue,
+                $"Invalid value for StateRule comparison type '{type}'."
+            ),
+        };
+    }
+
+    private static DateTime ParseWireDate<T>(string text)
+        where T : IParameterType, new()
+    {
+        var parameter = new Parameter_t<T>("Edit") { WireValue = text };
+        return (DateTime)parameter.GetCurrentValue();
     }
 
     private static int? CompareTemporalOrder(object a, object b)
@@ -310,9 +410,12 @@ public sealed class StateRuleEvaluator
         {
             return left.CompareTo(right);
         }
-        return !leftNumeric && !rightNumeric && a is string leftText && b is string rightText
-            ? string.Compare(leftText, rightText, StringComparison.Ordinal)
-            : null;
+        if (a is string leftText && b is string rightText)
+        {
+            return string.Compare(leftText, rightText, StringComparison.Ordinal);
+        }
+
+        return null;
     }
 
     // WireValue is annotated non-nullable from FixPortal.FixAtdl 1.1.5 onward. CompareOrder
@@ -372,7 +475,7 @@ public sealed class StateRuleEvaluator
 
         if (value is not JsonElement el)
         {
-            return value?.ToString();
+            return Convert.ToString(value, CultureInfo.InvariantCulture);
         }
 
         return el.ValueKind == JsonValueKind.String ? el.GetString() : el.GetRawText();
@@ -413,7 +516,12 @@ public sealed class StateRuleEvaluator
             // ("3.14") parse correctly regardless of the runner's system locale.
             // Without it, German/French locales treat '.' as a thousands separator
             // and throw, causing the catch to silently return false.
-            result = Convert.ToDecimal(value, System.Globalization.CultureInfo.InvariantCulture);
+            if (value is string text)
+            {
+                return decimal.TryParse(text, FixDecimalStyles, CultureInfo.InvariantCulture, out result);
+            }
+
+            result = Convert.ToDecimal(value, CultureInfo.InvariantCulture);
             return true;
         }
         catch (Exception ex) when (ex is InvalidCastException or FormatException or OverflowException)
