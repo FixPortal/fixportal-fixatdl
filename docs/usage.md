@@ -217,11 +217,9 @@ surface as the programming errors they indicate.
 ## Testing against a fixed clock
 
 Time-only `initValue`s anchor to "now", so inject a clock rather than letting the
-test drift:
+test drift. `FakeClock` comes from the `NodaTime.Testing` package:
 
-```FakeClock` comes from the `NodaTime.Testing` package.
-
-`csharp
+```csharp
 using NodaTime;
 using NodaTime.Testing;
 

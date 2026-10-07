@@ -37,7 +37,7 @@ that `FixPortal.FixAtdl.Contracts` maps from a parsed document.
   removed from this package. Rendering lives in the adapters above, or in your
   own UI on top of the parsed model — Blazor, Avalonia, anything.
 
-![Core and its two adapters: broker XML parsed by the headless core, which emits direct parameter tag values and the authoritative 957–960 group; WPF reads back through the core emitter, React emits 957–960 tag tuples through a host-mapped DTO, and the host validates and assembles the final FIX wire](https://raw.githubusercontent.com/FixPortal/fixportal-fixatdl/main/docs/images/three-pack.png)
+![Core and its two adapters: broker XML parsed by the headless core, which emits direct parameter tag values and the authoritative 957–960 group; WPF reads back through the core emitter, React emits 957–960 tag tuples from the JSON DTO that FixPortal.FixAtdl.Contracts maps, and the host validates and assembles the final FIX wire](https://raw.githubusercontent.com/FixPortal/fixportal-fixatdl/main/docs/images/three-pack.png)
 
 ## Read these first
 
@@ -162,7 +162,7 @@ version. Adapter versions that consume this package:
 | `FixPortal.FixAtdl` | 1.3.0 | In-tree version matches the release |
 | `FixPortal.FixAtdl.Contracts` | 1.3.0 | Released with core, same version |
 | `FixPortal.FixAtdl.Wpf` / `.Wpf.Core` | 1.0.5 | Pins core 1.1.6 |
-| `@fix-portal/fixatdl-react` | 0.3.2 | Takes the JSON `FixPortal.FixAtdl.Contracts` produces |
+| `@fix-portal/fixatdl-react` | 0.4.0 | Takes the JSON `FixPortal.FixAtdl.Contracts` produces |
 
 The public surface is governed by
 [semantic versioning](https://semver.org/spec/v2.0.0.html) and recorded in the
