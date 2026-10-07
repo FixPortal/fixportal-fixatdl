@@ -347,18 +347,7 @@ public class SupplementalCollectionTests
         // Ungrouped but a different parameter: excluded by the same-parameter filter.
         var ungroupedOtherParam = new RadioButton_t("ungroupedOtherParam") { ParameterRef = "Q", RadioGroup = "" };
         var helper = new CheckBox_t("helper") { ParameterRef = "H" };
-        helper.StateRules.Add(
-            new StateRule_t
-            {
-                Value = Atdl.NullValue,
-                Edit = new Edit_t<Control_t>
-                {
-                    Field = "source",
-                    Operator = Operator_t.Equal,
-                    Value = "true",
-                },
-            }
-        );
+        helper.StateRules.Add(ControlCollectionGuardTests.SourceEqualsTrue());
         // Radios start off so only the helper pass, selecting the sole ungrouped sibling with the
         // same (unset) parameter, can flip the companion.
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("Q") { WireValue = "N" });
@@ -674,18 +663,7 @@ public class SupplementalCollectionTests
         var panel = new StrategyPanel_t(strategy);
         var source = new CheckBox_t("source") { ParameterRef = "S" };
         var helper = new CheckBox_t("helper") { ParameterRef = "P" };
-        helper.StateRules.Add(
-            new StateRule_t
-            {
-                Value = Atdl.NullValue,
-                Edit = new Edit_t<Control_t>
-                {
-                    Field = "source",
-                    Operator = Operator_t.Equal,
-                    Value = "true",
-                },
-            }
-        );
+        helper.StateRules.Add(ControlCollectionGuardTests.SourceEqualsTrue());
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("S") { WireValue = "Y" });
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
         panel.Controls.Add(source);
@@ -708,18 +686,7 @@ public class SupplementalCollectionTests
         var panel = new StrategyPanel_t(strategy);
         var source = new CheckBox_t("source") { ParameterRef = "S" };
         var helper = new CheckBox_t("helper") { ParameterRef = "P" };
-        helper.StateRules.Add(
-            new StateRule_t
-            {
-                Value = Atdl.NullValue,
-                Edit = new Edit_t<Control_t>
-                {
-                    Field = "source",
-                    Operator = Operator_t.Equal,
-                    Value = "true",
-                },
-            }
-        );
+        helper.StateRules.Add(ControlCollectionGuardTests.SourceEqualsTrue());
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("S") { WireValue = "Y" });
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
 
