@@ -5,7 +5,7 @@
     <AssemblyName>FixPortal.FixAtdl.Contracts</AssemblyName>
     <PackageId>FixPortal.FixAtdl.Contracts</PackageId>
     <!-- Lockstep with core: release.yml overrides this with the tag version for both packages. -->
-    <Version>1.3.1</Version>
+    <Version>1.4.0</Version>
     <Description>JSON contract for @fix-portal/fixatdl-react: DTO records, a mapper from the parsed FixPortal.FixAtdl model, and the FIXatdl state-rule AST builder and evaluator. Headless. Maintained by FixPortal.</Description>
     <!-- FixPortal-authored package: no Atdl4net code, so neither upstream author nor upstream copyright applies. -->
     <Authors>FixPortal contributors</Authors>

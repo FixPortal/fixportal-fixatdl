@@ -15,6 +15,8 @@ retired with the pre-release history.
 
 ## [Unreleased]
 
+## [1.4.0] — 2026-10-07
+
 ### Fixed
 
 - `Float_t` and the types derived from it, including `Percentage_t`, validate a value after
@@ -452,7 +454,8 @@ First stable release of the modernised fork.
 First packaged fork of [Atdl4net](https://github.com/atdl4net/atdl4net),
 pre-release.
 
-[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/FixPortal/fixportal-fixatdl/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/FixPortal/fixportal-fixatdl/releases/tag/v1.2.0
