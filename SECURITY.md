@@ -23,6 +23,11 @@ Its security-relevant surface is:
 - **FIX-tag value emission** — values produced by `GetOutputValues()` are
   consumed by host applications' FIX sessions; a value that is silently wrong
   is more dangerous than one that fails loudly.
+- **Contracts mapping and server-side evaluation** —
+  `FixPortal.FixAtdl.Contracts` maps a parsed document to the JSON DTO the
+  React package consumes, and `StateRuleEvaluator` evaluates those rules
+  outside the form. Mapping and evaluation see the same hostile documents
+  as the parser. The JSON is host data, not a separate trust boundary.
 
 The library performs no network I/O of its own; sending FIX messages over the
 wire is the host application's responsibility and out of this repo's scope.
@@ -31,7 +36,7 @@ wire is the host application's responsibility and out of this repo's scope.
 
 | Version | Supported |
 |---|---|
-| Latest minor release | Yes |
+| Latest minor line (all patches) | Yes |
 | Earlier releases | No |
 
 Fixes land on `main` and ship in the next patch release of the

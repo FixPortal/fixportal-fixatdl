@@ -44,9 +44,10 @@
     "weakened ancestry or merged-PR check would ship silently. HIGH for the same reason as the",
     "coverage-floor pair.",
     "",
-    "docs/ai-findings.md is deliberately NOT under a low glob: it is the running ledger of",
-    "reviewer findings and their dispositions, so edits to it tier NORMAL (the no-match",
-    "default). LOW needs every changed file to match a low glob and the glob engine has no",
+    "docs/ai-findings.md is gitignored here and is not a tracked ledger. It is",
+    "deliberately NOT under a low glob: a force-add of that path would be a",
+    "disposition record, so it tiers NORMAL (the no-match default). LOW needs every",
+    "changed file to match a low glob and the glob engine has no",
     "exclusions, so 'low' enumerates the docs subtrees and remaining root files instead of",
     "'docs/**'. A NEW root-level docs file also tiers NORMAL until listed here - the safe",
     "direction, since unknown risk is not low risk."

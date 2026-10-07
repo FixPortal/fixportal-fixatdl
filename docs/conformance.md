@@ -74,11 +74,18 @@ was replaced merely to agree with a browser implementation.
   minute/hour/day/month/year via `DateTime` arithmetic, matching the
   `UTCTimestamp_t` spec's own worked example. A `:60` seconds field at any other
   minute is not a legal leap second; it is left untouched and fails parsing like any
-  other invalid value.
+  other invalid value. A leap second at year 9999 (the last representable
+  `DateTime`, `9999-12-31T23:59:60`) is rejected: rolling it forward would pass
+  `DateTime.MaxValue`.
   A Clock `initValue` carrying its own explicit UTC offset (the base XML Schema
   `time` type's `hh:mm[:ss]{+,-}hh:mm` form) now resolves directly from that
-  offset, taking precedence over `localMktTz`-based zone resolution; `localMktTz`
-  remains a required attribute regardless, per the spec's attribute table.
+  offset, taking precedence over `localMktTz`-based zone resolution. A
+  time-only value is anchored to today's date in that offset's wall-clock
+  frame, not in UTC, because the two calendar days differ for part of every
+  day. `localMktTz` remains a required attribute regardless, per the spec's
+  attribute table. A text control bound to `Boolean_t` decodes only that
+  parameter's `trueWireValue` / `falseWireValue` (default `Y` / `N`); the
+  spellings `true` and `false` are not accepted on that path.
 - Core DateTime wire formatting and the WPF clock's minute-level edit UI retain
   their existing precision policies. Preserving an untouched loaded value is
   tested separately from editing it.

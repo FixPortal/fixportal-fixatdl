@@ -15,6 +15,60 @@ retired with the pre-release history.
 
 ## [Unreleased]
 
+### Fixed
+
+- `Float_t` and the types derived from it, including `Percentage_t`, validate a value after
+  rounding to `Precision`. Setting `Precision` after `constValue`, or assigning a constant
+  while `Precision` is already set, throws `InvalidFieldValueException` when the rounded
+  value falls outside `MinValue` or `MaxValue` and leaves the previous precision and
+  constant in place. `Percentage_t` still checks the bound in whole-percent units.
+- `UTCTimestamp_t` and `UTCTimeOnly_t` truncate to milliseconds when a wire value or a
+  control value is assigned. A sub-millisecond instant is not rejected when the message
+  is built.
+- A time-only leap second rolls forward to the next second and stays on `0001-01-01`.
+  `9999-12-31T23:59:60` is rejected. A minimum or maximum bound of a leap second is
+  rejected when the parameter is loaded. `23:59:59` remains a valid maximum.
+- `Language_t` matches an inbound wire value to an `EnumPair` without regard to case.
+  The value it emits is still lower-case.
+- `Int_t` accepts a FIX integer with an explicit leading `+` or `-` and rejects
+  surrounding whitespace, a thousands separator, a decimal point, and an exponent.
+  `SeqNum_t` and the other non-negative integer types accept a leading `+` and reject a
+  leading `-`.
+- An empty `constValue` is stored as unset. `0` and `false` stay set.
+- A source control that already has a `ParameterRef` keeps that parameter when a helper
+  is refreshed. An unbound source is still inferred from the helper. A re-entrant change
+  to `ControlCollection` throws before a control's `Parent` is rewritten.
+- `StrategyParametersGrp` throws `InvalidOperationException` when a set parameter has an
+  empty or whitespace name and a non-empty wire value. A null name is still omitted, as
+  is an unset parameter.
+- A strategy edit compared with a non-numeric `FIX_` field now carries
+  `comparisonType` `String_t` on the contract. `FIX_ClOrdID == "1"` does not match
+  `"0001"`. A numeric `FIX_` field is left untyped and still compares as a number.
+  `regions-enums` is the golden that records this.
+- A `Boolean_t` parameter compared with another field carries `trueWireValue` and
+  `falseWireValue` (default `Y` and `N`). `StateRuleEvaluator` matches those tokens with
+  an ordinal comparison. Boolean edit literals are matched the same way.
+- Numeric state-rule coercion rejects `"1,000"`, `"1000+"`, and `"1000-"`. When only one
+  side of an ordering comparison parses as a number, the two sides are ordered as text,
+  so `"123" < "NONE"` is true.
+- `UTCDateOnly_t`, `UTCTimeOnly_t`, `UTCTimestamp_t`, and `LocalMktDate_t` comparisons
+  reject a time-only or unparseable operand. `Clock_t` comparisons stay permissive.
+- `FixValueFormatter` reads a JSON number as `long`, then `decimal`, then `double`, and
+  rejects a fractional value for an integer FIX field. Enum identifiers use the invariant
+  culture.
+- A strategy edit with neither `Edit` nor `EditRef` throws `AtdlParseException` instead
+  of becoming an empty `AND`. The AST builder rejects a compare that sets both a value
+  and `field2`, an operator combined with logic or children, and an empty `AND`, `OR`,
+  or `XOR`.
+- A parameter `constValue` that is not already a scalar is mapped from its wire value.
+  `initFixField` accepts a numeric tag or a known `FIX_` name and is omitted when the
+  name is empty or unknown.
+- `AND` and `OR` still return as soon as the result is known. The corpus cases
+  `and_short_circuit_skips_invalid_data_operand` (expected `false`) and
+  `or_short_circuit_skips_invalid_data_operand` (expected `true`) record that. The React
+  evaluator currently returns null for both. A `Data_t` comparison that is actually
+  evaluated throws.
+
 ## [1.3.1] — 2026-10-07
 
 ### Fixed

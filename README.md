@@ -107,6 +107,24 @@ dotnet build FixPortal.FixAtdl.slnx --configuration Release --no-restore
 dotnet test --solution FixPortal.FixAtdl.slnx --configuration Release --no-build
 ```
 
+```powershell
+dotnet dotnet-coverage collect -f cobertura -o coverage.cobertura.xml "dotnet test --solution FixPortal.FixAtdl.slnx --configuration Release --no-build"
+```
+
+```powershell
+./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl -MinimumLineRate 70
+```
+
+```powershell
+./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl.Contracts -MinimumLineRate 82
+```
+
+`dotnet-coverage` is a pinned local tool, restored by `dotnet tool restore`.
+CI collects one Cobertura report and enforces a 70% line floor on
+`FixPortal.FixAtdl` and an 82% line floor on `FixPortal.FixAtdl.Contracts`.
+The floor values live in `.github/workflows/ci.yml`. Run the floor script with
+PowerShell 7 (`pwsh`); it requires version 7.0 or newer.
+
 CSharpier is a pinned local tool. CI runs the read-only `check`; fix formatting
 locally with `dotnet csharpier format .` and commit the result — never as the
 gate itself, which would turn a failing check into a silent pass.
