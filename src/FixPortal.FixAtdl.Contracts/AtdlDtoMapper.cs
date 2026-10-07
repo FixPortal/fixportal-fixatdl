@@ -1,4 +1,6 @@
+// FP Enhancement: 2026-10-07 — wire constants, named FIX tags, and FIX/boolean edits.
 using FixPortal.FixAtdl.Contracts.StateRules;
+using FixPortal.FixAtdl.Fix;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Controls;
 using FixPortal.FixAtdl.Model.Controls.Support;
@@ -140,14 +142,41 @@ public sealed class AtdlDtoMapper
         };
         if (node.Field is null || !parameters.TryGetValue(node.Field, out var parameter))
         {
-            return mapped with { ComparisonType = null };
+            return mapped with { ComparisonType = ClassifyFixField(node.Field) };
         }
         mapped = mapped with { ComparisonType = parameter.Type };
-        if (parameter.Type != "Boolean_t" || node.Value is not string literal || node.Field2 is not null)
+        if (parameter.Type == "Boolean_t" && node.Field2 is not null)
+        {
+            return mapped with
+            {
+                TrueWireValue = parameter.TrueWireValue ?? "Y",
+                FalseWireValue = parameter.FalseWireValue ?? "N",
+            };
+        }
+        if (parameter.Type != "Boolean_t" || node.Value is not string literal)
         {
             return mapped;
         }
         return MapBooleanLiteral(node, mapped, parameter, literal, node.Field);
+    }
+
+    private static string? ClassifyFixField(string? field)
+    {
+        if (field is null || !field.StartsWith("FIX_", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        if (
+            !field.Contains(',')
+            && Enum.TryParse(field, ignoreCase: true, out FixField parsed)
+            && Enum.IsDefined(parsed)
+        )
+        {
+            return FixFieldTypes.IsNumeric(parsed) ? null : "String_t";
+        }
+
+        return "String_t";
     }
 
     private static StateRuleAstNodeDto MapBooleanLiteral(
@@ -192,10 +221,10 @@ public sealed class AtdlDtoMapper
         string? overridden,
         params string[] defaults
     ) =>
-        configured is not null && string.Equals(literal, configured, StringComparison.OrdinalIgnoreCase)
+        configured is not null && string.Equals(literal, configured, StringComparison.Ordinal)
         || defaults.Any(value =>
-            !string.Equals(value, overridden, StringComparison.OrdinalIgnoreCase)
-            && string.Equals(literal, value, StringComparison.OrdinalIgnoreCase)
+            !string.Equals(value, overridden, StringComparison.Ordinal)
+            && string.Equals(literal, value, StringComparison.Ordinal)
         );
 
     // ---------------------------------------------------------------------------
@@ -237,7 +266,7 @@ public sealed class AtdlDtoMapper
             FalseWireValue: GetProperty(parameterType, "FalseWireValue") as string,
             InvertOnWire: GetProperty(parameterType, "InvertOnWire") as bool?,
             LocalMktTz: GetProperty(parameterType, "LocalMktTz") as string,
-            ConstValue: MapScalar(GetProperty(parameterType, "ConstValue"), param.Type),
+            ConstValue: MapConstValue(param, parameterType),
             MinLength: GetProperty(parameterType, "MinLength") as int?,
             MaxLength: GetProperty(parameterType, "MaxLength") as int?,
             MultiplyBy100: GetProperty(parameterType, "MultiplyBy100") as bool?
@@ -336,7 +365,7 @@ public sealed class AtdlDtoMapper
             InnerIncrement: (control as DoubleSpinner_t)?.InnerIncrement,
             OuterIncrement: (control as DoubleSpinner_t)?.OuterIncrement,
             InitPolicy: control.InitPolicy?.ToString(),
-            InitFixField: int.TryParse(control.InitFixField, out var initFixField) ? initFixField : null
+            InitFixField: ResolveInitFixField(control.InitFixField)
         );
     }
 
@@ -414,9 +443,10 @@ public sealed class AtdlDtoMapper
             return builder.BuildFromRef(rule.EditRef.Id);
         }
 
-        // Neither Edit nor EditRef is set — document is malformed; emit an empty AND node
-        // as a safe placeholder so the mapper does not throw and lets the validator report it.
-        return StateRuleAst.And([]);
+        throw new AtdlParseException(
+            AtdlParseExceptionCode.ParseFailed,
+            "No valid Edit or EditRef was supplied for this StateRule."
+        );
     }
 
     // ---------------------------------------------------------------------------
@@ -449,6 +479,37 @@ public sealed class AtdlDtoMapper
     {
         var value = GetProperty(parameterType, prefix + "ValueText") ?? GetProperty(parameterType, prefix + "Value");
         return MapScalar(value, type);
+    }
+
+    private static object? MapConstValue(IParameter param, object? parameterType)
+    {
+        var constValue = GetProperty(parameterType, "ConstValue");
+        if (constValue is null or string or int or uint or decimal or bool)
+        {
+            return constValue;
+        }
+
+        return param.WireValue;
+    }
+
+    private static int? ResolveInitFixField(string? name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return null;
+        }
+
+        if (int.TryParse(name, out var tag))
+        {
+            return tag;
+        }
+
+        if (!name.Contains(',') && Enum.TryParse(name, ignoreCase: true, out FixField field) && Enum.IsDefined(field))
+        {
+            return (int)field;
+        }
+
+        return null;
     }
 
     private static object? MapScalar(object? value, string type) =>

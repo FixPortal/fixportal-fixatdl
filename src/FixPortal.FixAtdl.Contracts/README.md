@@ -41,9 +41,20 @@ strategy name, which populates each strategy's `sourceXml`. Without it,
 `sourceXml` is an empty string; the form does not need it.
 
 Mapping throws `AtdlParseException` for a document whose state rules cannot be
-built (an unresolved `EditRef`, an unknown operator, an invalid literal, or
-nesting deeper than the supported limit). `Code` carries a machine-readable
-reason from `AtdlParseExceptionCode`.
+built (an unresolved `EditRef`, an unknown operator, an invalid literal, a
+strategy edit with neither `Edit` nor `EditRef`, or nesting deeper than the
+supported limit). `Code` carries a machine-readable reason from
+`AtdlParseExceptionCode`.
+
+A compare against a non-numeric `FIX_` field carries `comparisonType` `String_t`,
+so a zero-padded identifier is not compared as a number. A numeric `FIX_` field
+omits `comparisonType` and still compares as a number. A compare between a
+`Boolean_t` parameter and another field carries `trueWireValue` and
+`falseWireValue` (default `Y` and `N`); `StateRuleEvaluator` matches those tokens
+with an ordinal comparison. `AND` and `OR` return as soon as the result is known.
+The corpus cases `and_short_circuit_skips_invalid_data_operand` and
+`or_short_circuit_skips_invalid_data_operand` pin that result for C#. The React
+evaluator does not yet.
 
 ## State-rule corpus
 

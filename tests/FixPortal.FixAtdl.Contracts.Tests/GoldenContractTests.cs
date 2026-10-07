@@ -11,7 +11,8 @@ namespace FixPortal.FixAtdl.Contracts.Tests;
 
 /// <summary>
 /// Holds the package to the wire JSON captured at commit 7a287c2, before the mapper moved
-/// here. A failure means the package changed the contract consumed by
+/// here, plus the <c>comparisonType</c> values added to non-numeric FIX field compares in
+/// regions-enums. A failure means the package changed the contract consumed by
 /// @fix-portal/fixatdl-react. Fix the code; never regenerate the golden.
 /// </summary>
 public class GoldenContractTests

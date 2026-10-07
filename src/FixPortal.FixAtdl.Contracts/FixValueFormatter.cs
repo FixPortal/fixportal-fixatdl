@@ -1,3 +1,4 @@
+// FP Enhancement: 2026-10-07 — invariant enum ids and exact JSON integer wires.
 using System.Globalization;
 using System.Text.Json;
 
@@ -27,7 +28,7 @@ public static class FixValueFormatter
 
         if (enumValues is { Count: > 0 })
         {
-            var strValue = value.ToString() ?? string.Empty;
+            var strValue = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
             var match = enumValues.FirstOrDefault(pair =>
                 string.Equals(pair.EnumId, strValue, StringComparison.Ordinal)
             );
@@ -87,7 +88,7 @@ public static class FixValueFormatter
             JsonValueKind.String => el.GetString() ?? string.Empty,
             JsonValueKind.True => true,
             JsonValueKind.False => false,
-            JsonValueKind.Number => el.TryGetInt64(out var l) ? l : el.GetDouble(),
+            JsonValueKind.Number => UnwrapNumber(el),
             JsonValueKind.Null or JsonValueKind.Undefined => string.Empty,
             _ => el.GetRawText(),
         };
@@ -137,11 +138,58 @@ public static class FixValueFormatter
             int i => i.ToString(CultureInfo.InvariantCulture),
             long l => l.ToString(CultureInfo.InvariantCulture),
             string s => s,
+            double d => FormatWholeNumber(d),
+            float f => FormatWholeNumber(f),
+            decimal m => FormatWholeNumber(m),
             _ => TryConvert(
                 () => Convert.ToInt64(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture),
                 value
             ),
         };
+    }
+
+    private static object UnwrapNumber(JsonElement element)
+    {
+        if (element.TryGetInt64(out long whole))
+        {
+            return whole;
+        }
+
+        if (element.TryGetDecimal(out decimal number))
+        {
+            return number;
+        }
+
+        return element.GetDouble();
+    }
+
+    private static string FormatWholeNumber(double value)
+    {
+        if (!double.IsFinite(value))
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), value, "FIX integer values must be integral.");
+        }
+
+        try
+        {
+            return FormatWholeNumber(new decimal(value));
+        }
+        catch (OverflowException)
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), value, "FIX integer values must be integral.");
+        }
+    }
+
+    private static string FormatWholeNumber(float value) => FormatWholeNumber((double)value);
+
+    private static string FormatWholeNumber(decimal value)
+    {
+        if (value != decimal.Truncate(value))
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), value, "FIX integer values must be integral.");
+        }
+
+        return decimal.ToInt64(value).ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>

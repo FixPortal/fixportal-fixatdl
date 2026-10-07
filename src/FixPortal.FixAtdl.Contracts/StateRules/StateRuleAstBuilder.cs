@@ -1,3 +1,4 @@
+// FP Enhancement: 2026-10-07 — reject edit shapes core Edit_t rejects.
 using FixPortal.FixAtdl.Contracts;
 using FixPortal.FixAtdl.Model.Collections;
 using FixPortal.FixAtdl.Model.Elements;
@@ -231,6 +232,22 @@ public sealed class StateRuleAstBuilder
         // Leaf compare node: Operator is set, LogicOperator is absent.
         if (opToken is not null)
         {
+            if (logicToken is not null)
+            {
+                throw new AtdlParseException(
+                    AtdlParseExceptionCode.InvalidEditValue,
+                    "A StateRule Edit cannot set both a comparison operator and a logic operator."
+                );
+            }
+
+            if (buildChildren().Count > 0)
+            {
+                throw new AtdlParseException(
+                    AtdlParseExceptionCode.InvalidEditValue,
+                    "A StateRule Edit with a comparison operator cannot contain child edits."
+                );
+            }
+
             return BuildCompare(opToken.Value, field, field2, rawValue);
         }
 
@@ -239,7 +256,16 @@ public sealed class StateRuleAstBuilder
         {
             // Children must be built to know the operand count; the NOT-arity check below
             // therefore runs post-build and reports the exact count in its error message.
-            return BuildLogic(logicToken.Value, buildChildren());
+            var children = buildChildren();
+            if (children.Count == 0 && logicToken != LogicOperator_t.Not)
+            {
+                throw new AtdlParseException(
+                    AtdlParseExceptionCode.InvalidEditValue,
+                    "A StateRule Edit logic operator requires at least one child edit."
+                );
+            }
+
+            return BuildLogic(logicToken.Value, children);
         }
 
         throw new AtdlParseException(
@@ -250,6 +276,14 @@ public sealed class StateRuleAstBuilder
 
     private StateRuleAstNodeDto BuildCompare(Operator_t opToken, string field, string? field2, string? rawValue)
     {
+        if (rawValue is not null && !string.IsNullOrEmpty(field2))
+        {
+            throw new AtdlParseException(
+                AtdlParseExceptionCode.InvalidEditValue,
+                "A StateRule Edit cannot set both Value and Field2."
+            );
+        }
+
         var op = MapOperator(opToken);
         if (
             op is not (StateRuleOperator.Exists or StateRuleOperator.NotExists)

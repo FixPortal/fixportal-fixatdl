@@ -1,3 +1,4 @@
+// FP Enhancement: 2026-10-07 — boolean wire tokens on compare nodes.
 namespace FixPortal.FixAtdl.Contracts;
 
 /// <summary>
@@ -29,6 +30,8 @@ namespace FixPortal.FixAtdl.Contracts;
 /// </param>
 /// <param name="Field2">Optional right-hand field reference, used instead of a literal Value.</param>
 /// <param name="ComparisonType">Parameter type or Clock_t/EnumState control type; absent for generic scalar state rules.</param>
+/// <param name="TrueWireValue">Boolean parameter true wire token, when a compare must apply that mapping.</param>
+/// <param name="FalseWireValue">Boolean parameter false wire token, when a compare must apply that mapping.</param>
 public sealed record StateRuleAstNodeDto(
     string Kind,
     string? Operator,
@@ -36,5 +39,7 @@ public sealed record StateRuleAstNodeDto(
     object? Value,
     IReadOnlyList<StateRuleAstNodeDto>? Children,
     string? Field2 = null,
-    string? ComparisonType = null
+    string? ComparisonType = null,
+    string? TrueWireValue = null,
+    string? FalseWireValue = null
 );
