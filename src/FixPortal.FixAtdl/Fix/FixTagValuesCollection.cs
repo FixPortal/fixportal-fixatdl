@@ -69,6 +69,11 @@ public class FixTagValuesCollection : IEnumerable<KeyValuePair<FixField, string>
     /// Gets or sets the value for the specified FIX field name.
     /// </summary>
     /// <param name="fixField">The FIX field name.</param>
+    /// <remarks>
+    /// The name must be a <see cref="FixField"/> identifier. A bare numeric tag such as
+    /// <c>"35"</c> is rejected here. <see cref="TryGetValue(string, out string?)"/> still accepts
+    /// numeric tags, including user-defined ones.
+    /// </remarks>
     public string this[string fixField]
     {
         get

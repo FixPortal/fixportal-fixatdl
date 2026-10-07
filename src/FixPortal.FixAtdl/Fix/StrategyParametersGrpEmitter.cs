@@ -1,3 +1,4 @@
+// FP Enhancement: 2026-10-07 — a set parameter with a blank name throws instead of being dropped.
 using System.Globalization;
 using FixPortal.FixAtdl.Model.Elements;
 using FixPortal.FixAtdl.Model.Elements.Support;
@@ -21,10 +22,11 @@ namespace FixPortal.FixAtdl.Fix;
 ///
 /// Parameters that are not set (<see cref="IParameter.IsSet"/> is false, or
 /// <see cref="IParameter.WireValue"/> is null or empty), and parameters whose
-/// <see cref="IParameter.Name"/> is null, empty or whitespace, are silently skipped: emitting
-/// "958=" or "960=" would produce a field <see cref="FixMessage"/> rejects on re-parse. The 957
-/// count reflects only the surviving parameters, and tag 957 itself is omitted entirely when none
-/// survive — an empty repeating group should not appear on the wire at all.
+/// <see cref="IParameter.Name"/> is null, are silently skipped: emitting
+/// "958=" or "960=" would produce a field <see cref="FixMessage"/> rejects on re-parse.
+/// A set parameter whose name is empty or whitespace throws; a blank name is not an unset value.
+/// The 957 count reflects only the surviving parameters, and tag 957 itself is omitted entirely when
+/// none survive — an empty repeating group should not appear on the wire at all.
 /// </remarks>
 public static class StrategyParametersGrpEmitter
 {
@@ -35,19 +37,30 @@ public static class StrategyParametersGrpEmitter
 
         // Pre-collect in parameter declaration order so the 957 count is known before emission.
         // An empty WireValue is filtered alongside a missing one: emitting "960=" would produce a
-        // field the parser rejects (Low 6). A null/empty/whitespace Name is filtered the same way —
-        // emitting "958=" is equally unparseable for a host that joins these tuples onto the wire.
+        // field the parser rejects (Low 6). A null Name is filtered the same way. A set parameter
+        // whose name is empty or whitespace throws: a blank name is not an unset value.
         var filled = new List<IParameter>(strategy.Parameters.Count);
         foreach (var parameter in strategy.Parameters)
         {
-            if (
-                parameter.IsSet
-                && !string.IsNullOrEmpty(parameter.WireValue)
-                && !string.IsNullOrWhiteSpace(parameter.Name)
-            )
+            if (!parameter.IsSet || string.IsNullOrEmpty(parameter.WireValue))
             {
-                filled.Add(parameter);
+                continue;
             }
+
+            if (parameter.Name is null)
+            {
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(parameter.Name))
+            {
+                throw ThrowHelper.New<InvalidOperationException>(
+                    strategy,
+                    "A set strategy parameter has a blank name and cannot be emitted as StrategyParameterName (tag 958)."
+                );
+            }
+
+            filled.Add(parameter);
         }
 
         var result = new List<(int, string)>(filled.Count == 0 ? 0 : 1 + filled.Count * 3);

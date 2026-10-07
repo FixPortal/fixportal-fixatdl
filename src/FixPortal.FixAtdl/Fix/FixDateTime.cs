@@ -19,6 +19,9 @@ public static partial class FixDateTime
 {
     private static readonly string ExceptionContext = "FixPortal.FixAtdl.Fix.FixDateTime";
 
+    private const DateTimeStyles CanonicalStyles =
+        DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
+
     // Matches a literal "60" seconds field (a declared UTC leap second, FIX-legal per the UTCTimestamp_t
     // spec) only when it directly follows "23:59:" and is not followed by a further digit. A leap second
     // can only ever be declared as the 60th second of 23:59 UTC, so a ":60" at any other minute is left
@@ -104,8 +107,6 @@ public static partial class FixDateTime
         // over a valid FIX format.
         // Apply the SAME styles to both the exact-FIX-format path and the loose fallback so that a value
         // only the fallback can parse still yields a canonical Kind=Utc result.
-        const DateTimeStyles styles =
-            DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal;
 
         // A null (reachable via a programmatically stored null in FixTagValuesCollection) or empty
         // value is simply not parseable; a Try method must not throw.
@@ -115,56 +116,104 @@ public static partial class FixDateTime
             return false;
         }
 
-        string parseValue = NormaliseLeapSecond(value, out bool wasLeapSecond);
-
-        // Truncate any fraction digits beyond what DateTime can hold so a valid nanosecond-precision
-        // timestamp is not rejected outright.
-        parseValue = TruncateExcessFraction(parseValue);
-
-        // The exact FIX formats are culture-fixed (the wire format's ':' separators and layout do not
-        // vary by locale), so parse them against the invariant culture: resolving the format's ':' as a
-        // culture-sensitive time separator would reject valid FIX timestamps under a culture whose
-        // TimeSeparator is not ':' (e.g. fi-FI uses '.'). The caller's provider remains for the loose
-        // fallback parse, whose purpose is locale input.
-        bool parsed =
-            DateTime.TryParseExact(
-                parseValue,
-                FixDateTimeFormat.FormatsArray,
-                CultureInfo.InvariantCulture,
-                styles,
-                out result
-            ) || DateTime.TryParse(parseValue, provider, styles, out result);
-
-        if (!parsed)
-        {
-            return false;
-        }
-
-        // A date-less (time-of-day-only) value otherwise gets its date filled in from the host's clock
-        // (and under AdjustToUniversal can even roll across midnight with the host timezone). Pin it to
-        // 0001-01-01 with Kind=Utc so the result is deterministic. This runs before the leap-second roll
-        // so a time-only "23:59:60" still rolls forward to 00:00:00 on the pinned date.
-        if (IsTimeOnlyText(value))
-        {
-            result = new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(result.TimeOfDay);
-        }
-
-        if (!wasLeapSecond)
+        ExactParseStatus exact = ParseExactFix(value, out result);
+        if (exact == ExactParseStatus.Parsed)
         {
             return true;
         }
 
-        // A leap second at the last representable instant would roll past DateTime.MaxValue; report
-        // failure rather than throw from AddSeconds.
-        if (result > DateTime.MaxValue.AddSeconds(-1))
+        // An exact FIX value that cannot be represented (a leap second past DateTime.MaxValue) must not
+        // fall through to the loose parse and succeed by another spelling.
+        if (exact == ExactParseStatus.Rejected)
+        {
+            return false;
+        }
+
+        string parseValue = NormaliseLeapSecond(value, out bool wasLeapSecond);
+        parseValue = TruncateExcessFraction(parseValue);
+
+        // The caller's provider applies only to this loose fallback. The exact path above is
+        // culture-fixed: resolving the format's ':' as a culture-sensitive time separator would reject
+        // valid FIX timestamps under a culture whose TimeSeparator is not ':' (e.g. fi-FI uses '.').
+        if (!DateTime.TryParse(parseValue, provider, CanonicalStyles, out result))
+        {
+            return false;
+        }
+
+        return ApplyPostParseAdjustments(value, wasLeapSecond, ref result);
+    }
+
+    /// <summary>
+    /// Parses <paramref name="value"/> against the exact FIX formats only. Bounds use this so a loose
+    /// spelling such as <c>1:00 PM</c> cannot become an absolute timestamp on the host's current date.
+    /// </summary>
+    internal static bool TryParseExactFix(string? value, out DateTime result)
+    {
+        if (string.IsNullOrEmpty(value))
         {
             result = default;
             return false;
         }
 
-        result = result.AddSeconds(1);
+        return ParseExactFix(value, out result) == ExactParseStatus.Parsed;
+    }
+
+    private static ExactParseStatus ParseExactFix(string value, out DateTime result)
+    {
+        string parseValue = NormaliseLeapSecond(value, out bool wasLeapSecond);
+        parseValue = TruncateExcessFraction(parseValue);
+
+        if (
+            !DateTime.TryParseExact(
+                parseValue,
+                FixDateTimeFormat.FormatsArray,
+                CultureInfo.InvariantCulture,
+                CanonicalStyles,
+                out result
+            )
+        )
+        {
+            return ExactParseStatus.NotExact;
+        }
+
+        return ApplyPostParseAdjustments(value, wasLeapSecond, ref result)
+            ? ExactParseStatus.Parsed
+            : ExactParseStatus.Rejected;
+    }
+
+    // Roll a declared leap second forward before re-anchoring a time-only value. Pinning the date
+    // first made "23:59:60" land on 0001-01-02 00:00:00; the wire path then re-anchored that midnight
+    // to 0001-01-01, so the two paths disagreed. A date-less value otherwise takes its date from the
+    // host clock (and AdjustToUniversal can roll it across midnight), so the re-anchor still pins the
+    // rolled time-of-day to 0001-01-01 with Kind=Utc.
+    private static bool ApplyPostParseAdjustments(string original, bool wasLeapSecond, ref DateTime result)
+    {
+        if (wasLeapSecond)
+        {
+            // A leap second at the last representable instant would roll past DateTime.MaxValue; report
+            // failure rather than throw from AddSeconds.
+            if (result > DateTime.MaxValue.AddSeconds(-1))
+            {
+                result = default;
+                return false;
+            }
+
+            result = result.AddSeconds(1);
+        }
+
+        if (IsTimeOnlyText(original))
+        {
+            result = new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(result.TimeOfDay);
+        }
 
         return true;
+    }
+
+    private enum ExactParseStatus
+    {
+        NotExact,
+        Parsed,
+        Rejected,
     }
 
     /// <summary>

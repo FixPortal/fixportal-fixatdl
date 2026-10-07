@@ -95,8 +95,10 @@ public class Int_t : AtdlValueType<int>, IControlConvertible
             return null;
         }
 
-        // Convert.ToInt32 FormatException/OverflowException are translated at the SetWireValue boundary.
-        return Convert.ToInt32(value, CultureInfo.InvariantCulture);
+        // Explicit styles: a FIX int is an optional leading sign and digits, so a thousands
+        // spelling ("1,000"), a decimal ("1.5"), an exponent ("1e2") and surrounding whitespace
+        // (" 1") must all fail. FormatException/OverflowException are translated at SetWireValue.
+        return int.Parse(value, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
     }
 
     /// <summary>

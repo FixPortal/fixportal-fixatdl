@@ -54,25 +54,26 @@ public class Percentage_t : Float_t
     {
         if (value != null)
         {
-            // The bound comparison is against the native fraction (0.75 == 75%); the error message,
-            // however, is shown in the user-facing whole-percent units the control uses, so always
-            // scale by 100 regardless of MultiplyBy100 (which governs only the wire representation).
-            if (MaxValue != null && (decimal)value > MaxValue)
+            // Compare the native fraction after the same rounding ConvertToWireValueFormat applies
+            // (rounded wire value mapped back to native units). The error message stays in
+            // whole-percent units, so always scale by 100 regardless of MultiplyBy100.
+            decimal comparable = RoundedNative((decimal)value);
+            if (MaxValue != null && comparable > MaxValue)
             {
                 return new ValidationResult(
                     ValidationResult.ResultType.Invalid,
                     ErrorMessages.MaxValueExceeded,
-                    RemoveTrailingZeroes(value * 100)!,
+                    RemoveTrailingZeroes(comparable * 100)!,
                     RemoveTrailingZeroes(MaxValue.Value * 100)!
                 );
             }
 
-            if (MinValue != null && (decimal)value < MinValue)
+            if (MinValue != null && comparable < MinValue)
             {
                 return new ValidationResult(
                     ValidationResult.ResultType.Invalid,
                     ErrorMessages.MinValueNotMet,
-                    RemoveTrailingZeroes(value * 100)!,
+                    RemoveTrailingZeroes(comparable * 100)!,
                     RemoveTrailingZeroes(MinValue.Value * 100)!
                 );
             }
@@ -134,8 +135,8 @@ public class Percentage_t : Float_t
         int effectivePrecision = Math.Min(28, MultiplyBy100 == true ? Precision.Value : Precision.Value + 2);
         decimal rounded = Round(adjustedValue, effectivePrecision)!.Value;
 
-        // As Float_t: re-validate the rounded output (mapped back to native units) before emission,
-        // since rounding after validation can push the value outside the validated bounds (R11).
+        // Backstop for a value that bypassed the setter. The setter already rejects a rounded
+        // native value outside Min/Max; re-check the rounded output before emission (R11).
         decimal roundedNative = MultiplyBy100 == true ? rounded / 100 : rounded;
         ValidationResult validity = ValidateValue(roundedNative, isRequired: false);
         if (!validity.IsValid)
@@ -229,6 +230,26 @@ public class Percentage_t : Float_t
     }
 
     #endregion
+
+    /// <summary>
+    /// Native units after the rounding <see cref="ConvertToWireValueFormat"/> applies.
+    /// A null precision returns <paramref name="value"/> unchanged. With
+    /// <see cref="MultiplyBy100"/>, the wire value (native × 100) is rounded to that
+    /// precision and divided back. Otherwise the native value is rounded to
+    /// precision + 2, matching emission.
+    /// </summary>
+    private decimal RoundedNative(decimal value)
+    {
+        if (Precision == null)
+        {
+            return value;
+        }
+
+        decimal adjustedValue = MultiplyBy100 == true ? (decimal)RemoveTrailingZeroes(value * 100)! : value;
+        int effectivePrecision = Math.Min(28, MultiplyBy100 == true ? Precision.Value : Precision.Value + 2);
+        decimal rounded = Round(adjustedValue, effectivePrecision)!.Value;
+        return MultiplyBy100 == true ? rounded / 100 : rounded;
+    }
 
     private static decimal? RemoveTrailingZeroes(decimal? value)
     {

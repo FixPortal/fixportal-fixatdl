@@ -64,7 +64,7 @@ public abstract class EnumTypeBase<T> : AtdlValueType<T>, IControlConvertible
     /// <remarks>This method converts the enum value to a string, looks up the EnumID from the supplied
     /// EnumPairCollection and then returns a new EnumState.  This method may be a little slow for
     /// very large enumerations.</remarks>
-    public EnumState ToEnumState(EnumPairCollection enumPairs)
+    public virtual EnumState ToEnumState(EnumPairCollection enumPairs)
     {
         EnumState state = new(enumPairs.EnumIds);
 

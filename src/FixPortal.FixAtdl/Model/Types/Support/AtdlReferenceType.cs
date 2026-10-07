@@ -1,8 +1,8 @@
 // FP Enhancement: 2026-05-24 — modernised for net10 (file-scoped, nullable, FixPortal namespace).
 // FP Enhancement: 2026-09-27 — value/wire/conversion machinery moved to the shared generic base
 // AtdlParameterTypeBase<TStorage>; this class remains as the reference-type pivot that pins storage to
-// T itself, and keeps the one behaviour unique to reference storage (an empty string/char[] control
-// candidate means "cleared") via the NormalizeControlCandidate override. Behaviour is unchanged.
+// T itself. NormalizeControlCandidate maps an emptied string or char[] control candidate to null, so an
+// emptied Data_t stores null rather than an empty value.
 #region Copyright (c) 2010-2011, Steve Wilkinson (author)
 //
 //   This software is released under the MIT License..

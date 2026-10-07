@@ -314,14 +314,36 @@ public class SupplementalCollectionTests
     }
 
     [Fact]
+    public void GetParameterValueSource_ungrouped_lookup_ignores_radios_that_have_a_radio_group()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var radioA = new RadioButton_t("r_A") { ParameterRef = "P" };
+        var grouped = new RadioButton_t("r_G") { ParameterRef = "P", RadioGroup = "g" };
+        var radioB = new RadioButton_t("r_B") { ParameterRef = "P" };
+        panel.Controls.Add(radioA);
+        panel.Controls.Add(grouped);
+        panel.Controls.Add(radioB);
+
+        grouped.SetValue(true);
+
+        strategy.Controls.GetParameterValueSource(radioA).Should().BeSameAs(radioA);
+
+        radioB.SetValue(true);
+
+        strategy.Controls.GetParameterValueSource(radioA).Should().BeSameAs(radioB);
+    }
+
+    [Fact]
     public void Helper_radio_toggle_uses_only_ungrouped_siblings_for_the_same_parameter()
     {
         var strategy = new Strategy_t();
         var panel = new StrategyPanel_t(strategy);
-        var source = new RadioButton_t("source") { ParameterRef = "P", RadioGroup = "" };
-        var companion = new RadioButton_t("companion") { ParameterRef = "P", RadioGroup = "" };
-        // Same parameter but grouped: excluded by the ungrouped-sibling filter.
-        var groupedSameParam = new RadioButton_t("groupedSameParam") { ParameterRef = "P", RadioGroup = "g" };
+        // Unbound: a source ParameterRef is left at its inbound value and is not inferred.
+        var source = new RadioButton_t("source") { RadioGroup = "" };
+        var companion = new RadioButton_t("companion") { RadioGroup = "" };
+        // Grouped: excluded by the ungrouped-sibling filter.
+        var groupedSameParam = new RadioButton_t("groupedSameParam") { RadioGroup = "g" };
         // Ungrouped but a different parameter: excluded by the same-parameter filter.
         var ungroupedOtherParam = new RadioButton_t("ungroupedOtherParam") { ParameterRef = "Q", RadioGroup = "" };
         var helper = new CheckBox_t("helper") { ParameterRef = "H" };
@@ -337,9 +359,8 @@ public class SupplementalCollectionTests
                 },
             }
         );
-        // P starts false so the companion assertion cannot pass from the parameter sync alone:
-        // only the helper pass selecting the sole ungrouped same-parameter sibling flips it.
-        strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "N" });
+        // Radios start off so only the helper pass, selecting the sole ungrouped sibling with the
+        // same (unset) parameter, can flip the companion.
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("Q") { WireValue = "N" });
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("H") { WireValue = "Y" });
         panel.Controls.Add(source);
@@ -347,6 +368,9 @@ public class SupplementalCollectionTests
         panel.Controls.Add(groupedSameParam);
         panel.Controls.Add(ungroupedOtherParam);
         panel.Controls.Add(helper);
+        source.SetValue(false);
+        companion.SetValue(false);
+        groupedSameParam.SetValue(false);
 
         strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
 
@@ -529,6 +553,63 @@ public class SupplementalCollectionTests
         second.OwningStrategyPanel.Should().BeNull();
     }
 
+    [Fact]
+    public void Reentrant_mutation_throws_before_parent_links_are_torn()
+    {
+        // StrategyPanel already subscribes, so one more handler makes CheckReentrancy throw.
+        // A single listener is allowed to re-enter.
+        AssertReentrantLeavesPriorState((controls, _) => controls.Clear());
+
+        AssertReentrantLeavesPriorState((controls, intruder) => controls.Insert(0, intruder), intruderStaysOut: true);
+
+        AssertReentrantLeavesPriorState((controls, intruder) => controls[0] = intruder, intruderStaysOut: true);
+    }
+
+    private static void AssertReentrantLeavesPriorState(
+        Action<ControlCollection, TextField_t> reenter,
+        bool intruderStaysOut = false
+    )
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var first = new TextField_t("c_First");
+        var second = new TextField_t("c_Second");
+        panel.Controls.Add(first);
+        panel.Controls.Add(second);
+
+        var intruder = new TextField_t("c_Intruder");
+        var trigger = new TextField_t("c_Trigger");
+        Control_t[] membershipBeforeReentrantCall = null!;
+        StrategyPanel_t?[] parentsBeforeReentrantCall = null!;
+        panel.Controls.CollectionChanged += (_, args) =>
+        {
+            if (args.Action != NotifyCollectionChangedAction.Add || args.NewItems?[0] is not TextField_t added)
+            {
+                return;
+            }
+
+            if (added.Id != "c_Trigger")
+            {
+                return;
+            }
+
+            membershipBeforeReentrantCall = [.. panel.Controls];
+            parentsBeforeReentrantCall = [.. panel.Controls.Select(control => control.OwningStrategyPanel)];
+            reenter(panel.Controls, intruder);
+        };
+
+        var act = () => panel.Controls.Add(trigger);
+
+        act.Should().Throw<InvalidOperationException>();
+        panel.Controls.Should().Equal(membershipBeforeReentrantCall);
+        parentsBeforeReentrantCall.Should().Equal(panel.Controls.Select(control => control.OwningStrategyPanel));
+        if (intruderStaysOut)
+        {
+            panel.Controls.Should().NotContain(intruder);
+            intruder.OwningStrategyPanel.Should().BeNull();
+        }
+    }
+
     // -----------------------------------------------------------------------
     // Control_t.Id — ownership guard (CR7)
     // -----------------------------------------------------------------------
@@ -644,7 +725,7 @@ public class SupplementalCollectionTests
     }
 
     [Fact]
-    public void UpdateValuesFromParameters_refreshes_helper_controls_after_reset()
+    public void UpdateValuesFromParameters_keeps_the_source_when_the_helper_parameter_is_reset()
     {
         var strategy = new Strategy_t();
         var panel = new StrategyPanel_t(strategy);
@@ -678,7 +759,7 @@ public class SupplementalCollectionTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void UpdateValuesFromParameters_applies_helper_controls_independent_of_declaration_order(bool sourceFirst)
+    public void UpdateValuesFromParameters_keeps_a_bound_source_independent_of_declaration_order(bool sourceFirst)
     {
         var strategy = new Strategy_t();
         var panel = new StrategyPanel_t(strategy);
@@ -712,6 +793,67 @@ public class SupplementalCollectionTests
 
         strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
 
+        source.GetCurrentValue().Should().Be(true);
+        strategy.Parameters["S"].WireValue.Should().Be("Y");
+    }
+
+    [Fact]
+    public void UpdateValuesFromParameters_infers_an_unbound_source_from_the_helper()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var source = new CheckBox_t("source");
+        var helper = new CheckBox_t("helper") { ParameterRef = "P" };
+        helper.StateRules.Add(
+            new StateRule_t
+            {
+                Value = Atdl.NullValue,
+                Edit = new Edit_t<Control_t>
+                {
+                    Field = "source",
+                    Operator = Operator_t.Equal,
+                    Value = "true",
+                },
+            }
+        );
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
+        panel.Controls.Add(source);
+        panel.Controls.Add(helper);
+
+        strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
+
+        source.GetCurrentValue().Should().Be(false);
+    }
+
+    [Fact]
+    public void UpdateValuesFromParameters_runs_the_helper_pass_when_a_control_refresh_throws()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        var spinner = new SingleSpinner_t("spinner") { ParameterRef = "Bad" };
+        var source = new CheckBox_t("source");
+        var helper = new CheckBox_t("helper") { ParameterRef = "P" };
+        helper.StateRules.Add(
+            new StateRule_t
+            {
+                Value = Atdl.NullValue,
+                Edit = new Edit_t<Control_t>
+                {
+                    Field = "source",
+                    Operator = Operator_t.Equal,
+                    Value = "true",
+                },
+            }
+        );
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("Bad") { WireValue = "Y" });
+        strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
+        panel.Controls.Add(spinner);
+        panel.Controls.Add(source);
+        panel.Controls.Add(helper);
+
+        var act = () => strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
+
+        act.Should().Throw<InvalidCastException>().WithMessage("*spinner*");
         source.GetCurrentValue().Should().Be(false);
     }
 }
