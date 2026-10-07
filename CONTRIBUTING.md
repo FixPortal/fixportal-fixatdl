@@ -30,8 +30,23 @@ dotnet build FixPortal.FixAtdl.slnx --configuration Release --no-restore
 dotnet test --solution FixPortal.FixAtdl.slnx --configuration Release --no-build
 ```
 
+```powershell
+dotnet dotnet-coverage collect -f cobertura -o coverage.cobertura.xml "dotnet test --solution FixPortal.FixAtdl.slnx --configuration Release --no-build"
+```
+
+```powershell
+./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl -MinimumLineRate 70
+```
+
+```powershell
+./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl.Contracts -MinimumLineRate 82
+```
+
 CI runs `dotnet csharpier check .`, which validates formatting without
-rewriting files — run `dotnet csharpier format .` before pushing.
+rewriting files — run `dotnet csharpier format .` before pushing. It also
+collects coverage and enforces a 70% line floor on `FixPortal.FixAtdl` and an
+82% line floor on `FixPortal.FixAtdl.Contracts`. The floor script needs
+PowerShell 7.
 
 ## Conventions
 

@@ -29,12 +29,17 @@ regenerated. `contracts/state-rule-cases.json` is the canonical corpus that
 
 - The public API is a compatibility surface. Breaking signature or behaviour
   changes are a release decision, not a drive-by.
-- `README.md` is packed into the nupkg (`PackageReadmeFile` in
-  `src/FixPortal.FixAtdl/FixPortal.FixAtdl.csproj`). Keep it NuGet-gallery
-  compatible: no YAML frontmatter, no GFM alert (`> [!NOTE]`) blocks — the
-  NuGet renderer does not support them. Links out of `README.md` must be
-  absolute `https://github.com/FixPortal/fixportal-fixatdl/blob/main/...` URLs:
-  a relative path resolves on GitHub but breaks on the NuGet gallery.
+- Both packed READMEs must stay NuGet-gallery compatible: the root
+  `README.md` (`PackageReadmeFile` in
+  `src/FixPortal.FixAtdl/FixPortal.FixAtdl.csproj`) and
+  `src/FixPortal.FixAtdl.Contracts/README.md` (packed by the Contracts
+  project). No YAML frontmatter and no GFM alert (`> [!NOTE]`) blocks — the
+  NuGet renderer does not support them. A link that points at a file in this
+  repository must be an absolute
+  `https://github.com/FixPortal/fixportal-fixatdl/blob/main/...` URL: a
+  relative path resolves on GitHub but breaks on the NuGet gallery. Links to
+  other sites, including nuget.org and the React repository, stay ordinary
+  absolute URLs.
 - Every consumer-visible change (public API, behaviour, packaging) gets a
   `CHANGELOG.md` entry under `## [Unreleased]` in the same PR. CI, test, and
   internal-refactor commits do not.
@@ -64,14 +69,10 @@ out of the build.
 
 ## Review workflow
 
-PRs merge rebase-only. `.claude/review-policy.json` tiers risk:
-`nuget.config`, `Directory.Build.props`, and the review control plane itself
-(`ci.yml`, `review-policy-guard.yml`, its two assertion scripts under
-`.github/scripts/`, the two coverage-floor scripts under `scripts/`,
-`review-policy.json`, `.coderabbit.yaml`) are HIGH; other workflows are NORMAL
-— workflow hygiene is asserted mechanically by `review-policy-guard.yml`
-instead. LOW documentation is limited to `docs/architecture/**`,
-`docs/superpowers/**`, `docs/batch-3-findings-disposition.md`,
-`docs/batch-5-conformance-review.md`, and `docs/coverage-baseline.md`; unmatched
-docs, including new root-level files, are NORMAL.
-Root markdown includes the README shipped in the package.
+PRs merge rebase-only. Risk tiers come from the committed
+`.claude/review-policy.json`. Do not copy its path lists into this file: a
+copied list drifts from the policy the guard actually enforces. Root
+markdown, including the README shipped in the package, is not in the low
+globs. `docs/ai-findings.md` is gitignored and is not a tracked ledger in
+this repository; the policy still leaves that path off the low globs, so a
+force-add stays NORMAL.

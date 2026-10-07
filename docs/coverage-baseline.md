@@ -122,4 +122,8 @@ The floor is on the **library package specifically, not the report's top-level `
 
 The script fails — rather than passes — when the report is missing, unparsable, empty of packages, or contains no package by that name. A renamed assembly would otherwise end coverage enforcement silently, which is the same class of defect as the one this section records.
 
-Figures when the floor was reinstated (2026-08-24), 729 tests all passing: library **73.3% line, 64.7% branch**. The floor in `ci.yml` is the live gate; it also covers `FixPortal.FixAtdl.Contracts` at 70% line.
+Figures when the floor was reinstated (2026-08-24), 729 tests all passing: library **73.3% line, 64.7% branch**. The live numbers stay in `ci.yml`.
+
+Measured on CI run [37605237315](https://github.com/FixPortal/fixportal-fixatdl/actions/runs/37605237315) at `36bfd6c` (2026-10-07, 1,501 tests): `FixPortal.FixAtdl` **87.056% line, 76.475% branch**, `FixPortal.FixAtdl.Contracts` **78.926% line, 66.242% branch**. The Contracts floor of 70% sat 8.9 points under that measurement.
+
+Measured again locally on `reviewer-findings-batch41` with `dotnet-coverage` 18.11.2 (1,580 tests): `FixPortal.FixAtdl` **87.198% line, 76.965% branch**, `FixPortal.FixAtdl.Contracts` **85.450% line, 72.865% branch**. `ci.yml` now gates Contracts at **82%** line, about 3 points under that figure. The core floor stays at **70%**. The same finding recorded the core rate and did not ask to retune it.

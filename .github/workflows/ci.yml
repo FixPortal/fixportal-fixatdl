@@ -57,12 +57,13 @@ jobs:
       - name: Test with coverage
         run: dotnet dotnet-coverage collect -f cobertura -o coverage.cobertura.xml "dotnet test --solution FixPortal.FixAtdl.slnx -c Release --no-build --report-xunit-trx --timeout 5m"
 
-      # Gates the LIBRARY's line rate, not the report's top-level rate: the latter
-      # averages in the test assembly, which covers itself almost completely. Measured
-      # when this was added: 84.3% whole-report against 73.3% library alone.
-      # The floor sits ~3 points under the measured figure, matching the convention the
-      # original 65%/69.3% floor used -- tight enough to catch a regression, loose enough
-      # to tolerate ordinary fluctuation.
+      # Gates each library package's line rate, not the report's top-level rate: the
+      # latter averages in the test assemblies, which cover themselves almost completely.
+      # Measured on CI run 37605237315 at 36bfd6c: FixPortal.FixAtdl 87.056% line and
+      # FixPortal.FixAtdl.Contracts 78.926% line. Measured again on this branch, 1,580
+      # tests: FixPortal.FixAtdl 87.198% line and FixPortal.FixAtdl.Contracts 85.450% line.
+      # The Contracts floor sits about 3 points under that second figure. The core floor
+      # stays at 70. That finding recorded the core rate and did not ask to retune it.
       # The floor script decides whether a PR can merge, so its own failure paths are
       # tested. It is a step in this job rather than a job of its own: a new job would
       # have to be wired into ci-gate's needs: for no benefit.
@@ -83,7 +84,7 @@ jobs:
         run: |
           ./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl -MinimumLineRate 70 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
           $core = $LASTEXITCODE
-          ./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl.Contracts -MinimumLineRate 70 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          ./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl.Contracts -MinimumLineRate 82 | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
           $contracts = $LASTEXITCODE
           if ($core -ne 0) { exit $core }
           exit $contracts

@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 <#
 .SYNOPSIS
     Fails when library line coverage drops below a floor, and writes a short summary.
@@ -52,7 +53,7 @@ function Fail([string] $Message) {
 # enforcing something. The floor is the thing being enforced, so it is checked before any
 # file work: a gate that cannot fail is reported broken before the report is even read.
 if (-not [double]::IsFinite($MinimumLineRate)) {
-    Fail "MinimumLineRate of '$MinimumLineRate' is not finite: a non-finite floor compares false against every rate, so the gate would pass any report -- this is a failure, not a pass."
+    Fail "MinimumLineRate of '$MinimumLineRate' is not finite. NaN and -Infinity compare false against every rate, so the gate would pass any report. +Infinity compares true against every finite rate, so the gate would fail every report. Either result is a failure, not a pass."
 }
 if ($MinimumLineRate -lt 0 -or $MinimumLineRate -gt 100) {
     Fail "MinimumLineRate of '$MinimumLineRate' is outside [0,100]: the floor is a percentage. A negative floor passes everything and a floor above 100 passes nothing, so neither can be the intended gate."
