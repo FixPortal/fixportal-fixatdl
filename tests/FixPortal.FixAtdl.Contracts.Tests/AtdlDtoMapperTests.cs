@@ -624,6 +624,10 @@ public class AtdlDtoMapperTests
         panel.Controls.Add(new TextField_t("qty") { InitFixField = "FIX_OrderQty" });
         panel.Controls.Add(new TextField_t("px") { InitFixField = "44" });
         panel.Controls.Add(new TextField_t("bad") { InitFixField = "NotAField" });
+        panel.Controls.Add(new TextField_t("plus") { InitFixField = "+44" });
+        panel.Controls.Add(new TextField_t("minus") { InitFixField = "-44" });
+        panel.Controls.Add(new TextField_t("padded") { InitFixField = " 44 " });
+        panel.Controls.Add(new TextField_t("zero") { InitFixField = "0" });
         var parsed = SingleStrategyResult(strategy);
         var controls = Mapper()
             .Map(parsed.Strategies, parsed.SourceXml)
@@ -633,6 +637,10 @@ public class AtdlDtoMapperTests
         controls[0].InitFixField.Should().Be((int)FixField.FIX_OrderQty);
         controls[1].InitFixField.Should().Be(44);
         controls[2].InitFixField.Should().BeNull();
+        controls[3].InitFixField.Should().BeNull();
+        controls[4].InitFixField.Should().BeNull();
+        controls[5].InitFixField.Should().BeNull();
+        controls[6].InitFixField.Should().BeNull();
     }
 
     [Fact]

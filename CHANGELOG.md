@@ -21,7 +21,8 @@ retired with the pre-release history.
   rounding to `Precision`. Setting `Precision` after `constValue`, or assigning a constant
   while `Precision` is already set, throws `InvalidFieldValueException` when the rounded
   value falls outside `MinValue` or `MaxValue` and leaves the previous precision and
-  constant in place. `Percentage_t` still checks the bound in whole-percent units.
+  constant in place. `Percentage_t` compares the rounded native fraction with those bounds.
+  The message shows the amounts in whole-percent units.
 - `UTCTimestamp_t` and `UTCTimeOnly_t` truncate to milliseconds when a wire value or a
   control value is assigned. A sub-millisecond instant is not rejected when the message
   is built.
@@ -54,15 +55,15 @@ retired with the pre-release history.
 - `UTCDateOnly_t`, `UTCTimeOnly_t`, `UTCTimestamp_t`, and `LocalMktDate_t` comparisons
   reject a time-only or unparseable operand. `Clock_t` comparisons stay permissive.
 - `FixValueFormatter` reads a JSON number as `long`, then `decimal`, then `double`, and
-  rejects a fractional value for an integer FIX field. Enum identifiers use the invariant
-  culture.
+  rejects a fractional value for an integer FIX field. A whole number outside the `Int64`
+  range throws `ArgumentOutOfRangeException`. Enum identifiers use the invariant culture.
 - A strategy edit with neither `Edit` nor `EditRef` throws `AtdlParseException` instead
   of becoming an empty `AND`. The AST builder rejects a compare that sets both a value
   and `field2`, an operator combined with logic or children, and an empty `AND`, `OR`,
   or `XOR`.
 - A parameter `constValue` that is not already a scalar is mapped from its wire value.
-  `initFixField` accepts a numeric tag or a known `FIX_` name and is omitted when the
-  name is empty or unknown.
+  `initFixField` accepts a positive numeric tag, digits only, or a known `FIX_` name. It is
+  omitted when the name is empty, unknown, zero, signed, or surrounded by whitespace.
 - `AND` and `OR` still return as soon as the result is known. The corpus cases
   `and_short_circuit_skips_invalid_data_operand` (expected `false`) and
   `or_short_circuit_skips_invalid_data_operand` (expected `true`) record that. The React

@@ -665,6 +665,7 @@ public class ValueTypeConversionTests
     {
         var p = new Parameter_t<Data_t>("Raw") { Use = Use_t.Required };
         p.Value.ConstValue = [];
+        p.IsSet.Should().BeFalse();
 
         var act = () => p.WireValue;
 

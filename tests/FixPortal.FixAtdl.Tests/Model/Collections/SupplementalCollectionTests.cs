@@ -314,6 +314,24 @@ public class SupplementalCollectionTests
     }
 
     [Fact]
+    public void GetParameterValueSource_ungrouped_radios_stay_on_their_own_panel()
+    {
+        // A named RadioGroup is what spans panels. Ungrouped radios on another panel are a
+        // separate implicit group, even when they share a ParameterRef.
+        var strategy = new Strategy_t();
+        var panelA = new StrategyPanel_t(strategy);
+        var panelB = new StrategyPanel_t(strategy);
+        var radioA = new RadioButton_t("r_A") { ParameterRef = "P" };
+        var radioB = new RadioButton_t("r_B") { ParameterRef = "P" };
+        panelA.Controls.Add(radioA);
+        panelB.Controls.Add(radioB);
+
+        radioB.SetValue(true);
+
+        strategy.Controls.GetParameterValueSource(radioA).Should().BeSameAs(radioA);
+    }
+
+    [Fact]
     public void GetParameterValueSource_ungrouped_lookup_ignores_radios_that_have_a_radio_group()
     {
         var strategy = new Strategy_t();

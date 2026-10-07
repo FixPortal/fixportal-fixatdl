@@ -188,7 +188,14 @@ public static class FixValueFormatter
             throw new ArgumentOutOfRangeException(nameof(value), value, "FIX integer values must be integral.");
         }
 
-        return decimal.ToInt64(value).ToString(CultureInfo.InvariantCulture);
+        try
+        {
+            return decimal.ToInt64(value).ToString(CultureInfo.InvariantCulture);
+        }
+        catch (OverflowException)
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), value, "FIX integer values must fit in Int64.");
+        }
     }
 
     /// <summary>

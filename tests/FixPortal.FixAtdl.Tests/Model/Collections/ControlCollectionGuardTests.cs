@@ -37,6 +37,7 @@ public class ControlCollectionGuardTests
         strategy.Parameters.Add(new Parameter_t<Boolean_t>("P") { WireValue = "Y" });
         panel.Controls.Add(source);
         panel.Controls.Add(helper);
+        source.SetValue(true);
 
         strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
 
@@ -57,6 +58,7 @@ public class ControlCollectionGuardTests
         panel.Controls.Add(spinner);
         panel.Controls.Add(source);
         panel.Controls.Add(helper);
+        source.SetValue(true);
 
         var act = () => strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
 

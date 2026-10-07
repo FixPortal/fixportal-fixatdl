@@ -216,6 +216,7 @@ public class ParameterTypeFeatureTests
     [InlineData("1.5")]
     [InlineData("1e2")]
     [InlineData("-1")]
+    [InlineData("-0")]
     [InlineData("+")]
     public void SeqNum_t_rejects_non_fix_integer_spellings(string wire)
     {
