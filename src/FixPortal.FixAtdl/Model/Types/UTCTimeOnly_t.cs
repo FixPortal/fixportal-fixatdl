@@ -36,10 +36,6 @@ public class UTCTimeOnly_t : UTCDateTimeTypeBase
     /// <summary>
     /// Gets the DateTime format strings to use when converting this date/time to a FIX string and vice versa.
     /// </summary>
-    /// <returns>Format strings suitable when calling DateTime.ToString().</returns>
-    /// <remarks>When converting from DateTime to string, the first member of the returned array is used.  When
-    /// converting from string to DateTime, the member of the array that has the same length as the string
-    /// value is used.</remarks>
     protected override string[] GetDateTimeFormatStrings()
     {
         return _formatStrings;
