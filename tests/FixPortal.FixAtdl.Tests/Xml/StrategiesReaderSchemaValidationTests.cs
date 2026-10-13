@@ -95,6 +95,41 @@ public class StrategiesReaderSchemaValidationTests
     }
 
     [Fact]
+    public void Load_with_schema_set_reports_every_validation_error_not_just_the_first()
+    {
+        // One missing required attribute plus one undeclared attribute: two distinct schema errors.
+        string xml = MinimalStrategyXml.Replace(" strategyIdentifierTag=\"5001\"", " bogus=\"x\"");
+        using var stream = StreamOf(xml);
+
+        Action act = () => new StrategiesReader(schemaSet: LoadMinimalSchemaSet()).Load(stream);
+
+        act.Should().Throw<SchemaValidationException>().Which.Errors.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void Constructor_compiles_an_uncompiled_schema_set_up_front()
+    {
+        XmlSchemaSet schemaSet = LoadMinimalSchemaSet();
+        schemaSet.IsCompiled.Should().BeFalse("the premise: Add leaves the set uncompiled");
+
+        _ = new StrategiesReader(schemaSet: schemaSet);
+
+        schemaSet.IsCompiled.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Load_accepts_a_schema_set_that_is_already_compiled()
+    {
+        XmlSchemaSet schemaSet = LoadMinimalSchemaSet();
+        schemaSet.Compile();
+        using var stream = StreamOf(MinimalStrategyXml);
+
+        Strategies_t strategies = new StrategiesReader(schemaSet: schemaSet).Load(stream);
+
+        strategies.Strategies.Should().ContainSingle();
+    }
+
+    [Fact]
     public void SchemaValidationException_rejects_null_errors()
     {
         var act = () => new SchemaValidationException(null!);

@@ -656,6 +656,30 @@ public class SupplementalCollectionTests
     }
 
     [Fact]
+    public void TryUpdateParameterValues_throws_ReferencedObjectNotFoundException_for_an_unresolved_parameterRef()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        panel.Controls.Add(new TextField_t("t_A") { ParameterRef = "Missing" });
+
+        var act = () => strategy.Controls.TryUpdateParameterValues(strategy.Parameters, false, out _);
+
+        act.Should().Throw<ReferencedObjectNotFoundException>().WithMessage("*Missing*");
+    }
+
+    [Fact]
+    public void UpdateValuesFromParameters_throws_ReferencedObjectNotFoundException_for_an_unresolved_parameterRef()
+    {
+        var strategy = new Strategy_t();
+        var panel = new StrategyPanel_t(strategy);
+        panel.Controls.Add(new TextField_t("t_A") { ParameterRef = "Missing" });
+
+        var act = () => strategy.Controls.UpdateValuesFromParameters(strategy.Parameters);
+
+        act.Should().Throw<ReferencedObjectNotFoundException>().WithMessage("*Missing*");
+    }
+
+    [Fact]
     public void UpdateValuesFromParameters_resets_control_when_parameter_is_empty()
     {
         var strategy = new Strategy_t();

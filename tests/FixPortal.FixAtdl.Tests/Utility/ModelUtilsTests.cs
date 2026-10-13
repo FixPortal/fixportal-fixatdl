@@ -33,6 +33,37 @@ public class ModelUtilsTests
         DynamicVisitProbe.SecondVisitCount.Should().Be(1);
     }
 
+    [Fact]
+    public void VisitHelper_surfaces_the_visitors_own_exception_not_a_TargetInvocationException()
+    {
+        var act = () => ModelUtils.VisitHelper(typeof(IVisitor), new ThrowingVisitor(), new VisitTarget());
+
+        act.Should().Throw<InvalidOperationException>().WithMessage("visitor failed");
+    }
+
+    [Fact]
+    public void VisitHelper_returns_false_every_time_when_the_visitor_has_no_matching_overload()
+    {
+        var visitor = new NoVisitOverload();
+
+        // Second call takes the cached-miss path.
+        ModelUtils.VisitHelper(typeof(IVisitor), visitor, new VisitTarget()).Should().BeFalse();
+        ModelUtils.VisitHelper(typeof(IVisitor), visitor, new VisitTarget()).Should().BeFalse();
+    }
+
+    // Visit is found by reflection (ModelUtils.VisitHelper), so the analyzers see these as unused or static-able.
+#pragma warning disable S1144, S1172, S2325
+    private sealed class ThrowingVisitor : IVisitor
+    {
+        public void Visit(VisitTarget target) => throw new InvalidOperationException("visitor failed");
+    }
+
+    private sealed class NoVisitOverload : IVisitor
+    {
+        public void Visit(string target) => throw new InvalidOperationException("must not be called");
+    }
+#pragma warning restore S1144, S1172, S2325
+
     private static object CreateDynamicVisitor(string recordMethodName)
     {
         // Each visitor lives in its own dynamic assembly (same assembly name, in fact) and defines
@@ -63,7 +94,7 @@ public class ModelUtilsTests
         return Activator.CreateInstance(dynamicVisitorType)!;
     }
 
-    public interface IVisitor;
+    public interface IVisitor { }
 
     /// <summary>Marker target type the dynamic <c>Visit</c> overloads accept.</summary>
     public sealed class VisitTarget
