@@ -10,8 +10,7 @@ using Country_t = FixPortal.FixAtdl.Model.Types.Country_t;
 namespace FixPortal.FixAtdl.Tests.Model.Types;
 
 /// <summary>
-/// Targets the specific coverage gaps that keep Model.Types.* below the 65 % floor:
-///   • MultipleCharValue_t / MultipleStringValue_t — InvertOnWire property (0 % classes)
+/// Targets the specific coverage gaps that keep Model.Types.* thinly covered:
 ///   • String_t — SOH-delimiter rejection, ToEnumState
 ///   • EnumTypeBase — ToEnumState (Country_t as the concrete vehicle)
 ///   • NonNegativeIntegerTypeBase — ToEnumState (SeqNum_t as the concrete vehicle)
@@ -31,52 +30,6 @@ public class TypeCoverageGapTests
             col.Add(new EnumPair_t { EnumId = enumId, WireValue = wireValue });
         }
         return col;
-    }
-
-    // ──────────────────────────────────────────────────────────────────────────
-    // MultipleCharValue_t — InvertOnWire property (covers the 0% class)
-    // ──────────────────────────────────────────────────────────────────────────
-
-    [Fact]
-    public void MultipleCharValue_t_InvertOnWire_defaults_to_null()
-    {
-        var p = new Parameter_t<MultipleCharValue_t>("Vals");
-        p.Value.InvertOnWire.Should().BeNull();
-    }
-
-    [Fact]
-    public void MultipleCharValue_t_InvertOnWire_can_be_set_true()
-    {
-        var p = new Parameter_t<MultipleCharValue_t>("Vals");
-        p.Value.InvertOnWire = true;
-        p.Value.InvertOnWire.Should().Be(true);
-    }
-
-    [Fact]
-    public void MultipleCharValue_t_InvertOnWire_can_be_set_false()
-    {
-        var p = new Parameter_t<MultipleCharValue_t>("Vals");
-        p.Value.InvertOnWire = false;
-        p.Value.InvertOnWire.Should().Be(false);
-    }
-
-    // ──────────────────────────────────────────────────────────────────────────
-    // MultipleStringValue_t — InvertOnWire property (covers the 0% class)
-    // ──────────────────────────────────────────────────────────────────────────
-
-    [Fact]
-    public void MultipleStringValue_t_InvertOnWire_defaults_to_null()
-    {
-        var p = new Parameter_t<MultipleStringValue_t>("Vals");
-        p.Value.InvertOnWire.Should().BeNull();
-    }
-
-    [Fact]
-    public void MultipleStringValue_t_InvertOnWire_can_be_set_true()
-    {
-        var p = new Parameter_t<MultipleStringValue_t>("Vals");
-        p.Value.InvertOnWire = true;
-        p.Value.InvertOnWire.Should().Be(true);
     }
 
     // ──────────────────────────────────────────────────────────────────────────

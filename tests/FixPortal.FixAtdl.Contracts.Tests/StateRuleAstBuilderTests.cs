@@ -389,6 +389,28 @@ public class StateRuleAstBuilderTests
     }
 
     [Fact]
+    public void Deeply_nested_bound_AND_chain_throws_MaxDepthExceeded()
+    {
+        // Same guard as the unbound chain above, on the bound Edit_t<T> path StateRule_t actually holds.
+        Edit_t<Control_t> current = new()
+        {
+            Field = "c_Leaf",
+            Operator = Operator_t.Equal,
+            Value = "1",
+        };
+        for (var i = 0; i < 200; i++)
+        {
+            Edit_t<Control_t> parent = new() { LogicOperator = LogicOperator_t.And };
+            parent.Edits.Add(current);
+            current = parent;
+        }
+
+        var act = () => Builder().Build(current);
+
+        act.Should().Throw<AtdlParseException>().Which.Code.Should().Be(AtdlParseExceptionCode.MaxDepthExceeded);
+    }
+
+    [Fact]
     public void Value_and_field2_together_are_rejected()
     {
         var edit = new Edit_t

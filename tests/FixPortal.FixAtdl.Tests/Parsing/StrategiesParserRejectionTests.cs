@@ -105,6 +105,43 @@ public class StrategiesParserRejectionTests
     }
 
     [Fact]
+    public void Load_of_an_empty_stream_throws_xml_exception()
+    {
+        using var stream = new MemoryStream();
+
+        var act = () => new StrategiesReader().Load(stream);
+
+        act.Should().Throw<XmlException>();
+    }
+
+    [Fact]
+    public void Load_reads_a_non_seekable_stream()
+    {
+        string xml = FixtureFiles.ReadAllText("Fixtures/twap.xml");
+        using var compressed = new MemoryStream();
+        using (
+            var writer = new System.IO.Compression.GZipStream(
+                compressed,
+                System.IO.Compression.CompressionMode.Compress,
+                true
+            )
+        )
+        {
+            writer.Write(Encoding.UTF8.GetBytes(xml));
+        }
+        compressed.Position = 0;
+        using var nonSeekable = new System.IO.Compression.GZipStream(
+            compressed,
+            System.IO.Compression.CompressionMode.Decompress
+        );
+        nonSeekable.CanSeek.Should().BeFalse();
+
+        var strategies = new StrategiesReader().Load(nonSeekable);
+
+        strategies.Count.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
     public void Parse_document_without_strategies_root_throws_fix_atdl_exception()
     {
         const string xml = """<Strategy xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" name="Test" />""";
