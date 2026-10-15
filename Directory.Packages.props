@@ -15,11 +15,10 @@
     <PackageVersion Include="NodaTime.Testing" Version="3.3.5" />
     <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.4" />
   </ItemGroup>
-  <!-- House style/analyzer rules applied to every project (CPM GlobalPackageReference =
-       implicit PrivateAssets=all). The package carries the global AnalyzerConfig (all rule
+  <!-- House style/analyzer version, applied by Directory.Build.props. The package carries the global AnalyzerConfig (all rule
        severities), sets EnforceCodeStyleInBuild, and bundles SonarAnalyzer.CSharp — do not
        reference SonarAnalyzer.CSharp separately. -->
   <ItemGroup Label="Analyzers">
-    <GlobalPackageReference Include="FixPortal.CodeStyle" Version="0.1.13" />
+    <PackageVersion Include="FixPortal.CodeStyle" Version="0.1.13" />
   </ItemGroup>
 </Project>
