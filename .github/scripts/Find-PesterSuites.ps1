@@ -27,6 +27,9 @@ function Get-VariableNameFromAst($VariableAst) { return [regex]::Replace($Variab
 
 function Get-AssignedVariableAsts($Target) {
     if ($Target -is [System.Management.Automation.Language.VariableExpressionAst]) { return @($Target) }
+    if ($Target -is [System.Management.Automation.Language.ForEachStatementAst]) { return @(Get-AssignedVariableAsts $Target.Variable) }
+    if ($Target -is [System.Management.Automation.Language.ParameterAst]) { return @(Get-AssignedVariableAsts $Target.Name) }
+    if ($Target -is [System.Management.Automation.Language.UnaryExpressionAst] -and $Target.TokenKind -in 'PlusPlus', 'MinusMinus', 'PostfixPlusPlus', 'PostfixMinusMinus') { return @(Get-AssignedVariableAsts $Target.Child) }
     if ($Target -is [System.Management.Automation.Language.ConvertExpressionAst]) { return @(Get-AssignedVariableAsts $Target.Child) }
     if ($Target -is [System.Management.Automation.Language.ArrayLiteralAst]) { return @($Target.Elements | ForEach-Object { Get-AssignedVariableAsts $_ }) }
     return @()
@@ -40,8 +43,9 @@ function Get-PesterRisk {
     $tree = [System.Management.Automation.Language.Parser]::ParseInput($Source, [ref]$tokens, [ref]$errors)
     if ($errors -and $errors.Count) { [void]$flags.Add('parse-error'); return @($flags) }
 
-    foreach ($ast in $tree.FindAll({ $args[0] -is [System.Management.Automation.Language.AssignmentStatementAst] }, $true)) {
-        foreach ($var in (Get-AssignedVariableAsts $ast.Left)) {
+    foreach ($ast in $tree.FindAll({ $args[0] -is [System.Management.Automation.Language.AssignmentStatementAst] -or $args[0] -is [System.Management.Automation.Language.ForEachStatementAst] -or $args[0] -is [System.Management.Automation.Language.ParameterAst] -or $args[0] -is [System.Management.Automation.Language.UnaryExpressionAst] }, $true)) {
+        $target = if ($ast -is [System.Management.Automation.Language.AssignmentStatementAst]) { $ast.Left } else { $ast }
+        foreach ($var in (Get-AssignedVariableAsts $target)) {
             if ($var.VariablePath.IsDriveQualified -and $var.VariablePath.DriveName -eq 'env') { [void]$flags.Add($(if ((Get-VariableNameFromAst $var) -in $script:ProfileEnvNames) { 'environment-write' } else { 'environment-write-other' })); continue }
             if ((Get-VariableNameFromAst $var) -in $script:AutomaticVariables) { [void]$flags.Add('automatic-variable-assignment') }
         }
@@ -74,8 +78,21 @@ function Get-PesterRisk {
             # The variable name is `-Name <x>` / `-Name:<x>` or the first positional argument.
             $elements = @($ast.CommandElements | Select-Object -Skip 1)
             $named = $elements | Where-Object { $_ -is [System.Management.Automation.Language.CommandParameterAst] -and $_.ParameterName -match '^n(a|am|ame)?$' } | Select-Object -First 1
-            $target = if ($named -and $named.Argument) { $named.Argument } elseif ($named) { $elements[[array]::IndexOf($elements, $named) + 1] } elseif ($elements.Count -and $elements[0] -isnot [System.Management.Automation.Language.CommandParameterAst]) { $elements[0] }
-            if ($target -is [System.Management.Automation.Language.StringConstantExpressionAst] -and $target.Value -in $script:AutomaticVariables) { [void]$flags.Add('automatic-variable-assignment') }
+            $target = if ($named -and $named.Argument) { $named.Argument } elseif ($named) { $elements[[array]::IndexOf($elements, $named) + 1] }
+            if (-not $named) {
+                for ($i = 0; $i -lt $elements.Count; $i++) {
+                    $element = $elements[$i]
+                    if ($element -is [System.Management.Automation.Language.CommandParameterAst]) {
+                        # Inline values consume no following node. Switches also consume no value;
+                        # other named arguments (e.g. -Scope Script) precede the positional Name.
+                        if (-not $element.Argument -and $element.ParameterName -notmatch '^(f(o(r(c(e)?)?)?)?|p(a(s(s(t(h(r(u)?)?)?)?)?)?)?|whatif|wi|confirm|cf|verbose|vb|debug|db)$') { $i++ }
+                    } else { $target = $element; break }
+                }
+            }
+            $targets = if ($target -is [System.Management.Automation.Language.ArrayLiteralAst]) { @($target.Elements) } else { @($target) }
+            foreach ($nameAst in $targets) {
+                if ($nameAst -is [System.Management.Automation.Language.StringConstantExpressionAst] -and $nameAst.Value -in $script:AutomaticVariables) { [void]$flags.Add('automatic-variable-assignment') }
+            }
         }
         if ($name -in 'Invoke-Expression', 'iex', 'Invoke-Command', 'icm') { [void]$flags.Add('dynamic-code') }
         if ($name -in 'pwsh', 'powershell') {
