@@ -56,6 +56,8 @@
   "version": 1,
 
   "high": [
+    ".github/scripts/Test-PowerShellTestSafety.ps1",
+    ".github/scripts/Find-PesterSuites.ps1",
     ".github/canonical-assets.json",
     ".github/scripts/assert_canonical_assets.py",
     ".github/workflows/review-policy-guard.yml",
