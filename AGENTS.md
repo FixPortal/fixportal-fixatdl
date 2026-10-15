@@ -76,3 +76,16 @@ markdown, including the README shipped in the package, is not in the low
 globs. `docs/ai-findings.md` is gitignored and is not a tracked ledger in
 this repository; the policy still leaves that path off the low globs, so a
 force-add stays NORMAL.
+
+## Release eligibility and local guard controls
+
+`release.yml` fetches full main history and calls
+`scripts/assert-release-eligibility.sh` before restore/build/pack. That script
+is this repository's sanctioned equivalent of the inline ancestry assertion:
+it requires both reachability from main and a GitHub-associated merged PR into
+main. Preserve the additional review boundary and its rejection-case coverage.
+
+The review-policy guard deliberately also requires the coverage-floor checker
+and its verifier to remain HIGH. Its adapted content is recorded in
+`.github/canonical-assets.json`; retain these stronger controls when syncing
+canonical assets rather than deleting them to force byte equality.
