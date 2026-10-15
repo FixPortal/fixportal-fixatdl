@@ -2,7 +2,7 @@
   "schema": 1,
   "canonical": {
     "repository": "FixPortal/fixportal-agents-skills",
-    "commit": "254b6d4c079d68953d61ce6cffe04d1e839dda42",
+    "commit": "abf6496fcdc9a3fe967c4ed4415270f0478faa58",
     "syncedAt": "2026-10-15"
   },
   "assets": [
@@ -162,16 +162,16 @@
     },
     {
       "path": ".github/scripts/Find-PesterSuites.ps1",
-      "sha256": "c47aa85c2c733398b06b68d1ade07b489a2b8a599af38ea748f95e24324e7910",
+      "sha256": "dc5c8293be17808e992d827fa98cf009b7bb452f4878b2775fcaa57c3fe54574",
       "verbatim": true,
-      "commit": "254b6d4c079d68953d61ce6cffe04d1e839dda42",
+      "commit": "abf6496fcdc9a3fe967c4ed4415270f0478faa58",
       "syncedAt": "2026-10-15"
     },
     {
       "path": ".github/scripts/Test-PowerShellTestSafety.ps1",
-      "sha256": "fd95f6d5b717d35299df7316d48399f48d435d8c0192d3b95f467cd7a4045eb2",
+      "sha256": "14ecc9411c6d2bff9ac6f5ae5ca6dc76ac9aaae76e2aa51401c6ef2e96f837e1",
       "verbatim": true,
-      "commit": "254b6d4c079d68953d61ce6cffe04d1e839dda42",
+      "commit": "abf6496fcdc9a3fe967c4ed4415270f0478faa58",
       "syncedAt": "2026-10-15"
     },
     {
