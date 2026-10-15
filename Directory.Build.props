@@ -28,4 +28,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>FIX;FIXatdl;Atdl4net;algorithmic-trading;FixPortal</PackageTags>
   </PropertyGroup>
+  <ItemGroup Label="Analyzers">
+    <PackageReference Include="FixPortal.CodeStyle" PrivateAssets="all" />
+  </ItemGroup>
 </Project>
