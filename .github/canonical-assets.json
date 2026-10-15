@@ -2,7 +2,7 @@
   "schema": 1,
   "canonical": {
     "repository": "FixPortal/fixportal-agents-skills",
-    "commit": "abf6496fcdc9a3fe967c4ed4415270f0478faa58",
+    "commit": "1ffb391aad47003e7bf7d6f4ef29b894018f968d",
     "syncedAt": "2026-10-15"
   },
   "assets": [
@@ -162,9 +162,9 @@
     },
     {
       "path": ".github/scripts/Find-PesterSuites.ps1",
-      "sha256": "dc5c8293be17808e992d827fa98cf009b7bb452f4878b2775fcaa57c3fe54574",
+      "sha256": "cfca545994464ee3329681d97e8f16f94b626c200b793f89704e655bb7d877cb",
       "verbatim": true,
-      "commit": "abf6496fcdc9a3fe967c4ed4415270f0478faa58",
+      "commit": "1ffb391aad47003e7bf7d6f4ef29b894018f968d",
       "syncedAt": "2026-10-15"
     },
     {

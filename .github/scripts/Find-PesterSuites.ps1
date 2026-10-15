@@ -18,12 +18,29 @@ param([string] $Repository, [switch] $IncludeVerifyScripts)
 # Read-only or meaning-bearing automatic variables. Benign, routinely assigned ones ($null discard, $global:LASTEXITCODE in mocks,
 # $Args, $Input, $Error, $Matches, $Event) are deliberately not listed: flagging them buries the real signal.
 $script:AutomaticVariables = @('Home', 'PSHome', 'Profile', 'PID', 'Host', 'PWD', 'ExecutionContext', 'MyInvocation', 'PSCmdlet',
-    'PSCommandPath', 'PSScriptRoot', 'ShellId', 'PSVersionTable', 'true', 'false')
+    'PSCommandPath', 'PSScriptRoot', 'ShellId', 'PSVersionTable', 'true', 'false', '?', 'PSCulture', 'PSUICulture',
+    'PSEdition', 'IsCoreCLR', 'IsWindows', 'IsLinux', 'IsMacOS', 'EnabledExperimentalFeatures', 'PSStyle', '_', 'PSItem', 'this')
 $script:ProfileEnvNames = @('USERPROFILE', 'HOME', 'HOMEPATH', 'HOMEDRIVE', 'APPDATA', 'LOCALAPPDATA', 'TEMP', 'TMP', 'ProgramData', 'PATH', 'PSModulePath')
 $script:DeleteCommands = @('Remove-Item', 'ri', 'rm', 'rmdir', 'rd', 'del', 'erase')
 $script:SkippedDirectories = @('node_modules', '.git', 'bin', 'obj', 'dist', '.next', 'coverage', 'TestResults', 'StrykerOutput')
 
 function Get-VariableNameFromAst($VariableAst) { return [regex]::Replace($VariableAst.VariablePath.UserPath, '^[A-Za-z]+:', '') }
+
+function Get-StaticPathArgument($CommandAst) {
+    $elements = @($CommandAst.CommandElements | Select-Object -Skip 1)
+    for ($i = 0; $i -lt $elements.Count; $i++) {
+        $element = $elements[$i]
+        if ($element -isnot [System.Management.Automation.Language.CommandParameterAst]) { return $element }
+        $parameter = $element.ParameterName
+        if ('Path'.StartsWith($parameter, [StringComparison]::OrdinalIgnoreCase) -or 'LiteralPath'.StartsWith($parameter, [StringComparison]::OrdinalIgnoreCase) -or $parameter -eq 'lp') {
+            if ($element.Argument) { return $element.Argument }
+            if ($i + 1 -lt $elements.Count) { return $elements[$i + 1] }
+            return $null
+        }
+        if (-not $element.Argument -and $parameter -notmatch '^(force|f|whatif|wi|confirm|cf|verbose|vb|debug|db|passthru|nonewline|asbytestream)$') { $i++ }
+    }
+    return $null
+}
 
 function Get-AssignedVariableAsts($Target) {
     if ($Target -is [System.Management.Automation.Language.VariableExpressionAst]) { return @($Target) }
@@ -96,13 +113,20 @@ function Get-PesterRisk {
         }
         if ($name -in 'Invoke-Expression', 'iex', 'Invoke-Command', 'icm') { [void]$flags.Add('dynamic-code') }
         if ($name -in 'pwsh', 'powershell') {
-            $viaCommand = @($ast.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.CommandParameterAst] -and $_.ParameterName -match '^(c|co|com|comm|comma|comman|command)$' }).Count -gt 0
+            $viaCommand = @($ast.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.CommandParameterAst] -and ($_.ParameterName -match '^(c|co|com|comm|comma|comman|command|ec)$' -or 'EncodedCommand'.StartsWith($_.ParameterName, [StringComparison]::OrdinalIgnoreCase)) }).Count -gt 0
             if ($viaCommand) { [void]$flags.Add('dynamic-code') }
         }
         if ($name -in 'Set-Item', 'si', 'Set-Content' -and ($ast.Extent.Text -match '(?i)\benv:')) { [void]$flags.Add('environment-write') }
+        if ($name -in 'Set-Item', 'si', 'Set-Content') {
+            $pathAst = Get-StaticPathArgument $ast
+            $pathAsts = if ($pathAst -is [System.Management.Automation.Language.ArrayLiteralAst]) { @($pathAst.Elements) } else { @($pathAst) }
+            foreach ($literalPath in $pathAsts) {
+                if ($literalPath -is [System.Management.Automation.Language.StringConstantExpressionAst] -and $literalPath.Value -match '(?i)^Variable:[\\/]?(?:(?:global|script|local|private):)?(.+)$' -and $Matches[1] -in $script:AutomaticVariables) { [void]$flags.Add('automatic-variable-assignment') }
+            }
+        }
         if ($name -in 'New-Item', 'ni', 'mklink') {
             $text = $ast.Extent.Text
-            if ($name -eq 'mklink' -or $text -match '(?i)-ItemType\s+[''"]?(Junction|SymbolicLink|HardLink)\b|-Type\s+[''"]?(Junction|SymbolicLink|HardLink)\b') { [void]$flags.Add('junction-or-symlink') }
+            if ($name -eq 'mklink' -or $text -match '(?i)-(?:ItemType|Type)(?:\s+|:)[''"]?(Junction|SymbolicLink|HardLink)\b') { [void]$flags.Add('junction-or-symlink') }
         }
     }
     foreach ($ast in $tree.FindAll({ $args[0] -is [System.Management.Automation.Language.InvokeMemberExpressionAst] }, $true)) {
