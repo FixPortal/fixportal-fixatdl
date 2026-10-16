@@ -343,6 +343,23 @@ public class FixMessageTests
         act.Should().Throw<InvalidOperationException>();
     }
 
+    [Fact]
+    public void FixTagValuesCollection_ToFix_throws_for_null_value()
+    {
+        var message = new FixTagValuesCollection { [(FixField)35] = null! };
+        var entry = message.Should().ContainSingle().Which;
+        entry.Key.Should().Be((FixField)35);
+        entry.Value.Should().BeNull();
+
+        Func<string> act = message.ToFix;
+
+        act.Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage(
+                "Unable to serialize FIX message: the value for tag '35' is null or contains the SOH field delimiter."
+            );
+    }
+
     // FixFieldValueProvider Boolean_t declared-wire-mapping translation (R12) ------------------
 
     [Theory]
