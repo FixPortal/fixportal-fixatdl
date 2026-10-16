@@ -218,6 +218,38 @@ public class ClockTimeZoneTests
     }
 
     [Fact]
+    public void Autumn_overlap_initValue_chooses_the_earlier_utc_instant()
+    {
+        var clock = BerlinClock(new InitValueClock("02:30:00"), Instant.FromUtc(2026, 10, 25, 12, 0, 0));
+
+        clock.LoadInitValue(FixFieldValueProvider.Empty);
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 10, 25, 0, 30, 0, DateTimeKind.Utc));
+        clock.ToString(null!).Should().Be("20261025-00:30:00");
+    }
+
+    [Fact]
+    public void Autumn_overlap_unspecified_time_only_SetValue_chooses_the_earlier_utc_instant()
+    {
+        var clock = new Clock_t("clk")
+        {
+            LocalMktTz = "Europe/Berlin",
+            Clock = new FakeClock(Instant.FromUtc(2026, 10, 25, 12, 0, 0)),
+        };
+
+        clock.SetValue(new DateTime(1, 1, 1, 2, 30, 0, DateTimeKind.Unspecified));
+
+        clock
+            .ToDateTime(null!, CultureInfo.InvariantCulture)
+            .Should()
+            .Be(new DateTime(2026, 10, 25, 0, 30, 0, DateTimeKind.Utc));
+        clock.ToString(null!).Should().Be("20261025-00:30:00");
+    }
+
+    [Fact]
     public void SetValue_with_unspecified_kind_throws_argument_exception()
     {
         var clock = new Clock_t("clk") { Clock = new FakeClock(Instant.FromUtc(2026, 1, 15, 12, 0, 0)) };
