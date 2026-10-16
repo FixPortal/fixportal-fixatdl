@@ -79,6 +79,8 @@
     "global.json",
     ".npmrc",
     "Directory.Build.props",
+    "Directory.Build.targets",
+    "scripts/test/verify-api-baseline.py",
     ".github/workflows/review-tier.yml"
   ],
 

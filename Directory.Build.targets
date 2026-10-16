@@ -1,0 +1,21 @@
+<Project>
+  <!-- The released archive is an independent input, not a generated API golden. -->
+  <Target Name="ValidateReleasedBaselineIntegrity" BeforeTargets="RunPackageValidation"
+          Condition="'$(PackageId)' == 'FixPortal.FixAtdl' or '$(PackageId)' == 'FixPortal.FixAtdl.Contracts'">
+    <PropertyGroup>
+      <_ReleasedBaselineVersion>1.4.0</_ReleasedBaselineVersion>
+      <_ReleasedBaselinePath>$([MSBuild]::NormalizePath('$(NuGetPackageRoot)', '$(PackageId.ToLower())', '$(_ReleasedBaselineVersion)', '$(PackageId.ToLower()).$(_ReleasedBaselineVersion).nupkg'))</_ReleasedBaselinePath>
+      <_ReleasedBaselineSha256 Condition="'$(PackageId)' == 'FixPortal.FixAtdl'">C5E0BF36EE3A2D3048E0401D85E1049AF480A096C9A64F8DE5ED60B65D153743</_ReleasedBaselineSha256>
+      <_ReleasedBaselineSha256 Condition="'$(PackageId)' == 'FixPortal.FixAtdl.Contracts'">AD13CD8ADEDF2B440C65CAEB9875BEAC25314EFF7AC9155D471987A992B85053</_ReleasedBaselineSha256>
+      <PackageValidationBaselinePath>$(_ReleasedBaselinePath)</PackageValidationBaselinePath>
+    </PropertyGroup>
+    <Error Condition="'$(EnablePackageValidation)' != 'true' or '$(RunApiCompat)' != 'true' or '$(DisablePackageBaselineValidation)' == 'true' or '$(PackageValidationBaselineVersion)' != '$(_ReleasedBaselineVersion)'"
+           Text="Both published packages must validate their released 1.4.0 API baseline." />
+    <Error Condition="!Exists('$(_ReleasedBaselinePath)')" Text="Released API baseline archive is missing: $(_ReleasedBaselinePath)" />
+    <GetFileHash Files="$(_ReleasedBaselinePath)" Algorithm="SHA256">
+      <Output TaskParameter="Hash" PropertyName="_ActualReleasedBaselineSha256" />
+    </GetFileHash>
+    <Error Condition="'$(_ActualReleasedBaselineSha256)' != '$(_ReleasedBaselineSha256)'" Text="Released API baseline SHA256 mismatch for $(PackageId)." />
+    <Message Importance="high" Text="Verified released API baseline: $(PackageId) $(_ReleasedBaselineVersion) SHA256=$(_ActualReleasedBaselineSha256)" />
+  </Target>
+</Project>

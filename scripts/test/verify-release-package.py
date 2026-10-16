@@ -7,6 +7,7 @@ workflow itself; this verifier never implements tag stripping or its own pack pa
 """
 
 import argparse
+import importlib.util
 import hashlib
 import json
 import os
@@ -50,6 +51,11 @@ def step(block, name):
 
 
 def check_wiring(root):
+    spec = importlib.util.spec_from_file_location("api_baseline", root / "scripts/test/verify-api-baseline.py")
+    baseline = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(baseline)
+    baseline.verify(root)
+    baseline.self_test(root)
     ci = (root / ".github/workflows/ci.yml").read_text()
     for name in ("build-and-test", "gate-coverage"):
         if re.search(r"(?m)^    (?:if|continue-on-error|defaults|env):", job(ci, name)):

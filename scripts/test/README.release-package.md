@@ -9,3 +9,11 @@ The package probe checks both actual package filenames, nuspec versions and the 
 Required build-and-test runs this verifier. The independent required gate-coverage job checks that invocation and both protected HIGH paths via `--check-wiring`.
 
 Both jobs must remain unconditional without job-level execution overrides. Qualification independently added `if: false` to each real job: the earlier wiring check accepted those bypasses, and the corrected check refuses both while accepting the real workflow.
+
+The actual packs also run the SDK's built-in API compatibility validation against
+both released 1.4.0 packages. `Directory.Build.targets` verifies the independent
+release archive SHA256 before validation. Additive APIs remain allowed; this is
+not a nullable or full behavioral compatibility guarantee. The synthetic
+`v9.8.7-audit.1` proof keeps baseline validation enabled. An intentional breaking
+release needs an explicit reviewed baseline/release-record change, rather than an
+automatic major-version exemption or generated suppression.
