@@ -188,3 +188,8 @@ The public surface is governed by
 there is no analyzer enforcing it at build time (`PublicApiAnalyzers` was
 removed before 1.0.5).
 [Issues and PRs](https://github.com/FixPortal/fixportal-fixatdl) are welcome.
+
+The required release-package check also restores both freshly packed packages into
+a fresh consumer cache, parses a small in-memory FIXatdl document through the
+public parser, and checks literal JSON values produced by the Contracts mapper.
+The consumer uses PackageReference rather than the repository projects.

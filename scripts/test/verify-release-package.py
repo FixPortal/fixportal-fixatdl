@@ -7,6 +7,7 @@ workflow itself; this verifier never implements tag stripping or its own pack pa
 """
 
 import argparse
+import ast
 import importlib.util
 import hashlib
 import json
@@ -14,6 +15,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 
 
 def job(text, name):
@@ -50,6 +52,20 @@ def step(block, name):
     return raw, following
 
 
+def consumer_wiring(source):
+    tree = ast.parse(source)
+    main = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "main")
+    tail = main.body[-2:]
+    if len(tail) != 2 or not all(isinstance(node, ast.Expr) and isinstance(node.value, ast.Call) for node in tail):
+        raise ValueError("The real package probe and consumer must be the final unconditional verifier steps")
+    expected = (
+        'subprocess.run(["dotnet", "run", "--project", str(root / "scripts/test/ReleasePackageProbe/ReleasePackageProbe.csproj"), "-c", "Release", "--", str(root)], cwd=root, env=env, check=True)',
+        'subprocess.run([sys.executable, "-B", str(root / "scripts/test/verify-packed-consumer.py"), "--root", str(root)], cwd=root, env=env, check=True)',
+    )
+    if any(ast.dump(node.value) != ast.dump(ast.parse(command).body[0].value) for node, command in zip(tail, expected)):
+        raise ValueError("The actual packed consumer must run unconditionally after the actual metadata probe")
+
+
 def check_wiring(root):
     spec = importlib.util.spec_from_file_location("api_baseline", root / "scripts/test/verify-api-baseline.py")
     baseline = importlib.util.module_from_spec(spec)
@@ -66,8 +82,17 @@ def check_wiring(root):
     command, _ = step(job(ci, "gate-coverage"), "Verify release-package gate wiring")
     if command != "python3 scripts/test/verify-release-package.py --check-wiring":
         raise ValueError("Independent gate-coverage job must preserve package-verifier wiring")
+    source = Path(__file__).read_text(encoding="utf-8")
+    consumer_wiring(source)
+    call = '    subprocess.run([sys.executable, "-B", str(root / "scripts/test/verify-packed-consumer.py"), "--root", str(root)], cwd=root, env=env, check=True)'
+    for changed in (source.replace(call, "    pass"), source.replace(call, "    # consumer omitted")):
+        try:
+            consumer_wiring(changed)
+        except ValueError:
+            continue
+        raise ValueError("Consumer wiring negative fixture was accepted")
     high = json.loads((root / ".claude/review-policy.json").read_text())["high"]
-    for name in ("scripts/test/verify-release-package.py", "scripts/test/ReleasePackageProbe/Program.cs"):
+    for name in ("scripts/test/verify-release-package.py", "scripts/test/ReleasePackageProbe/Program.cs", "scripts/test/verify-packed-consumer.py", "scripts/test/PackedConsumer/Program.cs"):
         if name not in high:
             raise ValueError(f"Package verification must remain HIGH: {name}")
 
@@ -128,6 +153,7 @@ def main():
         print(f"Executing actual release step {name}:\n{body}", flush=True)
         subprocess.run(["bash", "-euo", "pipefail", "-c", body], cwd=root, env=env, check=True)
     subprocess.run(["dotnet", "run", "--project", str(root / "scripts/test/ReleasePackageProbe/ReleasePackageProbe.csproj"), "-c", "Release", "--", str(root)], cwd=root, env=env, check=True)
+    subprocess.run([sys.executable, "-B", str(root / "scripts/test/verify-packed-consumer.py"), "--root", str(root)], cwd=root, env=env, check=True)
 
 
 if __name__ == "__main__":

@@ -70,6 +70,8 @@
     "scripts/test/verify-release-eligibility.sh",
     "scripts/test/verify-release-package.py",
     "scripts/test/ReleasePackageProbe/Program.cs",
+    "scripts/test/verify-packed-consumer.py",
+    "scripts/test/PackedConsumer/Program.cs",
     ".github/workflows/ci.yml",
     ".github/workflows/release.yml",
     ".claude/review-policy.json",
