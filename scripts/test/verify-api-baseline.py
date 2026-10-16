@@ -58,12 +58,20 @@ def verify(root):
     contract(*documents(root))
 
 
+def add_suppression(project):
+    group = ET.SubElement(project, "ItemGroup")
+    ET.SubElement(group, "ApiCompatSuppressionFile", {"Include": "CompatibilitySuppressions.xml"})
+
+
 def self_test(root):
     original = documents(root)
     mutations = []
     for name in PACKAGES:
         mutations += [(f"{name} disabled", lambda p, t, h, n=name: setattr(p[n].find("PropertyGroup/EnablePackageValidation"), "text", "false")),
-                      (f"{name} baseline changed", lambda p, t, h, n=name: setattr(p[n].find("PropertyGroup/PackageValidationBaselineVersion"), "text", "1.3.0"))]
+                      (f"{name} baseline changed", lambda p, t, h, n=name: setattr(p[n].find("PropertyGroup/PackageValidationBaselineVersion"), "text", "1.3.0")),
+                      (f"{name} package identity changed", lambda p, t, h, n=name: setattr(p[n].find("PropertyGroup/PackageId"), "text", "Unexpected.Package")),
+                      (f"{name} suppression added", lambda p, t, h, n=name: add_suppression(p[n])),
+                      (f"{name} baseline bypass added", lambda p, t, h, n=name: setattr(ET.SubElement(p[n].find("PropertyGroup"), "DisablePackageBaselineValidation"), "text", "true"))]
     mutations += [
         ("removed executable hook", lambda p, t, h: t[0].set("BeforeTargets", "Build")),
         ("conditional integrity", lambda p, t, h: t[0].set("Condition", "false")),
