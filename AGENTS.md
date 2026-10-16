@@ -56,7 +56,7 @@ regenerated. `contracts/state-rule-cases.json` is the canonical corpus that
   running on Microsoft.Testing.Platform.
 - Assert with `.Should()`, never xUnit `Assert.*`.
 - CI collects coverage with `dotnet-coverage` and enforces a 70% line floor on
-  `FixPortal.FixAtdl` and on `FixPortal.FixAtdl.Contracts` via
+  `FixPortal.FixAtdl` and an 82% line floor on `FixPortal.FixAtdl.Contracts` via
   `scripts/assert-coverage-floor.ps1`. The floor is
   defined in `ci.yml`, not in `docs/coverage-baseline.md` — that document is the
   historical 2026-05-30 starting baseline (32% line) and is not current state.

@@ -12,8 +12,10 @@ Both jobs must remain unconditional without job-level execution overrides. Quali
 
 The actual packs also run the SDK's built-in API compatibility validation against
 both released 1.4.0 packages. `Directory.Build.targets` verifies the independent
-release archive SHA256 before validation. Additive APIs remain allowed; this is
-not a nullable or full behavioral compatibility guarantee. The synthetic
+NuGet.org repository-signed release archive SHA256 before validation. The pinned
+archives include the repository signature absent from the GitHub release assets;
+all existing package entries, including DLLs, are byte-identical. Additive APIs
+remain allowed; this is not a nullable or full behavioral compatibility guarantee. The synthetic
 `v9.8.7-audit.1` proof keeps baseline validation enabled. An intentional breaking
 release needs an explicit reviewed baseline/release-record change, rather than an
 automatic major-version exemption or generated suppression.
