@@ -230,4 +230,59 @@ public class EditConformanceTests
 
         edit.CurrentState.Should().Be(expected);
     }
+
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    [InlineData(double.NegativeInfinity)]
+    public void Nonfinite_double_public_parameter_operands_are_rejected(double operand)
+    {
+        var edit = ResolveSameTypedOperand(operand);
+
+        var act = () => edit.Evaluate();
+
+        act.Should().Throw<InvalidOperationException>().WithMessage("Cannot compare NaN or Infinity values.");
+    }
+
+    [Theory]
+    [InlineData(float.NaN)]
+    [InlineData(float.PositiveInfinity)]
+    [InlineData(float.NegativeInfinity)]
+    public void Nonfinite_float_public_parameter_operands_are_rejected(float operand)
+    {
+        var edit = ResolveSameTypedOperand(operand);
+
+        var act = () => edit.Evaluate();
+
+        act.Should().Throw<InvalidOperationException>().WithMessage("Cannot compare NaN or Infinity values.");
+    }
+
+    [Theory]
+    [InlineData(1.25d)]
+    [InlineData(1.25f)]
+    public void Finite_public_parameter_operands_compare_normally(object operand)
+    {
+        var edit = ResolveSameTypedOperand(operand);
+
+        edit.Evaluate();
+
+        edit.CurrentState.Should().BeTrue();
+    }
+
+    private static Edit_t<IParameter> ResolveSameTypedOperand(object operand)
+    {
+        var strategy = new Strategy_t();
+        var parameter = Substitute.For<IParameter>();
+        parameter.Name.Returns("P");
+        parameter.GetCurrentValue().Returns(operand);
+        strategy.Parameters.Add(parameter);
+        var edit = new Edit_t<IParameter>
+        {
+            Field = "P",
+            Operator = Operator_t.Equal,
+            Field2 = "P",
+        };
+        ((IResolvable<Strategy_t, IParameter>)edit).Resolve(strategy, strategy.Parameters);
+        return edit;
+    }
 }
