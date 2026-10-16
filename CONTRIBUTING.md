@@ -35,7 +35,7 @@ dotnet dotnet-coverage collect -f cobertura -o coverage.cobertura.xml "dotnet te
 ```
 
 ```powershell
-./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl -MinimumLineRate 70
+./scripts/assert-coverage-floor.ps1 -ReportPath coverage.cobertura.xml -Package FixPortal.FixAtdl -MinimumLineRate 85
 ```
 
 ```powershell
@@ -44,7 +44,7 @@ dotnet dotnet-coverage collect -f cobertura -o coverage.cobertura.xml "dotnet te
 
 CI runs `dotnet csharpier check .`, which validates formatting without
 rewriting files — run `dotnet csharpier format .` before pushing. It also
-collects coverage and enforces a 70% line floor on `FixPortal.FixAtdl` and an
+collects coverage and enforces an 85% line floor on `FixPortal.FixAtdl` and an
 82% line floor on `FixPortal.FixAtdl.Contracts`. The floor script needs
 PowerShell 7.
 

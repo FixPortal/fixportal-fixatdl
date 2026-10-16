@@ -30,7 +30,7 @@ updated as the suite grows; CI runs the full suite on every pull request.
 The pass started from 731 passing tests. The September
 2026 pass ends with **1261 passing tests**, no failures or skips. CSharpier checks
 219 files. The coverage command below reports **76.1% library line coverage**,
-above the existing 70% floor. WPF's corresponding local integration run has
+above the 70% floor enforced for that pass. WPF's corresponding local integration run has
 165 passing tests against the updated core package.
 
 ```sh
@@ -39,8 +39,8 @@ dotnet csharpier check .
 dotnet dotnet-coverage collect -f cobertura -o coverage.cobertura.xml "dotnet test --solution FixPortal.FixAtdl.slnx -c Release --report-xunit-trx --timeout 5m"
 ```
 
-Run `scripts/assert-coverage-floor.ps1` with `-ReportPath coverage.cobertura.xml
--Package FixPortal.FixAtdl -MinimumLineRate 70` to check the library floor.
+For current coverage, run `scripts/assert-coverage-floor.ps1` with `-ReportPath coverage.cobertura.xml
+-Package FixPortal.FixAtdl -MinimumLineRate 85` to check the library floor.
 Release history, including the untagged 1.0.2–1.0.4 integration candidates,
 is recorded in the changelog.
 
