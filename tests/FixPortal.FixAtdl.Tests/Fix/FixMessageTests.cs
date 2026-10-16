@@ -8,6 +8,13 @@ namespace FixPortal.FixAtdl.Tests.Fix;
 
 public class FixMessageTests
 {
+    private static IInitialFixValueProvider InitialValues(FixTagValuesCollection fixValues)
+    {
+        var provider = Substitute.For<IInitialFixValueProvider>();
+        provider.InputFixValues.Returns(fixValues);
+        return provider;
+    }
+
     private static string Soh => FixMessage.SOH.ToString();
     private static char Sep => FixMessage.Separator;
 
@@ -229,8 +236,7 @@ public class FixMessageTests
         FixTagValuesCollection fixValues = [];
         fixValues.Add(35, "D");
 
-        var initialProvider = Substitute.For<IInitialFixValueProvider>();
-        initialProvider.InputFixValues.Returns(fixValues);
+        var initialProvider = InitialValues(fixValues);
 
         var provider = new FixFieldValueProvider(initialProvider, null);
 
@@ -243,8 +249,7 @@ public class FixMessageTests
     {
         FixTagValuesCollection fixValues = [];
         // tag 35 not present
-        var initialProvider = Substitute.For<IInitialFixValueProvider>();
-        initialProvider.InputFixValues.Returns(fixValues);
+        var initialProvider = InitialValues(fixValues);
 
         var provider = new FixFieldValueProvider(initialProvider, null);
 
@@ -257,8 +262,7 @@ public class FixMessageTests
         FixTagValuesCollection fixValues = [];
         fixValues.Add(35, "D");
 
-        var initialProvider = Substitute.For<IInitialFixValueProvider>();
-        initialProvider.InputFixValues.Returns(fixValues);
+        var initialProvider = InitialValues(fixValues);
 
         // null ParameterCollection → falls through without enum lookup
         var provider = new FixFieldValueProvider(initialProvider, null);
@@ -273,8 +277,7 @@ public class FixMessageTests
         FixTagValuesCollection fixValues = [];
         fixValues.Add(35, "D");
 
-        var initialProvider = Substitute.For<IInitialFixValueProvider>();
-        initialProvider.InputFixValues.Returns(fixValues);
+        var initialProvider = InitialValues(fixValues);
 
         // Build a minimal ParameterCollection with a plain String_t parameter (no enum pairs)
         ParameterCollection parameters = [new Parameter_t<String_t>("MsgType") { FixTag = 35 }];
@@ -291,8 +294,7 @@ public class FixMessageTests
         FixTagValuesCollection fixValues = [];
         fixValues.Add(35, "D");
 
-        var initialProvider = Substitute.For<IInitialFixValueProvider>();
-        initialProvider.InputFixValues.Returns(fixValues);
+        var initialProvider = InitialValues(fixValues);
 
         var provider = new FixFieldValueProvider(initialProvider, null);
 
@@ -370,8 +372,7 @@ public class FixMessageTests
         FixTagValuesCollection fixValues = [];
         fixValues.Add(636, wireValue);
 
-        var initialProvider = Substitute.For<IInitialFixValueProvider>();
-        initialProvider.InputFixValues.Returns(fixValues);
+        var initialProvider = InitialValues(fixValues);
 
         var booleanParameter = new Parameter_t<Boolean_t>("Flag");
         booleanParameter.Value.TrueWireValue = "1";
@@ -391,8 +392,7 @@ public class FixMessageTests
         FixTagValuesCollection fixValues = [];
         fixValues.Add(636, "X");
 
-        var initialProvider = Substitute.For<IInitialFixValueProvider>();
-        initialProvider.InputFixValues.Returns(fixValues);
+        var initialProvider = InitialValues(fixValues);
 
         var booleanParameter = new Parameter_t<Boolean_t>("Flag");
         booleanParameter.Value.TrueWireValue = "1";
@@ -429,8 +429,7 @@ public class FixMessageTests
         FixTagValuesCollection fixValues = [];
         fixValues.Add(849, wireValue);
 
-        var initialProvider = Substitute.For<IInitialFixValueProvider>();
-        initialProvider.InputFixValues.Returns(fixValues);
+        var initialProvider = InitialValues(fixValues);
 
         ParameterCollection parameters = [new Parameter_t<Percentage_t>("Pct")];
 
@@ -449,8 +448,7 @@ public class FixMessageTests
         FixTagValuesCollection fixValues = [];
         fixValues.Add(849, wireValue);
 
-        var initialProvider = Substitute.For<IInitialFixValueProvider>();
-        initialProvider.InputFixValues.Returns(fixValues);
+        var initialProvider = InitialValues(fixValues);
 
         ParameterCollection parameters = [new Parameter_t<Percentage_t>("Pct")];
 
