@@ -84,6 +84,9 @@ jobs:
         shell: bash
         run: ./scripts/test/verify-release-eligibility.sh
 
+      - name: Verify tag-stamped release packages
+        run: python3 scripts/test/verify-release-package.py
+
       - name: Coverage floor
         shell: pwsh
         run: |
@@ -118,6 +121,9 @@ jobs:
         env:
           GATE_EXEMPT: ''
         run: python3 .github/scripts/assert_gate_coverage.py .github/workflows/ci.yml
+
+      - name: Verify release-package gate wiring
+        run: python3 scripts/test/verify-release-package.py --check-wiring
 
       - name: Assert canonical asset copies match the committed manifest
         run: python3 .github/scripts/assert_canonical_assets.py

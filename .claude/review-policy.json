@@ -67,6 +67,8 @@
     "scripts/test/verify-coverage-floor.ps1",
     "scripts/assert-release-eligibility.sh",
     "scripts/test/verify-release-eligibility.sh",
+    "scripts/test/verify-release-package.py",
+    "scripts/test/ReleasePackageProbe/Program.cs",
     ".github/workflows/ci.yml",
     ".github/workflows/release.yml",
     ".claude/review-policy.json",
