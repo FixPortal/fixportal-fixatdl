@@ -7,3 +7,5 @@ The verifier reads and executes the actual release workflow Restore, Build (Rele
 The package probe checks both actual package filenames, nuspec versions and the Contracts dependency, packaged assembly versions, and byte-for-byte declared README/LICENSE assets plus Core NOTICE. Thus stamping the nuspec while retaining an old compiled DLL also fails. No generated golden files are involved.
 
 Required build-and-test runs this verifier. The independent required gate-coverage job checks that invocation and both protected HIGH paths via `--check-wiring`.
+
+Both jobs must remain unconditional without job-level execution overrides. Qualification independently added `if: false` to each real job: the earlier wiring check accepted those bypasses, and the corrected check refuses both while accepting the real workflow.

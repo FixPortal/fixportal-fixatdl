@@ -51,6 +51,9 @@ def step(block, name):
 
 def check_wiring(root):
     ci = (root / ".github/workflows/ci.yml").read_text()
+    for name in ("build-and-test", "gate-coverage"):
+        if re.search(r"(?m)^    (?:if|continue-on-error|defaults|env):", job(ci, name)):
+            raise ValueError(f"{name}: package verification job must be unconditional without execution overrides")
     command, _ = step(job(ci, "build-and-test"), "Verify tag-stamped release packages")
     if command != "python3 scripts/test/verify-release-package.py":
         raise ValueError("Required build-and-test job must execute the real package verifier")
