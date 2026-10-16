@@ -122,6 +122,9 @@ jobs:
           GATE_EXEMPT: ''
         run: python3 .github/scripts/assert_gate_coverage.py .github/workflows/ci.yml
 
+      - name: Test actual release idempotency and workflow coupling
+        run: python3 scripts/test/verify-release-flow.py
+
       - name: Verify release-package gate wiring
         run: python3 scripts/test/verify-release-package.py --check-wiring
 
