@@ -67,8 +67,8 @@ jobs:
       # Measured on CI run 37605237315 at 36bfd6c: FixPortal.FixAtdl 87.056% line and
       # FixPortal.FixAtdl.Contracts 78.926% line. Measured again on this branch, 1,580
       # tests: FixPortal.FixAtdl 87.198% line and FixPortal.FixAtdl.Contracts 85.450% line.
-      # Contracts retains its earlier floor calibration. Core now uses 85%, below
-      # the 87.6478% measured at PR221's merge (CI run 38973946713).
+      # The Core floor is 85%, below the 87.6478% measured at PR221's merge (CI run
+      # 38973946713). The Contracts floor is 82%.
       # The floor script decides whether a PR can merge, so its own failure paths are
       # tested. It is a step in this job rather than a job of its own: a new job would
       # have to be wired into ci-gate's needs: for no benefit.
