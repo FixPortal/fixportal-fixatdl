@@ -56,6 +56,7 @@
   "version": 1,
 
   "high": [
+    "scripts/test/verify-release-flow.py",
     ".github/scripts/Test-PowerShellTestSafety.ps1",
     ".github/scripts/Find-PesterSuites.ps1",
     ".github/canonical-assets.json",
