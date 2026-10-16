@@ -181,12 +181,24 @@ public class AdditionalConformanceTests
             Encoding.UTF8.GetBytes(FixtureFiles.ReadAllText("Fixtures/Conformance/editref-staterule.xml"))
         );
 
-        var strategy = new StrategiesReader().Load(stream).Strategies[0];
+        var strategies = new StrategiesReader().Load(stream);
+        var strategy = strategies.Strategies[0];
 
         strategy.Controls.LoadDefaults(FixFieldValueProvider.Empty);
         var control = strategy.Controls["c_Duration"];
         control.SetValue("0");
         var rule = control.StateRules[0];
+        rule.Evaluate();
+        rule.CurrentState.Should().BeTrue();
+
+        strategies.ResolveAll();
+        rule.Sources.Should().Equal("c_Duration");
+        control.SetValue("1");
+        Action evaluateAfterSecondResolve = rule.Evaluate;
+        evaluateAfterSecondResolve.Should().NotThrow("the newly resolved edit must retain its control binding");
+        rule.CurrentState.Should().BeFalse();
+
+        control.SetValue("0");
         rule.Evaluate();
         rule.CurrentState.Should().BeTrue();
     }
