@@ -36,7 +36,7 @@ def require(condition, message):
         raise ValueError(message)
 
 def active(value):
-    require(not any(key in value for key in ("if", "continue-on-error", "defaults", "working-directory", "needs")), "Execution must be unconditional and fail closed")
+    require(not any(key in value for key in ("if", "continue-on-error", "defaults", "working-directory", "needs", "background")), "Execution must be unconditional and fail closed")
     require(value.get("shell", "bash") == "bash", "Unsupported shell")
 
 def step(job, name):
@@ -71,6 +71,15 @@ def contract(release, ci, high):
     positions = [job["steps"].index(step(job, name)) for name in ("Assert the tagged commit is reviewed and reachable from main", "Restore", "Build (Release)", "Test (Release)", "Pack", "Push to GitHub Packages", "Push to NuGet.org", "Create GitHub Release")]
     require(positions == sorted(positions), "Eligibility/build/pack/publication/release order changed")
     require(all(not s.get("run") for s in job["steps"][:positions[0]]), "Eligibility must precede other executable commands")
+    before = job["steps"][:positions[0]]
+    approved = [
+        ("actions/checkout@", {"persist-credentials": "false"}),
+        ("raven-actions/actionlint@", {"shellcheck": "true"}),
+    ]
+    require(len(before) == len(approved), "Only checkout and workflow lint may precede eligibility")
+    for prior, (prefix, settings) in zip(before, approved):
+        active(prior)
+        require(set(prior) <= {"name", "uses", "with"} and prior.get("uses", "").startswith(prefix) and prior.get("with") == settings, "Unapproved action or inputs before eligibility")
     require(step(job, "Pack").get("run", "").count("dotnet pack ") == 2, "Both packages must precede release")
     jobs = ci["jobs"]
     gate = jobs["gate-coverage"]
@@ -133,6 +142,8 @@ class ReleaseFlowTests(unittest.TestCase):
             "early successful exit": lambda r, c: guard(r).update(run=guard(r)["run"].replace("git fetch --no-tags origin main", "git fetch --no-tags origin main\nexit 0")),
             "ignored guard": lambda r, c: guard(r).update({"continue-on-error": "true"}),
             "conditional guard": lambda r, c: guard(r).update({"if": "false"}),
+            "background guard": lambda r, c: guard(r).update({"background": "true"}),
+            "unapproved action before guard": lambda r, c: r["jobs"]["pack-and-release"]["steps"].insert(2, {"uses": "unapproved/action@v1"}),
             "after restore": lambda r, c: r["jobs"]["pack-and-release"]["steps"].append(r["jobs"]["pack-and-release"]["steps"].pop(r["jobs"]["pack-and-release"]["steps"].index(guard(r)))),
             "wrong release tag env": lambda r, c: action(r)["env"].update(RELEASE_TAG="${{ github.sha }}"),
             "wrong token env": lambda r, c: action(r)["env"].update(GITHUB_TOKEN="${{ secrets.UNRELATED }}"),
