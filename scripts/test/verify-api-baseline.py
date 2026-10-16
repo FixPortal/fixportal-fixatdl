@@ -6,8 +6,8 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 PACKAGES = {
-    "FixPortal.FixAtdl": "C5E0BF36EE3A2D3048E0401D85E1049AF480A096C9A64F8DE5ED60B65D153743",
-    "FixPortal.FixAtdl.Contracts": "AD13CD8ADEDF2B440C65CAEB9875BEAC25314EFF7AC9155D471987A992B85053",
+    "FixPortal.FixAtdl": "3DDA14D38CA75C7BD7C35EEA63B79EE4E8088DDE953E834E2F2343B925A980B1",
+    "FixPortal.FixAtdl.Contracts": "C5FB054FF39FF5789DB246A66956BCD0F5CB780C5A64FC61E028BAA998CB1814",
 }
 CONDITION = "'$(PackageId)' == 'FixPortal.FixAtdl' or '$(PackageId)' == 'FixPortal.FixAtdl.Contracts'"
 VALIDATION = "'$(EnablePackageValidation)' != 'true' or '$(RunApiCompat)' != 'true' or '$(DisablePackageBaselineValidation)' == 'true' or '$(PackageValidationBaselineVersion)' != '$(_ReleasedBaselineVersion)'"
