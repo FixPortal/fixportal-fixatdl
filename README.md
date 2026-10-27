@@ -57,7 +57,18 @@ dotnet add package FixPortal.FixAtdl
 
 ## Quick start
 
+Requires the .NET 10 SDK (`net10.0` is the only target; CI builds with `10.0.x`).
+`global.json` pins no SDK version, only the test runner (`Microsoft.Testing.Platform`).
+
+The snippet needs no logger: `StrategiesReader` takes an optional `ILoggerFactory`
+and defaults to `NullLoggerFactory`. To pass one, add
+`using Microsoft.Extensions.Logging;` and `new StrategiesReader(loggerFactory: factory)`.
+The repo enables `ImplicitUsings` (`Directory.Build.props`); the first two usings
+below are what that provides, so keep them if your project has it switched off.
+
 ```csharp
+using System;
+using System.IO;
 using FixPortal.FixAtdl.Xml;
 
 var reader = new StrategiesReader();
