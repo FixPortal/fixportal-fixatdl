@@ -15,6 +15,11 @@ retired with the pre-release history.
 
 ## [Unreleased]
 
+### Fixed
+
+- The package README Quick start now lists the `System` and `System.IO` usings it needs, says
+  that no logger is required (and how to pass one), and names the .NET 10 SDK requirement.
+
 ## [1.4.0] — 2026-10-07
 
 ### Fixed
