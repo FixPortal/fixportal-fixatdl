@@ -180,7 +180,7 @@ version. Adapter versions that consume this package:
 | `FixPortal.FixAtdl` | 1.4.0 | In-tree version matches the release |
 | `FixPortal.FixAtdl.Contracts` | 1.4.0 | Released with core, same version |
 | `FixPortal.FixAtdl.Wpf` / `.Wpf.Core` | 1.0.7 | Pins core 1.2.0 |
-| `@fix-portal/fixatdl-react` | 0.4.0 | Takes the JSON `FixPortal.FixAtdl.Contracts` produces |
+| `@fix-portal/fixatdl-react` | 0.4.1 | Takes the JSON `FixPortal.FixAtdl.Contracts` produces |
 
 The public surface is governed by
 [semantic versioning](https://semver.org/spec/v2.0.0.html) and recorded in the

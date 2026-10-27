@@ -63,7 +63,7 @@ Unknown types fall back to String (14).
 | `ValidationResult` | `IsValid`, `IsMissing`, `ErrorText` on the control-update path. |
 | `EditEvaluator<T>` / `Edit_t` | AND/OR/XOR/NOT grammar shared by state rules and strategy edits. XOR is exactly-one. |
 
-Decimal wire parsing uses `Atdl.FixDecimalStyles` (no thousands separator).
+Decimal wire parsing uses an internal `NumberStyles` constant, `Atdl.FixDecimalStyles` (no thousands separator); it is not part of the public API.
 `Atdl.NullValue` is the `{NULL}` token state rules use to clear a control.
 
 ## Exceptions

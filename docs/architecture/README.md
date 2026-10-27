@@ -113,7 +113,7 @@ Verified against the graph (degree from graphify, role confirmed via
   cross-reference resolution in `ResolveAll()`.
 - **`ReadOnlyControlCollection`** (degree 23) — the runtime coordinator for a
   strategy's controls (implements 3 interfaces, 18 methods).
-- **`Edit_t`** (degree 20, 568 lines) — dual-purpose: a parsed data record *and*
+- **`Edit_t`** (degree 20, 808 lines) — dual-purpose: a parsed data record *and*
   a runtime rule evaluator. The validation layer's core. AND/OR/XOR/NOT grammar
   lives in `EditEvaluatingCollection`, shared by both `StateRule_t` (UI state) and
   `StrategyEdit_t` (business rules).
