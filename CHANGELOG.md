@@ -19,6 +19,9 @@ retired with the pre-release history.
 
 - The package README Quick start now lists the `System` and `System.IO` usings it needs, says
   that no logger is required (and how to pass one), and names the .NET 10 SDK requirement.
+- The `FixTag` XML documentation on `IParameter` and `Parameter_t<T>` no longer says the
+  `StrategyParameterGrp` element is unsupported; it now points to `StrategyParametersGrpEmitter`,
+  which emits the repeating group.
 
 ## [1.4.0] — 2026-10-07
 
