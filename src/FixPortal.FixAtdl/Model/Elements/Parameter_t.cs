@@ -93,7 +93,7 @@ public class Parameter_t<T> : IParameter
     /// parameter. Required when parameter value is intended to be transported over the wire.  If fixTag is not
     /// provided then the Strategies-level attribute, tag957Support, must be set to true, indicating that the
     /// order recipient expects to receive algo parameters in the StrategyParameterGrp repeating group beginning
-    /// at tag 957.  <b>NB Atdl4net does not currently support usage of the StrategyParameterGrp element.</b></summary>
+    /// at tag 957.  <see cref="FixPortal.FixAtdl.Fix.StrategyParametersGrpEmitter"/> emits that repeating group.</summary>
     /// <value>The FIX tag to use.</value>
     public FixTag? FixTag { get; set; }
 
