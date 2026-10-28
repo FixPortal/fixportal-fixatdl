@@ -57,7 +57,7 @@ was replaced merely to agree with a browser implementation.
 - The core model does not schedule UI effects. WPF and React own state transitions,
   convergence errors, and radio selection exclusion. This extends to conflict
   resolution: `StateRuleCollection` is an ordered, unmerged list per control, and
-  `Evaluate()` only computes each rule's own boolean state - core does not decide
+  `EvaluateAll()` only computes each rule's own boolean state (via `StateRule_t.Evaluate()`) - core does not decide
   what a control's actual `Enabled`/`Visible` should be when two of its own
   StateRules assert opposing effects simultaneously. Precedence for that case
   (first-wins, last-wins, or otherwise) is left entirely to the adapter and is
