@@ -46,15 +46,15 @@ Two facts make this design what it is:
 
 ## Layers
 
-The understand-anything pass assigned every file-level node to one of 9 layers.
-The counts are that pass's record and drift as files are added — `Fix/`,
-`Utility/` and `Configuration/` were re-counted against the tree in September
-2026; the three `Model/` rows and `XML Ingestion` are still the graph's figures:
+The understand-anything pass assigned every file-level node to one of 8 layers.
+The counts are that pass's record and drift as files are added — `Fix/` and
+`Utility/` were re-counted against the tree in September 2026; the three
+`Model/` rows and `XML Ingestion` are still the graph's figures:
 
 ![The six pipeline layers in dependency order, from XML ingestion down to FIX emission, each with its file count](../images/layers.png)
 
 The diagram is the scan view of the six pipeline layers; the table below is the
-reference, and adds the three cross-cutting layers the stack omits.
+reference, and adds the two cross-cutting layers the stack omits.
 
 | Layer | Files | What lives here |
 |---|---:|---|

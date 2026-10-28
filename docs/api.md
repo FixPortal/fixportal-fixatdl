@@ -13,8 +13,8 @@ in a minor release.
 | Type | Namespace | What it is |
 |---|---|---|
 | `StrategiesReader` | `FixPortal.FixAtdl.Xml` | Entry point. `Load(Stream)` / `Load(string path)` deserialize, `ResolveAll`, and inject the reader clock into every `Clock_t`. Concurrent `Load` on one instance is supported. XXE-hardened (`DtdProcessing.Prohibit`, `XmlResolver = null`). |
-| `StrategyLoaded` | same | Fires per strategy after deserialization and **before** cross-reference resolution. Treat as "parsed", not "valid". |
-| `CustomParameterType` | `FixPortal.FixAtdl.Xml.Serialization` | Host registration for a vendor `Parameter` `xsi:type`. Checked at reader construction. |
+| `StrategiesReader.StrategyLoaded` event (`StrategyLoadedEventArgs`) | same | Fires per strategy after deserialization and **before** cross-reference resolution. Treat as "parsed", not "valid". |
+| `CustomParameterType` | `FixPortal.FixAtdl.Xml.Serialization` | Host registration for a vendor `Parameter` `xsi:type`. Checked when the `CustomParameterType` is constructed; the reader additionally rejects duplicate `xsi:type` names. |
 
 Constructor arguments on `StrategiesReader` are all optional: `ILoggerFactory`,
 NodaTime `IClock`, `XmlSchemaSet`, `IReadOnlyList<CustomParameterType>`.
