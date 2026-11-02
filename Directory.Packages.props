@@ -13,7 +13,7 @@
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="NSubstitute" Version="6.2.0" />
     <PackageVersion Include="NodaTime.Testing" Version="3.3.7" />
-    <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.4" />
+    <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.5" />
   </ItemGroup>
   <!-- House style/analyzer version, applied by Directory.Build.props. The package carries the global AnalyzerConfig (all rule
        severities), sets EnforceCodeStyleInBuild, and bundles SonarAnalyzer.CSharp — do not
