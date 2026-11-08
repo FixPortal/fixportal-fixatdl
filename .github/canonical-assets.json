@@ -2,8 +2,8 @@
   "schema": 1,
   "canonical": {
     "repository": "FixPortal/fixportal-agents-skills",
-    "commit": "d7366e65b0b6d93062383595b65718d3e7a41f3f",
-    "syncedAt": "2026-11-03"
+    "commit": "e3f76d85cb1ad93a539a5e675bbfa5406155e104",
+    "syncedAt": "2026-11-08"
   },
   "assets": [
     {
@@ -162,17 +162,17 @@
     },
     {
       "path": ".github/scripts/Find-PesterSuites.ps1",
-      "sha256": "430b4b729ce2d6f36f30ea9867e2e05fae5e49f705db5ce2e167217173d17055",
+      "sha256": "17463c0276a020a9b5d2d0363474537fa25520bf182431593dd0f44879874052",
       "verbatim": true,
-      "commit": "6804782d03980fa8bb153cc0c7545219f279f605",
-      "syncedAt": "2026-11-02"
+      "commit": "e3f76d85cb1ad93a539a5e675bbfa5406155e104",
+      "syncedAt": "2026-11-08"
     },
     {
       "path": ".github/scripts/Test-PowerShellTestSafety.ps1",
-      "sha256": "14ecc9411c6d2bff9ac6f5ae5ca6dc76ac9aaae76e2aa51401c6ef2e96f837e1",
+      "sha256": "0230c49f32bedbbf862de58754e3f548c096bb15d2e0933bd580e9e1e788f7e2",
       "verbatim": true,
-      "commit": "abf6496fcdc9a3fe967c4ed4415270f0478faa58",
-      "syncedAt": "2026-10-15"
+      "commit": "e3f76d85cb1ad93a539a5e675bbfa5406155e104",
+      "syncedAt": "2026-11-08"
     },
     {
       "path": ".github/workflows/ai-smells.yml",
