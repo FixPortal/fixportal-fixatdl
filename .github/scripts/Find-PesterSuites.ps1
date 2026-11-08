@@ -8,12 +8,12 @@
     lane" in SKILL.md. The flags lower the chance of a mistake going unnoticed; they are not isolation and say nothing about
     a suite that builds its commands dynamically (that is itself flagged as 'dynamic-code').
 
-    Dot-source for the functions, or run with -Repository to list suites.
+    Dot-source for the functions, or run with -Repository to list suites. There is no top-level param() block: dot-sourcing
+    would bind it in the caller's scope and overwrite the caller's own $Repository and $IncludeVerifyScripts.
 
     Flags: recursive-delete, automatic-variable-assignment, environment-write, junction-or-symlink, dynamic-code (all destructive),
     and profile-reference (informational).
 #>
-param([string] $Repository, [switch] $IncludeVerifyScripts)
 
 # Read-only or meaning-bearing automatic variables. Benign, routinely assigned ones ($null discard, $global:LASTEXITCODE in mocks,
 # $Args, $Input, $Error, $Matches, $Event) are deliberately not listed: flagging them buries the real signal.
@@ -157,6 +157,8 @@ function Get-PesterRisk {
         }
         if ($member -eq 'SetEnvironmentVariable') { [void]$flags.Add('environment-write') }
         if ($member -eq 'Create' -and $ast.Static -and $ast.Expression.Extent.Text -match '(?i)^\[(System\.Management\.Automation\.)?ScriptBlock\]$') { [void]$flags.Add('dynamic-code') }
+        # $ExecutionContext.InvokeCommand runs or expands text as code. Matched by member name alone, so an alias of the object is caught too.
+        if ($member -in 'InvokeScript', 'ExpandString') { [void]$flags.Add('dynamic-code') }
         if ($member -in 'CreateSymbolicLink', 'CreateHardLink', 'CreateSymbolicLinkA', 'CreateSymbolicLinkW') { [void]$flags.Add('junction-or-symlink') }
     }
     return @($flags | Sort-Object)
@@ -265,7 +267,8 @@ function Find-PesterSuites {
         }
         foreach ($file in $files) {
             $kind = if ($file -match '\.Tests?\.ps1$') { 'Pester' } elseif ($IncludeVerifyScripts -and $file -match '[\\/]verify-[^\\/]*\.ps1$') { 'VerifyScript' } else { continue }
-            $flags = Get-FileRisk -Path $file -WorkingDirectory $root
+            # @() keeps Flags an array: a function's output unrolls to $null or a lone string otherwise.
+            $flags = @(Get-FileRisk -Path $file -WorkingDirectory $root)
             $destructive = @($flags | Where-Object { $_ -in 'recursive-delete', 'automatic-variable-assignment', 'environment-write', 'junction-or-symlink', 'dynamic-code', 'parse-error' }).Count -gt 0
             [pscustomobject]@{ Path = $file; RelativePath = $file.Substring($root.Length + 1); Kind = $kind; Flags = $flags; Destructive = $destructive }
         }
@@ -277,4 +280,4 @@ function Find-PesterSuites {
     }
 }
 
-if ($Repository) { Find-PesterSuites -Repository $Repository -IncludeVerifyScripts:$IncludeVerifyScripts }
+if ($MyInvocation.InvocationName -ne '.' -and $args.Count) { Find-PesterSuites @args }
