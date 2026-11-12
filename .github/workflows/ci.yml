@@ -38,10 +38,9 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: ./.github/scripts/Test-PowerShellTestSafety.ps1
 
+      # No dotnet-version: setup-dotnet installs from global.json, the single SDK pin.
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: '10.0.x'
 
       - name: Restore local tools
         run: dotnet tool restore
