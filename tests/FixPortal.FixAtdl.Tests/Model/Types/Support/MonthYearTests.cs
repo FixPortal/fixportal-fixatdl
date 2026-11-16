@@ -102,9 +102,7 @@ public class MonthYearTests
         var week1 = MonthYear.Parse("202601w1");
 
         // Exact equality stays suffix-sensitive...
-        (day7 == week1)
-            .Should()
-            .BeFalse();
+        (day7 == week1).Should().BeFalse();
 
         // ...but ordering is total (consumed by MonthYear_t.ValidateValue Min/Max checks) and
         // must not throw on mixed suffixes; a day-qualified value sorts after a week-qualified

@@ -156,9 +156,7 @@ public class TenorTests
         var m1 = Tenor.Parse("M1"); // ~30 days
 
         // Exact equality is still unit-sensitive (different unit/offset => not equal)...
-        (d40 == m1)
-            .Should()
-            .BeFalse();
+        (d40 == m1).Should().BeFalse();
         // ...but ordering is total and compares by approximate calendar-day magnitude.
         Action act1 = () =>
         {

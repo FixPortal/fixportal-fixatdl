@@ -102,18 +102,15 @@ public static class ValueConverter
                 // Explicit styles: thousands separators and exponent notation are both outside the
                 // XML Schema decimal lexical grammar and must fail. Leading and trailing whitespace
                 // stay legal per the XSD whitespace-collapse facet. Tightened on review after R21.
-                return ParseOrThrow(
-                    value,
-                    targetType,
-                    v =>
-                        decimal.Parse(
-                            v,
-                            NumberStyles.AllowLeadingWhite
-                                | NumberStyles.AllowTrailingWhite
-                                | NumberStyles.AllowLeadingSign
-                                | NumberStyles.AllowDecimalPoint,
-                            CultureInfo.InvariantCulture
-                        )
+                return ParseOrThrow(value, targetType, v =>
+                    decimal.Parse(
+                        v,
+                        NumberStyles.AllowLeadingWhite
+                            | NumberStyles.AllowTrailingWhite
+                            | NumberStyles.AllowLeadingSign
+                            | NumberStyles.AllowDecimalPoint,
+                        CultureInfo.InvariantCulture
+                    )
                 );
 
             case "System.DateTime":
@@ -129,18 +126,14 @@ public static class ValueConverter
                 return result;
 
             case "FixPortal.FixAtdl.Fix.FixTag":
-                return ParseOrThrow(
-                    value,
-                    targetType,
-                    v => new FixTag(Convert.ToInt32(v, CultureInfo.InvariantCulture))
-                );
+                return ParseOrThrow(value, targetType, v => new FixTag(
+                    Convert.ToInt32(v, CultureInfo.InvariantCulture)
+                ));
 
             case "FixPortal.FixAtdl.Fix.NumInGroup":
-                return ParseOrThrow(
-                    value,
-                    targetType,
-                    v => new NumInGroup(Convert.ToInt32(v, CultureInfo.InvariantCulture))
-                );
+                return ParseOrThrow(value, targetType, v => new NumInGroup(
+                    Convert.ToInt32(v, CultureInfo.InvariantCulture)
+                ));
 
             case "FixPortal.FixAtdl.Model.Types.Support.MonthYear":
                 return ParseOrThrow(value, targetType, v => MonthYear.Parse(v));

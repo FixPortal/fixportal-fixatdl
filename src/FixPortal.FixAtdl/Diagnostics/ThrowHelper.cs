@@ -313,8 +313,7 @@ public static class ThrowHelper
             return CreateWithArguments([message, paramName]);
         }
 
-        ConstructorInfo defaultConstructor =
-            classType.GetConstructor([typeof(string)])
+        ConstructorInfo defaultConstructor = classType.GetConstructor([typeof(string)])
             ?? throw new InternalErrorException(
                 $"Exception type '{classType.FullName}' has no (string) constructor required by ThrowHelper. Message: {message}"
             );
@@ -326,8 +325,7 @@ public static class ThrowHelper
 
         T CreateWithArguments(object?[] arguments)
         {
-            ConstructorInfo constructor =
-                classType.GetConstructor([typeof(string), typeof(string)])
+            ConstructorInfo constructor = classType.GetConstructor([typeof(string), typeof(string)])
                 ?? throw new InternalErrorException(
                     $"Exception type '{classType.FullName}' has no (string, string) constructor required by ThrowHelper. Message: {message}"
                 );
@@ -344,8 +342,7 @@ public static class ThrowHelper
     {
         Type classType = typeof(T);
 
-        ConstructorInfo classConstructor =
-            classType.GetConstructor([typeof(string), typeof(Exception)])
+        ConstructorInfo classConstructor = classType.GetConstructor([typeof(string), typeof(Exception)])
             ?? throw new InternalErrorException(
                 $"Exception type '{classType.FullName}' has no (string, Exception) constructor required by ThrowHelper. Message: {message}"
             );

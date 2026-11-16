@@ -79,13 +79,8 @@ public sealed class StateRuleAstBuilder
             );
         }
 
-        return BuildCore(
-            edit.Operator,
-            edit.LogicOperator,
-            edit.Field,
-            edit.Field2,
-            edit.Value,
-            () => BuildChildren(edit.Edits, depth + 1)
+        return BuildCore(edit.Operator, edit.LogicOperator, edit.Field, edit.Field2, edit.Value, () =>
+            BuildChildren(edit.Edits, depth + 1)
         );
     }
 
@@ -161,13 +156,8 @@ public sealed class StateRuleAstBuilder
             );
         }
 
-        return BuildCore(
-            edit.Operator,
-            edit.LogicOperator,
-            edit.Field,
-            edit.Field2,
-            edit.Value,
-            () => BuildBoundChildren(edit.Edits, depth + 1)
+        return BuildCore(edit.Operator, edit.LogicOperator, edit.Field, edit.Field2, edit.Value, () =>
+            BuildBoundChildren(edit.Edits, depth + 1)
         );
     }
 
