@@ -59,8 +59,7 @@ public class UTCTimestamp_t : UTCDateTimeTypeBase
             return base.GetTimeOfDayForBounds(utcValue);
         }
 
-        DateTimeZone zone =
-            DateTimeZoneProviders.Tzdb.GetZoneOrNull(LocalMktTz)
+        DateTimeZone zone = DateTimeZoneProviders.Tzdb.GetZoneOrNull(LocalMktTz)
             ?? throw ThrowHelper.New<InvalidFieldValueException>(this, "Unrecognised localMktTz '{0}'.", LocalMktTz);
         // Use the order timestamp's date, so daily market bounds follow its DST offset.
         return TimeOnly.FromDateTime(Instant.FromDateTimeUtc(utcValue).InZone(zone).ToDateTimeUnspecified());

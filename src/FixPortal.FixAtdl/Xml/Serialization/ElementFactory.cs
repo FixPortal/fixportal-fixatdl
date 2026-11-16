@@ -671,8 +671,7 @@ public class ElementFactory : INotifyClassDeserialized
             );
         }
 
-        PropertyInfo outerProperty =
-            targetType.GetProperty(names[0])
+        PropertyInfo outerProperty = targetType.GetProperty(names[0])
             ?? throw ThrowHelper.New<InternalErrorException>(
                 this,
                 InternalErrors.PropertyNotFoundOnObjectInternal,
@@ -692,8 +691,7 @@ public class ElementFactory : INotifyClassDeserialized
             );
         }
 
-        PropertyInfo property =
-            outerProperty.PropertyType.GetProperty(names[1])
+        PropertyInfo property = outerProperty.PropertyType.GetProperty(names[1])
             ?? throw ThrowHelper.New<InvalidPropertyOnObjectException>(
                 this,
                 ErrorMessages.PropertyNotFoundOnObject,
@@ -706,8 +704,7 @@ public class ElementFactory : INotifyClassDeserialized
 
     private void SetDirectPropertyValue(Type targetType, ElementAttribute attrDefn, object target, object value)
     {
-        PropertyInfo property =
-            targetType.GetProperty(attrDefn.Property)
+        PropertyInfo property = targetType.GetProperty(attrDefn.Property)
             ?? throw ThrowHelper.New<InvalidPropertyOnObjectException>(
                 this,
                 ErrorMessages.PropertyNotFoundOnObject,
@@ -803,8 +800,7 @@ public class ElementFactory : INotifyClassDeserialized
             _ => CreateObject(targetDefinition, childElement, target),
         };
 
-        PropertyInfo property =
-            targetType.GetProperty(childDefinition.ContainerProperty)
+        PropertyInfo property = targetType.GetProperty(childDefinition.ContainerProperty)
             ?? throw ThrowHelper.New<InternalErrorException>(
                 this,
                 InternalErrors.PropertyNotFoundOnObjectInternal,
@@ -891,8 +887,7 @@ public class ElementFactory : INotifyClassDeserialized
             );
         }
 
-        MethodInfo targetMethod =
-            property.PropertyType.GetMethod(containerMethod, [targetType])
+        MethodInfo targetMethod = property.PropertyType.GetMethod(containerMethod, [targetType])
             ?? throw ThrowHelper.New<InternalErrorException>(
                 this,
                 InternalErrors.ContainerMethodNotFoundOnObject,

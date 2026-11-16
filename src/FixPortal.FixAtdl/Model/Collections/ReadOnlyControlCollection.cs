@@ -299,8 +299,8 @@ public class ReadOnlyControlCollection : IParentable<Strategy_t>, IEnumerable<Co
 
         // ponytail: linear scan per radio, index groups if layouts grow beyond ordinary forms.
         return candidates.FirstOrDefault(candidate =>
-                candidate.ParameterRef == radio.ParameterRef && candidate.GetCurrentValue() is true
-            ) ?? control;
+            candidate.ParameterRef == radio.ParameterRef && candidate.GetCurrentValue() is true
+        ) ?? control;
     }
 
     /// <summary>

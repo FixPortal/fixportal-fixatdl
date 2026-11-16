@@ -232,8 +232,7 @@ public static class StateRuleCorpus
     public static IReadOnlyList<StateRuleCorpusCase> Load(string filePath)
     {
         var json = File.ReadAllText(filePath);
-        var raw =
-            JsonSerializer.Deserialize<RawCase[]>(json, JsonOpts)
+        var raw = JsonSerializer.Deserialize<RawCase[]>(json, JsonOpts)
             ?? throw new InvalidOperationException("state-rule-cases.json deserialised to null.");
 
         var result = new List<StateRuleCorpusCase>(raw.Length);

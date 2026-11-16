@@ -63,9 +63,7 @@ public class ClockTimeZoneTests
 
         // Local display is 08:00 Berlin wall-clock (DateTime equality is Kind-insensitive).
         // GetCurrentValue returns ToDateTimeUnspecified, so match its Kind.
-        ((DateTime)clock.GetCurrentValue())
-            .Should()
-            .Be(new DateTime(2026, 1, 15, 8, 0, 0, DateTimeKind.Unspecified));
+        ((DateTime)clock.GetCurrentValue()).Should().Be(new DateTime(2026, 1, 15, 8, 0, 0, DateTimeKind.Unspecified));
     }
 
     [Fact]
@@ -472,9 +470,7 @@ public class ClockTimeZoneTests
     public void InitValueClock_accepts_fractional_seconds_of_any_precision(string raw, int expectedMilliseconds)
     {
         // Fractional seconds are not pinned to exactly 3 digits: ".5", ".25" and ".5000" all parse.
-        new InitValueClock(raw)
-            .TimeOfDay!.Value.Millisecond.Should()
-            .Be(expectedMilliseconds);
+        new InitValueClock(raw).TimeOfDay!.Value.Millisecond.Should().Be(expectedMilliseconds);
     }
 
     [Fact]
