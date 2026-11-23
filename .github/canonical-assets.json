@@ -2,8 +2,8 @@
   "schema": 1,
   "canonical": {
     "repository": "FixPortal/fixportal-agents-skills",
-    "commit": "a5599589ee609c516fa8832f1b9e89e984309388",
-    "syncedAt": "2026-11-22"
+    "commit": "d3e7b1f5056055f91856d4b4b7858677b0ecbc31",
+    "syncedAt": "2026-11-23"
   },
   "assets": [
     {
@@ -162,10 +162,10 @@
     },
     {
       "path": ".github/scripts/Find-PesterSuites.ps1",
-      "sha256": "17463c0276a020a9b5d2d0363474537fa25520bf182431593dd0f44879874052",
+      "sha256": "a70025a8270cd0c3cf24a9c489ea3e54bedc97d6a8d82746fa1e1c557d0e1a38",
       "verbatim": true,
-      "commit": "e3f76d85cb1ad93a539a5e675bbfa5406155e104",
-      "syncedAt": "2026-11-08"
+      "commit": "d3e7b1f5056055f91856d4b4b7858677b0ecbc31",
+      "syncedAt": "2026-11-23"
     },
     {
       "path": ".github/scripts/Test-PowerShellTestSafety.ps1",

@@ -147,7 +147,8 @@ function Get-PesterRisk {
         }
     }
     foreach ($ast in $tree.FindAll({ $args[0] -is [System.Management.Automation.Language.InvokeMemberExpressionAst] }, $true)) {
-        $member = $ast.Member.Extent.Text
+        # A quoted member name keeps its quotes in the extent text; the constant's Value is the bare name.
+        $member = if ($ast.Member -is [System.Management.Automation.Language.StringConstantExpressionAst]) { $ast.Member.Value } else { $ast.Member.Extent.Text }
         if ($member -in 'Delete', 'DeleteDirectory') {
             $callArguments = if ($ast.Arguments) { @($ast.Arguments) } else { @() }
             # Directory.Delete(path, recursive) is static; DirectoryInfo.Delete(recursive) is an instance call, so the flag moves to argument 0.
